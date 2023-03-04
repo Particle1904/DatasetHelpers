@@ -18,7 +18,7 @@ namespace DatasetHelpers.Services
         private PredictionEngine<InputData, OutputData> _predictionEngine;
 
         private string[] _tags;
-        private const float _tagThreshhold = 0.35f;
+        private const float _tagThreshhold = 0.5f;
 
         public string ModelPath
         {
