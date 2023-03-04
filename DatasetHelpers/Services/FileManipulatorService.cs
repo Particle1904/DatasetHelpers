@@ -52,7 +52,7 @@ namespace DatasetHelpers.Services
                 Console.WriteLine($"Current image: {fileName}");
                 using (Image image = Image.Load(file))
                 {
-                    if (image.Bounds.Width <= minimumSize || image.Bounds.Height <= minimumSize)
+                    if (image.Bounds.Width <= minimumSize && image.Bounds.Height <= minimumSize)
                     {
                         File.Move(file, $"{discardedOutputPath}/{fileName}");
                         Console.WriteLine($"Image {fileName} with size {image.Width}x{image.Height} is lower than the minimum value of {minimumSize}x{minimumSize}.");
@@ -77,10 +77,9 @@ namespace DatasetHelpers.Services
 
             ResizeOptions resizeOptions = new ResizeOptions()
             {
-                Size = new Size(512),
                 Mode = ResizeMode.BoxPad,
                 Position = AnchorPositionMode.Center,
-                Sampler = new LanczosResampler(9),
+                Sampler = new LanczosResampler(3),
                 Compand = true,
                 PadColor = Color.White
             };
@@ -95,6 +94,7 @@ namespace DatasetHelpers.Services
 
                 using (Image image = Image.Load(file))
                 {
+                    resizeOptions.Size = CalculateTargetImageSize(image, 512);
                     Console.WriteLine($"Resizing image of size {image.Width}x{image.Height} to {resizeOptions.Size.Width}x{resizeOptions.Size.Height}");
                     image.Mutate(image => image.Resize(resizeOptions));
                     string[] fileNameSplit = fileName.Split(".");
@@ -109,6 +109,25 @@ namespace DatasetHelpers.Services
         private string GetFilenameAndExtension(string filePath)
         {
             return filePath.Substring(filePath.LastIndexOf(@"\") + 1);
+        }
+
+        private Size CalculateTargetImageSize(Image image, int targetSize)
+        {
+            int targetWidth = image.Width;
+            int targetHeight = image.Height;
+
+            if (targetWidth > targetSize)
+            {
+                targetWidth = targetSize;
+                targetHeight = (int)((float)targetWidth * image.Height / image.Width);
+            }
+            if (targetHeight > targetSize)
+            {
+                targetHeight = targetSize;
+                targetWidth = (int)((float)targetHeight * image.Width / image.Height);
+            }
+
+            return new Size(targetWidth, targetHeight);
         }
     }
 }
