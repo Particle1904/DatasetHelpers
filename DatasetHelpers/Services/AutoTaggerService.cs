@@ -40,6 +40,10 @@ namespace DatasetHelpers.Services
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<InputData, OutputData>(_predictionPipe);
 
             LoadTags(csvPath);
+            for (int i = 0; i < _tags.Length; i++)
+            {
+                _tags[i] = _tags[i].Replace("_", " ");
+            }
         }
 
         public ITransformer GetPredictionPipeline()
@@ -54,7 +58,7 @@ namespace DatasetHelpers.Services
             return _pipeline.Fit(emptyDv);
         }
 
-        public List<string> GenerateTags(string imagePath)
+        public List<string> GetOrderedByScoreListOfTags(string imagePath)
         {
             Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
 
@@ -73,9 +77,14 @@ namespace DatasetHelpers.Services
 
             List<string> listOrdered = new List<string>();
 
-            foreach (var item in sortedDict)
+            foreach (KeyValuePair<string, float> item in sortedDict)
             {
                 listOrdered.Add(item.Key);
+            }
+
+            foreach (string item in listOrdered)
+            {
+                item.Replace("_", " ");
             }
 
             return listOrdered;
@@ -101,8 +110,6 @@ namespace DatasetHelpers.Services
 
                 image.Mutate(image => image.Resize(resizeOptions));
 
-                image.SaveAsPng("C:\\Users\\Leonardo\\Downloads\\1.png");
-
                 image.ProcessPixelRows(accessor =>
                 {
                     for (int y = 0; y < accessor.Height; y++)
@@ -121,7 +128,6 @@ namespace DatasetHelpers.Services
                         }
                     }
                 });
-                image.SaveAsPng("C:\\Users\\Leonardo\\Downloads\\2.png");
             }
 
             var prediction = _predictionEngine.Predict(inputData);

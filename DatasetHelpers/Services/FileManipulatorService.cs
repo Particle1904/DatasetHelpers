@@ -1,9 +1,28 @@
-﻿using SixLabors.ImageSharp.Processing.Processors.Transforms;
+﻿using DatasetHelpers.Models;
+
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 namespace DatasetHelpers.Services
 {
     public class FileManipulatorService
     {
+        private const ushort _divisor = 64;
+        private int _baseResolution = 512;
+        private int _lanczosSamplerRadius = 3;
+
+        public int BlocksPerRow { get; private set; }
+        private int _totalBlocks;
+        Dictionary<double, int> _aspectRatioToBlocks;
+
+        private int _processedImages;
+
+        public FileManipulatorService()
+        {
+            int BlocksPerRow = _baseResolution / _divisor;
+            _totalBlocks = BlocksPerRow * BlocksPerRow;
+            _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
+        }
+
         public void RenameAllToCrescent(string path)
         {
             string[] files = Directory.GetFiles(path);
@@ -11,31 +30,38 @@ namespace DatasetHelpers.Services
 
             if (files.Length > 0)
             {
-                Console.WriteLine($"Starting the rename process... Found {files.Length} files.");
-                for (int i = 0; i < files.Length; i++)
+                try
                 {
-                    string[] extension = files[i].Split(".");
-                    Console.WriteLine($"Renaming file from {files[i]} to {i + 1}.{extension.LastOrDefault()}");
-                    File.Move(files[i], $"{path}/{i + 1}.{extension.LastOrDefault()}");
+                    Console.WriteLine($"Starting the rename process... Found {files.Length} files.");
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        string extension = Path.GetExtension(files[i]);
+                        Console.WriteLine($"Renaming file from {files[i]} to {i + 1}.{extension}");
+                        string newFilePath = Path.Combine(path, $"{i + 1}{extension}");
+                        File.Move(files[i], newFilePath);
+                    }
                 }
-                Console.WriteLine($"Rename process finished!");
+                catch (Exception exception)
+                {
+                    Console.WriteLine($"An exception of name {exception.GetType} occured!");
+                    Console.WriteLine($"Message: {exception.Message}");
+                }
             }
+
+            Console.WriteLine($"Rename process finished!");
         }
 
-        public void CreateFolder(string folderName)
+        public void CreateFolderIfNotExist(string folderName)
         {
-            string path = $"{Environment.CurrentDirectory}/{folderName}";
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            string path = Path.Combine(Environment.CurrentDirectory, folderName);
+            Directory.CreateDirectory(path);
         }
 
         public void CreateFolders(string[] foldersName)
         {
             foreach (string folderName in foldersName)
             {
-                CreateFolder(folderName);
+                CreateFolderIfNotExist(folderName);
             }
         }
 
@@ -48,19 +74,21 @@ namespace DatasetHelpers.Services
 
             foreach (string file in files)
             {
-                string fileName = GetFilenameAndExtension(file);
+                string fileName = Path.GetFileName(file);
                 Console.WriteLine($"Current image: {fileName}");
                 using (Image image = Image.Load(file))
                 {
                     if (image.Bounds.Width <= minimumSize && image.Bounds.Height <= minimumSize)
                     {
-                        File.Move(file, $"{discardedOutputPath}/{fileName}");
+                        string path = Path.Combine(discardedOutputPath, fileName);
+                        File.Move(file, path);
                         Console.WriteLine($"Image {fileName} with size {image.Width}x{image.Height} is lower than the minimum value of {minimumSize}x{minimumSize}.");
                         Console.WriteLine($"Image will be marked as Discarded and will be moved to the appropriate folder.");
                     }
                     else
                     {
-                        File.Move(file, $"{selectedOutputPath}/{fileName}");
+                        string path = Path.Combine(selectedOutputPath, fileName);
+                        File.Move(file, path);
                         Console.WriteLine($"Image {fileName} with size {image.Width}x{image.Height} is bigger than the minimum value of {minimumSize}x{minimumSize}.");
                         Console.WriteLine($"Image will be marked as Selected and will be moved to the appropriate folder.");
                     }
@@ -75,59 +103,129 @@ namespace DatasetHelpers.Services
         {
             string[] files = Directory.GetFiles(inputPath);
 
-            ResizeOptions resizeOptions = new ResizeOptions()
-            {
-                Mode = ResizeMode.BoxPad,
-                Position = AnchorPositionMode.Center,
-                Sampler = new LanczosResampler(3),
-                Compand = true,
-                PadColor = Color.White
-            };
-
-            Console.WriteLine($"Starting the Resize process with sampler: {nameof(resizeOptions.Sampler)}.");
             Console.WriteLine($"{files.Length} images found.");
 
-            foreach (string file in files)
-            {
-                string fileName = GetFilenameAndExtension(file);
-                Console.WriteLine($"Current image: {fileName}");
+            CountdownEvent countdown = new CountdownEvent(files.Length);
 
-                using (Image image = Image.Load(file))
+            foreach (var file in files)
+            {
+                ResizeParams parameters = new ResizeParams()
                 {
-                    resizeOptions.Size = CalculateTargetImageSize(image, 512);
-                    Console.WriteLine($"Resizing image of size {image.Width}x{image.Height} to {resizeOptions.Size.Width}x{resizeOptions.Size.Height}");
-                    image.Mutate(image => image.Resize(resizeOptions));
-                    string[] fileNameSplit = fileName.Split(".");
-                    image.SaveAsPng($"{outputPath}/{fileNameSplit[0]}.png");
-                    Console.WriteLine($"Image {fileName} was resized and saved to the appropriate folder.");
+                    InputPath = inputPath,
+                    OutputPath = outputPath,
+                    FilePath = file,
+                    CountdownEvent = countdown
+                };
 
+                ThreadPool.QueueUserWorkItem(ResizeImage, parameters);
+            }
+
+            countdown.Wait();
+        }
+
+        private void ResizeImage(object state)
+        {
+            ResizeParams parameters = (ResizeParams)state;
+
+            string file = parameters.FilePath;
+            string fileName = Path.GetFileName(parameters.FilePath);
+            string inputPath = parameters.InputPath;
+            string outputPath = parameters.OutputPath;
+
+            using (Image image = Image.Load(file))
+            {
+                double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
+
+                int bucket = FindAspectRatioBucket(aspectRatio);
+                int blocks = _aspectRatioToBlocks.Values.Sum();
+
+                double bucketFraction = 0.0;
+                if (_aspectRatioToBlocks.ContainsKey(bucket))
+                {
+                    bucketFraction = _aspectRatioToBlocks[bucket] / (double)blocks;
                 }
-                Console.WriteLine($"Resize process finished!");
+                else
+                {
+                    bucketFraction = 1.0 / (double)blocks;
+                }
+
+                double targetAspectRatio = Math.Sqrt(bucketFraction);
+
+                int targetWidth;
+                int targetHeight;
+
+                if (image.Width > image.Height)
+                {
+                    targetWidth = Math.Min(image.Width, 512);
+                    targetHeight = (int)Math.Round(targetWidth / aspectRatio);
+                }
+                else
+                {
+                    targetHeight = Math.Min(image.Height, 512);
+                    targetWidth = (int)Math.Round(targetHeight * aspectRatio);
+                }
+
+                Console.WriteLine($"File: {fileName} | Aspect Ratio: {aspectRatio} | Bucket: {bucket} | TWidth: {targetWidth} | THeight: {targetHeight}");
+
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = new LanczosResampler(_lanczosSamplerRadius),
+                    Compand = true,
+                    PadColor = Color.White,
+                    Size = new Size(targetWidth, targetHeight)
+                };
+
+                Console.WriteLine($"Resizing image of size {image.Width}x{image.Height} to {resizeOptions.Size.Width}x{resizeOptions.Size.Height}");
+                image.Mutate(image => image.Resize(resizeOptions));
+                image.SaveAsPng(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"));
+                Console.WriteLine($"Image {fileName} was resized and saved to the appropriate folder.");
             }
+
+            parameters.CountdownEvent.Signal();
         }
 
-        private string GetFilenameAndExtension(string filePath)
+        private int FindAspectRatioBucket(double aspectRatio)
         {
-            return filePath.Substring(filePath.LastIndexOf(@"\") + 1);
+            foreach (var aspectRatioRange in _aspectRatioToBlocks.Keys.OrderByDescending(k => k))
+            {
+                if (aspectRatio >= aspectRatioRange)
+                {
+                    return _aspectRatioToBlocks[aspectRatioRange];
+                }
+            }
+
+            return _totalBlocks;
         }
 
-        private Size CalculateTargetImageSize(Image image, int targetSize)
+        private Dictionary<double, int> CalculateBuckets(int totalBlocks)
         {
-            int targetWidth = image.Width;
-            int targetHeight = image.Height;
+            Dictionary<double, int> aspectRatioToBlocks = new Dictionary<double, int>();
 
-            if (targetWidth > targetSize)
-            {
-                targetWidth = targetSize;
-                targetHeight = (int)((float)targetWidth * image.Height / image.Width);
-            }
-            if (targetHeight > targetSize)
-            {
-                targetHeight = targetSize;
-                targetWidth = (int)((float)targetHeight * image.Width / image.Height);
-            }
+            aspectRatioToBlocks[1.0f] = totalBlocks;
+            aspectRatioToBlocks[4.0f / 3.0f] = CalculateBlocksForAspectRatio(totalBlocks, 4.0f, 3.0f);
+            aspectRatioToBlocks[3.0f / 2.0f] = CalculateBlocksForAspectRatio(totalBlocks, 3.0f, 2.0f);
+            aspectRatioToBlocks[1.0f / 1.5f] = CalculateBlocksForAspectRatio(totalBlocks, 1.0f, 1.5f);
+            aspectRatioToBlocks[1.0f / 1.85f] = CalculateBlocksForAspectRatio(totalBlocks, 1.0f, 1.85f);
+            aspectRatioToBlocks[2.39f / 1.0f] = CalculateBlocksForAspectRatio(totalBlocks, 2.39f, 1.0f);
+            aspectRatioToBlocks[4.0f / 5.0f] = CalculateBlocksForAspectRatio(totalBlocks, 4.0f, 5.0f);
+            aspectRatioToBlocks[3.0f / 4.0f] = CalculateBlocksForAspectRatio(totalBlocks, 3.0f, 4.0f);
+            aspectRatioToBlocks[2.0f / 3.0f] = CalculateBlocksForAspectRatio(totalBlocks, 2.0f, 3.0f);
 
-            return new Size(targetWidth, targetHeight);
+            return aspectRatioToBlocks;
+        }
+
+        private int CalculateBlocksForAspectRatio(int totalBlocks, float width, float height)
+        {
+            double aspectRatio = width / (double)height;
+            double targetArea = totalBlocks * _baseResolution * _baseResolution;
+
+            int targetWidth = (int)Math.Min(_baseResolution, Math.Sqrt(targetArea * aspectRatio));
+            int targetHeight = (int)Math.Min(_baseResolution, Math.Sqrt(targetArea / aspectRatio));
+
+            int blocks = (int)Math.Ceiling(targetWidth * targetHeight / (double)_baseResolution);
+            return blocks;
         }
     }
 }
