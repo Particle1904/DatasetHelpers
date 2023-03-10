@@ -137,6 +137,7 @@ namespace DatasetHelpers.Services
                 double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
 
                 int bucket = FindAspectRatioBucket(aspectRatio);
+
                 int blocks = _aspectRatioToBlocks.Values.Sum();
 
                 double bucketFraction = 0.0;

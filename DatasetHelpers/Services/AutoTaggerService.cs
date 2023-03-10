@@ -18,7 +18,7 @@ namespace DatasetHelpers.Services
         private PredictionEngine<InputData, OutputData> _predictionEngine;
 
         private string[] _tags;
-        private const float _tagThreshhold = 0.5f;
+        private float _tagThreshold = 0.2f;
 
         public string ModelPath
         {
@@ -67,7 +67,7 @@ namespace DatasetHelpers.Services
 
             for (int i = 0; i < values.Length; i++)
             {
-                if (values[i] > _tagThreshhold)
+                if (values[i] > _tagThreshold)
                 {
                     predictionsDict.Add(_tags[i], values[i]);
                 }
@@ -92,6 +92,7 @@ namespace DatasetHelpers.Services
 
         private VBuffer<float> GetPrediction(string imagePath)
         {
+            Console.WriteLine($"Making predictions using a threshold of {_tagThreshold}");
             InputData inputData = new InputData();
             inputData.Input_1 = new float[448 * 448 * 3];
             int index = 0;
@@ -140,6 +141,11 @@ namespace DatasetHelpers.Services
             {
                 _tags = File.ReadAllLines(csvPath);
             }
+        }
+
+        public void LoadConfigs(Config configs)
+        {
+            _tagThreshold = configs.TaggerThreshold;
         }
     }
 }

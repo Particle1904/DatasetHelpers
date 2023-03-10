@@ -44,6 +44,8 @@ namespace DatasetHelpers.Services
                 tagsResult.RemoveAll(x => negativeTag.Equals(x));
             }
 
+            //tagsResult.Remove("sensitive");
+
             return string.Join(", ", tagsResult);
         }
 

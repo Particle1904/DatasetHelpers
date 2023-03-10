@@ -8,6 +8,9 @@ namespace DatasetHelpers
     {
         static async Task Main(string[] args)
         {
+            ConfigsService _configs = new ConfigsService();
+            _configs.LoadConfigurations();
+
             Stopwatch _stopWatch = new Stopwatch();
             _stopWatch.Start();
             string _mainPath = Environment.CurrentDirectory;
@@ -27,19 +30,20 @@ namespace DatasetHelpers
 
             string _combinedOutput = $"CombinedOutput";
 
-            FileManipulatorService fileService = new FileManipulatorService();
+            FileManipulatorService _fileService = new FileManipulatorService();
             AutoTaggerService _taggerService = new AutoTaggerService(_modelPath, _tagsPath);
+            _taggerService.LoadConfigs(_configs.Configurations);
             TagHelper _tagHelper = new TagHelper(_textInput, _combinedOutput);
 
-            fileService.CreateFolderIfNotExist(_imagesFolder);
-            fileService.CreateFolderIfNotExist(_imagesOutput);
-            fileService.CreateFolderIfNotExist(_imagesDiscardedOutput);
-            fileService.CreateFolderIfNotExist(_imagesSelectedOutput);
-            fileService.CreateFolderIfNotExist(_imagesResizedOutput);
-            fileService.CreateFolderIfNotExist(_combinedOutput);
+            _fileService.CreateFolderIfNotExist(_imagesFolder);
+            _fileService.CreateFolderIfNotExist(_imagesOutput);
+            _fileService.CreateFolderIfNotExist(_imagesDiscardedOutput);
+            _fileService.CreateFolderIfNotExist(_imagesSelectedOutput);
+            _fileService.CreateFolderIfNotExist(_imagesResizedOutput);
+            _fileService.CreateFolderIfNotExist(_combinedOutput);
 
-            fileService.SortImages(_imagesFolder, _imagesDiscardedOutput, _imagesSelectedOutput);
-            fileService.ResizeImages(_imagesSelectedOutput, _imagesResizedOutput);
+            _fileService.SortImages(_imagesFolder, _imagesDiscardedOutput, _imagesSelectedOutput);
+            _fileService.ResizeImages(_imagesSelectedOutput, _imagesResizedOutput);
 
             string[] treatedDataset = Directory.GetFiles(_imagesResizedOutput);
 
