@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dataset_Processor_Desktop.MainPage"
+             xmlns:local="clr-namespace:Dataset_Processor_Desktop.src.ViewModel"
+             xmlns:views="clr-namespace:Dataset_Processor_Desktop.src.Views">
+    <ContentPage.BindingContext>
+        <local:MainPageViewModel/>
+    </ContentPage.BindingContext>
+    <Grid x:Name="GridMainPage">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackLayout x:Name="FlyoutStackLayout"
+                     Grid.Column="0"
+                     BackgroundColor="Gray">
+            <Button Text="Sort Images"
+                    Command="{Binding NavigateToDatasetSortCommand}"/>
+            <Button Text="Settings"
+                    Command="{Binding NavigateToSettingsCommand}"/>
+        </StackLayout>
+
+        <StackLayout x:Name="MainPageStackLayout"
+                     Grid.Column="1"
+                     BackgroundColor="DarkGray">
+            <ContentView Content="{Binding DynamicContentView}"/>
+        </StackLayout>        
+    </Grid>
+</ContentPage>
