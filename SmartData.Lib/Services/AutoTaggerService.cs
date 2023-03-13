@@ -6,7 +6,7 @@ using Microsoft.ML.Transforms.Onnx;
 
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
-namespace DatasetHelpers.Services
+namespace SmartData.Lib.Services
 {
     public class AutoTaggerService
     {

@@ -2,12 +2,10 @@
 
 namespace Dataset_Processor_Desktop.src.Utilities
 {
-    class RelayCommand : ICommand
+    public class RelayCommand : ICommand
     {
         private readonly Action _execute;
-
         private readonly Func<bool> _canExecute;
-        private readonly Func<Task> _canExecuteAsync;
 
         public event EventHandler CanExecuteChanged;
 

@@ -1,4 +1,4 @@
-﻿namespace DatasetHelpers.Models
+﻿namespace SmartData.Lib.Models
 {
     public class Config
     {

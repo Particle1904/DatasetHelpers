@@ -1,13 +1,14 @@
-﻿using Dataset_Processor_Desktop.src.Utilities;
+﻿using Dataset_Processor_Desktop.src.Interfaces;
+using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.Views;
-
-using System.ComponentModel;
-using System.Windows.Input;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
-    public class MainPageViewModel : INotifyPropertyChanged
+    public class MainPageViewModel : BaseViewModel
     {
+        private readonly IFolderPickerService _folderPickerService;
+        public IFolderPickerService FolderPickerService { get; set; }
+
         #region Definition of App Views.
         private View _dynamicContentView;
 
@@ -18,10 +19,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public View DynamicContentView
         {
-            get
-            {
-                return _dynamicContentView;
-            }
+            get => _dynamicContentView;
             set
             {
                 _dynamicContentView = value;
@@ -29,13 +27,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public ICommand NavigateToSettingsCommand { get; private set; }
-        public ICommand NavigateToDatasetSortCommand { get; private set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        public RelayCommand NavigateToSettingsCommand { get; private set; }
+        public RelayCommand NavigateToDatasetSortCommand { get; private set; }
 
         public MainPageViewModel()
         {
+            _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();
+
             _welcomePage = new WelcomeView();
             _dynamicContentView = _welcomePage;
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsPage);
@@ -55,14 +53,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_datasetSortView == null)
             {
-                _datasetSortView = new DatasetSortView();
+                _datasetSortView = new DatasetSortView(_folderPickerService);
             }
             DynamicContentView = _datasetSortView;
-        }
-
-        public virtual void OnPropertyChanged(string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

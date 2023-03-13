@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace DatasetHelpers.Services
+namespace SmartData.Lib.Services
 {
     public class TagHelper
     {

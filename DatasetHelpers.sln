@@ -5,9 +5,9 @@ VisualStudioVersion = 17.5.33414.496
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatasetHelpers", "DatasetHelpers\DatasetHelpers.csproj", "{F3B28993-6359-4DDB-BF37-43736E645C12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dataset Processor Desktop", "Dataset Processor Desktop\Dataset Processor Desktop.csproj", "{E1596D7C-4138-4D77-AE12-E6D470524DB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dataset Processor Desktop", "Dataset Processor Desktop\Dataset Processor Desktop.csproj", "{E1596D7C-4138-4D77-AE12-E6D470524DB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartData.Lib", "SmartData.Lib\SmartData.Lib.csproj", "{FE346AF3-A75E-406D-BBC9-0B302C8A28A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartData.Lib", "SmartData.Lib\SmartData.Lib.csproj", "{FE346AF3-A75E-406D-BBC9-0B302C8A28A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

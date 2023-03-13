@@ -2,10 +2,59 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.DatasetSortView">
-    <VerticalStackLayout>
-        <Label 
-            Text="THIS IS THE SORT VIEW"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
+          ColumnSpacing="30" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Sort images"/>
+
+        <Button x:Name="SelectFolderButton" Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource Primary}"
+                Command="{Binding SelectFolderCommand}"
+                Text="Select folder:"/>
+
+        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox x:Name="BackupFilesCheckBox" Grid.Row="0" Grid.Column="0"/>
+            <Label x:Name="BackupFilesLabel" Grid.Row="0" Grid.Column="1"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   Text="Backup images before processing?"/>
+        </Grid>
+
+        <Label Grid.Row="2" Grid.Column="0"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Text="Selected folder:"/>
+
+        <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="{Binding SelectedFolderPath}"/>
+
+        <ListView ItemsSource="{Binding }"/>
+
+    </Grid>
 </ContentView>

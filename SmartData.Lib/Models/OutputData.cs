@@ -1,6 +1,6 @@
 ﻿using Microsoft.ML.Data;
 
-namespace DatasetHelpers.Models
+namespace SmartData.Lib.Models
 {
     public class OutputData
     {

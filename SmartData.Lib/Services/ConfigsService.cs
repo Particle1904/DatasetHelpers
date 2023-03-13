@@ -1,6 +1,6 @@
 ﻿using DatasetHelpers.Models;
 
-namespace DatasetHelpers.Services
+namespace SmartData.Lib.Services
 {
     public class ConfigsService
     {
