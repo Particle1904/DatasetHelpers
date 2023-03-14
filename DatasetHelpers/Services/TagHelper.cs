@@ -60,7 +60,7 @@ namespace DatasetHelpers.Services
 
                 foreach (string splittedTag in split)
                 {
-                    string match = tags.Keys.FirstOrDefault(x => x.Equals(splittedTag));
+                    string? match = tags.Keys.FirstOrDefault(x => x.Equals(splittedTag));
                     if (match == null)
                     {
                         tags.Add(splittedTag, 1);

@@ -1,10 +1,11 @@
 ﻿using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
+using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
-    public class ImageProcessorService
+    public class ImageProcessorService : IImageProcessorService
     {
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
@@ -23,6 +24,14 @@ namespace SmartData.Lib.Services
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
         }
 
+        /// <summary>
+        /// Resizes all images in a given input directory and saves the resized images to an output directory.
+        /// </summary>
+        /// <param name="inputPath">The path to the directory containing the input images.</param>
+        /// <param name="outputPath">The path to the directory where the resized images will be saved.</param>
+        /// <remarks>
+        /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
+        /// </remarks>
         public void ResizeImages(string inputPath, string outputPath)
         {
             string[] files = Directory.GetFiles(inputPath);
@@ -45,6 +54,13 @@ namespace SmartData.Lib.Services
             countdown.Wait();
         }
 
+        /// <summary>
+        /// Resizes a single image to a target aspect ratio and saves it as a PNG file.
+        /// </summary>
+        /// <param name="state">The state object passed to the thread pool.</param>
+        /// <remarks>
+        /// This method resizes an image to a target aspect ratio based on a predetermined set of aspect ratio buckets. The target aspect ratio is calculated based on the number of blocks assigned to each aspect ratio bucket. The resized image is saved as a PNG file in the output directory.
+        /// </remarks>
         private void ResizeImage(object state)
         {
             ResizeParams parameters = (ResizeParams)state;
@@ -105,6 +121,14 @@ namespace SmartData.Lib.Services
             parameters.CountdownEvent.Signal();
         }
 
+        /// <summary>
+        /// Calculates the number of blocks assigned to each aspect ratio bucket.
+        /// </summary>
+        /// <param name="totalBlocks">The total number of blocks to be assigned across all aspect ratio buckets.</param>
+        /// <returns>A dictionary containing the number of blocks assigned to each aspect ratio bucket.</returns>
+        /// <remarks>
+        /// This method calculates the number of blocks assigned to each aspect ratio bucket based on a predetermined set of aspect ratios. The number of blocks assigned to each bucket is proportional to the area of images with that aspect ratio in the input directory.
+        /// </remarks>
         private Dictionary<double, int> CalculateBuckets(int totalBlocks)
         {
             Dictionary<double, int> aspectRatioToBlocks = new Dictionary<double, int>();
@@ -122,6 +146,16 @@ namespace SmartData.Lib.Services
             return aspectRatioToBlocks;
         }
 
+        /// <summary>
+        /// Calculates the number of blocks required to represent an image with a target aspect ratio.
+        /// </summary>
+        /// <param name="totalBlocks">The total number of blocks to be assigned across all aspect ratio buckets.</param>
+        /// <param name="width">The width of the target aspect ratio.</param>
+        /// <param name="height">The height of the target aspect ratio.</param>
+        /// <returns>The number of blocks required to represent an image with the target aspect ratio.</returns>
+        /// <remarks>
+        /// This method calculates the number of blocks required to represent an image with the target aspect ratio. The target aspect ratio is used to calculate the target width and height of the image, and the number of blocks required to represent the image is calculated based on the target width and height.
+        /// </remarks>
         private int CalculateBlocksForAspectRatio(int totalBlocks, float width, float height)
         {
             double aspectRatio = width / (double)height;
@@ -134,6 +168,11 @@ namespace SmartData.Lib.Services
             return blocks;
         }
 
+        /// <summary>
+        /// Finds the aspect ratio bucket for the given aspect ratio.
+        /// </summary>
+        /// <param name="aspectRatio">The aspect ratio to find the bucket for.</param>
+        /// <returns>The bucket number that corresponds to the given aspect ratio. If no bucket is found, returns the total number of blocks.</returns>
         private int FindAspectRatioBucket(double aspectRatio)
         {
             foreach (var aspectRatioRange in _aspectRatioToBlocks.Keys.OrderByDescending(k => k))

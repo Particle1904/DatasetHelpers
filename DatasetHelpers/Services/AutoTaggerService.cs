@@ -40,7 +40,7 @@ namespace DatasetHelpers.Services
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<InputData, OutputData>(_predictionPipe);
 
             LoadTags(csvPath);
-            for (int i = 0; i < _tags.Length; i++)
+            for (int i = 0; i < _tags?.Length; i++)
             {
                 _tags[i] = _tags[i].Replace("_", " ");
             }

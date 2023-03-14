@@ -9,7 +9,7 @@ namespace DatasetHelpers
         static async Task Main(string[] args)
         {
             ConfigsService _configs = new ConfigsService();
-            _configs.LoadConfigurations();
+            await _configs.LoadConfigurations();
 
             Stopwatch _stopWatch = new Stopwatch();
             _stopWatch.Start();

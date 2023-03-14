@@ -2,11 +2,15 @@
 using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.Views;
 
+using SmartData.Lib.Interfaces;
+
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class MainPageViewModel : BaseViewModel
     {
         private readonly IFolderPickerService _folderPickerService;
+        private readonly IFileManipulatorService _fileManipulatorService;
+        private readonly IImageProcessorService _imageProcessorService;
         public IFolderPickerService FolderPickerService { get; set; }
 
         #region Definition of App Views.
@@ -33,6 +37,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public MainPageViewModel()
         {
             _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();
+            _fileManipulatorService = Application.Current.Handler.MauiContext.Services.GetService<IFileManipulatorService>();
+            _imageProcessorService = Application.Current.Handler.MauiContext.Services.GetService<IImageProcessorService>();
 
             _welcomePage = new WelcomeView();
             _dynamicContentView = _welcomePage;
@@ -53,7 +59,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_datasetSortView == null)
             {
-                _datasetSortView = new DatasetSortView(_folderPickerService);
+                _datasetSortView = new DatasetSortView(_folderPickerService, _fileManipulatorService);
             }
             DynamicContentView = _datasetSortView;
         }
