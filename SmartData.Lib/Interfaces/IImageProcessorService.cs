@@ -1,7 +1,11 @@
-﻿namespace SmartData.Lib.Interfaces
+﻿using SmartData.Lib.Enums;
+using SmartData.Lib.Helpers;
+
+namespace SmartData.Lib.Interfaces
 {
     public interface IImageProcessorService
     {
-        public void ResizeImages(string inputPath, string outputPath);
+        public Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension);
+        public Task ResizeImagesAsync(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension);
     }
 }

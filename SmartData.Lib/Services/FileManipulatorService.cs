@@ -5,6 +5,8 @@ namespace SmartData.Lib.Services
 {
     public class FileManipulatorService : IFileManipulatorService
     {
+        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+
         /// <summary>
         /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
         /// Only files with extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp" are considered to be image files.
@@ -12,7 +14,7 @@ namespace SmartData.Lib.Services
         /// <param name="path">The path to the directory containing the files to rename.</param>
         public void RenameAllToCrescent(string path)
         {
-            string[] imageFiles = Directory.GetFiles(path, "*.{jpg,jpeg,png,gif,webp}");
+            string[] imageFiles = Directory.GetFiles(path, _imageSearchPattern);
 
             if (imageFiles.Length > 0)
             {
@@ -51,7 +53,7 @@ namespace SmartData.Lib.Services
         /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
         public void RenameAllToCrescent(string path, Progress progress)
         {
-            string[] imageFiles = Directory.GetFiles(path, "*.{jpg,jpeg,png,gif,webp}");
+            string[] imageFiles = Directory.GetFiles(path, _imageSearchPattern);
 
             if (imageFiles.Length > 0)
             {
@@ -97,7 +99,7 @@ namespace SmartData.Lib.Services
         /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, int minimumSize = 512)
         {
-            string[] files = Directory.GetFiles(inputPath);
+            string[] files = Directory.GetFiles(inputPath, _imageSearchPattern);
             foreach (string file in files)
             {
                 string fileName = Path.GetFileName(file);
@@ -137,7 +139,7 @@ namespace SmartData.Lib.Services
         /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, Progress progress, int minimumSize = 512)
         {
-            string[] files = Directory.GetFiles(inputPath);
+            string[] files = Directory.GetFiles(inputPath, _imageSearchPattern);
 
             if (files.Length > 0)
             {
@@ -188,13 +190,14 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The full path of the directory containing the image files to backup.</param>
         /// <param name="backupPath">The full path of the directory to copy the image files to.</param>
         /// <exception cref="System.IO.IOException">Thrown when an I/O error occurs during file copying.</exception>
-        public void BackupFiles(string inputPath, string backupPath)
+        public async Task BackupFiles(string inputPath, string backupPath)
         {
-            string[] imageFiles = Directory.GetFiles(inputPath, "*.{jpg,jpeg,png,gif,webp}");
+            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
             foreach (var image in imageFiles)
             {
-                File.Copy(image, backupPath);
+                string finalPath = Path.Combine(Path.GetFileName(image), backupPath);
+                await Task.Run(() => File.Copy(image, finalPath));
             }
         }
     }

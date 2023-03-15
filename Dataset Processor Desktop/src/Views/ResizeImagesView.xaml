@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
+             x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
+          ColumnSpacing="30" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Resize images"/>
+
+        <Button Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding SelectInputFolderCommand}"
+                Text="Select Input folder:"/>
+        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="{Binding InputFolderPath}"/>
+
+        <Button Grid.Row="2" Grid.Column="0"
+                BackgroundColor="{StaticResource DarkPrimary}"
+                Command="{Binding SelectOutputFolderCommand}"
+                Text="Output Folder:"/>
+        <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="{Binding OutputFolderPath}"/>
+
+        <Label Grid.Row="3" Grid.Column="0"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="Select the maximum Dimension Size:"/>
+        <Picker Grid.Row="3" Grid.Column="1"
+                SelectedItem="{Binding Dimension}"
+                ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}"
+                VerticalOptions="Center">
+        </Picker>
+
+        <BoxView HeightRequest="1" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" 
+              BackgroundColor="{StaticResource Gray600}"/>
+
+        <Label Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Text="{Binding ResizeProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+
+        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
+                BackgroundColor="{StaticResource DarkPrimary}"
+                Command="{Binding ResizeImagesCommand}"
+                Text="Resize images!"/>
+
+        <ProgressBar Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+                     Progress="{Binding ResizeProgress.PercentFloat}"
+                     ProgressColor="{StaticResource DarkPrimary}"/>
+
+        <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center"
+               VerticalTextAlignment="Center"
+               FontSize="Medium"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="{Binding TaskStatusString}"/>
+    </Grid>
+</ContentView>

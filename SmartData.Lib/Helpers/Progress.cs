@@ -13,7 +13,11 @@ namespace SmartData.Lib.Helpers
         public int TotalFiles
         {
             get => _totalFiles;
-            set => _totalFiles = value;
+            set
+            {
+                _totalFiles = value;
+                OnPropertyChanged(nameof(TotalFiles));
+            }
         }
 
         public int PercentComplete
@@ -37,6 +41,9 @@ namespace SmartData.Lib.Helpers
             _percentComplete = 0;
         }
 
+        /// <summary>
+        /// Updates the progress tracker to reflect the completion of one file.
+        /// </summary>
         public void UpdateProgress()
         {
             _filesProcessed++;
@@ -45,6 +52,10 @@ namespace SmartData.Lib.Helpers
             OnPropertyChanged(nameof(PercentFloat));
         }
 
+        /// <summary>
+        /// Raises the <see cref="PropertyChanged"/> event for the specified property.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that changed.</param>
         public virtual void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -19,6 +19,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private View _welcomePage;
         private View _datasetSortView;
         private View _settingsView;
+        private View _resizeImagesView;
         #endregion
 
         public View DynamicContentView
@@ -33,6 +34,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public RelayCommand NavigateToSettingsCommand { get; private set; }
         public RelayCommand NavigateToDatasetSortCommand { get; private set; }
+        public RelayCommand NavigateToResizeImagesCommand { get; private set; }
 
         public MainPageViewModel()
         {
@@ -42,11 +44,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             _welcomePage = new WelcomeView();
             _dynamicContentView = _welcomePage;
-            NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsPage);
+            NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
             NavigateToDatasetSortCommand = new RelayCommand(NavigateToDatasetSortView);
+            NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
         }
 
-        public void NavigateToSettingsPage()
+        public void NavigateToSettingsView()
         {
             if (_settingsView == null)
             {
@@ -62,6 +65,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _datasetSortView = new DatasetSortView(_folderPickerService, _fileManipulatorService);
             }
             DynamicContentView = _datasetSortView;
+        }
+
+        public void NavigateToResizeImagesView()
+        {
+            if (_resizeImagesView == null)
+            {
+                _resizeImagesView = new ResizeImagesView(_folderPickerService, _imageProcessorService);
+            }
+            DynamicContentView = _resizeImagesView;
         }
     }
 }

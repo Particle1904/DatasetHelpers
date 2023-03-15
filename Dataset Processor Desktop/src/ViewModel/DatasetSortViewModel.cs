@@ -1,4 +1,5 @@
-﻿using Dataset_Processor_Desktop.src.Interfaces;
+﻿using Dataset_Processor_Desktop.src.Enums;
+using Dataset_Processor_Desktop.src.Interfaces;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Helpers;
@@ -81,7 +82,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectSelectedFolderCommand { get; private set; }
         public RelayCommand SelectDiscardedFolderCommand { get; private set; }
         public RelayCommand SelectBackupFolderCommand { get; private set; }
-
         public RelayCommand SortImagesCommand { get; private set; }
 
         public DatasetSortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService)
@@ -98,6 +98,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SelectDiscardedFolderCommand = new RelayCommand(async () => await SelectDiscardedFolderAsync());
             SelectBackupFolderCommand = new RelayCommand(async () => await SelectBackupFolderAsync());
             SortImagesCommand = new RelayCommand(async () => await SortImagesAsync());
+
+            TaskStatus = ProcessingStatus.Idle;
         }
 
         public async Task SelectInputFolderAsync()
@@ -144,7 +146,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 SortProgress = new Progress();
             }
 
+            if (BackupImages == true)
+            {
+                await _fileManipulatorService.BackupFiles(_inputFolderPath, _backupFolderPath);
+            }
+
+            TaskStatus = ProcessingStatus.Running;
             await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
+            TaskStatus = ProcessingStatus.Finished;
         }
     }
 }

@@ -14,6 +14,8 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -84,15 +86,26 @@
                    Text="Backup images before processing?"/>
         </Grid>
 
-        <Button Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Text="{Binding SortProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+
+        <Button Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SortImagesCommand}"
                 Text="Sort images!"/>
 
-        <ProgressBar Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding SortProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontSize="Medium"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="{Binding TaskStatusString}"/>
 
     </Grid>
 </ContentView>

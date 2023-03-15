@@ -1,12 +1,15 @@
 ﻿using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
+using SmartData.Lib.Enums;
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
     public class ImageProcessorService : IImageProcessorService
     {
+        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
         private int _lanczosSamplerRadius = 3;
@@ -14,8 +17,6 @@ namespace SmartData.Lib.Services
         public int BlocksPerRow { get; private set; }
         private int _totalBlocks;
         Dictionary<double, int> _aspectRatioToBlocks;
-
-        private int _processedImages;
 
         public ImageProcessorService()
         {
@@ -29,48 +30,78 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputPath">The path to the directory containing the input images.</param>
         /// <param name="outputPath">The path to the directory where the resized images will be saved.</param>
+        /// <param name="dimension">The target dimensions to resize the images to. Defaults to 512x512 resolution.</param>
         /// <remarks>
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
-        public void ResizeImages(string inputPath, string outputPath)
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            string[] files = Directory.GetFiles(inputPath);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
-            CountdownEvent countdown = new CountdownEvent(files.Length);
+            var tasks = new List<Task>();
 
             foreach (var file in files)
             {
-                ResizeParams parameters = new ResizeParams()
-                {
-                    InputPath = inputPath,
-                    OutputPath = outputPath,
-                    FilePath = file,
-                    CountdownEvent = countdown
-                };
-
-                ThreadPool.QueueUserWorkItem(ResizeImage, parameters);
+                tasks.Add(ResizeImageAsync(outputPath, file, dimension));
             }
 
-            countdown.Wait();
+            await Task.WhenAll(tasks);
         }
 
         /// <summary>
-        /// Resizes a single image to a target aspect ratio and saves it as a PNG file.
+        /// Resizes all images in a given input directory and saves the resized images to an output directory.
         /// </summary>
-        /// <param name="state">The state object passed to the thread pool.</param>
+        /// <param name="inputPath">The path to the directory containing the input images.</param>
+        /// <param name="outputPath">The path to the directory where the resized images will be saved.</param>
+        /// <param name="progress">An object used to report progress during the image resizing process.</param>
+        /// <param name="dimension">The target image dimension to resize the images to.</param>
         /// <remarks>
-        /// This method resizes an image to a target aspect ratio based on a predetermined set of aspect ratio buckets. The target aspect ratio is calculated based on the number of blocks assigned to each aspect ratio bucket. The resized image is saved as a PNG file in the output directory.
+        /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
-        private void ResizeImage(object state)
+        /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath, outputPath, or progress parameter is null.</exception>
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            ResizeParams parameters = (ResizeParams)state;
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
-            string file = parameters.FilePath;
-            string fileName = Path.GetFileName(parameters.FilePath);
-            string inputPath = parameters.InputPath;
-            string outputPath = parameters.OutputPath;
+            progress.TotalFiles = files.Length;
 
-            using (Image image = Image.Load(file))
+            var tasks = new List<Task>();
+            foreach (var file in files)
+            {
+                tasks.Add(ResizeImageAsync(outputPath, file, dimension)
+                     .ContinueWith(task =>
+                     {
+                         progress.UpdateProgress();
+                     }));
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Resizes an image to a target aspect ratio and saves it as a PNG file in the output directory.
+        /// </summary>
+        /// <param name="outputPath">The full path of the directory to save the resized image file in.</param>
+        /// <param name="inpuPath">The full path of the image file to resize.</param>
+        /// <param name="dimension">The maximum dimension (width or height) of the resized image. Defaults to 512.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation of resizing and saving the image file.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method resizes the input image file to a target aspect ratio based on a predetermined set of aspect ratio buckets. The target aspect ratio is calculated based on the number of blocks assigned to each aspect ratio bucket.
+        /// </para>
+        /// <para>
+        /// The resized image is saved as a PNG file in the output directory with the same name as the original file, but with the extension changed to ".png".
+        /// </para>
+        /// <para>
+        /// The maximum dimension (width or height) of the resized image can be specified using the optional `dimension` parameter. The default value is 512.
+        /// </para>
+        /// </remarks>
+        private async Task ResizeImageAsync(string outputPath, string inpuPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        {
+            string fileName = Path.GetFileName(inpuPath);
+
+            using (Image image = await Image.LoadAsync(inpuPath))
             {
                 double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
 
@@ -93,15 +124,31 @@ namespace SmartData.Lib.Services
                 int targetWidth;
                 int targetHeight;
 
-                if (image.Width > image.Height)
+                if (image.Width < (int)dimension && image.Height < (int)dimension)
                 {
-                    targetWidth = Math.Min(image.Width, 512);
-                    targetHeight = (int)Math.Round(targetWidth / aspectRatio);
+                    if (image.Width > image.Height)
+                    {
+                        targetWidth = (int)dimension;
+                        targetHeight = (int)Math.Round(targetWidth / aspectRatio);
+                    }
+                    else
+                    {
+                        targetHeight = (int)dimension;
+                        targetWidth = (int)Math.Round(targetHeight * aspectRatio);
+                    }
                 }
                 else
                 {
-                    targetHeight = Math.Min(image.Height, 512);
-                    targetWidth = (int)Math.Round(targetHeight * aspectRatio);
+                    if (image.Width > image.Height)
+                    {
+                        targetWidth = Math.Min(image.Width, (int)dimension);
+                        targetHeight = (int)Math.Round(targetWidth / aspectRatio);
+                    }
+                    else
+                    {
+                        targetHeight = Math.Min(image.Height, (int)dimension);
+                        targetWidth = (int)Math.Round(targetHeight * aspectRatio);
+                    }
                 }
 
                 ResizeOptions resizeOptions = new ResizeOptions()
@@ -114,11 +161,13 @@ namespace SmartData.Lib.Services
                     Size = new Size(targetWidth, targetHeight)
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
-                image.SaveAsPng(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"));
+                image.Mutate(image =>
+                {
+                    image.BackgroundColor(Color.White);
+                    image.Resize(resizeOptions);
+                });
+                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"));
             }
-
-            parameters.CountdownEvent.Signal();
         }
 
         /// <summary>

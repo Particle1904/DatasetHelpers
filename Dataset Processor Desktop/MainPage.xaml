@@ -17,6 +17,8 @@
                      Background="{StaticResource DarkSurface}">
             <Button Text="Sort Images"
                     Command="{Binding NavigateToDatasetSortCommand}"/>
+            <Button Text="Resize Images"
+                    Command="{Binding NavigateToResizeImagesCommand}"/>
             <Button Text="Settings"
                     Command="{Binding NavigateToSettingsCommand}"/>
         </StackLayout>
