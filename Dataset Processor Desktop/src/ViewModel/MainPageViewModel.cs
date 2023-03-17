@@ -11,6 +11,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IImageProcessorService _imageProcessorService;
+        private readonly IAutoTaggerService _autoTaggerService;
         public IFolderPickerService FolderPickerService { get; set; }
 
         #region Definition of App Views.
@@ -18,8 +19,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private View _welcomePage;
         private View _datasetSortView;
-        private View _settingsView;
         private View _resizeImagesView;
+        private View _tagGenerationView;
+        private View _settingsView;
         #endregion
 
         public View DynamicContentView
@@ -35,18 +37,21 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToSettingsCommand { get; private set; }
         public RelayCommand NavigateToDatasetSortCommand { get; private set; }
         public RelayCommand NavigateToResizeImagesCommand { get; private set; }
+        public RelayCommand NavigateToTagGenerationCommand { get; private set; }
 
         public MainPageViewModel()
         {
             _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();
             _fileManipulatorService = Application.Current.Handler.MauiContext.Services.GetService<IFileManipulatorService>();
             _imageProcessorService = Application.Current.Handler.MauiContext.Services.GetService<IImageProcessorService>();
+            _autoTaggerService = Application.Current.Handler.MauiContext.Services.GetService<IAutoTaggerService>();
 
             _welcomePage = new WelcomeView();
             _dynamicContentView = _welcomePage;
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
             NavigateToDatasetSortCommand = new RelayCommand(NavigateToDatasetSortView);
             NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
+            NavigateToTagGenerationCommand = new RelayCommand(NavigateToTagGenerationView);
         }
 
         public void NavigateToSettingsView()
@@ -71,9 +76,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_resizeImagesView == null)
             {
-                _resizeImagesView = new ResizeImagesView(_folderPickerService, _imageProcessorService);
+                _resizeImagesView = new ResizeImagesView(_folderPickerService, _fileManipulatorService, _imageProcessorService);
             }
             DynamicContentView = _resizeImagesView;
+        }
+
+        public void NavigateToTagGenerationView()
+        {
+            if (_tagGenerationView == null)
+            {
+                _tagGenerationView = new TagGenerationView(_folderPickerService, _fileManipulatorService, _autoTaggerService);
+            }
+            DynamicContentView = _tagGenerationView;
         }
     }
 }

@@ -5,6 +5,7 @@
         Idle,
         Running,
         Finished,
-        BackingUp
+        BackingUp,
+        LoadingModel
     }
 }

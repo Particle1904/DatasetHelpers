@@ -19,6 +19,8 @@
                     Command="{Binding NavigateToDatasetSortCommand}"/>
             <Button Text="Resize Images"
                     Command="{Binding NavigateToResizeImagesCommand}"/>
+            <Button Text="Generate Tags"
+                    Command="{Binding NavigateToTagGenerationCommand}"/>
             <Button Text="Settings"
                     Command="{Binding NavigateToSettingsCommand}"/>
         </StackLayout>

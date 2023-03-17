@@ -12,6 +12,10 @@ namespace Dataset_Processor_Desktop
     {
         public static MauiApp CreateMauiApp()
         {
+            string _modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
+            string _onnxFilename = "wdModel.onnx";
+            string _csvFilename = "wdTags.csv";
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
@@ -24,6 +28,11 @@ namespace Dataset_Processor_Desktop
             builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
             builder.Services.AddSingleton<IFileManipulatorService, FileManipulatorService>();
             builder.Services.AddSingleton<IImageProcessorService, ImageProcessorService>();
+            builder.Services.AddSingleton<IAutoTaggerService>(service =>
+            new AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                Path.Combine(_modelsPath, _onnxFilename),
+                Path.Combine(_modelsPath, _csvFilename)
+            ));
 
             return builder.Build();
         }

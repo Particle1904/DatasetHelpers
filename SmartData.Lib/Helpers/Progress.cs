@@ -52,11 +52,19 @@ namespace SmartData.Lib.Helpers
             OnPropertyChanged(nameof(PercentFloat));
         }
 
+        public void Reset()
+        {
+            _totalFiles = 0;
+            TotalFiles = 0;
+            PercentComplete = 0;
+
+        }
+
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event for the specified property.
         /// </summary>
         /// <param name="propertyName">The name of the property that changed.</param>
-        public virtual void OnPropertyChanged(string propertyName = null)
+        public virtual void OnPropertyChanged(string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

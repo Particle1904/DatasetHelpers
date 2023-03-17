@@ -5,22 +5,24 @@ using SmartData.Lib.Interfaces;
 
 namespace Dataset_Processor_Desktop.src.Views;
 
-public partial class ResizeImagesView : ContentView
+public partial class TagGenerationView : ContentView
 {
     private readonly IFolderPickerService _folderPickerService;
     private readonly IFileManipulatorService _fileManipulatorService;
-    private readonly IImageProcessorService _imageProcessorService;
+    private readonly IAutoTaggerService _autoTaggerService;
 
-    private ResizeImagesViewModel _viewModel;
-    public ResizeImagesView(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
+    private TagGenerationViewModel _viewModel;
+
+    public TagGenerationView(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService)
     {
         InitializeComponent();
 
         _folderPickerService = folderPickerService;
         _fileManipulatorService = fileManipulatorService;
-        _imageProcessorService = imageProcessorService;
+        _autoTaggerService = autoTaggerService;
 
-        _viewModel = new ResizeImagesViewModel(_folderPickerService, _fileManipulatorService, _imageProcessorService);
+        _viewModel = new TagGenerationViewModel(_folderPickerService, _fileManipulatorService, _autoTaggerService);
+
         BindingContext = _viewModel;
     }
 }

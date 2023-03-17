@@ -2,8 +2,8 @@
 {
     public class ResizeParams
     {
-        public string InputPath { get; set; }
-        public string OutputPath { get; set; }
-        public string FilePath { get; set; }
+        public string InputPath { get; set; } = String.Empty;
+        public string OutputPath { get; set; } = String.Empty;
+        public string FilePath { get; set; } = String.Empty;
     }
 }

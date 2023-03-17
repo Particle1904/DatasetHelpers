@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
-             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
-             x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
+             x:Class="Dataset_Processor_Desktop.src.Views.TagGenerationView">
     <Grid VerticalOptions="Center" HorizontalOptions="Center" 
           ColumnSpacing="30" RowSpacing="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
@@ -29,7 +27,7 @@
         <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                FontSize="Title"
-               Text="Resize images"/>
+               Text="Generate tags for images"/>
 
         <Button Grid.Row="1" Grid.Column="0"
                 Background="{StaticResource DarkPrimary}"
@@ -41,9 +39,9 @@
                Text="{Binding InputFolderPath}"/>
 
         <Button Grid.Row="2" Grid.Column="0"
-                BackgroundColor="{StaticResource DarkPrimary}"
+                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectOutputFolderCommand}"
-                Text="Select Output Folder:"/>
+                Text="Select Output folder:"/>
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
                HorizontalOptions="Start"
                VerticalOptions="Center"
@@ -52,12 +50,14 @@
         <Label Grid.Row="3" Grid.Column="0"
                HorizontalOptions="Start"
                VerticalOptions="Center"
-               Text="Select the maximum Dimension Size:"/>
-        <Picker Grid.Row="3" Grid.Column="1"
-                SelectedItem="{Binding Dimension}"
-                ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}"
-                VerticalOptions="Center">
-        </Picker>
+               Text="Threshold for predictions:"/>
+        <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                Minimum="0.1"
+                Value="{Binding Threshold}"/>
+        <Label Grid.Row="3" Grid.Column="3"
+               HorizontalOptions="Center"
+               VerticalOptions="Start"
+               Text="{Binding Threshold}"/>
 
         <BoxView HeightRequest="1" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
@@ -65,15 +65,15 @@
         <Label Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalOptions="Center"
                VerticalOptions="Center"
-               Text="{Binding ResizeProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+               Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
         <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
                 BackgroundColor="{StaticResource DarkPrimary}"
-                Command="{Binding ResizeImagesCommand}"
-                Text="Resize images!"/>
+                Command="{Binding MakePredictionsCommand}"
+                Text="Generate tags!"/>
 
         <ProgressBar Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
-                     Progress="{Binding ResizeProgress.PercentFloat}"
+                     Progress="{Binding PredictionProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
         <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"

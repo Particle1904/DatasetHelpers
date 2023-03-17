@@ -3,6 +3,7 @@
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
@@ -77,6 +78,55 @@ namespace SmartData.Lib.Services
             }
 
             await Task.WhenAll(tasks);
+        }
+
+        /// <summary>
+        /// Asynchronously processes an image for tag prediction by resizing it to 448x448 and converting it to a float array.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>An <see cref="InputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        public async Task<InputData> ProcessImageForTagPrediction(string inputPath)
+        {
+            InputData inputData = new InputData();
+            inputData.Input_1 = new float[448 * 448 * 3];
+
+            int index = 0;
+            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = new LanczosResampler(3),
+                    Compand = true,
+                    PadColor = new Bgr24(255, 255, 255),
+                    Size = new Size(448, 448),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Bgr24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Bgr24 pixel = ref pixelRow[x];
+                            byte temp = pixel.R;
+                            pixel.R = pixel.B;
+                            pixel.B = temp;
+
+                            inputData.Input_1[index++] = pixel.R;
+                            inputData.Input_1[index++] = pixel.G;
+                            inputData.Input_1[index++] = pixel.B;
+                        }
+                    }
+                });
+            }
+            return inputData;
         }
 
         /// <summary>
@@ -234,5 +284,6 @@ namespace SmartData.Lib.Services
 
             return _totalBlocks;
         }
+
     }
 }

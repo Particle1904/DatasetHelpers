@@ -20,6 +20,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                         return "Task status: finished.";
                     case ProcessingStatus.BackingUp:
                         return "Backing up files before the sorting process.";
+                    case ProcessingStatus.LoadingModel:
+                        return "Loading Model for tag generation.";
                     default:
                         return "Task status: Idle. Waiting for user input.";
                 }

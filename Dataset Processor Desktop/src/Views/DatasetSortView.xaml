@@ -43,7 +43,7 @@
         <Button Grid.Row="2" Grid.Column="0"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SelectSelectedFolderCommand}"
-                Text="Output Folder:"/>
+                Text="Select Output Folder:"/>
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
                HorizontalOptions="Start"
                VerticalOptions="Center"
@@ -52,7 +52,7 @@
         <Button Grid.Row="3" Grid.Column="0"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SelectDiscardedFolderCommand}"
-                Text="Discarded folder:"/>
+                Text="Select Discarded folder:"/>
         <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4"
                HorizontalOptions="Start"
                VerticalOptions="Center"
@@ -61,7 +61,7 @@
         <Button Grid.Row="4" Grid.Column="0"
                BackgroundColor="{StaticResource DarkPrimary}"
                Command="{Binding SelectBackupFolderCommand}"
-               Text="Backup folder:"/>
+               Text="Select Backup folder:"/>
         <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalOptions="Start"
                VerticalOptions="Center"

@@ -12,9 +12,9 @@ namespace SmartData.Lib.Services
         /// Only files with extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp" are considered to be image files.
         /// </summary>
         /// <param name="path">The path to the directory containing the files to rename.</param>
-        public void RenameAllToCrescent(string path)
+        public async Task RenameAllToCrescentAsync(string inputPath)
         {
-            string[] imageFiles = Directory.GetFiles(path, _imageSearchPattern);
+            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
             if (imageFiles.Length > 0)
             {
@@ -22,25 +22,25 @@ namespace SmartData.Lib.Services
                 {
                     string imageFileName = Path.GetFileNameWithoutExtension(imageFiles[i]);
 
-                    string? txtFile = Directory.GetFiles(path, $"{imageFileName}.txt").FirstOrDefault(file => File.Exists(file));
+                    string? txtFile = Directory.GetFiles(inputPath, $"{imageFileName}.txt").FirstOrDefault(file => File.Exists(file));
                     if (txtFile != null)
                     {
                         string txtExtension = Path.GetExtension(txtFile);
-                        string newTxtName = Path.Combine(path, $"{i + 1}{txtExtension}");
-                        File.Move(txtFile, newTxtName);
+                        string newTxtName = Path.Combine(inputPath, $"{i + 1}{txtExtension}");
+                        await Task.Run(() => File.Move(txtFile, newTxtName));
                     }
 
-                    string? captionFile = Directory.GetFiles(path, $"{imageFileName}.caption").FirstOrDefault(file => File.Exists(file));
+                    string? captionFile = Directory.GetFiles(inputPath, $"{imageFileName}.caption").FirstOrDefault(file => File.Exists(file));
                     if (captionFile != null)
                     {
                         string captionExtension = Path.GetExtension(captionFile);
-                        string newCaptionName = Path.Combine(path, $"{i + 1}{captionExtension}");
-                        File.Move(captionFile, newCaptionName);
+                        string newCaptionName = Path.Combine(inputPath, $"{i + 1}{captionExtension}");
+                        await Task.Run(() => File.Move(captionFile, newCaptionName));
                     }
 
                     string imageExtension = Path.GetExtension(imageFiles[i]);
-                    string newImageName = Path.Combine(path, $"{i + 1}{imageExtension}");
-                    File.Move(imageFiles[i], newImageName);
+                    string newImageName = Path.Combine(inputPath, $"{i + 1}{imageExtension}");
+                    await Task.Run(() => File.Move(imageFiles[i], newImageName));
                 }
             }
         }
@@ -51,9 +51,9 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="path">The path to the directory containing the files to rename.</param>
         /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
-        public void RenameAllToCrescent(string path, Progress progress)
+        public async Task RenameAllToCrescentAsync(string inputPath, Progress progress)
         {
-            string[] imageFiles = Directory.GetFiles(path, _imageSearchPattern);
+            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
             if (imageFiles.Length > 0)
             {
@@ -63,25 +63,25 @@ namespace SmartData.Lib.Services
                 {
                     string imageFileName = Path.GetFileNameWithoutExtension(imageFiles[i]);
 
-                    string? txtFile = Directory.GetFiles(path, $"{imageFileName}.txt").FirstOrDefault(file => File.Exists(file));
+                    string? txtFile = Directory.GetFiles(inputPath, $"{imageFileName}.txt").FirstOrDefault(file => File.Exists(file));
                     if (txtFile != null)
                     {
                         string txtExtension = Path.GetExtension(txtFile);
-                        string newTxtName = Path.Combine(path, $"{i + 1}{txtExtension}");
-                        File.Move(txtFile, newTxtName);
+                        string newTxtName = Path.Combine(inputPath, $"{i + 1}{txtExtension}");
+                        await Task.Run(() => File.Move(txtFile, newTxtName));
                     }
 
-                    string? captionFile = Directory.GetFiles(path, $"{imageFileName}.caption").FirstOrDefault(file => File.Exists(file));
+                    string? captionFile = Directory.GetFiles(inputPath, $"{imageFileName}.caption").FirstOrDefault(file => File.Exists(file));
                     if (captionFile != null)
                     {
                         string captionExtension = Path.GetExtension(captionFile);
-                        string newCaptionName = Path.Combine(path, $"{i + 1}{captionExtension}");
-                        File.Move(captionFile, newCaptionName);
+                        string newCaptionName = Path.Combine(inputPath, $"{i + 1}{captionExtension}");
+                        await Task.Run(() => File.Move(captionFile, newCaptionName));
                     }
 
                     string imageExtension = Path.GetExtension(imageFiles[i]);
-                    string newImageName = Path.Combine(path, $"{i + 1}{imageExtension}");
-                    File.Move(imageFiles[i], newImageName);
+                    string newImageName = Path.Combine(inputPath, $"{i + 1}{imageExtension}");
+                    await Task.Run(() => File.Move(imageFiles[i], newImageName));
 
                     progress.UpdateProgress();
                 }
@@ -99,7 +99,7 @@ namespace SmartData.Lib.Services
         /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, int minimumSize = 512)
         {
-            string[] files = Directory.GetFiles(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
             foreach (string file in files)
             {
                 string fileName = Path.GetFileName(file);
@@ -139,38 +139,35 @@ namespace SmartData.Lib.Services
         /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, Progress progress, int minimumSize = 512)
         {
-            string[] files = Directory.GetFiles(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
-            if (files.Length > 0)
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
             {
-                progress.TotalFiles = files.Length;
-
-                foreach (string file in files)
+                string fileName = Path.GetFileName(file);
+                using (Image image = Image.Load(file))
                 {
-                    string fileName = Path.GetFileName(file);
-                    using (Image image = Image.Load(file))
+                    if (image.Bounds.Width <= minimumSize && image.Bounds.Height <= minimumSize)
                     {
-                        if (image.Bounds.Width <= minimumSize && image.Bounds.Height <= minimumSize)
+                        string path = Path.Combine(discardedOutputPath, fileName);
+                        using (FileStream readStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+                        using (FileStream writeStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, true))
                         {
-                            string path = Path.Combine(discardedOutputPath, fileName);
-                            using (FileStream readStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                            using (FileStream writeStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, true))
-                            {
-                                await readStream.CopyToAsync(writeStream);
-                            }
-                        }
-                        else
-                        {
-                            string path = Path.Combine(selectedOutputPath, fileName);
-                            using (FileStream readStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
-                            using (FileStream writeStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, true))
-                            {
-                                await readStream.CopyToAsync(writeStream);
-                            }
+                            await readStream.CopyToAsync(writeStream);
                         }
                     }
-                    progress.UpdateProgress();
+                    else
+                    {
+                        string path = Path.Combine(selectedOutputPath, fileName);
+                        using (FileStream readStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+                        using (FileStream writeStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, true))
+                        {
+                            await readStream.CopyToAsync(writeStream);
+                        }
+                    }
                 }
+                progress.UpdateProgress();
             }
         }
 

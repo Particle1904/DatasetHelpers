@@ -86,12 +86,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public DatasetSortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService)
         {
+            _folderPickerService = folderPickerService;
+            _fileManipulatorService = fileManipulatorService;
+
             _discardedFolderPath = Path.Combine(AppContext.BaseDirectory, "discarded-images-output");
             _selectedFolderPath = Path.Combine(AppContext.BaseDirectory, "selected-images-output");
             _backupFolderPath = Path.Combine(AppContext.BaseDirectory, "images-backup");
-
-            _folderPickerService = folderPickerService;
-            _fileManipulatorService = fileManipulatorService;
+            _fileManipulatorService.CreateFolderIfNotExist(_discardedFolderPath);
+            _fileManipulatorService.CreateFolderIfNotExist(_selectedFolderPath);
+            _fileManipulatorService.CreateFolderIfNotExist(_backupFolderPath);
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectSelectedFolderCommand = new RelayCommand(async () => await SelectSelectedFolderAsync());
@@ -137,22 +140,25 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SortImagesAsync()
         {
-            _fileManipulatorService.CreateFolderIfNotExist(_discardedFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_selectedFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_backupFolderPath);
-
             if (SortProgress == null)
             {
                 SortProgress = new Progress();
             }
+            if (SortProgress.PercentFloat >= 1.0f)
+            {
+                SortProgress.Reset();
+            }
 
             if (BackupImages == true)
             {
+                TaskStatus = ProcessingStatus.BackingUp;
                 await _fileManipulatorService.BackupFiles(_inputFolderPath, _backupFolderPath);
+                TaskStatus = ProcessingStatus.Idle;
             }
 
             TaskStatus = ProcessingStatus.Running;
             await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
+            await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
             TaskStatus = ProcessingStatus.Finished;
         }
     }

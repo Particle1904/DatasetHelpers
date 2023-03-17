@@ -5,15 +5,13 @@ namespace SmartData.Lib.Services
 {
     public class TagHelper
     {
-        private readonly string _inputPath;
         private readonly string _outputPath;
 
         private readonly HashSet<string> _tags;
         private readonly HashSet<string> _negativeTags;
 
-        public TagHelper(string inputPath, string outputPath)
+        public TagHelper(string outputPath)
         {
-            _inputPath = inputPath;
             _outputPath = outputPath;
 
             string[] tags = File.ReadAllLines($"{Environment.CurrentDirectory}/tags.txt");
@@ -43,8 +41,6 @@ namespace SmartData.Lib.Services
             {
                 tagsResult.RemoveAll(x => negativeTag.Equals(x));
             }
-
-            //tagsResult.Remove("sensitive");
 
             return string.Join(", ", tagsResult);
         }
