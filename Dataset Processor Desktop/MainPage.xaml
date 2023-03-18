@@ -21,6 +21,8 @@
                     Command="{Binding NavigateToResizeImagesCommand}"/>
             <Button Text="Generate Tags"
                     Command="{Binding NavigateToTagGenerationCommand}"/>
+            <Button Text="Process Tags"
+                    Command="{Binding NavigateToTagProcessingCommand}"/>
             <Button Text="Settings"
                     Command="{Binding NavigateToSettingsCommand}"/>
         </StackLayout>

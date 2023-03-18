@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dataset_Processor_Desktop.src.Views.TagProcessingView">
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
+          ColumnSpacing="30" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="160"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Mass process tag files"/>
+
+        <Button Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding SelectInputFolderCommand}"
+                Text="Select Input folder:"/>
+        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="{Binding InputFolderPath}"/>
+
+        <Label Grid.Row="2" Grid.Column="0"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="Tags to add:"/>
+        <Editor Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                Placeholder="Type here the Tags you would like to add, separated by comma like this: 'tag1, tag2' or leave empty."
+                Text="{Binding TagsToAdd}"/>
+
+        <Label Grid.Row="3" Grid.Column="0"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="Tags to emphasize:"/>
+        <Editor Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                Placeholder="Type here the Tags you would like to give emphasis by bringing it to the beginning, separated by comma like this: 'tag1, tag2' or leave empty."
+                Text="{Binding TagsToEmphasize}"/>
+
+        <Label Grid.Row="4" Grid.Column="0"
+               HorizontalOptions="Start"
+               VerticalOptions="Center"
+               Text="Tags to remove:"/>
+        <Editor Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
+                Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
+                Text="{Binding TagsToRemove}"/>
+
+        <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" 
+              BackgroundColor="{StaticResource Gray600}"/>
+
+        <Label Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+
+        <Button Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+                BackgroundColor="{StaticResource DarkPrimary}"
+                Command="{Binding ProcessTagsCommand}"
+                Text="Process tags!"/>
+
+        <ProgressBar Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+                     Progress="{Binding TagProcessingProgress.PercentFloat}"
+                     ProgressColor="{StaticResource DarkPrimary}"/>
+
+        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center"
+               VerticalTextAlignment="Center"
+               FontSize="Medium"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="{Binding TaskStatusString}"/>
+
+    </Grid>
+</ContentView>
