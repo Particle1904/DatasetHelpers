@@ -4,29 +4,29 @@
              xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
-    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
-          ColumnSpacing="30" RowSpacing="10">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+          ColumnSpacing="10" RowSpacing="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="1"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                FontSize="Title"
                Text="Resize images"/>
@@ -36,8 +36,6 @@
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
         <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding InputFolderPath}"/>
 
         <Button Grid.Row="2" Grid.Column="0"
@@ -45,13 +43,9 @@
                 Command="{Binding SelectOutputFolderCommand}"
                 Text="Select Output Folder:"/>
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding OutputFolderPath}"/>
 
         <Label Grid.Row="3" Grid.Column="0"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="Select the maximum Dimension Size:"/>
         <Picker Grid.Row="3" Grid.Column="1"
                 SelectedItem="{Binding Dimension}"
@@ -67,7 +61,7 @@
                VerticalOptions="Center"
                Text="{Binding ResizeProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
+        <Button Grid.Row="6" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding ResizeImagesCommand}"
                 Text="Resize images!"/>
@@ -78,7 +72,7 @@
 
         <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
-               VerticalTextAlignment="Center"
+               VerticalOptions="Center"
                FontSize="Medium"
                TextColor="{StaticResource DarkSecondary}"
                Text="{Binding TaskStatusString}"/>

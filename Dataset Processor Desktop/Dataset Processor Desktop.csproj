@@ -75,6 +75,9 @@
 	  <MauiXaml Update="src\Views\SettingsView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="src\Views\TagEditorView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="src\Views\TagGenerationView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

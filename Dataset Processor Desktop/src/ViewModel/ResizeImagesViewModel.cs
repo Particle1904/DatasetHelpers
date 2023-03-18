@@ -86,7 +86,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public async Task SelectInputFolderAsync()
         {
             var result = await _folderPickerService.PickFolderAsync();
-            if (result != null)
+            if (!string.IsNullOrEmpty(result))
             {
                 InputFolderPath = result;
             }
@@ -95,7 +95,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public async Task SelectOutputFolderAsync()
         {
             var result = await _folderPickerService.PickFolderAsync();
-            if (result != null)
+            if (!string.IsNullOrEmpty(result))
             {
                 OutputFolderPath = result;
             }

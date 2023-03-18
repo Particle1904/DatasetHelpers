@@ -10,5 +10,8 @@ namespace SmartData.Lib.Interfaces
         public Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, Progress progress, int minimumSize = 512);
         public void CreateFolderIfNotExist(string folderName);
         public Task BackupFiles(string inputPath, string backupPath);
+        public List<string> GetImageFiles(string inputPath);
+        public string GetTagsForImage(string imageFilePath);
+        public void SaveTagsForImage(string filePath, string textToSave);
     }
 }

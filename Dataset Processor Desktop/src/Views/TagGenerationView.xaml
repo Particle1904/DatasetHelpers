@@ -2,26 +2,27 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagGenerationView">
-    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
-          ColumnSpacing="30" RowSpacing="10">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+          ColumnSpacing="10" RowSpacing="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="1"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
         <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
@@ -34,8 +35,6 @@
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
         <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding InputFolderPath}"/>
 
         <Button Grid.Row="2" Grid.Column="0"
@@ -43,40 +42,38 @@
                 Command="{Binding SelectOutputFolderCommand}"
                 Text="Select Output folder:"/>
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding OutputFolderPath}"/>
 
         <Label Grid.Row="3" Grid.Column="0"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="Threshold for predictions:"/>
-        <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+        <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
                 Minimum="0.1"
                 Value="{Binding Threshold}"/>
-        <Label Grid.Row="3" Grid.Column="3"
-               HorizontalOptions="Center"
-               VerticalOptions="Start"
+        <Label Grid.Row="3" Grid.Column="4"
                Text="{Binding Threshold}"/>
 
-        <BoxView HeightRequest="1" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalTextAlignment="Center"
+               Text="Note: Lower Threshold values can capture false positives. Use around 0.25 for characters and 0.7 for scenes."/>
+
+        <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Label Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
+        <Button Grid.Row="7" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding MakePredictionsCommand}"
                 Text="Generate tags!"/>
 
-        <ProgressBar Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding PredictionProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
                FontSize="Medium"

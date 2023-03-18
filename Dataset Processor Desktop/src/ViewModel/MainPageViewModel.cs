@@ -23,6 +23,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private View _tagGenerationView;
         private View _tagProcessingView;
         private View _settingsView;
+        private View _tagEditorView;
         #endregion
 
         public View DynamicContentView
@@ -40,6 +41,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToResizeImagesCommand { get; private set; }
         public RelayCommand NavigateToTagGenerationCommand { get; private set; }
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
+        public RelayCommand NavigateToTagEditorCommand { get; private set; }
 
         public MainPageViewModel()
         {
@@ -56,6 +58,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
             NavigateToTagGenerationCommand = new RelayCommand(NavigateToTagGenerationView);
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
+            NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
         }
 
         public void NavigateToSettingsView()
@@ -101,6 +104,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _tagProcessingView = new TagProcessingView(_folderPickerService, _tagProcessorService, _fileManipulatorService);
             }
             DynamicContentView = _tagProcessingView;
+        }
+
+        public void NavigateToTagEditorView()
+        {
+            if (_tagEditorView == null)
+            {
+                _tagEditorView = new TagEditorView(_folderPickerService, _fileManipulatorService, _imageProcessorService);
+            }
+            DynamicContentView = _tagEditorView;
         }
     }
 }

@@ -10,10 +10,6 @@ namespace SmartData.Lib.Services
     {
         private string _txtSearchPattern = "*.txt";
 
-        public TagProcessor()
-        {
-        }
-
         /// <summary>
         /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags.
         /// </summary>
@@ -55,6 +51,44 @@ namespace SmartData.Lib.Services
             {
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ProcessListOfTags(readTags, tagsToAdd, tagsToEmphasize, tagsToRemove);
+                await File.WriteAllTextAsync(file, processedTags);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
+        /// Randomizes the tags of all the text files in the specified input folder path.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the input folder.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task RandomizeTagsOfFiles(string inputFolderPath)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = RandomizeTags(readTags);
+                await File.WriteAllTextAsync(file, processedTags);
+            }
+        }
+
+        /// <summary>
+        /// Randomizes the tags of all the text files in the specified input folder path.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the input folder.</param>
+        /// <param name="progress">The progress tracker for updating the progress of the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task RandomizeTagsOfFiles(string inputFolderPath, Progress progress)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = RandomizeTags(readTags);
                 await File.WriteAllTextAsync(file, processedTags);
                 progress.UpdateProgress();
             }
@@ -170,6 +204,34 @@ namespace SmartData.Lib.Services
             }
 
             return string.Join(", ", tagsResult.Distinct());
+        }
+
+        /// <summary>
+        /// Randomizes the order of tags separated by commas in a string.
+        /// </summary>
+        /// <param name="tags">A string containing tags separated by commas.</param>
+        /// <returns>A string with the same tags as the input, but in a random order.</returns>
+        private string RandomizeTags(string tags)
+        {
+            List<string> tagsSplit = tags.Replace(", ", ",").Split(",").ToList();
+
+            Random random = new Random();
+
+            tagsSplit.Sort((a, b) => random.Next(-1, 2));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string tag in tagsSplit)
+            {
+                if (tag != tagsSplit.LastOrDefault())
+                {
+                    stringBuilder.Append($"{tag}, ");
+                }
+                else
+                {
+                    stringBuilder.Append(tag);
+                }
+            }
+            return stringBuilder.ToString();
         }
     }
 }

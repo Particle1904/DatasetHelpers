@@ -67,6 +67,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _randomizeTags;
+        public bool RandomizeTags
+        {
+            get => _randomizeTags;
+            set
+            {
+                _randomizeTags = value;
+                OnPropertyChanged(nameof(RandomizeTags));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessTagsCommand { get; private set; }
 
@@ -81,12 +92,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             ProcessTagsCommand = new RelayCommand(async () => await ProcessTagsAsync());
+
+            RandomizeTags = false;
         }
 
         public async Task SelectInputFolderAsync()
         {
             var result = await _folderPickerService.PickFolderAsync();
-            if (result != null)
+            if (!string.IsNullOrEmpty(result))
             {
                 InputFolderPath = result;
             }
@@ -105,6 +118,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             TaskStatus = Enums.ProcessingStatus.Running;
             await _tagProcessorService.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove, TagProcessingProgress);
+            if (RandomizeTags)
+            {
+                await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath);
+            }
             TaskStatus = Enums.ProcessingStatus.Finished;
         }
     }

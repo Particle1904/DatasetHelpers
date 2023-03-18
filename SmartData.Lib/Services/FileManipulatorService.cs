@@ -197,5 +197,41 @@ namespace SmartData.Lib.Services
                 await Task.Run(() => File.Copy(image, finalPath));
             }
         }
+
+        /// <summary>
+        /// Returns an array of image files from the given input path based on the defined image search pattern.
+        /// </summary>
+        /// <param name="inputPath">The path of the directory to search for image files.</param>
+        /// <returns>An array of image file names.</returns>
+        public List<string> GetImageFiles(string inputPath)
+        {
+            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+            imageFiles.Sort((a, b) => string.Compare(a, b));
+            return imageFiles;
+        }
+
+        /// <summary>
+        /// Retrieves the tags associated with an image located at the specified file path.
+        /// </summary>
+        /// <param name="imageFilePath">The file path of the image to retrieve tags for.</param>
+        /// <returns>A string containing the tags associated with the specified image.</returns>
+        public string GetTagsForImage(string imageFilePath)
+        {
+            string txtFilePath = Path.ChangeExtension(imageFilePath, ".txt");
+            string result = File.ReadAllText(txtFilePath);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Saves the specified text to a file located at the specified file path.
+        /// </summary>
+        /// <param name="filePath">The file path where the text will be saved.</param>
+        /// <param name="textToSave">The text to save to the file.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public void SaveTagsForImage(string filePath, string textToSave)
+        {
+            File.WriteAllText(filePath, textToSave);
+        }
     }
 }

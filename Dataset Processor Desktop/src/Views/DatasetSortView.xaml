@@ -2,31 +2,31 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.DatasetSortView">
-    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
-          ColumnSpacing="30" RowSpacing="10">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+          ColumnSpacing="10" RowSpacing="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="1"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
-            <ColumnDefinition Width="160"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                FontSize="Title"
                Text="Sort images"/>
@@ -36,8 +36,6 @@
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
         <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding InputFolderPath}"/>
 
         <Button Grid.Row="2" Grid.Column="0"
@@ -45,26 +43,20 @@
                 Command="{Binding SelectSelectedFolderCommand}"
                 Text="Select Output Folder:"/>
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding SelectedFolderPath}"/>
-        
+
         <Button Grid.Row="3" Grid.Column="0"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SelectDiscardedFolderCommand}"
                 Text="Select Discarded folder:"/>
         <Label Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
-               Text="{Binding DiscardedFolderPath}"/>       
+               Text="{Binding DiscardedFolderPath}"/>
 
         <Button Grid.Row="4" Grid.Column="0"
                BackgroundColor="{StaticResource DarkPrimary}"
                Command="{Binding SelectBackupFolderCommand}"
                Text="Select Backup folder:"/>
         <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
-               HorizontalOptions="Start"
-               VerticalOptions="Center"
                Text="{Binding BackupFolderPath}"/>
 
         <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" 
@@ -78,9 +70,9 @@
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-            <CheckBox x:Name="BackupFilesCheckBox" Grid.Row="0" Grid.Column="0"
+            <CheckBox Grid.Row="0" Grid.Column="0"
                       IsChecked="{Binding BackupImages}"/>
-            <Label x:Name="BackupFilesLabel" Grid.Row="0" Grid.Column="1"
+            <Label Grid.Row="0" Grid.Column="1"
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
                    Text="Backup images before processing?"/>
@@ -91,7 +83,7 @@
                VerticalOptions="Center"
                Text="{Binding SortProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <Button Grid.Row="8" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SortImagesCommand}"
                 Text="Sort images!"/>
