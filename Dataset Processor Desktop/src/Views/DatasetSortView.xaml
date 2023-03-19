@@ -86,6 +86,7 @@
         <Button Grid.Row="8" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SortImagesCommand}"
+                IsEnabled="{Binding IsUiLocked}"
                 Text="Sort images!"/>
 
         <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"

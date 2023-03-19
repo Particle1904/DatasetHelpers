@@ -140,6 +140,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SortImagesAsync()
         {
+            IsUiLocked = true;
             if (SortProgress == null)
             {
                 SortProgress = new Progress();
@@ -160,6 +161,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
             await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
             TaskStatus = ProcessingStatus.Finished;
+            IsUiLocked = false;
         }
     }
 }

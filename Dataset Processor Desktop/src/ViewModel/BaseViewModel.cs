@@ -6,6 +6,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
+        private bool _isUiLocked = true;
+        public bool IsUiLocked
+        {
+            get => _isUiLocked;
+            set
+            {
+                _isUiLocked = true;
+                OnPropertyChanged(nameof(IsUiLocked));
+            }
+        }
+
         public string TaskStatusString
         {
             get
@@ -15,9 +26,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     case ProcessingStatus.Idle:
                         return "Task status: Idle. Waiting for user input.";
                     case ProcessingStatus.Running:
-                        return "Task status: Running. Please wait while we process.";
+                        return "Task status: Processing. Please wait.";
                     case ProcessingStatus.Finished:
-                        return "Task status: finished.";
+                        return "Task status: Finished.";
                     case ProcessingStatus.BackingUp:
                         return "Backing up files before the sorting process.";
                     case ProcessingStatus.LoadingModel:

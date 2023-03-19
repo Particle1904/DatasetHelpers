@@ -2,7 +2,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagEditorView">
-    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
               ColumnSpacing="10" RowSpacing="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -68,12 +68,20 @@
                     WidthRequest="50"/>
         </Grid>
 
-        <Editor Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2"
-                    Placeholder="This is where you can edit the tags."
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand"
+        <StackLayout Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand">
+            <Editor Placeholder="This is where you can edit the tags."
+                    MinimumHeightRequest="440"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand"
+                    AutoSize="TextChanges"
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="False"
                     Text="{Binding CurrentImageTags}"/>
-
+        </StackLayout>
+        
         <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"

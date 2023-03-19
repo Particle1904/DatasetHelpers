@@ -54,7 +54,8 @@
                Text="Tags to remove:"/>
         <Editor Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
                 Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
-                Text="{Binding TagsToRemove}"/>
+                Text="{Binding TagsToRemove}" 
+                Keyboard="Plain"/>
 
         <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.RowDefinitions>
@@ -76,7 +77,7 @@
               BackgroundColor="{StaticResource Gray600}"/>
 
         <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
-               Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+               Text="{Binding TagProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
         <Button Grid.Row="8" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"

@@ -54,14 +54,14 @@
 
         <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
-               Text="Note: Lower Threshold values can capture false positives. Use around 0.25 for characters and 0.7 for scenes."/>
+               Text="Note: Lower Threshold values can capture false positives. Use around 0.35 for general/style/environment and 0.7 for characters."/>
 
         <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
         <Label Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"
+               VerticalTextAlignment="Center"
+               HorizontalTextAlignment="Center"
                Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
         <Button Grid.Row="7" Grid.Column="2"

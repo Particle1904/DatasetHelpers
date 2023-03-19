@@ -41,7 +41,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _selectedItemIndex = value;
                 OnPropertyChanged(nameof(SelectedItemIndex));
-                if (_imageFiles != null)
+                if (_imageFiles.Count > 0)
                 {
                     SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
@@ -103,6 +103,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 InputFolderPath = result;
                 ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
+                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
             }
         }
 
