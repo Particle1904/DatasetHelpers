@@ -13,6 +13,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFolderPickerService _folderPickerService;
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IFileManipulatorService _fileManipulatorService;
+        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -63,11 +64,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public RelayCommand ResizeImagesCommand { get; private set; }
 
-        public ResizeImagesViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
+        public ResizeImagesViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _imageProcessorService = imageProcessorService;
             _fileManipulatorService = fileManipulatorService;
+            _loggerService = loggerService;
 
             _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "selected-images-output");
             _outputFolderPath = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
@@ -107,7 +109,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 ResizeProgress = new Progress();
             }
-            if (ResizeProgress.PercentFloat >= 1.0f)
+            if (ResizeProgress.PercentFloat != 0f)
             {
                 ResizeProgress.Reset();
             }

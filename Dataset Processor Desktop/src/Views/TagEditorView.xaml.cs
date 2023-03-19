@@ -10,18 +10,20 @@ public partial class TagEditorView : ContentView
     private readonly IFolderPickerService _folderPickerService;
     private readonly IFileManipulatorService _fileManipulatorService;
     private readonly IImageProcessorService _imageProcessorService;
+    private readonly ILoggerService _loggerService;
 
     private TagEditorViewModel _viewModel;
 
-    public TagEditorView(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
+    public TagEditorView(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService, ILoggerService loggerService)
     {
         InitializeComponent();
 
         _folderPickerService = folderPickerService;
         _fileManipulatorService = fileManipulatorService;
         _imageProcessorService = imageProcessorService;
+        _loggerService = loggerService;
 
-        _viewModel = new TagEditorViewModel(_folderPickerService, _fileManipulatorService, _imageProcessorService);
+        _viewModel = new TagEditorViewModel(_folderPickerService, _fileManipulatorService, _loggerService);
         BindingContext = _viewModel;
     }
 }

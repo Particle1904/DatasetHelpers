@@ -9,7 +9,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
     {
         private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
-        private readonly IImageProcessorService _imageProcessorService;
+        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -54,9 +54,19 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _selectedImage;
             set
             {
-                _selectedImage = value;
-                OnPropertyChanged(nameof(SelectedImage));
-                CurrentImageTags = _fileManipulatorService.GetTagsForImage(_imageFiles[_selectedItemIndex]);
+                try
+                {
+                    CurrentImageTags = _fileManipulatorService.GetTagsForImage(_imageFiles[_selectedItemIndex]);
+                }
+                catch (Exception exception)
+                {
+                    _loggerService.LatestLogMessage = $".txt file for current image not found, just type in the editor and one will be created! Error: {exception.Message}";
+                }
+                finally
+                {
+                    _selectedImage = value;
+                    OnPropertyChanged(nameof(SelectedImage));
+                }
             }
         }
 
@@ -78,11 +88,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public TagEditorViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
+        public TagEditorViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
-            _imageProcessorService = imageProcessorService;
+            _loggerService = loggerService;
 
             _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
             _fileManipulatorService.CreateFolderIfNotExist(_inputFolderPath);
@@ -102,8 +112,21 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             if (!string.IsNullOrEmpty(result))
             {
                 InputFolderPath = result;
-                ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+                try
+                {
+                    ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
+                }
+                catch
+                {
+                    _loggerService.LatestLogMessage = "No image files were found in the directory.";
+                }
+                finally
+                {
+                    if (_imageFiles.Count > 0)
+                    {
+                        SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+                    }
+                }
             }
         }
 

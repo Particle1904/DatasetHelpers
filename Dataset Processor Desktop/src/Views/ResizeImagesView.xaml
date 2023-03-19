@@ -5,7 +5,7 @@
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-          ColumnSpacing="10" RowSpacing="10">
+          ColumnSpacing="10" RowSpacing="10" Padding="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>

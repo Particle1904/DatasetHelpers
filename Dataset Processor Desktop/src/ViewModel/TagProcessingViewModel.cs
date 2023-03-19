@@ -11,6 +11,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFolderPickerService _folderPickerService;
         private readonly ITagProcessorService _tagProcessorService;
         private readonly IFileManipulatorService _fileManipulatorService;
+        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -81,11 +82,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessTagsCommand { get; private set; }
 
-        public TagProcessingViewModel(IFolderPickerService folderPickerService, ITagProcessorService tagProcessorService, IFileManipulatorService fileManipulatorService)
+        public TagProcessingViewModel(IFolderPickerService folderPickerService, ITagProcessorService tagProcessorService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _tagProcessorService = tagProcessorService;
             _fileManipulatorService = fileManipulatorService;
+            _loggerService = loggerService;
 
             _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
             _fileManipulatorService.CreateFolderIfNotExist(_inputFolderPath);
@@ -111,7 +113,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 TagProcessingProgress = new Progress();
             }
-            if (TagProcessingProgress.PercentFloat >= 1.0f)
+            if (TagProcessingProgress.PercentFloat != 0f)
             {
                 TagProcessingProgress.Reset();
             }

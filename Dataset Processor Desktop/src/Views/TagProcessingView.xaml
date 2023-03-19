@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagProcessingView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-          ColumnSpacing="10" RowSpacing="10">
+          ColumnSpacing="10" RowSpacing="10" Padding="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -41,21 +41,38 @@
         <Label Grid.Row="2" Grid.Column="0"
                Text="Tags to add:"/>
         <Editor Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                
+                VerticalTextAlignment="Start"
+                HorizontalTextAlignment="Start"
+                IsTextPredictionEnabled="True"
                 Placeholder="Type here the Tags you would like to add, separated by comma like this: 'tag1, tag2' or leave empty."
                 Text="{Binding TagsToAdd}"/>
 
         <Label Grid.Row="3" Grid.Column="0"
                 Text="Tags to emphasize:"/>
         <Editor Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                
+                VerticalTextAlignment="Start"
+                HorizontalTextAlignment="Start"
+                IsTextPredictionEnabled="True"
                 Placeholder="Type here the Tags you would like to give emphasis by bringing it to the beginning, separated by comma like this: 'tag1, tag2' or leave empty."
                 Text="{Binding TagsToEmphasize}"/>
 
         <Label Grid.Row="4" Grid.Column="0"
                Text="Tags to remove:"/>
         <Editor Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                
+                VerticalTextAlignment="Start"
+                HorizontalTextAlignment="Start"
+                IsTextPredictionEnabled="True"
                 Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
-                Text="{Binding TagsToRemove}" 
-                Keyboard="Plain"/>
+                Text="{Binding TagsToRemove}"/>
 
         <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.RowDefinitions>

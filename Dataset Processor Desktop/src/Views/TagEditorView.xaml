@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagEditorView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-              ColumnSpacing="10" RowSpacing="10">
+              ColumnSpacing="10" RowSpacing="10" Padding="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -34,8 +34,8 @@
                    Text="{Binding InputFolderPath}"/>
 
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                     VerticalOptions="CenterAndExpand"
-                     HorizontalOptions="CenterAndExpand">
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="80*"/>
@@ -51,8 +51,8 @@
                    BorderColor="Transparent"
                    Padding="0"
                    Margin="10"    
-                   VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="FillAndExpand"
+                   HorizontalOptions="FillAndExpand"
                    MinimumWidthRequest="440"
                    MaximumWidthRequest="440"
                    MinimumHeightRequest="440"
@@ -73,12 +73,13 @@
                      HorizontalOptions="FillAndExpand">
             <Editor Placeholder="This is where you can edit the tags."
                     MinimumHeightRequest="440"
-                    VerticalOptions="CenterAndExpand"
-                    HorizontalOptions="CenterAndExpand"
+                    MinimumWidthRequest="300"
+                    VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"
                     AutoSize="TextChanges"
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="False"
+                    IsTextPredictionEnabled="True"
                     Text="{Binding CurrentImageTags}"/>
         </StackLayout>
         

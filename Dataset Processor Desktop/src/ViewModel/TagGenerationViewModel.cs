@@ -12,6 +12,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IAutoTaggerService _autoTaggerService;
+        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -61,11 +62,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand MakePredictionsCommand { get; private set; }
 
-        public TagGenerationViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService)
+        public TagGenerationViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
             _autoTaggerService = autoTaggerService;
+            _loggerService = loggerService;
 
             _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
             _outputFolderPath = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
@@ -100,18 +102,25 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task MakePredictionsAsync()
         {
-            if (_predictionProgress == null)
+            if (PredictionProgress == null)
             {
-                _predictionProgress = new Progress();
+                PredictionProgress = new Progress();
             }
-            if (_predictionProgress.PercentFloat >= 1.0f)
+            if (PredictionProgress.PercentFloat != 0f)
             {
-                _predictionProgress.Reset();
+                PredictionProgress.Reset();
             }
 
             TaskStatus = ProcessingStatus.Running;
             _autoTaggerService.Threshold = (float)Threshold;
-            await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress);
+            try
+            {
+                await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress);
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Model file not found! Error: {exception.Message}";
+            }
             TaskStatus = ProcessingStatus.Finished;
         }
     }

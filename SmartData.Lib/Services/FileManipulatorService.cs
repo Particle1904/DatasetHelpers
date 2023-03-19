@@ -218,6 +218,7 @@ namespace SmartData.Lib.Services
         public string GetTagsForImage(string imageFilePath)
         {
             string txtFilePath = Path.ChangeExtension(imageFilePath, ".txt");
+
             string result = File.ReadAllText(txtFilePath);
 
             return result;

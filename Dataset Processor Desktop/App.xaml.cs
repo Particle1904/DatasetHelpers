@@ -15,6 +15,7 @@
 
             window.MinimumWidth = 1280;
             window.MinimumHeight = 768;
+            window.Title = "Dataset Processor All-in-one tools - v1.0";
 
             return window;
         }

@@ -11,6 +11,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
     {
         private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
+        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -84,10 +85,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectBackupFolderCommand { get; private set; }
         public RelayCommand SortImagesCommand { get; private set; }
 
-        public DatasetSortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService)
+        public DatasetSortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
+            _loggerService = loggerService;
 
             _discardedFolderPath = Path.Combine(AppContext.BaseDirectory, "discarded-images-output");
             _selectedFolderPath = Path.Combine(AppContext.BaseDirectory, "selected-images-output");
@@ -145,7 +147,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 SortProgress = new Progress();
             }
-            if (SortProgress.PercentFloat >= 1.0f)
+            if (SortProgress.PercentFloat != 0f)
             {
                 SortProgress.Reset();
             }

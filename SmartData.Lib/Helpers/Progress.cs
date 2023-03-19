@@ -27,6 +27,7 @@ namespace SmartData.Lib.Helpers
             {
                 _percentComplete = value;
                 OnPropertyChanged(nameof(PercentComplete));
+                OnPropertyChanged(nameof(PercentFloat));
             }
         }
 
@@ -54,10 +55,9 @@ namespace SmartData.Lib.Helpers
 
         public void Reset()
         {
-            _totalFiles = 0;
             TotalFiles = 0;
             PercentComplete = 0;
-
+            _filesProcessed = 0;
         }
 
         /// <summary>

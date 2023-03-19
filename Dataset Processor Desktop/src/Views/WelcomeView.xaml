@@ -2,10 +2,32 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.WelcomeView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to the Dataset Processor App!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    <VerticalStackLayout Spacing="50" Padding="20" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+        <Label Text="Welcome to the Dataset Processor App!"
+               VerticalOptions="Center" 
+               HorizontalOptions="Center"
+               FontSize="Header"/>
+        
+        <VerticalStackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" Spacing="10">
+            <Label Text="Use the Buttons on the left to navigate through the app."
+                   HorizontalTextAlignment="Center"
+                   FontSize="Medium"
+                   Margin="0,0,0,40"/>
+            <Label Text="Use the Sort Page to discard images with low resolution (image with Width or Height lower than 512) and/or backup images."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
+            <Label Text="Use the Resize Images Page to resize images respecting original Aspect Ratio to be used for Bucketing (it will Upscale if necessary)."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
+            <Label Text="Use the Generate Tags Page to generate Tags using the WD 1.4 Model; BLIP Captioning is planned for future updates."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
+            <Label Text="Use the Process Tags Page to mass edit .txt files with tags, it can add, remove, give emphasis and randomize tags."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
+            <Label Text="Use the Tag Editor to manually edit Tags for files, the editor automatically saves any changes (it will create a new one if necessary)."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentView>

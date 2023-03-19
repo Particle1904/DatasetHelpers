@@ -6,7 +6,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        private bool _isUiLocked = true;
+        private bool _isUiLocked = false;
         public bool IsUiLocked
         {
             get => _isUiLocked;

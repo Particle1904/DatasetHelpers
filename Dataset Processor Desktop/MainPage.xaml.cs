@@ -6,12 +6,14 @@ namespace Dataset_Processor_Desktop
     {
         private MainPageViewModel _viewModel;
 
+
         public MainPage()
         {
             InitializeComponent();
             _viewModel = new MainPageViewModel();
             BindingContext = _viewModel;
 
+            SettingsButton.IsEnabled = false;
         }
     }
 }
