@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Storage;
 
 using Dataset_Processor_Desktop.src.Interfaces;
 
@@ -23,15 +21,14 @@ namespace Dataset_Processor_Desktop.src.Services
 
         public async Task<string> PickFolderAsync()
         {
-            if (DeviceInfo.Platform != DevicePlatform.WinUI)
-            {
-                throw new PlatformNotSupportedException("This platform is not supported!");
-            }
+            //if (DeviceInfo.Platform != DevicePlatform.WinUI)
+            //{
+            //    throw new PlatformNotSupportedException("This platform is not supported!");
+            //}
 
             FolderPickerResult result = await FolderPicker.Default.PickAsync(_cancelToken);
             if (!result.IsSuccessful)
             {
-                await Toast.Make($"No folder was selected!", ToastDuration.Long).Show(_cancelToken);
                 return "";
             }
 

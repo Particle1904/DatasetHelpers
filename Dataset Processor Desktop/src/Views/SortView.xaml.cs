@@ -11,7 +11,7 @@ public partial class DatasetSortView : ContentView
     private readonly IFileManipulatorService _fileManipulatorService;
     private readonly ILoggerService _loggerService;
 
-    private DatasetSortViewModel _viewModel;
+    private SortViewModel _viewModel;
 
     public DatasetSortView(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
     {
@@ -21,7 +21,7 @@ public partial class DatasetSortView : ContentView
         _fileManipulatorService = fileManipulatorService;
         _loggerService = loggerService;
 
-        _viewModel = new DatasetSortViewModel(_folderPickerService, _fileManipulatorService, _loggerService);
+        _viewModel = new SortViewModel(_folderPickerService, _fileManipulatorService, _loggerService);
         BindingContext = _viewModel;
     }
 }

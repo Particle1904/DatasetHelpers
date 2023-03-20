@@ -12,7 +12,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _isUiLocked;
             set
             {
-                _isUiLocked = true;
+                _isUiLocked = value;
                 OnPropertyChanged(nameof(IsUiLocked));
             }
         }

@@ -7,7 +7,7 @@ using SmartData.Lib.Interfaces;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
-    public class DatasetSortViewModel : BaseViewModel
+    public class SortViewModel : BaseViewModel
     {
         private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
@@ -85,7 +85,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectBackupFolderCommand { get; private set; }
         public RelayCommand SortImagesCommand { get; private set; }
 
-        public DatasetSortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
+        public SortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
         {
             _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
@@ -105,6 +105,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SortImagesCommand = new RelayCommand(async () => await SortImagesAsync());
 
             TaskStatus = ProcessingStatus.Idle;
+            IsUiLocked = false;
         }
 
         public async Task SelectInputFolderAsync()
@@ -142,7 +143,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SortImagesAsync()
         {
-            IsUiLocked = true;
             if (SortProgress == null)
             {
                 SortProgress = new Progress();
@@ -163,7 +163,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
             await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
             TaskStatus = ProcessingStatus.Finished;
-            IsUiLocked = false;
         }
     }
 }
