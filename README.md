@@ -18,7 +18,7 @@ Dataset Processor Tools is a comprehensive set of tools designed for processing 
 To get started with the Dataset Processor Tools, download the provided release or build yourself.
 To build clone this repository and open the project in Visual Studio 2022 or later. You can then build and run the project.
 
-Use this command to build it, only windows supported at this time:
+Use this command to build it as a self-contained .exe application (only windows supported at this time):
 
 ```msbuild /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None /p:RuntimeIdentifier=win10-x64 -p:BuildWindowsOnly=true```
 
