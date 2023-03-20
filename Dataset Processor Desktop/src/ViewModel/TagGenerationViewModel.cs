@@ -119,9 +119,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Model file not found! Error: {exception.Message}";
+                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
             }
-            TaskStatus = ProcessingStatus.Finished;
+            finally
+            {
+                TaskStatus = ProcessingStatus.Finished;
+            }
         }
     }
 }

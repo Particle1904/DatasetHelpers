@@ -58,7 +58,9 @@
                    Padding="10"
                    CornerRadius="0"
                    BorderColor="{StaticResource DarkPrimary}">
-                <Label Text="{Binding LatestLogMessage}"/>
+                <ScrollView>
+                    <Label Text="{Binding LatestLogMessage}"/>
+                </ScrollView>
             </Frame>
         </Grid>
     </Grid>

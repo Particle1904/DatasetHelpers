@@ -60,7 +60,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 catch (Exception exception)
                 {
-                    _loggerService.LatestLogMessage = $".txt file for current image not found, just type in the editor and one will be created! Error: {exception.Message}";
+                    _loggerService.LatestLogMessage = $".txt file for current image not found, just type in the editor and one will be created! Error: {exception.StackTrace}";
                 }
                 finally
                 {

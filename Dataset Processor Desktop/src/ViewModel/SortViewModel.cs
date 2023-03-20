@@ -143,6 +143,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SortImagesAsync()
         {
+
             if (SortProgress == null)
             {
                 SortProgress = new Progress();
@@ -160,9 +161,19 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
 
             TaskStatus = ProcessingStatus.Running;
-            await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
-            await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
-            TaskStatus = ProcessingStatus.Finished;
+            try
+            {
+                await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
+                await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+            }
+            finally
+            {
+                TaskStatus = ProcessingStatus.Finished;
+            }
         }
     }
 }

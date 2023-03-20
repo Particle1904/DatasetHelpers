@@ -115,8 +115,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
 
             TaskStatus = ProcessingStatus.Running;
-            await Task.Run(() => _imageProcessorService.ResizeImagesAsync(InputFolderPath, OutputFolderPath, ResizeProgress, Dimension));
-            TaskStatus = ProcessingStatus.Finished;
+            try
+            {
+                await Task.Run(() => _imageProcessorService.ResizeImagesAsync(InputFolderPath, OutputFolderPath, ResizeProgress, Dimension));
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+            }
+            finally
+            {
+                TaskStatus = ProcessingStatus.Finished;
+            }
         }
     }
 }

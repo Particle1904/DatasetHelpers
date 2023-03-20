@@ -119,12 +119,22 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
 
             TaskStatus = Enums.ProcessingStatus.Running;
-            await _tagProcessorService.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove, TagProcessingProgress);
-            if (RandomizeTags)
+            try
             {
-                await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath);
+                await _tagProcessorService.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove, TagProcessingProgress);
+                if (RandomizeTags)
+                {
+                    await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath);
+                }
             }
-            TaskStatus = Enums.ProcessingStatus.Finished;
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+            }
+            finally
+            {
+                TaskStatus = Enums.ProcessingStatus.Finished;
+            }
         }
     }
 }
