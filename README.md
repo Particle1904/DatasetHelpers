@@ -23,7 +23,7 @@ Right-click the Solution and click "Open in Terminal" then use the commands
 
 ```dotnet restore```
 
-```msbuild /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None /p:RuntimeIdentifier=win10-x64 -p:BuildWindowsOnly=true```
+```dotnet build /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None -p:BuildWindowsOnly=true```
 
 ## Usage
 Dataset Processor Tools can be used to process image datasets for machine learning, allowing you to perform various tasks, such as discarding images with low resolution, resizing images while preserving their aspect ratio, generating tags using a pre-trained model, and mass editing .txt files with tags.
