@@ -11,6 +11,7 @@ namespace SmartData.Lib.Services
     {
         private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
+        private const ushort _semaphoreConcurrent = 6;
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
         private int _lanczosSamplerRadius = 3;
@@ -40,14 +41,21 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
-            var tasks = new List<Task>();
+            SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
 
             foreach (var file in files)
             {
-                tasks.Add(ResizeImageAsync(outputPath, file, dimension));
-            }
+                await semaphore.WaitAsync();
 
-            await Task.WhenAll(tasks);
+                try
+                {
+                    await ResizeImageAsync(outputPath, file, dimension);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }
         }
 
         /// <summary>
@@ -67,17 +75,21 @@ namespace SmartData.Lib.Services
 
             progress.TotalFiles = files.Length;
 
-            var tasks = new List<Task>();
+            SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
             foreach (var file in files)
             {
-                tasks.Add(ResizeImageAsync(outputPath, file, dimension)
-                     .ContinueWith(task =>
-                     {
-                         progress.UpdateProgress();
-                     }));
-            }
+                await semaphore.WaitAsync();
 
-            await Task.WhenAll(tasks);
+                try
+                {
+                    await ResizeImageAsync(outputPath, file, dimension);
+                }
+                finally
+                {
+                    progress.UpdateProgress();
+                    semaphore.Release();
+                }
+            }
         }
 
         /// <summary>
@@ -203,7 +215,7 @@ namespace SmartData.Lib.Services
 
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
-                    Mode = ResizeMode.BoxPad,
+                    Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
                     Sampler = new LanczosResampler(_lanczosSamplerRadius),
                     Compand = true,

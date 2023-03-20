@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagEditorView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-              ColumnSpacing="10" RowSpacing="10" Padding="10">
+              ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -53,10 +53,10 @@
                    Margin="10"    
                    VerticalOptions="FillAndExpand"
                    HorizontalOptions="FillAndExpand"
-                   MinimumWidthRequest="440"
-                   MaximumWidthRequest="440"
-                   MinimumHeightRequest="440"
-                   MaximumHeightRequest="440"
+                   MinimumWidthRequest="512"
+                   MaximumWidthRequest="512"
+                   MinimumHeightRequest="512"
+                   MaximumHeightRequest="512"
                    BackgroundColor="{StaticResource DarkSecondaryBackground}">
                 <Image Aspect="AspectFit"
                        Source="{Binding SelectedImage, Mode=TwoWay}"/>
@@ -72,7 +72,7 @@
                      VerticalOptions="FillAndExpand"
                      HorizontalOptions="FillAndExpand">
             <Editor Placeholder="This is where you can edit the tags."
-                    MinimumHeightRequest="440"
+                    MinimumHeightRequest="512"
                     MinimumWidthRequest="300"
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"

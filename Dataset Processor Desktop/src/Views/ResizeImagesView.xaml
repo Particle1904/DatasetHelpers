@@ -5,7 +5,7 @@
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-          ColumnSpacing="10" RowSpacing="10" Padding="10">
+          ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -53,7 +53,8 @@
                 VerticalOptions="Center">
         </Picker>
 
-        <BoxView HeightRequest="1" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" 
+        <BoxView HeightRequest="1" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+                 HorizontalOptions="FillAndExpand"
               BackgroundColor="{StaticResource Gray600}"/>
 
         <Label Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
