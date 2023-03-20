@@ -1,6 +1,8 @@
 # Dataset Processor - All-in-one Tools
 Dataset Processor Tools is a comprehensive set of tools designed for processing image datasets for machine learning. These tools provide various functionalities, including discarding images with low resolution, resizing images while preserving their aspect ratio, generating tags using a pre-trained model, mass editing .txt files with tags, and a simple editor to manually edit .txt files.
 
+![Alt Text](https://github.com/LeonardoFer/DatasetHelpers/blob/master/showcase_gif.gif?raw=true)
+
 ## Features
 - Discard images with low resolution
 - Resize images while preserving aspect ratio
