@@ -18,6 +18,13 @@ Dataset Processor Tools is a comprehensive set of tools designed for processing 
 To get started with the Dataset Processor Tools, download the provided release or build yourself.
 To build clone this repository and open the project in Visual Studio 2022 or later. You can then build and run the project.
 
+Use these commands to build it as a self-contained .exe application (only windows supported at this time):
+Right-click the Solution and click "Open in Terminal" then use the commands
+
+```dotnet restore```
+
+```dotnet build /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None -p:BuildWindowsOnly=true```
+
 ## Usage
 Dataset Processor Tools can be used to process image datasets for machine learning, allowing you to perform various tasks, such as discarding images with low resolution, resizing images while preserving their aspect ratio, generating tags using a pre-trained model, and mass editing .txt files with tags.
 
