@@ -79,6 +79,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _renameFilesToCrescent;
+        public bool RenameFilesToCrescent
+        {
+            get => _renameFilesToCrescent;
+            set
+            {
+                _renameFilesToCrescent = value;
+                OnPropertyChanged(nameof(RenameFilesToCrescent));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessTagsCommand { get; private set; }
 
@@ -96,6 +107,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             ProcessTagsCommand = new RelayCommand(async () => await ProcessTagsAsync());
 
             RandomizeTags = false;
+            RenameFilesToCrescent = true;
         }
 
         public async Task SelectInputFolderAsync()
@@ -125,6 +137,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 if (RandomizeTags)
                 {
                     await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath);
+                }
+                if (RenameFilesToCrescent)
+                {
+                    await _fileManipulatorService.RenameAllToCrescentAsync(InputFolderPath);
                 }
             }
             catch (Exception exception)

@@ -164,7 +164,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             try
             {
                 await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
-                await _fileManipulatorService.RenameAllToCrescentAsync(_selectedFolderPath);
             }
             catch (Exception exception)
             {

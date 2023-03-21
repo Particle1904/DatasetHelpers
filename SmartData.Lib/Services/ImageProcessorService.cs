@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp.Processing.Processors.Transforms;
+﻿using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
@@ -142,7 +143,7 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Resizes an image to a target aspect ratio and saves it as a PNG file in the output directory.
+        /// Resizes an image to a target aspect ratio and saves it as a JPEG file in the output directory.
         /// </summary>
         /// <param name="outputPath">The full path of the directory to save the resized image file in.</param>
         /// <param name="inpuPath">The full path of the image file to resize.</param>
@@ -153,10 +154,13 @@ namespace SmartData.Lib.Services
         /// This method resizes the input image file to a target aspect ratio based on a predetermined set of aspect ratio buckets. The target aspect ratio is calculated based on the number of blocks assigned to each aspect ratio bucket.
         /// </para>
         /// <para>
-        /// The resized image is saved as a PNG file in the output directory with the same name as the original file, but with the extension changed to ".png".
+        /// The resized image is saved as a JPEG file in the output directory with the same name as the original file, but with the extension changed to ".jpeg".
         /// </para>
         /// <para>
-        /// The maximum dimension (width or height) of the resized image can be specified using the optional `dimension` parameter. The default value is 512.
+        /// The maximum dimension (width or height) of the resized image can be specified using the optional dimension parameter. If both width and height of the image are less than the specified dimension, then the image is not resized. The default value of dimension is 512.
+        /// </para>
+        /// <para>
+        /// This method uses a Lanczos resampling algorithm for high-quality image resizing. The JPEG encoding quality is set to 100 and metadata is not skipped.
         /// </para>
         /// </remarks>
         private async Task ResizeImageAsync(string outputPath, string inpuPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
@@ -228,7 +232,16 @@ namespace SmartData.Lib.Services
                     image.BackgroundColor(Color.White);
                     image.Resize(resizeOptions);
                 });
-                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"));
+
+                JpegEncoder encoder = new JpegEncoder()
+                {
+                    ColorType = JpegEncodingColor.Rgb,
+                    Interleaved = true,
+                    Quality = 100,
+                    SkipMetadata = false
+                };
+
+                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
             }
         }
 
