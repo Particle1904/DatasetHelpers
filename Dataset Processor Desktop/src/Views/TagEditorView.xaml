@@ -48,20 +48,20 @@
                     HeightRequest="50"
                     WidthRequest="50"/>
             <Frame Grid.Column="1" 
-                   BorderColor="Transparent"
-                   Padding="0"
-                   Margin="10"    
-                   VerticalOptions="FillAndExpand"
-                   HorizontalOptions="FillAndExpand"
-                   MinimumWidthRequest="512"
-                   MaximumWidthRequest="512"
-                   MinimumHeightRequest="512"
-                   MaximumHeightRequest="512"
-                   BackgroundColor="{StaticResource DarkSecondaryBackground}">
+                       BorderColor="Transparent"
+                       Padding="0"
+                       Margin="10"    
+                       VerticalOptions="FillAndExpand"
+                       HorizontalOptions="FillAndExpand"
+                       MinimumWidthRequest="512"
+                       MaximumWidthRequest="512"
+                       MinimumHeightRequest="512"
+                       MaximumHeightRequest="512"
+                       BackgroundColor="{StaticResource DarkSecondaryBackground}">
                 <Image Aspect="AspectFit"
                        Source="{Binding SelectedImage, Mode=TwoWay}"/>
             </Frame>
-            <Button Grid.Column="2" 
+                <Button Grid.Column="2" 
                     Text="&gt;"
                     Command="{Binding NextItemCommand}"
                     HeightRequest="50"

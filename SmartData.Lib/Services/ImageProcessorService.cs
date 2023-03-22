@@ -13,6 +13,9 @@ namespace SmartData.Lib.Services
         private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         private const ushort _semaphoreConcurrent = 6;
+
+        private const float _blurRadius = 50.0f;
+
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
         private int _lanczosSamplerRadius = 3;
@@ -140,6 +143,34 @@ namespace SmartData.Lib.Services
                 });
             }
             return inputData;
+        }
+
+        /// <summary>
+        /// Applies a Gaussian blur filter to the specified image bytes and returns the resulting blurred image as a byte array.
+        /// </summary>
+        /// <param name="imageBytes">The byte array representing the image to be blurred.</param>
+        /// <returns>A byte array representing the blurred image.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method loads the image bytes into an ImageSharp image and applies a Gaussian blur filter with the specified blur radius to it.
+        /// </para>
+        /// <para>
+        /// The blurred image is then saved as a JPEG image into a new memory stream, which is converted to a byte array and returned as the result.
+        /// </para>
+        /// </remarks>
+        public Stream GetBlurriedImage(string imagePath)
+        {
+            using (Image image = Image.Load(imagePath))
+            {
+                image.Mutate(x => x.GaussianBlur(_blurRadius));
+
+                using (MemoryStream blurredImageStream = new MemoryStream())
+                {
+                    image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
+
+                    return blurredImageStream;
+                }
+            }
         }
 
         /// <summary>
@@ -309,6 +340,5 @@ namespace SmartData.Lib.Services
 
             return _totalBlocks;
         }
-
     }
 }

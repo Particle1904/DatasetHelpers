@@ -145,7 +145,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                if (exception.GetType() == typeof(System.IO.IOException))
+                {
+                    _loggerService.LatestLogMessage = $"Images and Tag files are named in crescent order already!";
+                }
+                else
+                {
+                    _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                }
             }
             finally
             {

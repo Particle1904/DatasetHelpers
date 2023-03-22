@@ -13,7 +13,7 @@
             <RowDefinition Height="5*"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="1*"/>
@@ -102,6 +102,8 @@
               BackgroundColor="{StaticResource Gray600}"/>
 
         <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
                Text="{Binding TagProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
         <Button Grid.Row="8" Grid.Column="2"
