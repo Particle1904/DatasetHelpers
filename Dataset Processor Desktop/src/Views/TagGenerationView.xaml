@@ -34,15 +34,31 @@
                 Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
-        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-               Text="{Binding InputFolderPath}"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
 
         <Button Grid.Row="2" Grid.Column="0"
                 Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectOutputFolderCommand}"
                 Text="Select Output folder:"/>
-        <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
-               Text="{Binding OutputFolderPath}"/>
+        <StackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding OutputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenOutputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
 
         <Label Grid.Row="3" Grid.Column="0"
                Text="Threshold for predictions:"/>

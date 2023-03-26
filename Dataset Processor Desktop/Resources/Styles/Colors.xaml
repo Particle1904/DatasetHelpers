@@ -58,5 +58,4 @@
     <SolidColorBrush x:Key="DarkSecondaryDarkBrush" Color="{StaticResource DarkSecondaryDark}" />
     <SolidColorBrush x:Key="DarkSurfaceBrush" Color="{StaticResource DarkSurface}" />
     <SolidColorBrush x:Key="DarkSecondaryBackgroundBrush" Color="{StaticResource DarkSecondaryBackground}" />
-
 </ResourceDictionary>

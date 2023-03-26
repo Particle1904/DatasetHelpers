@@ -3,5 +3,6 @@
     public interface IFolderPickerService
     {
         Task<string> PickFolderAsync();
+        Task OpenFolderInExplorerAsync(string folderPath);
     }
 }

@@ -2,10 +2,48 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.SettingsView">
-    <VerticalStackLayout WidthRequest="1024">
-        <Label 
-            Text="THIS IS THE SETTINGS PAGE!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+          ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Settings"/>
+
+        <Button Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding SelectInputFolderCommand}"
+                Text="Select Input folder:"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
+        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center" VerticalTextAlignment="Center"
+               Text="{Binding SortedFolderDrescription}"/>
+
+    </Grid>
 </ContentView>

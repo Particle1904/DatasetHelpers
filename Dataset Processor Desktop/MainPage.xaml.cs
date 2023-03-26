@@ -12,8 +12,6 @@ namespace Dataset_Processor_Desktop
             InitializeComponent();
             _viewModel = new MainPageViewModel();
             BindingContext = _viewModel;
-
-            SettingsButton.IsEnabled = false;
         }
     }
 }

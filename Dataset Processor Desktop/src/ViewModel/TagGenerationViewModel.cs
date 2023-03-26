@@ -1,5 +1,4 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
-using Dataset_Processor_Desktop.src.Interfaces;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Helpers;
@@ -9,10 +8,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class TagGenerationViewModel : BaseViewModel
     {
-        private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IAutoTaggerService _autoTaggerService;
-        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -62,24 +59,29 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand MakePredictionsCommand { get; private set; }
 
-        public TagGenerationViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService, ILoggerService loggerService)
+        public RelayCommand OpenInputFolderCommand { get; private set; }
+        public RelayCommand OpenOutputFolderCommand { get; private set; }
+
+        public TagGenerationViewModel(IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService)
         {
-            _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
             _autoTaggerService = autoTaggerService;
-            _loggerService = loggerService;
 
-            _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
-            _outputFolderPath = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
-            _fileManipulatorService.CreateFolderIfNotExist(_inputFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_outputFolderPath);
+            InputFolderPath = _configsService.Configurations.ResizedFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
+            OutputFolderPath = _configsService.Configurations.CombinedOutputFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
+
+            Threshold = _configsService.Configurations.TaggerThreshold;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
             MakePredictionsCommand = new RelayCommand(async () => await MakePredictionsAsync());
 
+            OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+            OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
+
             TaskStatus = ProcessingStatus.Idle;
-            Threshold = 0.35d;
         }
 
         public async Task SelectInputFolderAsync()

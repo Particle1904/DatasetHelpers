@@ -1,4 +1,7 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
+using Dataset_Processor_Desktop.src.Interfaces;
+
+using SmartData.Lib.Interfaces;
 
 using System.ComponentModel;
 
@@ -6,6 +9,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
+        protected readonly IFolderPickerService _folderPickerService;
+        protected readonly ILoggerService _loggerService;
+        protected readonly IConfigsService _configsService;
+
         private bool _isUiLocked = false;
         public bool IsUiLocked
         {
@@ -15,6 +22,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _isUiLocked = value;
                 OnPropertyChanged(nameof(IsUiLocked));
             }
+        }
+
+        public BaseViewModel()
+        {
+            _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();
+            _loggerService = Application.Current.Handler.MauiContext.Services.GetService<ILoggerService>();
+            _configsService = Application.Current.Handler.MauiContext.Services.GetService<IConfigsService>();
         }
 
         public string TaskStatusString
@@ -56,6 +70,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public virtual void OnPropertyChanged(string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public async Task OpenFolderAsync(string folderPath)
+        {
+            try
+            {
+                await _folderPickerService.OpenFolderInExplorerAsync(folderPath);
+            }
+            catch
+            {
+                _loggerService.LatestLogMessage = "Unable to open the folder!";
+            }
         }
     }
 }

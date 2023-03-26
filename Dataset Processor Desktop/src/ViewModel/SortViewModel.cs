@@ -1,5 +1,4 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
-using Dataset_Processor_Desktop.src.Interfaces;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Helpers;
@@ -9,9 +8,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class SortViewModel : BaseViewModel
     {
-        private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
-        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -24,14 +21,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        private string _selectedFolderPath;
-        public string SelectedFolderPath
+        private string _outputFolderPath;
+        public string OutputFolderPath
         {
-            get => _selectedFolderPath;
+            get => _outputFolderPath;
             set
             {
-                _selectedFolderPath = value;
-                OnPropertyChanged(nameof(SelectedFolderPath));
+                _outputFolderPath = value;
+                OnPropertyChanged(nameof(OutputFolderPath));
             }
         }
 
@@ -80,29 +77,37 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         }
 
         public RelayCommand SelectInputFolderCommand { get; private set; }
-        public RelayCommand SelectSelectedFolderCommand { get; private set; }
+        public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand SelectDiscardedFolderCommand { get; private set; }
         public RelayCommand SelectBackupFolderCommand { get; private set; }
         public RelayCommand SortImagesCommand { get; private set; }
 
-        public SortViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
-        {
-            _folderPickerService = folderPickerService;
-            _fileManipulatorService = fileManipulatorService;
-            _loggerService = loggerService;
+        public RelayCommand OpenInputFolderCommand { get; private set; }
+        public RelayCommand OpenOutputFolderCommand { get; private set; }
+        public RelayCommand OpenDiscardedFolderCommand { get; private set; }
+        public RelayCommand OpenBackupFolderCommand { get; private set; }
 
-            _discardedFolderPath = Path.Combine(AppContext.BaseDirectory, "discarded-images-output");
-            _selectedFolderPath = Path.Combine(AppContext.BaseDirectory, "selected-images-output");
-            _backupFolderPath = Path.Combine(AppContext.BaseDirectory, "images-backup");
-            _fileManipulatorService.CreateFolderIfNotExist(_discardedFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_selectedFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_backupFolderPath);
+        public SortViewModel(IFileManipulatorService fileManipulatorService)
+        {
+            _fileManipulatorService = fileManipulatorService;
+
+            DiscardedFolderPath = _configsService.Configurations.DiscardedFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(DiscardedFolderPath);
+            OutputFolderPath = _configsService.Configurations.SortedFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
+            BackupFolderPath = _configsService.Configurations.BackupFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(BackupFolderPath);
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
-            SelectSelectedFolderCommand = new RelayCommand(async () => await SelectSelectedFolderAsync());
+            SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
             SelectDiscardedFolderCommand = new RelayCommand(async () => await SelectDiscardedFolderAsync());
             SelectBackupFolderCommand = new RelayCommand(async () => await SelectBackupFolderAsync());
             SortImagesCommand = new RelayCommand(async () => await SortImagesAsync());
+
+            OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+            OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
+            OpenDiscardedFolderCommand = new RelayCommand(async () => await OpenFolderAsync(DiscardedFolderPath));
+            OpenBackupFolderCommand = new RelayCommand(async () => await OpenFolderAsync(BackupFolderPath));
 
             TaskStatus = ProcessingStatus.Idle;
             IsUiLocked = false;
@@ -116,12 +121,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 InputFolderPath = result;
             }
         }
-        public async Task SelectSelectedFolderAsync()
+        public async Task SelectOutputFolderAsync()
         {
             var result = await _folderPickerService.PickFolderAsync();
             if (!string.IsNullOrEmpty(result))
             {
-                SelectedFolderPath = result;
+                OutputFolderPath = result;
             }
         }
         public async Task SelectDiscardedFolderAsync()
@@ -163,7 +168,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             TaskStatus = ProcessingStatus.Running;
             try
             {
-                await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _selectedFolderPath, SortProgress, 512);
+                await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _outputFolderPath, SortProgress, 512);
             }
             catch (Exception exception)
             {

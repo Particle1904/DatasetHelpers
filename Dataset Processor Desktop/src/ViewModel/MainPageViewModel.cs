@@ -1,5 +1,4 @@
-﻿using Dataset_Processor_Desktop.src.Interfaces;
-using Dataset_Processor_Desktop.src.Utilities;
+﻿using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.Views;
 
 using SmartData.Lib.Interfaces;
@@ -10,12 +9,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class MainPageViewModel : BaseViewModel
     {
-        private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IAutoTaggerService _autoTaggerService;
         private readonly ITagProcessorService _tagProcessorService;
-        private readonly ILoggerService _loggerService;
 
         #region Definition of App Views.
         private View _dynamicContentView;
@@ -54,12 +51,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public MainPageViewModel()
         {
-            _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();
             _fileManipulatorService = Application.Current.Handler.MauiContext.Services.GetService<IFileManipulatorService>();
             _imageProcessorService = Application.Current.Handler.MauiContext.Services.GetService<IImageProcessorService>();
             _autoTaggerService = Application.Current.Handler.MauiContext.Services.GetService<IAutoTaggerService>();
             _tagProcessorService = Application.Current.Handler.MauiContext.Services.GetService<ITagProcessorService>();
-            _loggerService = Application.Current.Handler.MauiContext.Services.GetService<ILoggerService>();
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -72,6 +67,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
+
+            _configsService.LoadConfigurations();
         }
 
         public void NavigateToWelcomeView()
@@ -87,7 +84,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_datasetSortView == null)
             {
-                _datasetSortView = new DatasetSortView(_folderPickerService, _fileManipulatorService, _loggerService);
+                _datasetSortView = new DatasetSortView(_fileManipulatorService);
             }
             DynamicContentView = _datasetSortView;
         }
@@ -96,7 +93,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_resizeImagesView == null)
             {
-                _resizeImagesView = new ResizeImagesView(_folderPickerService, _fileManipulatorService, _imageProcessorService, _loggerService);
+                _resizeImagesView = new ResizeImagesView(_fileManipulatorService, _imageProcessorService);
             }
             DynamicContentView = _resizeImagesView;
         }
@@ -105,7 +102,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_tagGenerationView == null)
             {
-                _tagGenerationView = new TagGenerationView(_folderPickerService, _fileManipulatorService, _autoTaggerService, _loggerService);
+                _tagGenerationView = new TagGenerationView(_fileManipulatorService, _autoTaggerService);
             }
             DynamicContentView = _tagGenerationView;
         }
@@ -114,7 +111,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_tagProcessingView == null)
             {
-                _tagProcessingView = new TagProcessingView(_folderPickerService, _tagProcessorService, _fileManipulatorService, _loggerService);
+                _tagProcessingView = new TagProcessingView(_tagProcessorService, _fileManipulatorService);
             }
             DynamicContentView = _tagProcessingView;
         }
@@ -123,8 +120,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_tagEditorView == null)
             {
-                _tagEditorView = new TagEditorView(_folderPickerService, _fileManipulatorService, _imageProcessorService, _loggerService);
+                _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService);
             }
+
+            var tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
+            tagEditorViewModel.UpdateCurrentSelectedTags();
             DynamicContentView = _tagEditorView;
         }
 

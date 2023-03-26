@@ -6,7 +6,6 @@
         public App()
         {
             InitializeComponent();
-
             MainPage = new AppShell();
         }
 
@@ -15,7 +14,7 @@
             var window = base.CreateWindow(activationState);
 
             window.MinimumWidth = 1280;
-            window.MinimumHeight = 768;
+            window.MinimumHeight = 960;
             window.Title = "Dataset Processor All-in-one tools - v1.0";
 
             return window;

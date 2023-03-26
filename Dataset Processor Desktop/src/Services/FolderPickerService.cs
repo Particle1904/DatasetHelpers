@@ -34,5 +34,13 @@ namespace Dataset_Processor_Desktop.src.Services
 
             return result.Folder.Path;
         }
+
+        public async Task OpenFolderInExplorerAsync(string folderPath)
+        {
+            if (!string.IsNullOrEmpty(folderPath))
+            {
+                await Launcher.OpenAsync(folderPath);
+            }
+        }
     }
 }

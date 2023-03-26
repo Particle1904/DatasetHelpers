@@ -7,6 +7,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="10*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
@@ -28,14 +29,25 @@
                     Background="{StaticResource DarkPrimary}"
                     Command="{Binding SelectInputFolderCommand}"
                     Text="Select Input folder:"/>
-        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-                   HorizontalOptions="Start"
-                   VerticalOptions="Center"
-                   Text="{Binding InputFolderPath}"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
 
-        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                     VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand">
+        <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+               Text="{Binding SelectedImageFilename, StringFormat='Current file: {0}'}"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"/>
+
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+              VerticalOptions="Center"
+              HorizontalOptions="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="80*"/>
@@ -43,36 +55,45 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" 
-                    Text="&lt;" 
-                    Command="{Binding PreviousItemCommand}"
-                    HeightRequest="50"
-                    WidthRequest="50"/>
+            Text="&lt;" 
+            Command="{Binding PreviousItemCommand}"
+            HeightRequest="50"
+            WidthRequest="50"/>
             <Frame Grid.Column="1" 
-                       BorderColor="Transparent"
-                       Padding="0"
-                       Margin="10"    
-                       VerticalOptions="FillAndExpand"
-                       HorizontalOptions="FillAndExpand"
-                       MinimumWidthRequest="512"
-                       MaximumWidthRequest="512"
-                       MinimumHeightRequest="512"
-                       MaximumHeightRequest="512"
-                       BackgroundColor="{StaticResource DarkSecondaryBackground}">
-                <Image Aspect="AspectFit"
-                       Source="{Binding SelectedImage, Mode=TwoWay}"/>
+                   BorderColor="Transparent"
+                   Padding="0"
+                   Margin="10"    
+                   VerticalOptions="Fill"
+                   HorizontalOptions="Fill"
+                   MinimumWidthRequest="400"
+                   MaximumWidthRequest="400"
+                   MinimumHeightRequest="480"
+                   MaximumHeightRequest="480"
+                   CornerRadius="0"
+                   BackgroundColor="{StaticResource DarkSecondaryBackground}">
+                <Grid VerticalOptions="FillAndExpand"
+                      HorizontalOptions="FillAndExpand">
+                    <Image Aspect="AspectFit"
+                   Source="{Binding SelectedImage, Mode=TwoWay}">
+                        <!--<Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BlurImageCommand}"/>
+                        </Image.GestureRecognizers>-->
+                    </Image>
+                </Grid>
             </Frame>
-                <Button Grid.Column="2" 
-                    Text="&gt;"
-                    Command="{Binding NextItemCommand}"
-                    HeightRequest="50"
-                    WidthRequest="50"/>
+            <Button Grid.Column="2" 
+            Text="&gt;"
+            Command="{Binding NextItemCommand}"
+            HeightRequest="50"
+            WidthRequest="50"/>
         </Grid>
 
-        <StackLayout Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2"
+        <StackLayout Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
                      VerticalOptions="FillAndExpand"
                      HorizontalOptions="FillAndExpand">
-            <Editor Placeholder="This is where you can edit the tags."
-                    MinimumHeightRequest="512"
+            <Editor x:Name="EditorTags"
+                    Placeholder="This is where you can edit the tags."
+                    MinimumHeightRequest="400"
                     MinimumWidthRequest="300"
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"
@@ -80,10 +101,19 @@
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
                     IsTextPredictionEnabled="True"
-                    Text="{Binding CurrentImageTags}"/>
+                    Text="{Binding CurrentImageTags}"
+                    IsSpellCheckEnabled="True">
+                <Editor.Keyboard>
+                    <Keyboard x:FactoryMethod="Create">
+                        <x:Arguments>
+                            <KeyboardFlags>Spellcheck,Suggestions</KeyboardFlags>
+                        </x:Arguments>
+                    </Keyboard>
+                </Editor.Keyboard>
+            </Editor>
         </StackLayout>
         
-        <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                Margin="0,0,0,0"

@@ -30,6 +30,7 @@ namespace Dataset_Processor_Desktop
             builder.Services.AddSingleton<IImageProcessorService, ImageProcessorService>();
             builder.Services.AddSingleton<ITagProcessorService, TagProcessor>();
             builder.Services.AddSingleton<ILoggerService, LoggerService>();
+            builder.Services.AddSingleton<IConfigsService, ConfigsService>();
             builder.Services.AddSingleton<IAutoTaggerService>(service =>
             new AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, _onnxFilename),

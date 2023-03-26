@@ -1,5 +1,4 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
-using Dataset_Processor_Desktop.src.Interfaces;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Enums;
@@ -10,10 +9,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class ResizeImagesViewModel : BaseViewModel
     {
-        private readonly IFolderPickerService _folderPickerService;
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IFileManipulatorService _fileManipulatorService;
-        private readonly ILoggerService _loggerService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -62,25 +59,29 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
 
+        public RelayCommand OpenInputFolderCommand { get; private set; }
+        public RelayCommand OpenOutputFolderCommand { get; private set; }
+
         public RelayCommand ResizeImagesCommand { get; private set; }
 
-        public ResizeImagesViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService, ILoggerService loggerService)
+        public ResizeImagesViewModel(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
         {
-            _folderPickerService = folderPickerService;
             _imageProcessorService = imageProcessorService;
             _fileManipulatorService = fileManipulatorService;
-            _loggerService = loggerService;
-
-            _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "selected-images-output");
-            _outputFolderPath = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
-            _fileManipulatorService.CreateFolderIfNotExist(_inputFolderPath);
-            _fileManipulatorService.CreateFolderIfNotExist(_outputFolderPath);
 
             Dimension = SupportedDimensions.Resolution512x512;
+
+            InputFolderPath = _configsService.Configurations.SortedFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
+            OutputFolderPath = _configsService.Configurations.ResizedFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
             ResizeImagesCommand = new RelayCommand(async () => await ResizeImagesAsync());
+
+            OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+            OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
 
             TaskStatus = ProcessingStatus.Idle;
         }

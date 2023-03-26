@@ -158,9 +158,9 @@ namespace SmartData.Lib.Services
         /// The blurred image is then saved as a JPEG image into a new memory stream, which is converted to a byte array and returned as the result.
         /// </para>
         /// </remarks>
-        public Stream GetBlurriedImage(string imagePath)
+        public async Task<MemoryStream> GetBlurriedImage(string imagePath)
         {
-            using (Image image = Image.Load(imagePath))
+            using (Image image = await Image.LoadAsync(imagePath))
             {
                 image.Mutate(x => x.GaussianBlur(_blurRadius));
 

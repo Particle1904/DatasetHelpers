@@ -35,8 +35,7 @@
                     Command="{Binding NavigateToTagEditorCommand}"/>
             <Button Text="Settings"
                     VerticalOptions="Center"
-                    Command="{Binding NavigateToSettingsCommand}"
-                    x:Name="SettingsButton"/>
+                    Command="{Binding NavigateToSettingsCommand}"/>
         </StackLayout>
 
         <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"

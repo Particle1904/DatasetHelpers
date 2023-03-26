@@ -1,5 +1,4 @@
-﻿using Dataset_Processor_Desktop.src.Interfaces;
-using Dataset_Processor_Desktop.src.Utilities;
+﻿using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Interfaces;
 
@@ -7,9 +6,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class TagEditorViewModel : BaseViewModel
     {
-        private readonly IFolderPickerService _folderPickerService;
         private readonly IFileManipulatorService _fileManipulatorService;
-        private readonly ILoggerService _loggerService;
+        private readonly IImageProcessorService _imageProcessorService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -56,7 +54,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 try
                 {
-                    CurrentImageTags = _fileManipulatorService.GetTagsForImage(_imageFiles[_selectedItemIndex]);
+                    UpdateCurrentSelectedTags();
                 }
                 catch (Exception exception)
                 {
@@ -65,14 +63,28 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 finally
                 {
                     _selectedImage = value;
-                    OnPropertyChanged(nameof(SelectedImage));
+                    SelectedImageFilename = Path.GetFileName(_imageFiles[_selectedItemIndex]);
                 }
+                OnPropertyChanged(nameof(SelectedImage));
+            }
+        }
+
+        private string _selectedImageFilename;
+        public string SelectedImageFilename
+        {
+            get => _selectedImageFilename;
+            set
+            {
+                _selectedImageFilename = value;
+                OnPropertyChanged(nameof(SelectedImageFilename));
             }
         }
 
         public RelayCommand PreviousItemCommand { get; private set; }
         public RelayCommand NextItemCommand { get; private set; }
         public RelayCommand SelectInputFolderCommand { get; private set; }
+
+        public RelayCommand OpenInputFolderCommand { get; private set; }
 
         private string _currentImageTags;
         public string CurrentImageTags
@@ -88,14 +100,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public TagEditorViewModel(IFolderPickerService folderPickerService, IFileManipulatorService fileManipulatorService, ILoggerService loggerService)
+        public TagEditorViewModel(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
         {
-            _folderPickerService = folderPickerService;
             _fileManipulatorService = fileManipulatorService;
-            _loggerService = loggerService;
+            _imageProcessorService = imageProcessorService;
 
-            _inputFolderPath = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
-            _fileManipulatorService.CreateFolderIfNotExist(_inputFolderPath);
+            InputFolderPath = _configsService.Configurations.CombinedOutputFolder;
+            _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
 
             ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
 
@@ -103,8 +114,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NextItemCommand = new RelayCommand(GoToNextItem);
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
 
+            OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+
             SelectedItemIndex = 0;
-            _showBlurredImage = false;
         }
 
         public async Task SelectInputFolderAsync()
@@ -116,6 +128,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 try
                 {
                     ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
+                    if (ImageFiles.Count != 0)
+                    {
+                        ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    }
                 }
                 catch
                 {
@@ -123,7 +139,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 finally
                 {
-                    if (_imageFiles.Count > 0)
+                    if (ImageFiles.Count != 0)
                     {
                         SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                     }
@@ -148,6 +164,45 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _selectedItemIndex++;
                 SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 OnPropertyChanged(nameof(SelectedItemIndex));
+            }
+        }
+
+        //public async Task BlurImageAsync()
+        //{
+        //    _showBlurredImage = !_showBlurredImage;
+        //    try
+        //    {
+        //        if (_showBlurredImage)
+        //        {
+        //            await MainThread.InvokeOnMainThreadAsync(async () =>
+        //            {
+        //                MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImage(_imageFiles[_selectedItemIndex]);
+        //                SelectedImage = ImageSource.FromStream(() => imageMemoryStream);
+        //            });
+        //        }
+        //        else
+        //        {
+        //            await MainThread.InvokeOnMainThreadAsync(() =>
+        //            {
+        //                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+        //            });
+        //        }
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! {exception.InnerException}";
+        //    }
+        //    finally
+        //    {
+        //        OnPropertyChanged(nameof(SelectedImage));
+        //    }
+        //}
+
+        public void UpdateCurrentSelectedTags()
+        {
+            if (SelectedImage != null)
+            {
+                CurrentImageTags = _fileManipulatorService.GetTagsForImage(_imageFiles[_selectedItemIndex]);
             }
         }
     }

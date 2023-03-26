@@ -36,44 +36,55 @@
                 Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
-        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4"
-               Text="{Binding InputFolderPath}"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
 
         <Label Grid.Row="2" Grid.Column="0"
                Text="Tags to add:"/>
-        <Editor Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
-                VerticalOptions="FillAndExpand"
-                HorizontalOptions="FillAndExpand"
-                
-                VerticalTextAlignment="Start"
-                HorizontalTextAlignment="Start"
-                IsTextPredictionEnabled="True"
-                Placeholder="Type here the Tags you would like to add, separated by comma like this: 'tag1, tag2' or leave empty."
-                Text="{Binding TagsToAdd}"/>
+        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="True"
+                    AutoSize="TextChanges"
+                    Placeholder="Type here the Tags you would like to add, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Text="{Binding TagsToAdd}"/>
+        </ScrollView>
 
         <Label Grid.Row="3" Grid.Column="0"
                 Text="Tags to emphasize:"/>
-        <Editor Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
-                VerticalOptions="FillAndExpand"
-                HorizontalOptions="FillAndExpand"
-                
-                VerticalTextAlignment="Start"
-                HorizontalTextAlignment="Start"
-                IsTextPredictionEnabled="True"
-                Placeholder="Type here the Tags you would like to give emphasis by bringing it to the beginning, separated by comma like this: 'tag1, tag2' or leave empty."
-                Text="{Binding TagsToEmphasize}"/>
-
+        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="True"
+                    AutoSize="TextChanges"
+                    Placeholder="Type here the Tags you would like to give emphasis by bringing it to the beginning, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Text="{Binding TagsToEmphasize}"/>
+        </ScrollView>
+    
         <Label Grid.Row="4" Grid.Column="0"
                Text="Tags to remove:"/>
-        <Editor Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
-                VerticalOptions="FillAndExpand"
-                HorizontalOptions="FillAndExpand"
-                
-                VerticalTextAlignment="Start"
-                HorizontalTextAlignment="Start"
-                IsTextPredictionEnabled="True"
-                Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
-                Text="{Binding TagsToRemove}"/>
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="True"
+                    AutoSize="TextChanges"
+                    Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Text="{Binding TagsToRemove}"/>
+        </ScrollView>
 
         <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.RowDefinitions>
