@@ -104,6 +104,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
 
             SelectedItemIndex = 0;
+            _showBlurredImage = false;
         }
 
         public async Task SelectInputFolderAsync()
