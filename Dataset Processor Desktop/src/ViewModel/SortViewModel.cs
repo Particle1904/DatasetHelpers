@@ -93,7 +93,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             DiscardedFolderPath = _configsService.Configurations.DiscardedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(DiscardedFolderPath);
-            OutputFolderPath = _configsService.Configurations.SortedFolder;
+            OutputFolderPath = _configsService.Configurations.SelectedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
             BackupFolderPath = _configsService.Configurations.BackupFolder;
             _fileManipulatorService.CreateFolderIfNotExist(BackupFolderPath);

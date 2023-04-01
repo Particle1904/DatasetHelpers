@@ -69,6 +69,7 @@
 	  <Folder Include="Platforms\Windows\Services\" />
 	  <Folder Include="Resources\Images\" />
 	  <Folder Include="src\Models\" />
+	  <Folder Include="src\Renders\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -80,7 +81,6 @@
 
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Maui" Version="5.0.0" />
-	  <PackageReference Include="NHunspell" Version="1.2.5554.16953" />
 	</ItemGroup>
 
 	<ItemGroup>

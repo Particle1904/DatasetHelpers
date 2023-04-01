@@ -71,7 +71,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             Dimension = SupportedDimensions.Resolution512x512;
 
-            InputFolderPath = _configsService.Configurations.SortedFolder;
+            InputFolderPath = _configsService.Configurations.SelectedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configsService.Configurations.ResizedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);

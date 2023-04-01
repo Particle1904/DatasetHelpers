@@ -1,26 +1,35 @@
 ﻿using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 
+using System.ComponentModel;
+
 namespace SmartData.Lib.Services
 {
-    public class ConfigsService : IConfigsService
+    public class ConfigsService : IConfigsService, INotifyPropertyChanged
     {
         public Config Configurations { get; set; }
 
         private readonly string _cfgFilePath = Path.Combine(AppContext.BaseDirectory, "config.cfg");
 
         private string _taggerThresholdDescription = "#Threshold for AutoTagger, must be a decimal value between 0-1.0 | 0 meaning 0% and 1 is 100%. Values will be clamped if necessary.";
-        public string TaggerTrresholdDescription { get => _taggerThresholdDescription; }
-        private string _sortedFolderDescription = "#Folder for Discarded Images.";
-        public string SortedFolderDrescription { get => _sortedFolderDescription; }
+        public string TaggerThresholdDescription { get => _taggerThresholdDescription.Replace("#", ""); }
+
+        private string _discardedFolderDescription = "#Folder for Discarded Images.";
+        public string DiscardedFolderDescription { get => _discardedFolderDescription.Replace("#", ""); }
+
         private string _selectedFolderDescription = "#Folder for Selected Images. This is also the folder the Resize page will use as Input.";
-        public string SelectedFolderDescription { get => _selectedFolderDescription; }
+        public string SelectedFolderDescription { get => _selectedFolderDescription.Replace("#", ""); }
+
         private string _backupFolderDescription = "#Folder for Backup.";
-        public string BackupFolderDescription { get => _backupFolderDescription; }
+        public string BackupFolderDescription { get => _backupFolderDescription.Replace("#", ""); }
+
         private string _resizedFolderDescription = "#Folder for Resized images output. This is also the folder the Generate page will use as Input.";
-        public string ResizedFolderDescription { get => _resizedFolderDescription; }
+        public string ResizedFolderDescription { get => _resizedFolderDescription.Replace("#", ""); }
+
         private string _combinedFolderDescription = "#Folder for Generated Tags and their corresponding Images. This is also the folder the Processor and Tag Editor pages will use as Input.";
-        public string CombinedFolderDescription { get => _combinedFolderDescription; }
+        public string CombinedFolderDescription { get => _combinedFolderDescription.Replace("#", ""); }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public ConfigsService()
         {
@@ -47,7 +56,7 @@ namespace SmartData.Lib.Services
                 }
                 else if (line.StartsWith("SortedFolder"))
                 {
-                    Configurations.SortedFolder = GetStringConfig(line);
+                    Configurations.SelectedFolder = GetStringConfig(line);
                 }
                 else if (line.StartsWith("BackupFolder"))
                 {
@@ -71,11 +80,11 @@ namespace SmartData.Lib.Services
                 _taggerThresholdDescription,
                 $"TaggerThreshold={Configurations.TaggerThreshold}",
                 "\n",
-                _sortedFolderDescription,
+                _discardedFolderDescription,
                 $"DiscardedFolder={Configurations.DiscardedFolder}",
                 "\n",
                 _selectedFolderDescription,
-                $"SortedFolder={Configurations.SortedFolder}",
+                $"SortedFolder={Configurations.SelectedFolder}",
                 "\n",
                 _backupFolderDescription,
                 $"BackupFolder={Configurations.BackupFolder}",
@@ -100,7 +109,7 @@ namespace SmartData.Lib.Services
                     _taggerThresholdDescription,
                     $"TaggerThreshold={Configurations.TaggerThreshold}",
                     "\n",
-                    _sortedFolderDescription,
+                    _discardedFolderDescription,
                     $"DiscardedFolder={Path.Combine(AppContext.BaseDirectory, "discarded-images-output")}",
                     "\n",
                     _selectedFolderDescription,
@@ -142,6 +151,11 @@ namespace SmartData.Lib.Services
         {
             string[] splitLine = line.Split("=");
             return splitLine.Last();
+        }
+
+        public virtual void OnPropertyChanged(string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
