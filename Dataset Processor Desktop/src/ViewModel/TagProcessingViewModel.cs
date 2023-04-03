@@ -54,6 +54,28 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private string _tagsToReplace;
+        public string TagsToReplace
+        {
+            get => _tagsToReplace;
+            set
+            {
+                _tagsToReplace = value;
+                OnPropertyChanged(nameof(TagsToReplace));
+            }
+        }
+
+        private string _tagsToBeReplaced;
+        public string TagsToBeReplaced
+        {
+            get => _tagsToBeReplaced;
+            set
+            {
+                _tagsToBeReplaced = value;
+                OnPropertyChanged(nameof(TagsToBeReplaced));
+            }
+        }
+
         private Progress _tagProcessingProgress;
         public Progress TagProcessingProgress
         {
@@ -156,6 +178,28 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             finally
             {
                 TaskStatus = Enums.ProcessingStatus.Finished;
+            }
+
+            if (!string.IsNullOrEmpty(TagsToReplace))
+            {
+                TaskStatus = Enums.ProcessingStatus.Running;
+                TagProcessingProgress.Reset();
+
+                try
+                {
+                    await _tagProcessorService.ProcessTagsReplacement(InputFolderPath, TagsToReplace, TagsToBeReplaced, TagProcessingProgress);
+                }
+                catch (Exception exception)
+                {
+                    if (exception.GetType() == typeof(System.ArgumentException))
+                    {
+                        _loggerService.LatestLogMessage = exception.Message;
+                    }
+                }
+                finally
+                {
+                    TaskStatus = Enums.ProcessingStatus.Finished;
+                }
             }
         }
     }

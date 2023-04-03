@@ -57,6 +57,48 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Processes the replacement of tags in all text files within the specified input folder path with the specified tags to replace and tags to be replaced.
+        /// </summary>
+        /// <param name="inputFolderPath">The input folder path containing the text files to be processed.</param>
+        /// <param name="tagsToReplace">The comma-separated list of tags to replace.</param>
+        /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToReplace, string tagsToBeReplaced)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            foreach (var file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = ReplaceListOfTags(readTags, tagsToReplace, tagsToBeReplaced);
+                await File.WriteAllTextAsync(file, processedTags);
+            }
+        }
+
+        /// <summary>
+        /// Processes the replacement of tags in all text files within the specified input folder path with the specified tags to replace and tags to be replaced.
+        /// </summary>
+        /// <param name="inputFolderPath">The input folder path containing the text files to be processed.</param>
+        /// <param name="tagsToReplace">The comma-separated list of tags to replace.</param>
+        /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
+        /// <param name="progress">The Progress object used to track the progress of the operation.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToReplace, string tagsToBeReplaced, Progress progress)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (var file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = ReplaceListOfTags(readTags, tagsToReplace, tagsToBeReplaced);
+                await File.WriteAllTextAsync(file, processedTags);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
         /// Randomizes the tags of all the text files in the specified input folder path.
         /// </summary>
         /// <param name="inputFolderPath">The path of the input folder.</param>
@@ -200,6 +242,44 @@ namespace SmartData.Lib.Services
                 foreach (string tag in tagsToRemoveSplit)
                 {
                     tagsResult.RemoveAll(x => tag.Equals(x));
+                }
+            }
+
+            return string.Join(", ", tagsResult.Distinct());
+        }
+
+        /// <summary>
+        /// Replaces a list of tags in a string with another list of tags.
+        /// </summary>
+        /// <param name="tags">The original string containing the tags.</param>
+        /// <param name="tagsToReplace">The comma-separated list of tags to be replaced.</param>
+        /// <param name="tagsToBeReplaced">The comma-separated list of replacement tags.</param>
+        /// <returns>The modified string with the tags replaced.</returns>
+        /// <exception cref="ArgumentException">Thrown when the number of tags to replace is not equal to the number of replacement tags.</exception>
+        private string ReplaceListOfTags(string tags, string tagsToReplace, string tagsToBeReplaced)
+        {
+            List<string> tagsResult = new List<string>();
+
+            string[] tagsToReplaceSplit = tagsToReplace.Replace(", ", ",").Split(",");
+            string[] tagsToBeReplacedSplit = tagsToBeReplaced.Replace(", ", ",").Split(",");
+
+            if (tagsToReplaceSplit.Length != tagsToBeReplacedSplit.Length)
+            {
+                throw new ArgumentException("Amount of tags must be the same!");
+            }
+
+            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
+
+            foreach (string tag in tagsSplit)
+            {
+                if (tagsToReplaceSplit.Contains(tag))
+                {
+                    int index = Array.IndexOf(tagsToReplaceSplit, tag);
+                    tagsResult.Add(tagsToBeReplacedSplit[index]);
+                }
+                else
+                {
+                    tagsResult.Add(tag);
                 }
             }
 

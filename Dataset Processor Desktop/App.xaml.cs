@@ -1,4 +1,6 @@
-﻿namespace Dataset_Processor_Desktop
+﻿using System.Globalization;
+
+namespace Dataset_Processor_Desktop
 {
     public partial class App : Application
     {
@@ -6,6 +8,8 @@
         public App()
         {
             InitializeComponent();
+            var culture = new CultureInfo("en-US");
+            Preferences.Set("Language", culture.Name);
             MainPage = new AppShell();
         }
 

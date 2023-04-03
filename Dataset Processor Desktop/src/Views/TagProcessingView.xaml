@@ -10,6 +10,7 @@
             <RowDefinition Height="3*"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="3*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="2*"/>
@@ -49,44 +50,67 @@
 
         <Label Grid.Row="2" Grid.Column="0"
                Text="Tags to add:"/>
-        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
+        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
                     IsTextPredictionEnabled="True"
                     AutoSize="TextChanges"
-                    Placeholder="Type here the Tags you would like to add, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Placeholder="Enter tags you want to add, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToAdd}"/>
         </ScrollView>
 
         <Label Grid.Row="3" Grid.Column="0"
                 Text="Tags to emphasize:"/>
-        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3">
+        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4">
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
                     IsTextPredictionEnabled="True"
                     AutoSize="TextChanges"
-                    Placeholder="Type here the Tags you would like to give emphasis by bringing it to the beginning, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Placeholder="Enter tags you want to emphasize by bringing them to the beginning, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToEmphasize}"/>
         </ScrollView>
     
         <Label Grid.Row="4" Grid.Column="0"
                Text="Tags to remove:"/>
-        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3">
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4">
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
                     IsTextPredictionEnabled="True"
                     AutoSize="TextChanges"
-                    Placeholder="Type here the Tags you would like to remove, separated by comma like this: 'tag1, tag2' or leave empty."
+                    Placeholder="Enter tags you want to remove, separated by commas. For example: 'obsolete, redundant'. Leave blank if not applicable."
                     Text="{Binding TagsToRemove}"/>
         </ScrollView>
 
-        <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5">
+        <Label Grid.Row="5" Grid.Column="0"
+               Text="Tags to replace:"/>
+        <ScrollView Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="True"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+                    Text="{Binding TagsToReplace}"/>
+        </ScrollView>
+        <ScrollView Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="True"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
+                    Text="{Binding TagsToBeReplaced}"/>
+        </ScrollView>
+
+        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
@@ -109,31 +133,31 @@
                    Text="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg and 1.txt, 2.jpeg and 2.txt..."/>
         </Grid>        
         
-        <BoxView HeightRequest="1" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5" 
+        <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                Text="{Binding TagProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="8" Grid.Column="2"
+        <Button Grid.Row="9" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding ProcessTagsCommand}"
                 Text="Process tags!"/>
 
-        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding TagProcessingProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
                FontSize="Medium"
                TextColor="{StaticResource DarkSecondary}"
                Text="{Binding TaskStatusString}"/>
 
-        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="5" 
                TextColor="{StaticResource DarkSecondary}"
                Margin="0,0,0,0"
                VerticalTextAlignment="Center"

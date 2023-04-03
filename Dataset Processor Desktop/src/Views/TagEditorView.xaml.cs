@@ -21,4 +21,9 @@ public partial class TagEditorView : ContentView
         _viewModel = new TagEditorViewModel(_fileManipulatorService, _imageProcessorService);
         BindingContext = _viewModel;
     }
+
+    private void EditorTags_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var text = e.NewTextValue;
+    }
 }
