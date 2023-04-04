@@ -164,12 +164,10 @@ namespace SmartData.Lib.Services
             {
                 image.Mutate(x => x.GaussianBlur(_blurRadius));
 
-                using (MemoryStream blurredImageStream = new MemoryStream())
-                {
-                    image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
+                MemoryStream blurredImageStream = new MemoryStream();
+                image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
 
-                    return blurredImageStream;
-                }
+                return blurredImageStream;
             }
         }
 

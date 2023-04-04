@@ -83,10 +83,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand PreviousItemCommand { get; private set; }
         public RelayCommand NextItemCommand { get; private set; }
         public RelayCommand SelectInputFolderCommand { get; private set; }
-
+        public RelayCommand BlurImageCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
 
         private string _currentImageTags;
+
+        private bool _showBlurredImage;
+
+        private MemoryStream _currentImageMemoryStream;
+
         public string CurrentImageTags
         {
             get => _currentImageTags;
@@ -113,7 +118,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             PreviousItemCommand = new RelayCommand(GoToPreviousItem);
             NextItemCommand = new RelayCommand(GoToNextItem);
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
-
+            BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
 
             SelectedItemIndex = 0;
@@ -167,36 +172,37 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        //public async Task BlurImageAsync()
-        //{
-        //    _showBlurredImage = !_showBlurredImage;
-        //    try
-        //    {
-        //        if (_showBlurredImage)
-        //        {
-        //            await MainThread.InvokeOnMainThreadAsync(async () =>
-        //            {
-        //                MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImage(_imageFiles[_selectedItemIndex]);
-        //                SelectedImage = ImageSource.FromStream(() => imageMemoryStream);
-        //            });
-        //        }
-        //        else
-        //        {
-        //            await MainThread.InvokeOnMainThreadAsync(() =>
-        //            {
-        //                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-        //            });
-        //        }
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! {exception.InnerException}";
-        //    }
-        //    finally
-        //    {
-        //        OnPropertyChanged(nameof(SelectedImage));
-        //    }
-        //}
+        public async Task BlurImageAsync()
+        {
+            _showBlurredImage = !_showBlurredImage;
+            try
+            {
+                if (_showBlurredImage)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImage(_imageFiles[_selectedItemIndex]);
+                        imageMemoryStream.Seek(0, SeekOrigin.Begin);
+                        _currentImageMemoryStream?.Dispose();
+                        MemoryStream imageMemoryStreamCopy = new MemoryStream(imageMemoryStream.ToArray());
+                        SelectedImage = ImageSource.FromStream(() => imageMemoryStreamCopy);
+                        OnPropertyChanged(nameof(SelectedImage));
+                        await imageMemoryStream.DisposeAsync();
+                    });
+                }
+                else
+                {
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+                    });
+                }
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! {exception.InnerException}";
+            }
+        }
 
         public void UpdateCurrentSelectedTags()
         {

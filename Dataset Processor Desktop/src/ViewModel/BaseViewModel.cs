@@ -73,7 +73,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public virtual void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            MainThread.InvokeOnMainThreadAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
         }
 
         public async Task OpenFolderAsync(string folderPath)

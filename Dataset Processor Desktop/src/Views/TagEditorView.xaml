@@ -74,10 +74,10 @@
                 <Grid VerticalOptions="FillAndExpand"
                       HorizontalOptions="FillAndExpand">
                     <Image Aspect="AspectFit"
-                   Source="{Binding SelectedImage, Mode=TwoWay}">
-                        <!--<Image.GestureRecognizers>
+                           Source="{Binding SelectedImage, Mode=TwoWay}">
+                        <Image.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding BlurImageCommand}"/>
-                        </Image.GestureRecognizers>-->
+                        </Image.GestureRecognizers>
                     </Image>
                 </Grid>
             </Frame>
