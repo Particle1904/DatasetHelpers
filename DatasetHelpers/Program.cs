@@ -47,19 +47,19 @@ namespace DatasetHelpers
 
             string[] treatedDataset = Directory.GetFiles(_imagesResizedOutput);
 
-            Console.WriteLine($"Starting process of generating tags using WD Tagger Model!");
-            for (int i = 0; i < treatedDataset.Length; i++)
-            {
-                Console.WriteLine($"Predicting for file {i + 1}...");
+            //Console.WriteLine($"Starting process of generating tags using WD Tagger Model!");
+            //for (int i = 0; i < treatedDataset.Length; i++)
+            //{
+            //    Console.WriteLine($"Predicting for file {i + 1}...");
 
-                List<string> prediction = _taggerService.GetOrderedByScoreListOfTags(treatedDataset[i]);
-                string tags = _tagHelper.ProcessListOfTags(prediction);
-                File.WriteAllText($"{_combinedOutput}/{i + 1}.txt", tags);
-                File.Move(treatedDataset[i], $"{_combinedOutput}/{i + 1}.png");
+            //    List<string> prediction = _taggerService.GetOrderedByScoreListOfTags(treatedDataset[i]);
+            //    string tags = _tagHelper.ProcessListOfTags(prediction);
+            //    File.WriteAllText($"{_combinedOutput}/{i + 1}.txt", tags);
+            //    File.Move(treatedDataset[i], $"{_combinedOutput}/{i + 1}.png");
 
-                Console.WriteLine($"Finished processing file {i + 1}! File moved to the appropriate folder and tags file created.");
-            }
-            Console.WriteLine($"Finished process of tag generation and processing.");
+            //    Console.WriteLine($"Finished processing file {i + 1}! File moved to the appropriate folder and tags file created.");
+            //}
+            //Console.WriteLine($"Finished process of tag generation and processing.");
 
             _tagHelper.CalculateListOfMostUsedTags();
 

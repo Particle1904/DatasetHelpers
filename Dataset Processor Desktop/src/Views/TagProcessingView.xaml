@@ -52,10 +52,10 @@
                Text="Tags to add:"/>
         <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
             <Editor VerticalOptions="FillAndExpand"
-                    HorizontalOptions="FillAndExpand"                
+                    HorizontalOptions="FillAndExpand"
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
+                    IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter tags you want to add, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToAdd}"/>
@@ -68,7 +68,7 @@
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
+                    IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter tags you want to emphasize by bringing them to the beginning, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToEmphasize}"/>
@@ -81,7 +81,7 @@
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
+                    IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter tags you want to remove, separated by commas. For example: 'obsolete, redundant'. Leave blank if not applicable."
                     Text="{Binding TagsToRemove}"/>
@@ -94,7 +94,7 @@
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
+                    IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToReplace}"/>
@@ -104,7 +104,7 @@
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
+                    IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
                     Text="{Binding TagsToBeReplaced}"/>

@@ -14,7 +14,7 @@ namespace SmartData.Lib.Services
 
         private const ushort _semaphoreConcurrent = 6;
 
-        private const float _blurRadius = 50.0f;
+        private const float _blurRadius = 22f;
 
         private const ushort _divisor = 64;
         private int _baseResolution = 512;

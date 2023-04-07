@@ -8,7 +8,8 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="10*"/>
+            <RowDefinition Height="12*"/>
+            <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
@@ -90,31 +91,45 @@
 
         <StackLayout Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
                      VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand">
-            <Editor x:Name="EditorTags"
-                    Placeholder="This is where you can edit the tags."
-                    MinimumHeightRequest="400"
-                    MinimumWidthRequest="300"
+                     HorizontalOptions="FillAndExpand"
+                     Spacing="0">
+            <ScrollView HeightRequest="300">
+                <Editor x:Name="EditorTags"
+                        Placeholder="This is where you can edit the tags."                        
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        Text="{Binding CurrentImageTags}"
+                        IsSpellCheckEnabled="False"
+                        TextChanged="OnTextChanged">
+                </Editor>
+            </ScrollView>
+            
+            <ScrollView HeightRequest="300">
+                <Label x:Name="LabelFormatted"
+                       Padding="10"/>
+            </ScrollView>
+        </StackLayout>
+
+        <Label Grid.Row="4" Grid.Column="0"
+               Text="Highlight words:"/>
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4">
+            <Editor x:Name="EditorHighlight"
                     VerticalOptions="FillAndExpand"
-                    HorizontalOptions="FillAndExpand"
-                    AutoSize="TextChanges"
+                    HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
                     HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="True"
-                    Text="{Binding CurrentImageTags}"
-                    IsSpellCheckEnabled="True"
-                    TextChanged="EditorTags_TextChanged">
-                <Editor.Keyboard>
-                    <Keyboard x:FactoryMethod="Create">
-                        <x:Arguments>
-                            <KeyboardFlags>Spellcheck,Suggestions</KeyboardFlags>
-                        </x:Arguments>
-                    </Keyboard>
-                </Editor.Keyboard>
-            </Editor>
-        </StackLayout>
-        
-        <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5"
+                    IsTextPredictionEnabled="False"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter words you want to highlight (even if its just parcial part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+                    Text="{Binding WordsToHighlight}"
+                    TextChanged="OnTextChanged"/>
+        </ScrollView>
+
+        <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                Margin="0,0,0,0"

@@ -80,6 +80,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        public string _wordsToHighlight;
+        public string WordsToHighlight
+        {
+            get => _wordsToHighlight;
+            set
+            {
+                _wordsToHighlight = value;
+                OnPropertyChanged(nameof(WordsToHighlight));
+            }
+        }
+
         public RelayCommand PreviousItemCommand { get; private set; }
         public RelayCommand NextItemCommand { get; private set; }
         public RelayCommand SelectInputFolderCommand { get; private set; }
