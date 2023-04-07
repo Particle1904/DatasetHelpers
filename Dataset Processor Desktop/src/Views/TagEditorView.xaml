@@ -11,6 +11,7 @@
             <RowDefinition Height="12*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -110,7 +111,7 @@
             
             <ScrollView HeightRequest="300">
                 <Label x:Name="LabelFormatted"
-                       Padding="10"/>
+                       Padding="14"/>
             </ScrollView>
         </StackLayout>
 
@@ -135,5 +136,12 @@
                Margin="0,0,0,0"
                TextColor="{StaticResource DarkSecondary}"
                Text="Note: text changes are automatically saved whenever you type anything in the Text Box."/>
+        
+        <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               Margin="0,0,0,0"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="Note: the search functionality can be very expensive and take a few seconds to complete!"/>
     </Grid>
 </ContentView>

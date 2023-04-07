@@ -21,6 +21,7 @@ public partial class TagEditorView : ContentView, INotifyPropertyChanged
     private FormattedString _labelFormattedString;
 
     private CancellationTokenSource _cancellationTokenSource;
+    private TimeSpan _waitTimeInMilliseconds = new TimeSpan(0, 0, 2);
 
     public FormattedString LabelFormattedString
     {
@@ -55,11 +56,13 @@ public partial class TagEditorView : ContentView, INotifyPropertyChanged
 
         try
         {
-            await Task.Delay(500, _cancellationTokenSource.Token).ContinueWith(_ => action.Invoke(),
-            CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion,
-            TaskScheduler.FromCurrentSynchronizationContext());
+            await Task.Delay(_waitTimeInMilliseconds, _cancellationTokenSource.Token);
+            action.Invoke();
         }
-        catch (TaskCanceledException) { }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
         finally
         {
             _cancellationTokenSource?.Dispose();
@@ -100,33 +103,30 @@ public partial class TagEditorView : ContentView, INotifyPropertyChanged
     {
         LabelFormattedString.Spans.Clear();
 
+        string regexSearchPattern = $@"\b({string.Join("|", wordsToHighlighSplit)})\b";
+        Regex regex = new Regex(regexSearchPattern, RegexOptions.IgnoreCase);
+
         for (int i = 0; i < parts.Length; i++)
         {
             Span span = new Span();
             span.Text = parts[i];
+
+            MatchCollection matches = regex.Matches(span.Text);
+            if (matches.Count > 0)
+            {
+                span.BackgroundColor = _highlightBackgroundColor;
+            }
+            else
+            {
+                span.BackgroundColor = _transparentColor;
+            }
 
             if (i < parts.Length - 1)
             {
                 span.Text += ", ";
             }
 
-            foreach (string word in wordsToHighlighSplit)
-            {
-                Regex regex = new Regex(@"\b" + word + @"\b");
-                Match match = regex.Match(span.Text);
-
-                if (match.Success)
-                {
-                    span.BackgroundColor = _highlightBackgroundColor;
-                    break;
-                }
-                else
-                {
-                    span.BackgroundColor = _transparentColor;
-                }
-            }
             span.TextColor = _textColor;
-
             LabelFormattedString.Spans.Add(span);
         }
     }
