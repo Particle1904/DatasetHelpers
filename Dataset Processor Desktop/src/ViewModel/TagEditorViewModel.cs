@@ -101,7 +101,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private bool _showBlurredImage;
 
-        private MemoryStream _currentImageMemoryStream;
+        private MemoryStream _currentImageMemoryStream = null;
 
         public string CurrentImageTags
         {
