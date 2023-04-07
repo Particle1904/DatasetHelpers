@@ -105,7 +105,8 @@
                         IsTextPredictionEnabled="False"
                         Text="{Binding CurrentImageTags}"
                         IsSpellCheckEnabled="False"
-                        TextChanged="OnTextChanged">
+                        TextChanged="OnTextChanged"
+                        FontSize="Default">
                 </Editor>
             </ScrollView>
             
@@ -113,7 +114,9 @@
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand">
                 <Label x:Name="LabelFormatted"
-                       Padding="14"/>
+                       Padding="12"
+                       FontSize="Default" 
+                       FontFamily="OpenSansRegular"/>
             </ScrollView>
         </StackLayout>
 
@@ -140,14 +143,14 @@
 
         <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Center"
+               VerticalTextAlignment="Start"
                Margin="0,0,0,0"
                TextColor="{StaticResource DarkSecondary}"
                Text="Note: text changes are automatically saved whenever you type anything in the Text Box."/>
         
         <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Center"
+               VerticalTextAlignment="Start"
                Margin="0,0,0,0"
                TextColor="{StaticResource DarkSecondary}"
                Text="Note: the search functionality can be very expensive and take a few seconds to complete!"/>
