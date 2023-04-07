@@ -8,7 +8,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="12*"/>
+            <RowDefinition Height="14*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -94,7 +94,7 @@
                      VerticalOptions="FillAndExpand"
                      HorizontalOptions="FillAndExpand"
                      Spacing="0">
-            <ScrollView HeightRequest="300">
+            <ScrollView HeightRequest="240">
                 <Editor x:Name="EditorTags"
                         Placeholder="This is where you can edit the tags."                        
                         VerticalOptions="FillAndExpand"
@@ -109,15 +109,23 @@
                 </Editor>
             </ScrollView>
             
-            <ScrollView HeightRequest="300">
+            <ScrollView HeightRequest="240"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
                 <Label x:Name="LabelFormatted"
                        Padding="14"/>
             </ScrollView>
         </StackLayout>
 
         <Label Grid.Row="4" Grid.Column="0"
-               Text="Highlight words:"/>
-        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4">
+               HorizontalOptions="FillAndExpand"
+               VerticalOptions="FillAndExpand"
+               Text="Highlight words:"
+               HeightRequest="50"/>
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    HeightRequest="50">
             <Editor x:Name="EditorHighlight"
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
