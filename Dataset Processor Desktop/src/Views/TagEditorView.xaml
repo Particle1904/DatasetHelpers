@@ -106,7 +106,8 @@
                         Text="{Binding CurrentImageTags}"
                         IsSpellCheckEnabled="False"
                         TextChanged="OnTextChanged"
-                        FontSize="Default">
+                        FontSize="Default"
+                        FontFamily="OpenSansRegular">
                 </Editor>
             </ScrollView>
             
@@ -114,7 +115,7 @@
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand">
                 <Label x:Name="LabelFormatted"
-                       Padding="12"
+                       Padding="11"
                        FontSize="Default" 
                        FontFamily="OpenSansRegular"/>
             </ScrollView>
