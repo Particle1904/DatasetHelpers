@@ -10,8 +10,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _taggerThreshold;
             set
             {
-                _taggerThreshold = Math.Round(value, 2);
-                OnPropertyChanged(nameof(TaggerThreshold));
+                if (Math.Round(value, 2) != _taggerThreshold)
+                {
+                    _taggerThreshold = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(TaggerThreshold));
+                }
             }
         }
         private string _selectedFolderPath;
