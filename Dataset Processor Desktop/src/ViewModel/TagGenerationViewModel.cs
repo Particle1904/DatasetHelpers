@@ -50,8 +50,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _threshold;
             set
             {
-                _threshold = Math.Round(value, 2);
-                OnPropertyChanged(nameof(Threshold));
+                if (Math.Round(value, 2) != _threshold)
+                {
+                    _threshold = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(Threshold));
+                }
             }
         }
 
