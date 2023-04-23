@@ -1,8 +1,12 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 
+using Microsoft.UI.Xaml;
+
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+
+using System.Diagnostics;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
@@ -58,6 +62,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private readonly Stopwatch _timer;
+        public TimeSpan ElapsedTime
+        {
+            get => _timer.Elapsed;
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand MakePredictionsCommand { get; private set; }
@@ -84,6 +94,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
 
+            _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
         }
 
@@ -116,10 +127,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 PredictionProgress.Reset();
             }
 
+            _timer.Reset();
             TaskStatus = ProcessingStatus.Running;
             _autoTaggerService.Threshold = (float)Threshold;
+
             try
             {
+                _timer.Start();
+                DispatcherTimer timer = new DispatcherTimer()
+                {
+                    Interval = TimeSpan.FromMilliseconds(100)
+                };
+                timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
+                timer.Start();
+
                 await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress);
             }
             catch (Exception exception)
@@ -129,6 +150,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             finally
             {
                 TaskStatus = ProcessingStatus.Finished;
+                _timer.Stop();
             }
         }
     }

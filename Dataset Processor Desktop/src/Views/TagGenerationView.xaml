@@ -15,6 +15,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -80,16 +81,21 @@
                HorizontalTextAlignment="Center"
                Text="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="7" Grid.Column="2"
+        <Label Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               Text="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:mm\\:ss\\.fff}'}" />
+
+        <Button Grid.Row="8" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding MakePredictionsCommand}"
                 Text="Generate tags!"/>
 
-        <ProgressBar Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding PredictionProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
                FontSize="Medium"
