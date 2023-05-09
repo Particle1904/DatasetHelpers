@@ -16,7 +16,7 @@ namespace DatasetHelpers.Services
             _inputPath = inputPath;
             _outputPath = outputPath;
 
-            string[] tags = File.ReadAllLines($"{Environment.CurrentDirectory}/tags.txt");
+            string[] tags = File.ReadAllLines($"{Environment.CurrentDirectory}/tags.csv");
             _tags = new HashSet<string>(tags[0].Split(","));
             _negativeTags = new HashSet<string>(tags[1].Split(","));
         }

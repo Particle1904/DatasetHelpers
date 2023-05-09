@@ -56,11 +56,16 @@
                 <ColumnDefinition Width="10*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" 
-                    Text="&lt;" 
-                    Command="{Binding PreviousItemCommand}"
-                    HeightRequest="50"
-                    WidthRequest="50"/>
+            <StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="10">
+                <Button Text="&lt;" 
+                        Command="{Binding PreviousItemCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"/>
+                <Button Text="&lt;&lt;&lt;" 
+                        Command="{Binding PreviousTenItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"/>
+            </StackLayout>            
             <Frame Grid.Column="1" 
                    BorderColor="Transparent"
                    Padding="0"
@@ -83,11 +88,17 @@
                     </Image>
                 </Grid>
             </Frame>
-            <Button Grid.Column="2" 
-            Text="&gt;"
-            Command="{Binding NextItemCommand}"
-            HeightRequest="50"
-            WidthRequest="50"/>
+            <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="10">
+                <Button Text="&gt;"
+                        Command="{Binding NextItemCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"/>
+                <Button Text="&gt;&gt;&gt;"
+                        Command="{Binding NextTenItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"/>
+            </StackLayout>
+            
         </Grid>
 
         <StackLayout Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"

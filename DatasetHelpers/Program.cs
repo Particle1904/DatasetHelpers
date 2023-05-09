@@ -31,8 +31,8 @@ namespace DatasetHelpers
             string _combinedOutput = $"CombinedOutput";
 
             FileManipulatorService _fileService = new FileManipulatorService();
-            AutoTaggerService _taggerService = new AutoTaggerService(_modelPath, _tagsPath);
-            _taggerService.LoadConfigs(_configs.Configurations);
+            //AutoTaggerService _taggerService = new AutoTaggerService(_modelPath, _tagsPath);
+            //_taggerService.LoadConfigs(_configs.Configurations);
             TagHelper _tagHelper = new TagHelper(_textInput, _combinedOutput);
 
             _fileService.CreateFolderIfNotExist(_imagesFolder);
