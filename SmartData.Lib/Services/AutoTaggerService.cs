@@ -94,7 +94,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The path to the folder containing the input images.</param>
         /// <param name="outputPath">The path to the folder where the output files will be saved.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GenerateTags(string inputPath, string outputPath)
+        public async Task GenerateTags(string inputPath, string outputPath, bool weightedCaptions = false)
         {
             if (!_isModelLoaded)
             {
@@ -105,7 +105,7 @@ namespace SmartData.Lib.Services
 
             foreach (string file in files)
             {
-                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file);
+                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
                 string commaSeparated = GetCommaSeparatedString(orderedPredictions);
 
                 string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
@@ -128,7 +128,7 @@ namespace SmartData.Lib.Services
         /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
         /// <param name="progress">The progress object to update with the status of the operation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GenerateTags(string inputPath, string outputPath, Progress progress)
+        public async Task GenerateTags(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false)
         {
             if (!_isModelLoaded)
             {
@@ -141,7 +141,7 @@ namespace SmartData.Lib.Services
 
             foreach (string file in files)
             {
-                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file);
+                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
                 string commaSeparated = GetCommaSeparatedString(orderedPredictions);
 
                 string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
@@ -162,7 +162,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="imagePath">The file path of the image to be analyzed.</param>
         /// <returns>A list of tags ordered by their score in descending order.</returns>
-        private async Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath)
+        private async Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath, bool weightedCaptions = false)
         {
 
             Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
@@ -181,10 +181,19 @@ namespace SmartData.Lib.Services
             IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
 
             List<string> listOrdered = new List<string>();
-
-            foreach (KeyValuePair<string, float> item in sortedDict)
+            if (weightedCaptions)
             {
-                listOrdered.Add(item.Key);
+                foreach (KeyValuePair<string, float> item in sortedDict)
+                {
+                    listOrdered.Add($"({item.Key}:{item.Value.ToString("F2")})");
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, float> item in sortedDict)
+                {
+                    listOrdered.Add(item.Key);
+                }
             }
 
             foreach (string item in listOrdered)

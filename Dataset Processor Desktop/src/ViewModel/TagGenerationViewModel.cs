@@ -68,6 +68,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _timer.Elapsed;
         }
 
+        private bool _weightedCaptions = true;
+        public bool WeightedCaptions
+        {
+            get => _weightedCaptions;
+            set
+            {
+                _weightedCaptions = value;
+                OnPropertyChanged(nameof(WeightedCaptions));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand MakePredictionsCommand { get; private set; }
@@ -141,7 +152,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress);
+                await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
             }
             catch (Exception exception)
             {
