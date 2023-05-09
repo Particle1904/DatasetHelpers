@@ -68,7 +68,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _timer.Elapsed;
         }
 
-        private bool _weightedCaptions = true;
+        private bool _weightedCaptions;
         public bool WeightedCaptions
         {
             get => _weightedCaptions;
@@ -104,6 +104,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
+
+            WeightedCaptions = false;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
