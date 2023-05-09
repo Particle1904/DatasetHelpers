@@ -15,9 +15,7 @@ To get started with the Dataset Processor Tools, download the provided release o
 To build clone this repository and open the project in Visual Studio 2022 or later. You can then build and run the project.
 
 Use these commands to build it as a self-contained .exe application (only windows supported at this time):
-Right-click the Solution and click "Open in Terminal" then use the commands
-
-```dotnet restore```
+Right-click the Solution and click "Open in Terminal" then use the command:
 
 ```dotnet build /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None -p:BuildWindowsOnly=true```
 
