@@ -73,7 +73,7 @@ namespace SmartData.Lib.Services
             get => _expansionPercentage;
             set
             {
-                _expansionPercentage = Math.Clamp(value, 0.1f, 1.0f);
+                _expansionPercentage = Math.Clamp(value, 1.0f, 2.0f);
             }
         }
 
