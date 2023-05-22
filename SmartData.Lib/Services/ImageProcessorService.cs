@@ -50,10 +50,12 @@ namespace SmartData.Lib.Services
 
         /// <summary>
         /// Crops and resizes an image based on the bounding box of a detected person, and saves the resulting image to the specified output path.
+        /// If no person is detected in the image, the original image is copied to the output path.
         /// </summary>
-        /// <param name="outputPath">The output path where the cropped and resized image will be saved.</param>
         /// <param name="inputPath">The path of the input image.</param>
+        /// <param name="outputPath">The output path where the cropped and resized image will be saved.</param>
         /// <param name="results">The list of detected persons containing the bounding box information.</param>
+        /// <param name="boundingBoxScale">The scale factor to apply to the bounding box to include more context in the cropped image.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f)
         {
@@ -120,7 +122,7 @@ namespace SmartData.Lib.Services
                 resizedImage.Mutate(x => x.Resize(new ResizeOptions
                 {
                     Size = new Size(resizedWidth, resizedHeight),
-                    Mode = ResizeMode.Pad,
+                    Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
                     Sampler = KnownResamplers.Lanczos3,
                     Compand = true,
