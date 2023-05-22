@@ -19,7 +19,7 @@ namespace SmartData.Lib.Services
         private MLContext _mlContext;
         private OnnxScoringEstimator _pipeline;
         private ITransformer _predictionPipe;
-        private PredictionEngine<InputData, OutputData> _predictionEngine;
+        private PredictionEngine<WDInputData, WDOutputData> _predictionEngine;
 
         private string[] _tags;
 
@@ -82,7 +82,7 @@ namespace SmartData.Lib.Services
         {
             _imageProcessorService = imageProcessorService;
 
-            _modelPath = modelPath;
+            ModelPath = modelPath;
             _tagsPath = tagsPath;
 
             _mlContext = new MLContext();
@@ -212,7 +212,7 @@ namespace SmartData.Lib.Services
         private async Task LoadModel()
         {
             _predictionPipe = await Task.Run(() => GetPredictionPipeline());
-            _predictionEngine = _mlContext.Model.CreatePredictionEngine<InputData, OutputData>(_predictionPipe);
+            _predictionEngine = _mlContext.Model.CreatePredictionEngine<WDInputData, WDOutputData>(_predictionPipe);
 
             LoadTags(TagsPath);
             if (_tags?.Length > 0)
@@ -233,9 +233,9 @@ namespace SmartData.Lib.Services
         /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
         private async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
         {
-            InputData inputData = await _imageProcessorService.ProcessImageForTagPrediction(inputImagePath);
+            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(inputImagePath);
 
-            OutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
+            WDOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
             return prediction.PredictionsSigmoid;
         }
 
@@ -250,7 +250,7 @@ namespace SmartData.Lib.Services
 
             _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, _modelPath);
 
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable(new InputData[] { });
+            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable(new WDInputData[] { });
 
             return _pipeline.Fit(emptyDv);
         }

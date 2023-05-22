@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dataset_Processor_Desktop.src.Views.ContentAwareCroppingView">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+          ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Content Aware automatic crop for images"/>
+
+        <Button Grid.Row="1" Grid.Column="0"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding SelectInputFolderCommand}"
+                Text="Select Input folder:"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
+
+        <Button Grid.Row="2" Grid.Column="0"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding SelectOutputFolderCommand}"
+                Text="Select Output folder:"/>
+        <StackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding OutputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenOutputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </StackLayout>
+
+        <Label Grid.Row="3" Grid.Column="0"
+               Text="Threshold for predictions certainty:"/>
+        <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                Minimum="0.1"
+                Value="{Binding ScoreThreshold}"/>
+        <Label Grid.Row="3" Grid.Column="4"
+               Text="{Binding ScoreThreshold}"/>
+
+        <Label Grid.Row="4" Grid.Column="0"
+               Text="Threshold for Intersection over Union (IoU):"/>
+        <Slider Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
+                Minimum="0.1"
+                Value="{Binding IouThreshold}"/>
+        <Label Grid.Row="4" Grid.Column="4"
+               Text="{Binding IouThreshold}"/>
+        
+        <Label Grid.Row="5" Grid.Column="0"
+               Text="Bounding Box expansion in %:"/>
+        <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
+                Minimum="0.1"
+                Value="{Binding ExpansionPercentage}"/>
+        <Label Grid.Row="5" Grid.Column="4"
+               Text="{Binding ExpansionPercentage}"/>
+
+        <BoxView HeightRequest="1" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5" 
+              BackgroundColor="{StaticResource Gray600}"/>
+
+        <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+               VerticalTextAlignment="Center"
+               HorizontalTextAlignment="Center"
+               Text="{Binding CropProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+
+        <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               Text="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:mm\\:ss\\.fff}'}" />
+
+        <Button Grid.Row="9" Grid.Column="2"
+                BackgroundColor="{StaticResource DarkPrimary}"
+                Command="{Binding CropImagesCommand}"
+                Text="Auto Crop Images!"/>
+
+        <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"
+                     Progress="{Binding CropProgress.PercentFloat}"
+                     ProgressColor="{StaticResource DarkPrimary}"/>
+
+        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center"
+               VerticalTextAlignment="Center"
+               FontSize="Medium"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="{Binding TaskStatusString}"/>
+    </Grid>
+</ContentView>

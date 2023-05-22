@@ -13,12 +13,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IAutoTaggerService _autoTaggerService;
         private readonly ITagProcessorService _tagProcessorService;
+        private readonly IContentAwareCropService _contentAwareCropService;
 
         #region Definition of App Views.
         private View _dynamicContentView;
 
         private View _welcomePage;
         private View _datasetSortView;
+        private View _contentAwareCropView;
         private View _resizeImagesView;
         private View _tagGenerationView;
         private View _tagProcessingView;
@@ -43,6 +45,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public RelayCommand NavigateToWelcomePageCommand { get; private set; }
         public RelayCommand NavigateToDatasetSortCommand { get; private set; }
+        public RelayCommand NavigateToContentAwareCropCommand { get; private set; }
         public RelayCommand NavigateToResizeImagesCommand { get; private set; }
         public RelayCommand NavigateToTagGenerationCommand { get; private set; }
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
@@ -55,6 +58,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _imageProcessorService = Application.Current.Handler.MauiContext.Services.GetService<IImageProcessorService>();
             _autoTaggerService = Application.Current.Handler.MauiContext.Services.GetService<IAutoTaggerService>();
             _tagProcessorService = Application.Current.Handler.MauiContext.Services.GetService<ITagProcessorService>();
+            _contentAwareCropService = Application.Current.Handler.MauiContext.Services.GetService<IContentAwareCropService>();
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -62,6 +66,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _dynamicContentView = _welcomePage;
             NavigateToWelcomePageCommand = new RelayCommand(NavigateToWelcomeView);
             NavigateToDatasetSortCommand = new RelayCommand(NavigateToDatasetSortView);
+            NavigateToContentAwareCropCommand = new RelayCommand(NavigateToContentAwareCropView);
             NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
             NavigateToTagGenerationCommand = new RelayCommand(NavigateToTagGenerationView);
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
@@ -87,6 +92,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _datasetSortView = new DatasetSortView(_fileManipulatorService);
             }
             DynamicContentView = _datasetSortView;
+        }
+
+        public void NavigateToContentAwareCropView()
+        {
+            if (_contentAwareCropView == null)
+            {
+                _contentAwareCropView = new ContentAwareCroppingView(_fileManipulatorService, _contentAwareCropService);
+            }
+            DynamicContentView = _contentAwareCropView;
         }
 
         public void NavigateToResizeImagesView()

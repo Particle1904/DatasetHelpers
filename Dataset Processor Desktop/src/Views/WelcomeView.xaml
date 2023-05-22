@@ -16,6 +16,9 @@
             <Label Text="Use the Sort Page to discard images with low resolution (image with Width or Height lower than 512) and/or backup images."
                    HorizontalTextAlignment="Start"
                    FontSize="Small"/>
+            <Label Text="Use the Content Aware Crop View to automatically crop images using Content Aware techniques and Object Detection with the YoloV4 model."
+                   HorizontalTextAlignment="Start"
+                   FontSize="Small"/>
             <Label Text="Use the Resize Images Page to resize images respecting original Aspect Ratio to be used for Bucketing (it will Upscale if necessary)."
                    HorizontalTextAlignment="Start"
                    FontSize="Small"/>

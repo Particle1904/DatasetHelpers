@@ -225,7 +225,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImage(_imageFiles[_selectedItemIndex]);
+                        MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImageAsync(_imageFiles[_selectedItemIndex]);
                         imageMemoryStream.Seek(0, SeekOrigin.Begin);
                         _currentImageMemoryStream?.Dispose();
                         MemoryStream imageMemoryStreamCopy = new MemoryStream(imageMemoryStream.ToArray());

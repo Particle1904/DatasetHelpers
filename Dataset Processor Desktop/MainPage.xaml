@@ -21,6 +21,9 @@
             <Button Text="Sort Images"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToDatasetSortCommand}"/>
+            <Button Text="Content Aware Crop"
+                    VerticalOptions="Center"
+                    Command="{Binding NavigateToContentAwareCropCommand}"/>
             <Button Text="Resize Images"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToResizeImagesCommand}"/>

@@ -2,7 +2,7 @@
 
 namespace SmartData.Lib.Models
 {
-    public class OutputData
+    public class WDOutputData
     {
         [ColumnName("predictions_sigmoid")]
         public VBuffer<float> PredictionsSigmoid { get; set; }

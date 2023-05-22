@@ -32,6 +32,114 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously retrieves the size of an image file.
+        /// </summary>
+        /// <param name="filePath">The path to the image file.</param>
+        /// <returns>A <see cref="System.Drawing.Size"/> representing the width and height of the image.</returns>
+        public async Task<System.Drawing.Size> GetImageSizeAsync(string filePath)
+        {
+            System.Drawing.Size size = new System.Drawing.Size();
+            using (Image image = await Image.LoadAsync(filePath))
+            {
+                size.Width = image.Width;
+                size.Height = image.Height;
+            }
+
+            return size;
+        }
+
+        /// <summary>
+        /// Crops and resizes an image based on the bounding box of a detected person, and saves the resulting image to the specified output path.
+        /// </summary>
+        /// <param name="outputPath">The output path where the cropped and resized image will be saved.</param>
+        /// <param name="inputPath">The path of the input image.</param>
+        /// <param name="results">The list of detected persons containing the bounding box information.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f)
+        {
+            string fileName = Path.GetFileName(inputPath);
+
+            if (results == null || results.Count == 0)
+            {
+                File.Copy(inputPath, outputPath, true);
+                return;
+            }
+
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            {
+                DetectedPerson detectedPerson = results.FirstOrDefault();
+                float[] boundingBox = detectedPerson.BoundingBox;
+
+                int targetWidth = 512;
+                int targetHeight = 512;
+                int maxWidth = image.Width;
+                int maxHeight = image.Height;
+
+                int centerX = (int)((boundingBox[0] + boundingBox[2]) / 2);
+                int centerY = (int)((boundingBox[1] + boundingBox[3]) / 2);
+                int width = (int)(boundingBox[2] - boundingBox[0]);
+                int height = (int)(boundingBox[3] - boundingBox[1]);
+
+                int scaledWidth = (int)(width * boundingBoxScale);
+                int scaledHeight = (int)(height * boundingBoxScale);
+
+                int scaledX1 = Math.Max(0, centerX - scaledWidth / 2);
+                int scaledY1 = Math.Max(0, centerY - scaledHeight / 2);
+                int scaledX2 = Math.Min(maxWidth, centerX + scaledWidth / 2);
+                int scaledY2 = Math.Min(maxHeight, centerY + scaledHeight / 2);
+
+                int cropWidth = scaledX2 - scaledX1;
+                int cropHeight = scaledY2 - scaledY1;
+
+                double originalAspectRatio = width / (double)height;
+                double targetAspectRatio = targetWidth / (double)targetHeight;
+
+                if (originalAspectRatio < targetAspectRatio)
+                {
+                    cropHeight = (int)(cropWidth / originalAspectRatio);
+                }
+                else
+                {
+                    cropWidth = (int)(cropHeight * originalAspectRatio);
+                }
+
+                int cropX = Math.Max(0, centerX - cropWidth / 2);
+                int cropY = Math.Max(0, centerY - cropHeight / 2);
+
+                cropWidth = Math.Min(cropWidth, maxWidth - cropX);
+                cropHeight = Math.Min(cropHeight, maxHeight - cropY);
+
+                Image<Rgb24> croppedImage = image.Clone();
+                croppedImage.Mutate(x => x.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
+
+                double resizeFactor = Math.Min(targetWidth / (double)cropWidth, targetHeight / (double)cropHeight);
+                int resizedWidth = (int)(cropWidth * resizeFactor);
+                int resizedHeight = (int)(cropHeight * resizeFactor);
+
+                Image<Rgb24> resizedImage = croppedImage.Clone();
+                resizedImage.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(resizedWidth, resizedHeight),
+                    Mode = ResizeMode.Pad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = KnownResamplers.Lanczos3,
+                    Compand = true,
+                    PadColor = new Rgb24(0, 0, 0)
+                }));
+
+                JpegEncoder encoder = new JpegEncoder()
+                {
+                    ColorType = JpegEncodingColor.Rgb,
+                    Interleaved = true,
+                    Quality = 100,
+                    SkipMetadata = false
+                };
+
+                await resizedImage.SaveAsJpegAsync(outputPath, encoder);
+            }
+        }
+
+        /// <summary>
         /// Resizes all images in a given input directory and saves the resized images to an output directory.
         /// </summary>
         /// <param name="inputPath">The path to the directory containing the input images.</param>
@@ -100,12 +208,12 @@ namespace SmartData.Lib.Services
         /// Asynchronously processes an image for tag prediction by resizing it to 448x448 and converting it to a float array.
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
-        /// <returns>An <see cref="InputData"/> object containing the processed image as a float array.</returns>
+        /// <returns>An <see cref="WDInputData"/> object containing the processed image as a float array.</returns>
         /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
-        public async Task<InputData> ProcessImageForTagPrediction(string inputPath)
+        public async Task<WDInputData> ProcessImageForTagPredictionAsync(string inputPath)
         {
-            InputData inputData = new InputData();
+            WDInputData inputData = new WDInputData();
             inputData.Input_1 = new float[448 * 448 * 3];
 
             int index = 0;
@@ -146,6 +254,56 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously processes an image for bounding box prediction by resizing it to 416x416 and converting it to a float array.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>A <see cref="Yolov4InputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        public async Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath)
+        {
+            Yolov4InputData inputData = new Yolov4InputData();
+            inputData.Input_1 = new float[416 * 416 * 3];
+
+            int index = 0;
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = KnownResamplers.Lanczos3,
+                    Compand = true,
+                    PadColor = new Rgb24(0, 0, 0),
+                    Size = new Size(416, 416),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Rgb24 pixel = ref pixelRow[x];
+
+                            float r = pixel.R * 1f / 255f;
+                            float g = pixel.G * 1f / 255f;
+                            float b = pixel.B * 1f / 255f;
+
+                            inputData.Input_1[index++] = r;
+                            inputData.Input_1[index++] = g;
+                            inputData.Input_1[index++] = b;
+                        }
+                    }
+                });
+            }
+            return inputData;
+        }
+
+        /// <summary>
         /// Applies a Gaussian blur filter to the specified image bytes and returns the resulting blurred image as a byte array.
         /// </summary>
         /// <param name="imageBytes">The byte array representing the image to be blurred.</param>
@@ -158,7 +316,7 @@ namespace SmartData.Lib.Services
         /// The blurred image is then saved as a JPEG image into a new memory stream, which is converted to a byte array and returned as the result.
         /// </para>
         /// </remarks>
-        public async Task<MemoryStream> GetBlurriedImage(string imagePath)
+        public async Task<MemoryStream> GetBlurriedImageAsync(string imagePath)
         {
             using (Image image = await Image.LoadAsync(imagePath))
             {
@@ -175,7 +333,7 @@ namespace SmartData.Lib.Services
         /// Resizes an image to a target aspect ratio and saves it as a JPEG file in the output directory.
         /// </summary>
         /// <param name="outputPath">The full path of the directory to save the resized image file in.</param>
-        /// <param name="inpuPath">The full path of the image file to resize.</param>
+        /// <param name="inputPath">The full path of the image file to resize.</param>
         /// <param name="dimension">The maximum dimension (width or height) of the resized image. Defaults to 512.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation of resizing and saving the image file.</returns>
         /// <remarks>
@@ -192,11 +350,11 @@ namespace SmartData.Lib.Services
         /// This method uses a Lanczos resampling algorithm for high-quality image resizing. The JPEG encoding quality is set to 100 and metadata is not skipped.
         /// </para>
         /// </remarks>
-        private async Task ResizeImageAsync(string outputPath, string inpuPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            string fileName = Path.GetFileName(inpuPath);
+            string fileName = Path.GetFileName(inputPath);
 
-            using (Image image = await Image.LoadAsync(inpuPath))
+            using (Image image = await Image.LoadAsync(inputPath))
             {
                 double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
 

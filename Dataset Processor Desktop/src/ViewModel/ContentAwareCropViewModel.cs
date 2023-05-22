@@ -10,10 +10,10 @@ using System.Diagnostics;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
-    public class TagGenerationViewModel : BaseViewModel
+    public class ContentAwareCropViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulatorService;
-        private readonly IAutoTaggerService _autoTaggerService;
+        private readonly IContentAwareCropService _contentAwareCropService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -37,27 +37,55 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        private Progress _predictionProgress;
-        public Progress PredictionProgress
+        private Progress _cropProgress;
+        public Progress CropProgress
         {
-            get => _predictionProgress;
+            get => _cropProgress;
             set
             {
-                _predictionProgress = value;
-                OnPropertyChanged(nameof(PredictionProgress));
+                _cropProgress = value;
+                OnPropertyChanged(nameof(CropProgress));
             }
         }
 
-        private double _threshold;
-        public double Threshold
+        private double _scoreThreshold;
+        public double ScoreThreshold
         {
-            get => _threshold;
+            get => _scoreThreshold;
             set
             {
-                if (Math.Round(value, 2) != _threshold)
+                if (Math.Round(value, 2) != _scoreThreshold)
                 {
-                    _threshold = Math.Round(value, 2);
-                    OnPropertyChanged(nameof(Threshold));
+                    _scoreThreshold = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(ScoreThreshold));
+                }
+            }
+        }
+
+        private double _iouThreshold;
+        public double IouThreshold
+        {
+            get => _iouThreshold;
+            set
+            {
+                if (Math.Round(value, 2) != _iouThreshold)
+                {
+                    _iouThreshold = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(IouThreshold));
+                }
+            }
+        }
+
+        private double _expansionPercentage;
+        public double ExpansionPercentage
+        {
+            get => _expansionPercentage;
+            set
+            {
+                if (Math.Round(value, 2) != _expansionPercentage)
+                {
+                    _expansionPercentage = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(ExpansionPercentage));
                 }
             }
         }
@@ -68,43 +96,32 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _timer.Elapsed;
         }
 
-        private bool _weightedCaptions;
-        public bool WeightedCaptions
-        {
-            get => _weightedCaptions;
-            set
-            {
-                _weightedCaptions = value;
-                OnPropertyChanged(nameof(WeightedCaptions));
-            }
-        }
-
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
         public RelayCommand OpenOutputFolderCommand { get; private set; }
-        public RelayCommand MakePredictionsCommand { get; private set; }
+        public RelayCommand CropImagesCommand { get; private set; }
 
-        public TagGenerationViewModel(IFileManipulatorService fileManipulatorService, IAutoTaggerService autoTaggerService)
+        public ContentAwareCropViewModel(IFileManipulatorService fileManipulatorService, IContentAwareCropService contentAwareCropService)
         {
             _fileManipulatorService = fileManipulatorService;
-            _autoTaggerService = autoTaggerService;
+            _contentAwareCropService = contentAwareCropService;
 
-            InputFolderPath = _configsService.Configurations.ResizedFolder;
+            InputFolderPath = _configsService.Configurations.SelectedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configsService.Configurations.CombinedOutputFolder;
+            OutputFolderPath = _configsService.Configurations.ResizedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
 
-            Threshold = _configsService.Configurations.TaggerThreshold;
+            ScoreThreshold = 0.5f;
+            IouThreshold = 0.4f;
+            ExpansionPercentage = 0.1f;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
 
-            MakePredictionsCommand = new RelayCommand(async () => await MakePredictionsAsync());
-
-            WeightedCaptions = false;
+            CropImagesCommand = new RelayCommand(async () => await CropImagesAsync());
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
@@ -128,20 +145,22 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public async Task MakePredictionsAsync()
+        public async Task CropImagesAsync()
         {
-            if (PredictionProgress == null)
+            if (CropProgress == null)
             {
-                PredictionProgress = new Progress();
+                CropProgress = new Progress();
             }
-            if (PredictionProgress.PercentFloat != 0f)
+            if (CropProgress.PercentFloat != 0f)
             {
-                PredictionProgress.Reset();
+                CropProgress.Reset();
             }
 
             _timer.Reset();
             TaskStatus = ProcessingStatus.Running;
-            _autoTaggerService.Threshold = (float)Threshold;
+            _contentAwareCropService.ScoreThreshold = (float)ScoreThreshold;
+            _contentAwareCropService.IouThreshold = (float)IouThreshold;
+            _contentAwareCropService.ExpansionPercentage = (float)ExpansionPercentage + 1.0f;
 
             try
             {
@@ -153,7 +172,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress);
             }
             catch (Exception exception)
             {

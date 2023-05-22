@@ -89,12 +89,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="src\Views\ContentAwareCropView.xaml.cs">
+	    <DependentUpon>ContentAwareCropView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="src\Views\SortView.xaml.cs">
 	    <DependentUpon>SortView.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="src\Views\ContentAwareCropView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="src\Views\SortView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

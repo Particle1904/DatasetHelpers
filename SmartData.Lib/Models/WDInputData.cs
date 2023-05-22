@@ -2,7 +2,7 @@
 
 namespace SmartData.Lib.Models
 {
-    public class InputData
+    public class WDInputData
     {
         [ColumnName("input_1:0")]
         [VectorType(1, 448, 448, 3)]
