@@ -2,8 +2,8 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.TagEditorView">
-    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
-              ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
+                  ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
@@ -23,91 +23,103 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
-                   HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
-                   FontSize="Title"
-                   Text="Tag editor"/>
+                       HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                       FontSize="Title"
+                       Text="Tag editor"/>
 
         <Button Grid.Row="1" Grid.Column="0"
-                    Background="{StaticResource DarkPrimary}"
-                    Command="{Binding SelectInputFolderCommand}"
-                    Text="Select Input folder:"/>
+                        Background="{StaticResource DarkPrimary}"
+                        Command="{Binding SelectInputFolderCommand}"
+                        Text="Select Input folder:"/>
+
         <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding InputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
-                         BackgroundColor="{StaticResource DarkPrimary}"
-                         Command="{Binding OpenInputFolderCommand}"
-                         WidthRequest="30"
-                         HeightRequest="30"
-                         Padding="2"
-                         HorizontalOptions="End"/>
+                             BackgroundColor="{StaticResource DarkPrimary}"
+                             Command="{Binding OpenInputFolderCommand}"
+                             WidthRequest="30"
+                             HeightRequest="30"
+                             Padding="2"
+                             HorizontalOptions="End"/>
         </StackLayout>
 
         <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
-               Text="{Binding SelectedImageFilename, StringFormat='Current file: {0}'}"
-               VerticalOptions="Center"
-               HorizontalOptions="Center"/>
+                   Text="{Binding SelectedImageFilename, StringFormat='Current file: {0}'}"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
 
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" ColumnSpacing="10"
               VerticalOptions="Center"
               HorizontalOptions="Center">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10*"/>
-                <ColumnDefinition Width="80*"/>
-                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="512"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="10">
+            <Grid Grid.Column="0" VerticalOptions="Center" HorizontalOptions="Center" RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
                 <Button Text="&lt;" 
-                        Command="{Binding PreviousItemCommand}"
-                        HeightRequest="50"
-                        WidthRequest="50"/>
-                <Button Text="&lt;&lt;&lt;" 
-                        Command="{Binding PreviousTenItemsCommand}"
-                        HeightRequest="50"
-                        WidthRequest="50"/>
-            </StackLayout>            
-            <Frame Grid.Column="1" 
-                   BorderColor="Transparent"
-                   Padding="0"
-                   Margin="10"    
-                   VerticalOptions="Fill"
-                   HorizontalOptions="Fill"
-                   MinimumWidthRequest="400"
-                   MaximumWidthRequest="400"
-                   MinimumHeightRequest="480"
-                   MaximumHeightRequest="480"
-                   CornerRadius="0"
-                   BackgroundColor="{StaticResource DarkSecondaryBackground}">
-                <Grid VerticalOptions="FillAndExpand"
-                      HorizontalOptions="FillAndExpand">
-                    <Image Aspect="AspectFit"
-                           Source="{Binding SelectedImage, Mode=TwoWay}">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BlurImageCommand}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
-                </Grid>
-            </Frame>
-            <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="10">
-                <Button Text="&gt;"
-                        Command="{Binding NextItemCommand}"
-                        HeightRequest="50"
-                        WidthRequest="50"/>
-                <Button Text="&gt;&gt;&gt;"
-                        Command="{Binding NextTenItemsCommand}"
-                        HeightRequest="50"
-                        WidthRequest="50"/>
-            </StackLayout>
-            
+                            Command="{Binding PreviousItemCommand}"
+                            HeightRequest="50"
+                            WidthRequest="50"/>
+                <Button Grid.Row="1"
+                            Text="&lt;&lt;&lt;" 
+                            Command="{Binding PreviousTenItemsCommand}"
+                            HeightRequest="50"
+                            WidthRequest="50"/>
+            </Grid>
+
+            <Grid Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"
+                  BackgroundColor="Transparent"
+                  MinimumHeightRequest="400"
+                  MinimumWidthRequest="200"
+                  MaximumHeightRequest="512"
+                  MaximumWidthRequest="512">
+                <Image Aspect="AspectFit"
+                       HorizontalOptions="CenterAndExpand"
+                       VerticalOptions="CenterAndExpand"
+                       Source="{Binding SelectedImage, Mode=TwoWay}">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BlurImageCommand}"/>
+                    </Image.GestureRecognizers>
+                </Image>
+            </Grid>
+
+            <Grid Grid.Column="2" VerticalOptions="Center" HorizontalOptions="End" RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0"
+                            Text="&gt;"
+                            Command="{Binding NextItemCommand}"
+                            HeightRequest="50"
+                            WidthRequest="50"/>
+                <Button Grid.Row="1"
+                            Text="&gt;&gt;&gt;"
+                            Command="{Binding NextTenItemsCommand}"
+                            HeightRequest="50"
+                            WidthRequest="50"/>
+            </Grid>
         </Grid>
 
-        <StackLayout Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
-                     VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand"
-                     Spacing="0">
-            <ScrollView HeightRequest="240">
+        <Grid Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
+                  VerticalOptions="FillAndExpand"
+                  HorizontalOptions="FillAndExpand"
+                  RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <ScrollView Grid.Row="0" >
                 <Editor x:Name="EditorTags"
-                        Placeholder="This is where you can edit the tags."                        
+                    Placeholder="This is where you can edit the tags."
                         VerticalOptions="FillAndExpand"
                         HorizontalOptions="FillAndExpand"
                         AutoSize="TextChanges"
@@ -121,8 +133,8 @@
                         FontFamily="OpenSansRegular">
                 </Editor>
             </ScrollView>
-            
-            <ScrollView HeightRequest="240"
+
+            <ScrollView Grid.Row="1" 
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand">
                 <Label x:Name="LabelFormatted"
@@ -130,41 +142,41 @@
                        FontSize="Default" 
                        FontFamily="OpenSansRegular"/>
             </ScrollView>
-        </StackLayout>
+        </Grid>
 
         <Label Grid.Row="4" Grid.Column="0"
-               HorizontalOptions="FillAndExpand"
-               VerticalOptions="FillAndExpand"
-               Text="Highlight words:"
-               HeightRequest="50"/>
-        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4"
-                    HorizontalOptions="FillAndExpand"
-                    VerticalOptions="FillAndExpand"
-                    HeightRequest="50">
+                   HorizontalOptions="FillAndExpand"
+                   VerticalOptions="FillAndExpand"
+                   Text="Highlight words:"
+                   HeightRequest="50"/>
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" 
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
+                        HeightRequest="50">
             <Editor x:Name="EditorHighlight"
-                    VerticalOptions="FillAndExpand"
-                    HorizontalOptions="FillAndExpand"                
-                    VerticalTextAlignment="Start"
-                    HorizontalTextAlignment="Start"
-                    IsTextPredictionEnabled="False"
-                    AutoSize="TextChanges"
-                    Placeholder="Enter words you want to highlight (even if its just parcial part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
-                    Text="{Binding WordsToHighlight}"
-                    TextChanged="OnTextChanged"/>
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"                
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        AutoSize="TextChanges"
+                        Placeholder="Enter words you want to highlight (even if its just parcial part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+                        Text="{Binding WordsToHighlight}"
+                        TextChanged="OnTextChanged"/>
         </ScrollView>
 
         <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
-               HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Start"
-               Margin="0,0,0,0"
-               TextColor="{StaticResource DarkSecondary}"
-               Text="Note: text changes are automatically saved whenever you type anything in the Text Box."/>
-        
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Start"
+                   Margin="0,0,0,0"
+                   TextColor="{StaticResource DarkSecondary}"
+                   Text="Note: text changes are automatically saved whenever you type anything in the Text Box."/>
+
         <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5"
-               HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Start"
-               Margin="0,0,0,0"
-               TextColor="{StaticResource DarkSecondary}"
-               Text="Note: the search functionality can be very expensive and take a few seconds to complete!"/>
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Start"
+                   Margin="0,0,0,0"
+                   TextColor="{StaticResource DarkSecondary}"
+                   Text="Note: the search functionality can be very expensive and take a few seconds to complete!"/>
     </Grid>
 </ContentView>

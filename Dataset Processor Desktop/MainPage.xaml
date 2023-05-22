@@ -12,46 +12,67 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"
-                     Grid.Column="0"
-                     Background="{StaticResource DarkSurface}">
-            <Button Text="Welcome Page"
+        <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"
+              Grid.Column="0"
+              Background="{StaticResource DarkSurface}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0"
+                    Text="Welcome Page"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToWelcomePageCommand}"/>
-            <Button Text="Sort Images"
+            <Button Grid.Row="1"
+                    Text="Sort Images"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToDatasetSortCommand}"/>
-            <Button Text="Content Aware Crop"
+            <Button Grid.Row="2"
+                    Text="Content Aware Crop"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToContentAwareCropCommand}"/>
-            <Button Text="Resize Images"
+            <Button Grid.Row="3"
+                    Text="Resize Images"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToResizeImagesCommand}"/>
-            <Button Text="Generate Tags"
+            <Button Grid.Row="4"
+                    Text="Generate Tags"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagGenerationCommand}"/>
-            <Button Text="Process Tags"
+            <Button Grid.Row="5"
+                    Text="Process Tags"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagProcessingCommand}"/>
-            <Button Text="Tag Editor"
+            <Button Grid.Row="6"
+                    Text="Tag Editor"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagEditorCommand}"/>
-            <Button Text="Settings"
+            <Button Grid.Row="7"
+                    Text="Settings"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToSettingsCommand}"/>
-        </StackLayout>
+        </Grid>
 
         <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"
               Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="93*"/>
-                <RowDefinition Height="7*"/>
+                <RowDefinition Height="90*"/>
+                <RowDefinition Height="10*"/>
             </Grid.RowDefinitions>
             
-            <ContentView Grid.Row="0" 
-                         VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"
-                         Content="{Binding DynamicContentView}"                         
-                         Padding="10"/>
+            <ScrollView Grid.Row="0" >
+                <ContentView VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand"
+                             Content="{Binding DynamicContentView}"                         
+                             Padding="10"/>
+            </ScrollView>
+        
             <Frame Grid.Row="1"
                    VerticalOptions="FillAndExpand"
                    HorizontalOptions="FillAndExpand"
@@ -60,7 +81,7 @@
                    Padding="10"
                    CornerRadius="0"
                    BorderColor="{StaticResource DarkPrimary}">
-                <ScrollView>
+                <ScrollView >
                     <Label Text="{Binding LatestLogMessage}"/>
                 </ScrollView>
             </Frame>

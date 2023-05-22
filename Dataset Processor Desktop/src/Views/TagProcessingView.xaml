@@ -50,7 +50,7 @@
 
         <Label Grid.Row="2" Grid.Column="0"
                Text="Tags to add:"/>
-        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
+        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" >
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"
                     VerticalTextAlignment="Start"
@@ -63,7 +63,7 @@
 
         <Label Grid.Row="3" Grid.Column="0"
                 Text="Tags to emphasize:"/>
-        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4">
+        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" >
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
@@ -76,7 +76,7 @@
     
         <Label Grid.Row="4" Grid.Column="0"
                Text="Tags to remove:"/>
-        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4">
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" >
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
@@ -89,7 +89,7 @@
 
         <Label Grid.Row="5" Grid.Column="0"
                Text="Tags to replace:"/>
-        <ScrollView Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2">
+        <ScrollView Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" >
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
@@ -99,7 +99,7 @@
                     Placeholder="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
                     Text="{Binding TagsToReplace}"/>
         </ScrollView>
-        <ScrollView Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2">
+            <ScrollView Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2" >
             <Editor VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"                
                     VerticalTextAlignment="Start"
