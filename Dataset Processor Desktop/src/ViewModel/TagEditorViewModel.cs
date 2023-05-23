@@ -58,7 +58,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 catch (Exception exception)
                 {
-                    _loggerService.LatestLogMessage = $".txt file for current image not found, just type in the editor and one will be created! Error: {exception.StackTrace}";
+                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created! Error: {exception.StackTrace}";
                 }
                 finally
                 {
@@ -98,13 +98,30 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand BlurImageCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
-
-        private string _currentImageTags;
+        public RelayCommand SwitchEditorTypeCommand { get; private set; }
 
         private bool _showBlurredImage;
 
         private MemoryStream _currentImageMemoryStream = null;
 
+        private bool _editingTxt;
+
+        public string CurrentType
+        {
+            get
+            {
+                if (_editingTxt)
+                {
+                    return ".txt";
+                }
+                else
+                {
+                    return ".caption";
+                }
+            }
+        }
+
+        private string _currentImageTags;
         public string CurrentImageTags
         {
             get => _currentImageTags;
@@ -113,8 +130,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _currentImageTags = value;
                 OnPropertyChanged(nameof(CurrentImageTags));
 
-                string txtFile = Path.ChangeExtension(_imageFiles[_selectedItemIndex], ".txt");
-                _fileManipulatorService.SaveTagsForImage(txtFile, _currentImageTags);
+                string txtFile = Path.ChangeExtension(_imageFiles[_selectedItemIndex], CurrentType);
+                _fileManipulatorService.SaveTextForImage(txtFile, _currentImageTags);
             }
         }
 
@@ -135,6 +152,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+            SwitchEditorTypeCommand = new RelayCommand(SwitchEditorType);
+
+            _editingTxt = true;
 
             SelectedItemIndex = 0;
         }
@@ -165,6 +185,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     }
                 }
             }
+        }
+
+        public void SwitchEditorType()
+        {
+            _editingTxt = !_editingTxt;
+            OnPropertyChanged(nameof(CurrentType));
+            UpdateCurrentSelectedTags();
         }
 
         public void GoToPreviousItem()
@@ -252,7 +279,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (SelectedImage != null)
             {
-                CurrentImageTags = _fileManipulatorService.GetTagsForImage(_imageFiles[_selectedItemIndex]);
+                CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
             }
         }
     }

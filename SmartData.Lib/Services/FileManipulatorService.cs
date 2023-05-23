@@ -215,9 +215,9 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="imageFilePath">The file path of the image to retrieve tags for.</param>
         /// <returns>A string containing the tags associated with the specified image.</returns>
-        public string GetTagsForImage(string imageFilePath)
+        public string GetTextFromFile(string imageFilePath, string textFileExtension)
         {
-            string txtFilePath = Path.ChangeExtension(imageFilePath, ".txt");
+            string txtFilePath = Path.ChangeExtension(imageFilePath, textFileExtension);
 
             string result = File.ReadAllText(txtFilePath);
 
@@ -230,7 +230,7 @@ namespace SmartData.Lib.Services
         /// <param name="filePath">The file path where the text will be saved.</param>
         /// <param name="textToSave">The text to save to the file.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public void SaveTagsForImage(string filePath, string textToSave)
+        public void SaveTextForImage(string filePath, string textToSave)
         {
             File.WriteAllText(filePath, textToSave);
         }

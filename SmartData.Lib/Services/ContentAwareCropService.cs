@@ -153,8 +153,9 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            List<string> filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
 
-            foreach (string file in files)
+            foreach (string file in filesList)
             {
                 Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
 
@@ -191,10 +192,11 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            List<string> filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
 
             progress.TotalFiles = files.Length;
 
-            foreach (string file in files)
+            foreach (string file in filesList)
             {
                 Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
 

@@ -75,8 +75,8 @@
 
             <Grid Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"
                   BackgroundColor="Transparent"
-                  MinimumHeightRequest="400"
-                  MinimumWidthRequest="200"
+                  MinimumHeightRequest="500"
+                  MinimumWidthRequest="300"
                   MaximumHeightRequest="512"
                   MaximumWidthRequest="512">
                 <Image Aspect="AspectFit"
@@ -111,15 +111,39 @@
         <Grid Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2"
                   VerticalOptions="FillAndExpand"
                   HorizontalOptions="FillAndExpand"
-                  RowSpacing="0">
+                  RowSpacing="10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
 
-            <ScrollView Grid.Row="0" >
+            <Grid Grid.Row="0" Margin="10" RowSpacing="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                
+                <Label Grid.Column="0" Grid.Row="0"
+                       Text="Switch between .caption and .text"/>
+                <Button Grid.Column="1" Grid.Row="0"
+                        Text="Switch"
+                        Command="{Binding SwitchEditorTypeCommand}"
+                        HeightRequest="40"/>
+
+                <Label Grid.Column="0" Grid.Row="1" Text="Currently editing:"/>
+                <Label Grid.Column="1" Grid.Row="1" Text="{Binding CurrentType}"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"/>
+            </Grid>
+
+            <ScrollView Grid.Row="1" >
                 <Editor x:Name="EditorTags"
-                    Placeholder="This is where you can edit the tags."
+                    Placeholder="This is where you can edit the tags/captions."
                         VerticalOptions="FillAndExpand"
                         HorizontalOptions="FillAndExpand"
                         AutoSize="TextChanges"
@@ -134,13 +158,14 @@
                 </Editor>
             </ScrollView>
 
-            <ScrollView Grid.Row="1" 
+            <ScrollView Grid.Row="2" 
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand">
                 <Label x:Name="LabelFormatted"
                        Padding="11"
                        FontSize="Default" 
-                       FontFamily="OpenSansRegular"/>
+                       FontFamily="OpenSansRegular"
+                       VerticalTextAlignment="Start"/>
             </ScrollView>
         </Grid>
 
