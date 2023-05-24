@@ -191,7 +191,7 @@ namespace SmartData.Lib.Services
 
                 try
                 {
-                    await ResizeImageAsync(outputPath, file, dimension);
+                    await ResizeImageAsync(file, outputPath, dimension);
                 }
                 finally
                 {
