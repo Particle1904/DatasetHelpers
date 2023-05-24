@@ -130,7 +130,7 @@
             <Label Grid.Row="1" Grid.Column="1"
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
-                   Text="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg and 1.txt, 2.jpeg and 2.txt..."/>
+                   Text="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg + 1.txt, 2.jpeg + 2.txt and etc."/>
         </Grid>        
         
         <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 

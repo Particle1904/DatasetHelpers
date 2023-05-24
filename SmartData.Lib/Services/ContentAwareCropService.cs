@@ -1,6 +1,7 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.Transforms.Onnx;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
@@ -145,7 +146,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The input path containing the images to process.</param>
         /// <param name="outputPath">The output path to store the cropped images.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath)
+        public async Task ProcessCroppedImage(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
             if (!_isModelLoaded)
             {
@@ -164,7 +165,7 @@ namespace SmartData.Lib.Services
                 var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
 
                 string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.jpeg");
-                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage);
+                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage, dimension);
             }
         }
 
@@ -184,7 +185,7 @@ namespace SmartData.Lib.Services
         /// <param name="outputPath">The output path to store the cropped images.</param>
         /// <param name="progress">The progress object to track the processing progress.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress)
+        public async Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
             if (!_isModelLoaded)
             {
@@ -205,7 +206,7 @@ namespace SmartData.Lib.Services
                 var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
 
                 string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.jpeg");
-                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage);
+                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage, dimension);
 
                 progress.UpdateProgress();
             }

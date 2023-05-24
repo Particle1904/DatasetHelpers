@@ -1,4 +1,6 @@
-﻿namespace SmartData.Lib.Enums
+﻿// Ignore Spelling: Enums
+
+namespace SmartData.Lib.Enums
 {
     public enum SupportedDimensions
     {

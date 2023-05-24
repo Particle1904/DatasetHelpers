@@ -153,7 +153,7 @@ namespace SmartData.Lib.Services
             return splitLine.Last();
         }
 
-        public virtual void OnPropertyChanged(string propertyName = null)
+        public virtual void OnPropertyChanged(string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -3,6 +3,7 @@ using Dataset_Processor_Desktop.src.Utilities;
 
 using Microsoft.UI.Xaml;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -86,7 +87,23 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     _expansionPercentage = Math.Round(value, 2);
                     OnPropertyChanged(nameof(ExpansionPercentage));
+                    OnPropertyChanged(nameof(ExpansionPercentageString));
                 }
+            }
+        }
+        public string ExpansionPercentageString
+        {
+            get => $"%{(int)(_expansionPercentage * 100)}";
+        }
+
+        private SupportedDimensions _dimension;
+        public SupportedDimensions Dimension
+        {
+            get => _dimension;
+            set
+            {
+                _dimension = value;
+                OnPropertyChanged(nameof(Dimension));
             }
         }
 
@@ -114,13 +131,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             ScoreThreshold = 0.5f;
             IouThreshold = 0.4f;
-            ExpansionPercentage = 0.1f;
+            ExpansionPercentage = 0.15f;
+            Dimension = SupportedDimensions.Resolution512x512;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
-
             CropImagesCommand = new RelayCommand(async () => await CropImagesAsync());
 
             _timer = new Stopwatch();
@@ -172,11 +189,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress);
+                await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                _loggerService.LatestLogMessage = $"Something went wrong!{Environment.NewLine}{exception.StackTrace}";
             }
             finally
             {

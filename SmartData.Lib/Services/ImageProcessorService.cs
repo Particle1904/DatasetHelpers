@@ -57,25 +57,21 @@ namespace SmartData.Lib.Services
         /// <param name="results">The list of detected persons containing the bounding box information.</param>
         /// <param name="boundingBoxScale">The scale factor to apply to the bounding box to include more context in the cropped image.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f)
+        public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            string fileName = Path.GetFileName(inputPath);
-
-            if (results == null || results.Count == 0)
-            {
-                File.Copy(inputPath, outputPath, true);
-                return;
-            }
-
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
             {
-                DetectedPerson detectedPerson = results.FirstOrDefault();
-                float[] boundingBox = detectedPerson.BoundingBox;
+                if (results == null || results.Count == 0)
+                {
+                    //File.Copy(inputPath, outputPath, true);
+                    return;
+                }
 
-                int targetWidth = 512;
-                int targetHeight = 512;
-                int maxWidth = image.Width;
-                int maxHeight = image.Height;
+                DetectedPerson? detectedPerson = results.FirstOrDefault();
+                float[] boundingBox = detectedPerson!.BoundingBox;
+
+                int targetWidth = (int)dimension;
+                int targetHeight = (int)dimension;
 
                 int centerX = (int)((boundingBox[0] + boundingBox[2]) / 2);
                 int centerY = (int)((boundingBox[1] + boundingBox[3]) / 2);
@@ -87,8 +83,8 @@ namespace SmartData.Lib.Services
 
                 int scaledX1 = Math.Max(0, centerX - scaledWidth / 2);
                 int scaledY1 = Math.Max(0, centerY - scaledHeight / 2);
-                int scaledX2 = Math.Min(maxWidth, centerX + scaledWidth / 2);
-                int scaledY2 = Math.Min(maxHeight, centerY + scaledHeight / 2);
+                int scaledX2 = Math.Min(image.Width, centerX + scaledWidth / 2);
+                int scaledY2 = Math.Min(image.Height, centerY + scaledHeight / 2);
 
                 int cropWidth = scaledX2 - scaledX1;
                 int cropHeight = scaledY2 - scaledY1;
@@ -108,8 +104,8 @@ namespace SmartData.Lib.Services
                 int cropX = Math.Max(0, centerX - cropWidth / 2);
                 int cropY = Math.Max(0, centerY - cropHeight / 2);
 
-                cropWidth = Math.Min(cropWidth, maxWidth - cropX);
-                cropHeight = Math.Min(cropHeight, maxHeight - cropY);
+                cropWidth = Math.Min(cropWidth, image.Width - cropX);
+                cropHeight = Math.Min(cropHeight, image.Height - cropY);
 
                 Image<Rgb24> croppedImage = image.Clone();
                 croppedImage.Mutate(x => x.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
@@ -125,8 +121,7 @@ namespace SmartData.Lib.Services
                     Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
                     Sampler = KnownResamplers.Lanczos3,
-                    Compand = true,
-                    PadColor = new Rgb24(0, 0, 0)
+                    Compand = true
                 }));
 
                 JpegEncoder encoder = new JpegEncoder()
@@ -318,7 +313,7 @@ namespace SmartData.Lib.Services
         /// The blurred image is then saved as a JPEG image into a new memory stream, which is converted to a byte array and returned as the result.
         /// </para>
         /// </remarks>
-        public async Task<MemoryStream> GetBlurriedImageAsync(string imagePath)
+        public async Task<MemoryStream> GetBlurredImageAsync(string imagePath)
         {
             using (Image image = await Image.LoadAsync(imagePath))
             {

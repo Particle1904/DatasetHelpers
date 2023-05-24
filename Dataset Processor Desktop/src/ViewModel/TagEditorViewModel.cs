@@ -58,7 +58,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 catch (Exception exception)
                 {
-                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created! Error: {exception.StackTrace}";
+                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}";
                 }
                 finally
                 {
@@ -252,7 +252,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
-                        MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurriedImageAsync(_imageFiles[_selectedItemIndex]);
+                        MemoryStream imageMemoryStream = await _imageProcessorService.GetBlurredImageAsync(_imageFiles[_selectedItemIndex]);
                         imageMemoryStream.Seek(0, SeekOrigin.Begin);
                         _currentImageMemoryStream?.Dispose();
                         MemoryStream imageMemoryStreamCopy = new MemoryStream(imageMemoryStream.ToArray());
@@ -271,7 +271,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! {exception.InnerException}";
+                _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image!{Environment.NewLine}{exception.InnerException}";
             }
         }
 
@@ -279,7 +279,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (SelectedImage != null)
             {
-                CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
+                try
+                {
+                    CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
+                }
+                catch (Exception exception)
+                {
+                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}";
+                }
             }
         }
     }

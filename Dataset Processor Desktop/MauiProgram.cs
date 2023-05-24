@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui;
+﻿// Ignore Spelling: App
+
+using CommunityToolkit.Maui;
 
 using Dataset_Processor_Desktop.src.Interfaces;
 using Dataset_Processor_Desktop.src.Services;

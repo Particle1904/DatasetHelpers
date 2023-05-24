@@ -1,4 +1,5 @@
-﻿using SmartData.Lib.Helpers;
+﻿using SmartData.Lib.Enums;
+using SmartData.Lib.Helpers;
 
 namespace SmartData.Lib.Interfaces
 {
@@ -10,7 +11,7 @@ namespace SmartData.Lib.Interfaces
         public float IouThreshold { get; set; }
         public float ExpansionPercentage { get; set; }
 
-        public Task ProcessCroppedImage(string inputPath, string outputPath);
-        public Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress);
+        public Task ProcessCroppedImage(string inputPath, string outputPath, SupportedDimensions dimension);
+        public Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension);
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿// Ignore Spelling: App
+
+using System.Globalization;
 
 namespace Dataset_Processor_Desktop
 {
@@ -19,7 +21,7 @@ namespace Dataset_Processor_Desktop
 
             window.MinimumWidth = 1280;
             window.MinimumHeight = 960;
-            window.Title = "Dataset Processor All-in-one tools - v1.0";
+            window.Title = "Dataset Processor All-in-one tools - v1.4";
 
             return window;
         }

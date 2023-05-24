@@ -26,7 +26,7 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Label   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                FontSize="Title"
                Text="Resize images"/>
