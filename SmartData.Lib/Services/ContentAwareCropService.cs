@@ -154,7 +154,15 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            List<string> filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+            List<string> filesList = new List<string>();
+            try
+            {
+                filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+            }
+            catch (Exception exception)
+            {
+                filesList = files.ToList();
+            }
 
             foreach (string file in filesList)
             {
@@ -193,7 +201,15 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            List<string> filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+            List<string> filesList = new List<string>();
+            try
+            {
+                filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+            }
+            catch (Exception exception)
+            {
+                filesList = files.ToList();
+            }
 
             progress.TotalFiles = files.Length;
 
