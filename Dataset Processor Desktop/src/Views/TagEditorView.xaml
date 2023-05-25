@@ -141,9 +141,12 @@
                        VerticalTextAlignment="Center"/>
             </Grid>
 
-            <ScrollView Grid.Row="1" >
+            <ScrollView Grid.Row="1"
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
+                        HeightRequest="200">
                 <Editor x:Name="EditorTags"
-                    Placeholder="This is where you can edit the tags/captions."
+                        Placeholder="This is where you can edit the tags/captions."
                         VerticalOptions="FillAndExpand"
                         HorizontalOptions="FillAndExpand"
                         AutoSize="TextChanges"
@@ -158,14 +161,17 @@
                 </Editor>
             </ScrollView>
 
-            <ScrollView Grid.Row="2" 
+            <ScrollView Grid.Row="2"
                         HorizontalOptions="FillAndExpand"
-                        VerticalOptions="FillAndExpand">
+                        VerticalOptions="FillAndExpand"
+                        HeightRequest="200">
                 <Label x:Name="LabelFormatted"
                        Padding="11"
                        FontSize="Default" 
                        FontFamily="OpenSansRegular"
-                       VerticalTextAlignment="Start"/>
+                       VerticalTextAlignment="Start"
+                       HorizontalOptions="FillAndExpand"
+                       VerticalOptions="FillAndExpand"/>
             </ScrollView>
         </Grid>
 
@@ -177,7 +183,7 @@
         <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" 
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand"
-                        HeightRequest="50">
+                        HeightRequest="70">
             <Editor x:Name="EditorHighlight"
                         VerticalOptions="FillAndExpand"
                         HorizontalOptions="FillAndExpand"                
