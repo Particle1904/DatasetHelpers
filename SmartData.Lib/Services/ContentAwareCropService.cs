@@ -172,8 +172,7 @@ namespace SmartData.Lib.Services
 
                 var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
 
-                string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.jpeg");
-                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage, dimension);
+                await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
             }
         }
 
@@ -221,8 +220,7 @@ namespace SmartData.Lib.Services
 
                 var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
 
-                string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.jpeg");
-                await _imageProcessorService.CropImageAsync(file, resultPath, results, _expansionPercentage, dimension);
+                await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
 
                 progress.UpdateProgress();
             }

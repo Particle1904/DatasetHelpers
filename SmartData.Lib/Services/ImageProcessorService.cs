@@ -59,14 +59,16 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
+            if (results == null || results.Count == 0)
+            {
+                await ResizeImageAsync(inputPath, outputPath, dimension);
+                return;
+            }
+
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
             {
-                if (results == null || results.Count == 0)
-                {
-                    //File.Copy(inputPath, outputPath, true);
-                    return;
-                }
-
                 DetectedPerson? detectedPerson = results.FirstOrDefault();
                 float[] boundingBox = detectedPerson!.BoundingBox;
 
@@ -132,7 +134,7 @@ namespace SmartData.Lib.Services
                     SkipMetadata = false
                 };
 
-                await resizedImage.SaveAsJpegAsync(outputPath, encoder);
+                await resizedImage.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
             }
         }
 
@@ -158,7 +160,7 @@ namespace SmartData.Lib.Services
 
                 try
                 {
-                    await ResizeImageAsync(outputPath, file, dimension);
+                    await ResizeImageAsync(file, outputPath, dimension);
                 }
                 finally
                 {
@@ -349,7 +351,7 @@ namespace SmartData.Lib.Services
         /// </remarks>
         private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            string fileName = Path.GetFileName(inputPath);
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
             using (Image image = await Image.LoadAsync(inputPath))
             {
