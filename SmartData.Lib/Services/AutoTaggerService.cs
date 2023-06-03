@@ -263,7 +263,7 @@ namespace SmartData.Lib.Services
                 }
             }
 
-            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo" };
+            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo", "general" };
             foreach (string tagToRemove in tagsToRemove)
             {
                 cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
