@@ -7,6 +7,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
@@ -93,6 +94,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputPath">The path to the folder containing the input images.</param>
         /// <param name="outputPath">The path to the folder where the output files will be saved.</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task GenerateTags(string inputPath, string outputPath, bool weightedCaptions = false)
         {
@@ -105,18 +107,7 @@ namespace SmartData.Lib.Services
 
             foreach (string file in files)
             {
-                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-                string commaSeparated = GetCommaSeparatedString(orderedPredictions);
-
-                string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
-
-                string tempFile = Path.Combine(outputPath, $"temp_{Path.GetFileName(file)}");
-                File.Move(file, tempFile);
-
-                string finalFile = tempFile.Replace("temp_", "");
-                File.Move(tempFile, finalFile);
-
-                await File.WriteAllTextAsync(resultPath, commaSeparated);
+                await PostProcessTags(outputPath, weightedCaptions, file);
             }
         }
 
@@ -127,6 +118,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The path to the input folder containing image files.</param>
         /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
         /// <param name="progress">The progress object to update with the status of the operation.</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task GenerateTags(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false)
         {
@@ -136,25 +128,37 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
             progress.TotalFiles = files.Length;
-
             foreach (string file in files)
             {
-                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-                string commaSeparated = GetCommaSeparatedString(orderedPredictions);
-
-                string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
-
-                string tempFile = Path.Combine(outputPath, $"temp_{Path.GetFileName(file)}");
-                File.Move(file, tempFile);
-
-                string finalFile = tempFile.Replace("temp_", "");
-                File.Move(tempFile, finalFile);
-
-                await File.WriteAllTextAsync(resultPath, commaSeparated);
+                await PostProcessTags(outputPath, weightedCaptions, file);
                 progress.UpdateProgress();
             }
+        }
+
+        /// <summary>
+        /// Processes a list of tags from a file and generates a summarized version of the tags.
+        /// </summary>
+        /// <param name="outputPath">The output path where the summarized tags will be saved.</param>
+        /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
+        /// <param name="file">The input file containing the tags to be processed.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task PostProcessTags(string outputPath, bool weightedCaptions, string file)
+        {
+            List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
+            string commaSeparated = GetCommaSeparatedString(orderedPredictions);
+
+            string redundantRemoved = RemoveRedundantTags(commaSeparated);
+
+            string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
+
+            string tempFile = Path.Combine(outputPath, $"temp_{Path.GetFileName(file)}");
+            File.Move(file, tempFile);
+
+            string finalFile = tempFile.Replace("temp_", "");
+            File.Move(tempFile, finalFile);
+
+            await File.WriteAllTextAsync(resultPath, redundantRemoved);
         }
 
         /// <summary>
@@ -202,6 +206,106 @@ namespace SmartData.Lib.Services
             }
 
             return listOrdered;
+        }
+
+        /// <summary>
+        /// Removes redundant tags from the input string. For example: if "shirt, white shirt" is present in the input, 
+        /// the output will only have "white shirt" since thats more descriptive. It will also remove common
+        /// useless tags like "general" and "sensitive" and others.
+        /// </summary>
+        /// <param name="tags">The string containing tags.</param>
+        /// <returns>The string with redundant tags removed.</returns>
+        private string RemoveRedundantTags(string tags)
+        {
+            List<string> cleanedTags = new List<string>();
+            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
+
+            bool hasBreastSizeTag = false;
+            bool hasMaleGenitaliaSizeTag = false;
+
+            foreach (string tag in tagsSplit)
+            {
+                bool isBreastSizeTag = IsBreastSize(tag);
+                bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
+                bool isReduntant = false;
+
+                foreach (string processedTag in cleanedTags)
+                {
+                    if (IsRedundantWith(tag, processedTag))
+                    {
+                        if (tag.Length < processedTag.Length)
+                        {
+                            isReduntant = true;
+                            continue;
+                        }
+                        else
+                        {
+                            cleanedTags.Remove(processedTag);
+                            break;
+                        }
+                    }
+                }
+
+                if (isBreastSizeTag && !hasBreastSizeTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasBreastSizeTag = true;
+                }
+                else if (isMaleGenitaliaTag && !hasMaleGenitaliaSizeTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasMaleGenitaliaSizeTag = true;
+                }
+                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isReduntant)
+                {
+                    cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
+                    cleanedTags.Add(tag);
+                }
+            }
+
+            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo" };
+            foreach (string tagToRemove in tagsToRemove)
+            {
+                cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return GetCommaSeparatedString(cleanedTags);
+        }
+
+        /// <summary>
+        /// Determines if the given tag is redundant with another tag.
+        /// </summary>
+        /// <param name="tag">The tag to compare.</param>
+        /// <param name="otherTag">The other tag to compare against.</param>
+        /// <returns>True if the tags are redundant, false otherwise.</returns>
+        public bool IsRedundantWith(string tag, string otherTag)
+        {
+            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase) || Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase));
+            //return (tag.Contains(otherTag, StringComparison.OrdinalIgnoreCase) || otherTag.Contains(tag, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a breast size.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a breast size, false otherwise.</returns>
+        public bool IsBreastSize(string tag)
+        {
+            string[] sizeKeywords = { "small b", "medium b", "large b", "huge b", "flat chest" };
+
+            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a male genitalia size.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a male genitalia size, false otherwise.</returns>
+        public bool IsMaleGenitaliaSize(string tag)
+        {
+            string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
+
+            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

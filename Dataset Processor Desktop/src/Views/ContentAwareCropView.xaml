@@ -14,6 +14,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -96,30 +97,38 @@
                 ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}"
                 VerticalOptions="Center">
         </Picker>
-        
-        <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 
+
+        <Label Grid.Row="7" Grid.Column="0"
+               Text="Lanczos sampler Radius:"/>
+        <Entry Grid.Row="7" Grid.Column="1"
+               Keyboard="Numeric"
+               BindingContext="{Binding LanczosRadius}"/>
+        <Label Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="3"
+               Text="This value will be clamped to between 1 and 25! Higher numbers take much longer to process."/>
+
+        <BoxView HeightRequest="1" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Label Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                VerticalTextAlignment="Center"
                HorizontalTextAlignment="Center"
                Text="{Binding CropProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                Text="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:mm\\:ss\\.fff}'}" />
 
-        <Button Grid.Row="10" Grid.Column="2"
+        <Button Grid.Row="11" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding CropImagesCommand}"
                 Text="Auto Crop Images!"/>
 
-        <ProgressBar Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding CropProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
                FontSize="Medium"
