@@ -1,4 +1,6 @@
-﻿using Dataset_Processor_Desktop.src.Enums;
+﻿// Ignore Spelling: Lanczos
+
+using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using Microsoft.UI.Xaml;
@@ -113,6 +115,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _timer.Elapsed;
         }
 
+        private double _lanczosRadius;
+        public double LanczosRadius
+        {
+            get => _lanczosRadius;
+            set
+            {
+                if (Math.Round(value) != _lanczosRadius)
+                {
+                    _lanczosRadius = Math.Clamp(Math.Round(value), 1, 25);
+                    OnPropertyChanged(nameof(LanczosRadius));
+                }
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -133,6 +149,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             IouThreshold = 0.4f;
             ExpansionPercentage = 0.15f;
             Dimension = SupportedDimensions.Resolution512x512;
+            LanczosRadius = 3.0d;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -189,6 +206,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
+                _contentAwareCropService.LanczosSamplerRadius = (int)LanczosRadius;
                 await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
             }
             catch (Exception exception)

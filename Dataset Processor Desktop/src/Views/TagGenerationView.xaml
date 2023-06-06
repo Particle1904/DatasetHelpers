@@ -101,7 +101,7 @@
         <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
-               Text="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:mm\\:ss\\.fff}'}" />
+               Text="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}" />
 
         <Button Grid.Row="9" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"

@@ -56,6 +56,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private double _lanczosRadius;
+        public double LanczosRadius
+        {
+            get => _lanczosRadius;
+            set
+            {
+                if (Math.Round(value) != _lanczosRadius)
+                {
+                    _lanczosRadius = Math.Clamp(Math.Round(value), 1, 25);
+                    OnPropertyChanged(nameof(LanczosRadius));
+                }
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
 
@@ -75,6 +89,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configsService.Configurations.ResizedFolder;
             _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
+
+            LanczosRadius = 3.0d;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -118,6 +134,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             TaskStatus = ProcessingStatus.Running;
             try
             {
+                _imageProcessorService.LanczosSamplerRadius = (int)LanczosRadius;
                 await Task.Run(() => _imageProcessorService.ResizeImagesAsync(InputFolderPath, OutputFolderPath, ResizeProgress, Dimension));
             }
             catch (Exception exception)

@@ -123,6 +123,16 @@ namespace SmartData.Lib.Services
             }
         }
 
+        private int _lanczosSamplerRadius = 3;
+        public int LanczosSamplerRadius
+        {
+            get => _lanczosSamplerRadius;
+            set
+            {
+                _lanczosSamplerRadius = Math.Clamp(value, 1, 25);
+            }
+        }
+
         public ContentAwareCropService(IImageProcessorService imageProcessorService, string modelPath)
         {
             _imageProcessorService = imageProcessorService;
@@ -159,20 +169,15 @@ namespace SmartData.Lib.Services
             {
                 filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 filesList = files.ToList();
             }
 
+            _imageProcessorService.LanczosSamplerRadius = LanczosSamplerRadius;
             foreach (string file in filesList)
             {
-                Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
-
-                System.Drawing.Size imageSize = await _imageProcessorService.GetImageSizeAsync(file);
-
-                var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
-
-                await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
+                await ProcessingRoutine(outputPath, dimension, file);
             }
         }
 
@@ -205,25 +210,34 @@ namespace SmartData.Lib.Services
             {
                 filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 filesList = files.ToList();
             }
 
             progress.TotalFiles = files.Length;
 
+            _imageProcessorService.LanczosSamplerRadius = LanczosSamplerRadius;
             foreach (string file in filesList)
             {
-                Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
-
-                System.Drawing.Size imageSize = await _imageProcessorService.GetImageSizeAsync(file);
-
-                var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
-
-                await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
-
+                await ProcessingRoutine(outputPath, dimension, file);
                 progress.UpdateProgress();
             }
+        }
+
+        /// <summary>
+        /// Performs the processing routine for a given file, including bounding box prediction, image size retrieval, cropping, and saving the result to the specified output path.
+        /// </summary>
+        /// <param name="outputPath">The path where the processed image will be saved.</param>
+        /// <param name="dimension">The supported dimensions for cropping the image.</param>
+        /// <param name="file">The input file to be processed.</param>
+        /// <returns>A task representing the asynchronous processing operation.</returns>
+        private async Task ProcessingRoutine(string outputPath, SupportedDimensions dimension, string file)
+        {
+            Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
+            System.Drawing.Size imageSize = await _imageProcessorService.GetImageSizeAsync(file);
+            var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
+            await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
         }
 
         /// <summary>

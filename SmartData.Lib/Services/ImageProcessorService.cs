@@ -19,6 +19,14 @@ namespace SmartData.Lib.Services
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
         private int _lanczosSamplerRadius = 3;
+        public int LanczosSamplerRadius
+        {
+            get => _lanczosSamplerRadius;
+            set
+            {
+                _lanczosSamplerRadius = Math.Clamp(value, 1, 25);
+            }
+        }
 
         public int BlocksPerRow { get; private set; }
         private int _totalBlocks;

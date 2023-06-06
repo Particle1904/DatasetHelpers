@@ -5,6 +5,8 @@ namespace SmartData.Lib.Interfaces
 {
     public interface IContentAwareCropService
     {
+        public int LanczosSamplerRadius { get; set; }
+
         public bool IsModelLoaded { get; }
         public string ModelPath { get; set; }
         public float ScoreThreshold { get; set; }

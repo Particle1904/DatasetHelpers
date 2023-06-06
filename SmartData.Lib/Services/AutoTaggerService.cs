@@ -148,7 +148,7 @@ namespace SmartData.Lib.Services
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
             string commaSeparated = GetCommaSeparatedString(orderedPredictions);
 
-            string redundantRemoved = RemoveRedundantTags(commaSeparated);
+            string redundantRemoved = ProcessingRoutine(commaSeparated);
 
             string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
 
@@ -215,7 +215,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tags">The string containing tags.</param>
         /// <returns>The string with redundant tags removed.</returns>
-        private string RemoveRedundantTags(string tags)
+        private string ProcessingRoutine(string tags)
         {
             List<string> cleanedTags = new List<string>();
             string[] tagsSplit = tags.Replace(", ", ",").Split(",");
