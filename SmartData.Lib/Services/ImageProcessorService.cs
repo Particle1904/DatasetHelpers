@@ -12,12 +12,15 @@ namespace SmartData.Lib.Services
     {
         private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
+        private LanczosResampler _lanczosResampler;
+
         private const ushort _semaphoreConcurrent = 6;
 
         private const float _blurRadius = 22f;
 
         private const ushort _divisor = 64;
         private int _baseResolution = 512;
+
         private int _lanczosSamplerRadius = 3;
         public int LanczosSamplerRadius
         {
@@ -25,6 +28,28 @@ namespace SmartData.Lib.Services
             set
             {
                 _lanczosSamplerRadius = Math.Clamp(value, 1, 25);
+                if (_lanczosSamplerRadius != _lanczosResampler.Radius)
+                {
+                    _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
+                }
+            }
+        }
+        private float _sharpenSigma = 1.0f;
+        public float SharpenSigma
+        {
+            get => _sharpenSigma;
+            set
+            {
+                _sharpenSigma = Math.Clamp(value, 0.5f, 5.0f);
+            }
+        }
+        private bool _applySharpen = false;
+        public bool ApplySharpen
+        {
+            get => _applySharpen;
+            set
+            {
+                _applySharpen = value;
             }
         }
 
@@ -37,6 +62,7 @@ namespace SmartData.Lib.Services
             int BlocksPerRow = _baseResolution / _divisor;
             _totalBlocks = BlocksPerRow * BlocksPerRow;
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
+            _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
         }
 
         /// <summary>
@@ -130,9 +156,14 @@ namespace SmartData.Lib.Services
                     Size = new Size(resizedWidth, resizedHeight),
                     Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
-                    Sampler = KnownResamplers.Lanczos3,
+                    Sampler = _lanczosResampler,
                     Compand = true
                 }));
+
+                if (_applySharpen)
+                {
+                    resizedImage.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                }
 
                 JpegEncoder encoder = new JpegEncoder()
                 {
@@ -230,7 +261,7 @@ namespace SmartData.Lib.Services
                 {
                     Mode = ResizeMode.BoxPad,
                     Position = AnchorPositionMode.Center,
-                    Sampler = new LanczosResampler(3),
+                    Sampler = _lanczosResampler,
                     Compand = true,
                     PadColor = new Bgr24(255, 255, 255),
                     Size = new Size(448, 448),
@@ -279,7 +310,7 @@ namespace SmartData.Lib.Services
                 {
                     Mode = ResizeMode.BoxPad,
                     Position = AnchorPositionMode.Center,
-                    Sampler = KnownResamplers.Lanczos3,
+                    Sampler = _lanczosResampler,
                     Compand = true,
                     PadColor = new Rgb24(0, 0, 0),
                     Size = new Size(416, 416),
@@ -415,7 +446,7 @@ namespace SmartData.Lib.Services
                 {
                     Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
-                    Sampler = new LanczosResampler(_lanczosSamplerRadius),
+                    Sampler = _lanczosResampler,
                     Compand = true,
                     PadColor = Color.White,
                     Size = new Size(targetWidth, targetHeight)
@@ -426,6 +457,11 @@ namespace SmartData.Lib.Services
                     image.BackgroundColor(Color.White);
                     image.Resize(resizeOptions);
                 });
+
+                if (_applySharpen)
+                {
+                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                }
 
                 JpegEncoder encoder = new JpegEncoder()
                 {

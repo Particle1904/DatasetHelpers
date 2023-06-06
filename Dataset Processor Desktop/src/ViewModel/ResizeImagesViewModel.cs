@@ -70,6 +70,31 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _applySharpen;
+        public bool ApplySharpen
+        {
+            get => _applySharpen;
+            set
+            {
+                _applySharpen = value;
+                OnPropertyChanged(nameof(ApplySharpen));
+            }
+        }
+
+        private double _sharpenSigma;
+        public double SharpenSigma
+        {
+            get => _sharpenSigma;
+            set
+            {
+                if (Math.Round(value, 2) != _sharpenSigma)
+                {
+                    _sharpenSigma = Math.Clamp(Math.Round(value, 2), 0.5d, 5d);
+                    OnPropertyChanged(nameof(SharpenSigma));
+                }
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
 
@@ -91,6 +116,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _fileManipulatorService.CreateFolderIfNotExist(OutputFolderPath);
 
             LanczosRadius = 3.0d;
+            ApplySharpen = false;
+            SharpenSigma = 1.0d;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -135,6 +162,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             try
             {
                 _imageProcessorService.LanczosSamplerRadius = (int)LanczosRadius;
+                _imageProcessorService.ApplySharpen = ApplySharpen;
+                _imageProcessorService.SharpenSigma = (float)SharpenSigma;
                 await Task.Run(() => _imageProcessorService.ResizeImagesAsync(InputFolderPath, OutputFolderPath, ResizeProgress, Dimension));
             }
             catch (Exception exception)

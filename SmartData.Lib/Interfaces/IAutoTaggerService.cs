@@ -10,6 +10,6 @@ namespace SmartData.Lib.Interfaces
         public float Threshold { get; set; }
 
         public Task GenerateTags(string inputPath, string outputPath, bool weightedCaptions = false);
-        public Task GenerateTags(string inputPath, string outputPath, Progress progess, bool weightedCaptions = false);
+        public Task GenerateTags(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false);
     }
 }

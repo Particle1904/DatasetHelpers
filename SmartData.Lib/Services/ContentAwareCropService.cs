@@ -123,13 +123,36 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private int _lanczosSamplerRadius = 3;
-        public int LanczosSamplerRadius
+        private int _lanczosRadius = 3;
+        public int LanczosRadius
         {
-            get => _lanczosSamplerRadius;
+            get => _lanczosRadius;
             set
             {
-                _lanczosSamplerRadius = Math.Clamp(value, 1, 25);
+                _lanczosRadius = Math.Clamp(value, 1, 25);
+            }
+        }
+
+        private bool _applySharpen;
+        public bool ApplySharpen
+        {
+            get => _applySharpen;
+            set
+            {
+                _applySharpen = value;
+            }
+        }
+
+        private double _sharpenSigma;
+        public double SharpenSigma
+        {
+            get => _sharpenSigma;
+            set
+            {
+                if (Math.Round(value, 2) != _sharpenSigma)
+                {
+                    _sharpenSigma = Math.Clamp(Math.Round(value, 2), 0.5d, 5d);
+                }
             }
         }
 
@@ -174,7 +197,9 @@ namespace SmartData.Lib.Services
                 filesList = files.ToList();
             }
 
-            _imageProcessorService.LanczosSamplerRadius = LanczosSamplerRadius;
+            _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
+            _imageProcessorService.ApplySharpen = ApplySharpen;
+            _imageProcessorService.SharpenSigma = (float)SharpenSigma;
             foreach (string file in filesList)
             {
                 await ProcessingRoutine(outputPath, dimension, file);
@@ -217,7 +242,9 @@ namespace SmartData.Lib.Services
 
             progress.TotalFiles = files.Length;
 
-            _imageProcessorService.LanczosSamplerRadius = LanczosSamplerRadius;
+            _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
+            _imageProcessorService.ApplySharpen = ApplySharpen;
+            _imageProcessorService.SharpenSigma = (float)SharpenSigma;
             foreach (string file in filesList)
             {
                 await ProcessingRoutine(outputPath, dimension, file);

@@ -12,6 +12,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="2*"/>
@@ -80,25 +81,41 @@
         <Label Grid.Row="4" Grid.Column="4"
                Text="{Binding LanczosRadius}"/>
 
-        <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
+        <Grid Grid.Row="5" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox IsChecked="{Binding ApplySharpen}"/>
+            <Label Grid.Column="2"
+               Text="Sharpen Sigma?"/>
+        </Grid>        
+        <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
+                Minimum="0.5"
+                Maximum="5"
+                Value="{Binding SharpenSigma}"/>
+        <Label Grid.Row="5" Grid.Column="4"
+               Text="{Binding SharpenSigma}"/>
+
+        <BoxView HeightRequest="1" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5"
                  HorizontalOptions="FillAndExpand"
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Label Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                Text="{Binding ResizeProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="7" Grid.Column="2"
+        <Button Grid.Row="8" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding ResizeImagesCommand}"
                 Text="Resize images!"/>
 
-        <ProgressBar Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding ResizeProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                FontSize="Medium"

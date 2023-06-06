@@ -129,6 +129,31 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _applySharpen;
+        public bool ApplySharpen
+        {
+            get => _applySharpen;
+            set
+            {
+                _applySharpen = value;
+                OnPropertyChanged(nameof(ApplySharpen));
+            }
+        }
+
+        private double _sharpenSigma;
+        public double SharpenSigma
+        {
+            get => _sharpenSigma;
+            set
+            {
+                if (Math.Round(value, 2) != _sharpenSigma)
+                {
+                    _sharpenSigma = Math.Clamp(Math.Round(value, 2), 0.5d, 5d);
+                    OnPropertyChanged(nameof(SharpenSigma));
+                }
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -149,7 +174,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             IouThreshold = 0.4f;
             ExpansionPercentage = 0.15f;
             Dimension = SupportedDimensions.Resolution512x512;
+
             LanczosRadius = 3.0d;
+            ApplySharpen = false;
+            SharpenSigma = 1.0d;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -192,9 +220,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             _timer.Reset();
             TaskStatus = ProcessingStatus.Running;
-            _contentAwareCropService.ScoreThreshold = (float)ScoreThreshold;
-            _contentAwareCropService.IouThreshold = (float)IouThreshold;
-            _contentAwareCropService.ExpansionPercentage = (float)ExpansionPercentage + 1.0f;
+
 
             try
             {
@@ -206,7 +232,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                _contentAwareCropService.LanczosSamplerRadius = (int)LanczosRadius;
+                _contentAwareCropService.ScoreThreshold = (float)ScoreThreshold;
+                _contentAwareCropService.IouThreshold = (float)IouThreshold;
+                _contentAwareCropService.ExpansionPercentage = (float)ExpansionPercentage + 1.0f;
+                _contentAwareCropService.LanczosRadius = (int)LanczosRadius;
+                _contentAwareCropService.ApplySharpen = ApplySharpen;
+                _contentAwareCropService.SharpenSigma = (float)SharpenSigma;
+
                 await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
             }
             catch (Exception exception)
