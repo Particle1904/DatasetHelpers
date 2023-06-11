@@ -129,6 +129,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
@@ -146,6 +147,12 @@
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
                    Text="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg + 1.txt, 2.jpeg + 2.txt and etc."/>
+            <CheckBox Grid.Row="2" Grid.Column="0"
+                      IsChecked="{Binding ApplyRedundancyRemoval}"/>
+            <Label Grid.Row="2" Grid.Column="1"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   Text="Would you like to apply redundancy removal to the tags? For example: if the processed tags have &quot;shirt&quot; and &quot;black shirt&quot;;&#x0a;it will strip &quot;shirt&quot; and keep &quot;black shirt&quot; since its more descriptive."/>
         </Grid>        
         
         <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 

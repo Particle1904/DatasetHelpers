@@ -109,6 +109,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _applyRedundancyRemoval;
+        public bool ApplyRedundancyRemoval
+        {
+            get => _applyRedundancyRemoval;
+            set
+            {
+                _applyRedundancyRemoval = value;
+                OnPropertyChanged(nameof(ApplyRedundancyRemoval));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessTagsCommand { get; private set; }
 
@@ -129,6 +140,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             RandomizeTags = false;
             RenameFilesToCrescent = true;
+            ApplyRedundancyRemoval = false;
         }
 
         public async Task SelectInputFolderAsync()
@@ -163,10 +175,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     await _fileManipulatorService.RenameAllToCrescentAsync(InputFolderPath);
                 }
+                if (ApplyRedundancyRemoval)
+                {
+                    await _tagProcessorService.ApplyRedundancyRemovalToFiles(InputFolderPath);
+                }
             }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(System.IO.IOException))
+                if (exception.GetType() == typeof(IOException))
                 {
                     _loggerService.LatestLogMessage = $"Images and Tag files are named in crescent order already!";
                 }
@@ -191,7 +207,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 catch (Exception exception)
                 {
-                    if (exception.GetType() == typeof(System.ArgumentException))
+                    if (exception.GetType() == typeof(ArgumentException))
                     {
                         _loggerService.LatestLogMessage = exception.Message;
                     }

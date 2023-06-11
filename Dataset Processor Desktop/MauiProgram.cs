@@ -40,6 +40,7 @@ namespace Dataset_Processor_Desktop
             );
             builder.Services.AddSingleton<IAutoTaggerService>(service =>
                 new AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                    service.GetRequiredService<ITagProcessorService>(),
                     Path.Combine(_modelsPath, _WDOnnxFilename),
                     Path.Combine(_modelsPath, _csvFilename)
             ));

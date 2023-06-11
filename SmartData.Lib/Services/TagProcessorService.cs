@@ -137,6 +137,44 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Apply redundancy removal for tags for all .txt files in the specified input folder path.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the input folder.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ApplyRedundancyRemovalToFiles(string inputFolderPath)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = ApplyRedundancyRemoval(readTags);
+                await File.WriteAllTextAsync(file, processedTags);
+            }
+        }
+
+        /// <summary>
+        /// Apply redundancy removal for tags for all .txt files in the specified input folder path.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the input folder.</param>
+        /// /// <param name="progress">The progress tracker for updating the progress of the operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ApplyRedundancyRemovalToFiles(string inputFolderPath, Progress progress)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string processedTags = ApplyRedundancyRemoval(readTags);
+                await File.WriteAllTextAsync(file, processedTags);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
         /// Calculates the count of each tag used in all the text files inside the specified folder 
         /// and writes the results to a file named "tag-count.txt" in the same folder.
         /// </summary>
@@ -182,6 +220,148 @@ namespace SmartData.Lib.Services
             string filePath = Path.Combine(inputFolderPath, "tag-count.txt");
 
             await File.WriteAllTextAsync(filePath, stringBuilder.ToString());
+        }
+
+        /// <summary>
+        /// Removes redundant tags from the input string. For example: if "shirt, white shirt" is present in the input, 
+        /// the output will only have "white shirt" since thats more descriptive. It will also remove common
+        /// useless tags like "general" and "sensitive" and others.
+        /// </summary>
+        /// <param name="tags">The string containing tags.</param>
+        /// <returns>The string with redundant tags removed.</returns>
+        public string ApplyRedundancyRemoval(string tags)
+        {
+            List<string> cleanedTags = new List<string>();
+            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
+
+            bool hasBreastSizeTag = false;
+            bool hasMaleGenitaliaSizeTag = false;
+            bool hasHairLengthTag = false;
+
+            foreach (string tag in tagsSplit)
+            {
+                bool isBreastSizeTag = IsBreastSize(tag);
+                bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
+                bool isHairLengthTag = IsHairLength(tag);
+                bool isRedundant = false;
+
+                foreach (string processedTag in cleanedTags)
+                {
+                    if (IsRedundantWith(tag, processedTag))
+                    {
+                        if (tag.Length < processedTag.Length)
+                        {
+                            isRedundant = true;
+                            continue;
+                        }
+                        else
+                        {
+                            cleanedTags.Remove(processedTag);
+                            break;
+                        }
+                    }
+                }
+
+                if (isBreastSizeTag && !hasBreastSizeTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasBreastSizeTag = true;
+                }
+                else if (isMaleGenitaliaTag && !hasMaleGenitaliaSizeTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasMaleGenitaliaSizeTag = true;
+                }
+                else if (isHairLengthTag && !hasHairLengthTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasHairLengthTag = true;
+                }
+                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isHairLengthTag && !isRedundant)
+                {
+                    cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
+                    cleanedTags.Add(tag);
+                }
+            }
+
+            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo", "general" };
+            foreach (string tagToRemove in tagsToRemove)
+            {
+                cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return GetCommaSeparatedString(cleanedTags);
+        }
+
+        /// <summary>
+        /// Constructs a comma-separated string from the elements in the specified list.
+        /// </summary>
+        /// <param name="predictedTags">The list of tags to construct a string from.</param>
+        /// <returns>A string that contains the elements of the specified list separated by commas.</returns>
+        public string GetCommaSeparatedString(List<string> predictedTags)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (string tag in predictedTags)
+            {
+                if (tag != predictedTags.LastOrDefault())
+                {
+                    stringBuilder.Append($"{tag}, ");
+                }
+                else
+                {
+                    stringBuilder.Append(tag);
+                }
+            }
+
+            return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Determines if the given tag is redundant with another tag.
+        /// </summary>
+        /// <param name="tag">The tag to compare.</param>
+        /// <param name="otherTag">The other tag to compare against.</param>
+        /// <returns>True if the tags are redundant, false otherwise.</returns>
+        private bool IsRedundantWith(string tag, string otherTag)
+        {
+            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase) || Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase));
+            //return (tag.Contains(otherTag, StringComparison.OrdinalIgnoreCase) || otherTag.Contains(tag, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a breast size.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a breast size, false otherwise.</returns>
+        private bool IsBreastSize(string tag)
+        {
+            string[] sizeKeywords = { "small b", "medium b", "large b", "huge b", "flat chest" };
+
+            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a hair length.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a hair length, false otherwise.</returns>
+        private bool IsHairLength(string tag)
+        {
+            string[] sizeKeywords = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "big hair" };
+
+            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a male genitalia size.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a male genitalia size, false otherwise.</returns>
+        private bool IsMaleGenitaliaSize(string tag)
+        {
+            string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
+
+            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

@@ -6,9 +6,6 @@ using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace SmartData.Lib.Services
 {
     public class AutoTaggerService : IAutoTaggerService
@@ -16,6 +13,7 @@ namespace SmartData.Lib.Services
         private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         private readonly IImageProcessorService _imageProcessorService;
+        private readonly ITagProcessorService _tagProcessorService;
 
         private MLContext _mlContext;
         private OnnxScoringEstimator _pipeline;
@@ -79,9 +77,10 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public AutoTaggerService(IImageProcessorService imageProcessorService, string modelPath, string tagsPath)
+        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath)
         {
             _imageProcessorService = imageProcessorService;
+            _tagProcessorService = tagProcessorService;
 
             ModelPath = modelPath;
             _tagsPath = tagsPath;
@@ -146,9 +145,9 @@ namespace SmartData.Lib.Services
         private async Task PostProcessTags(string outputPath, bool weightedCaptions, string file)
         {
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-            string commaSeparated = GetCommaSeparatedString(orderedPredictions);
+            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
 
-            string redundantRemoved = ProcessingRoutine(commaSeparated);
+            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
 
             string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
 
@@ -206,106 +205,6 @@ namespace SmartData.Lib.Services
             }
 
             return listOrdered;
-        }
-
-        /// <summary>
-        /// Removes redundant tags from the input string. For example: if "shirt, white shirt" is present in the input, 
-        /// the output will only have "white shirt" since thats more descriptive. It will also remove common
-        /// useless tags like "general" and "sensitive" and others.
-        /// </summary>
-        /// <param name="tags">The string containing tags.</param>
-        /// <returns>The string with redundant tags removed.</returns>
-        private string ProcessingRoutine(string tags)
-        {
-            List<string> cleanedTags = new List<string>();
-            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
-
-            bool hasBreastSizeTag = false;
-            bool hasMaleGenitaliaSizeTag = false;
-
-            foreach (string tag in tagsSplit)
-            {
-                bool isBreastSizeTag = IsBreastSize(tag);
-                bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
-                bool isReduntant = false;
-
-                foreach (string processedTag in cleanedTags)
-                {
-                    if (IsRedundantWith(tag, processedTag))
-                    {
-                        if (tag.Length < processedTag.Length)
-                        {
-                            isReduntant = true;
-                            continue;
-                        }
-                        else
-                        {
-                            cleanedTags.Remove(processedTag);
-                            break;
-                        }
-                    }
-                }
-
-                if (isBreastSizeTag && !hasBreastSizeTag)
-                {
-                    cleanedTags.Add(tag);
-                    hasBreastSizeTag = true;
-                }
-                else if (isMaleGenitaliaTag && !hasMaleGenitaliaSizeTag)
-                {
-                    cleanedTags.Add(tag);
-                    hasMaleGenitaliaSizeTag = true;
-                }
-                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isReduntant)
-                {
-                    cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
-                    cleanedTags.Add(tag);
-                }
-            }
-
-            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo", "general" };
-            foreach (string tagToRemove in tagsToRemove)
-            {
-                cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
-            }
-
-            return GetCommaSeparatedString(cleanedTags);
-        }
-
-        /// <summary>
-        /// Determines if the given tag is redundant with another tag.
-        /// </summary>
-        /// <param name="tag">The tag to compare.</param>
-        /// <param name="otherTag">The other tag to compare against.</param>
-        /// <returns>True if the tags are redundant, false otherwise.</returns>
-        public bool IsRedundantWith(string tag, string otherTag)
-        {
-            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase) || Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase));
-            //return (tag.Contains(otherTag, StringComparison.OrdinalIgnoreCase) || otherTag.Contains(tag, StringComparison.OrdinalIgnoreCase));
-        }
-
-        /// <summary>
-        /// Determines if the given tag represents a breast size.
-        /// </summary>
-        /// <param name="tag">The tag to check.</param>
-        /// <returns>True if the tag represents a breast size, false otherwise.</returns>
-        public bool IsBreastSize(string tag)
-        {
-            string[] sizeKeywords = { "small b", "medium b", "large b", "huge b", "flat chest" };
-
-            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
-        }
-
-        /// <summary>
-        /// Determines if the given tag represents a male genitalia size.
-        /// </summary>
-        /// <param name="tag">The tag to check.</param>
-        /// <returns>True if the tag represents a male genitalia size, false otherwise.</returns>
-        public bool IsMaleGenitaliaSize(string tag)
-        {
-            string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
-
-            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -371,27 +270,6 @@ namespace SmartData.Lib.Services
             }
         }
 
-        /// <summary>
-        /// Constructs a comma-separated string from the elements in the specified list.
-        /// </summary>
-        /// <param name="predictedTags">The list of tags to construct a string from.</param>
-        /// <returns>A string that contains the elements of the specified list separated by commas.</returns>
-        private string GetCommaSeparatedString(List<string> predictedTags)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (string tag in predictedTags)
-            {
-                if (tag != predictedTags.LastOrDefault())
-                {
-                    stringBuilder.Append($"{tag}, ");
-                }
-                else
-                {
-                    stringBuilder.Append(tag);
-                }
-            }
 
-            return stringBuilder.ToString();
-        }
     }
 }

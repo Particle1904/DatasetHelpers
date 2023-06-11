@@ -10,6 +10,10 @@ namespace SmartData.Lib.Interfaces
         public Task ProcessTagsReplacement(string inputFolderPath, string tagsToReplace, string tagsToBeReplaced, Progress progress);
         public Task RandomizeTagsOfFiles(string inputFolderPath);
         public Task RandomizeTagsOfFiles(string inputFolderPath, Progress progress);
+        public Task ApplyRedundancyRemovalToFiles(string inputFolderPath);
+        public Task ApplyRedundancyRemovalToFiles(string inputFolderPath, Progress progress);
         public Task CalculateListOfMostUsedTags(string inputFolderPath);
+        public string ApplyRedundancyRemoval(string tags);
+        public string GetCommaSeparatedString(List<string> predictedTags);
     }
 }
