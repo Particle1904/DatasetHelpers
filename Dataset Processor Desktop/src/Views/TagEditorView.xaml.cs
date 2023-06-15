@@ -20,7 +20,7 @@ public partial class TagEditorView : ContentView
     private FormattedString _labelFormattedString;
 
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    private TimeSpan _waitTimeInMilliseconds = TimeSpan.FromSeconds(1);
+    private TimeSpan _waitTimeInMilliseconds = TimeSpan.FromSeconds(3);
 
     public TagEditorView(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
     {
