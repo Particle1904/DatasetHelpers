@@ -1,6 +1,4 @@
-﻿using Microsoft.ML;
-using Microsoft.ML.Data;
-using Microsoft.ML.Transforms.Onnx;
+﻿using Microsoft.ML.Data;
 
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -8,18 +6,8 @@ using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
-    public class AutoTaggerService : IAutoTaggerService
+    public class AutoTaggerService : BaseAIConsumer<WDInputData, WDOutputData>, IAutoTaggerService
     {
-        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
-
-        private readonly IImageProcessorService _imageProcessorService;
-        private readonly ITagProcessorService _tagProcessorService;
-
-        private MLContext _mlContext;
-        private OnnxScoringEstimator _pipeline;
-        private ITransformer _predictionPipe;
-        private PredictionEngine<WDInputData, WDOutputData> _predictionEngine;
-
         private string[] _tags;
 
         private float _threshold = 0.2f;
@@ -41,19 +29,6 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private string _modelPath;
-        public string ModelPath
-        {
-            get
-            {
-                return _modelPath;
-            }
-            set
-            {
-                _modelPath = value;
-            }
-        }
-
         private string _tagsPath;
         public string TagsPath
         {
@@ -67,25 +42,34 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private bool _isModelLoaded = false;
-        public bool IsModelLoaded
+        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, tagProcessorService, modelPath)
         {
-            get => _isModelLoaded;
-            private set
-            {
-                _isModelLoaded = value;
-            }
+            _tagsPath = tagsPath;
         }
 
-        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath)
+        protected override async Task LoadModel()
         {
-            _imageProcessorService = imageProcessorService;
-            _tagProcessorService = tagProcessorService;
+            await base.LoadModel();
 
-            ModelPath = modelPath;
-            _tagsPath = tagsPath;
+            LoadTags(TagsPath);
+            if (_tags?.Length > 0)
+            {
+                for (int i = 0; i < _tags.Length; i++)
+                {
+                    _tags[i] = _tags[i].Replace("_", " ");
+                }
+            }
 
-            _mlContext = new MLContext();
+            _isModelLoaded = true;
+        }
+
+        protected override string[] GetInputColumns()
+        {
+            return new string[] { "input_1:0" };
+        }
+        protected override string[] GetOutputColumns()
+        {
+            return new string[] { "predictions_sigmoid" };
         }
 
         /// <summary>
@@ -208,28 +192,6 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Loads the machine learning model and initializes the prediction pipeline and engine.
-        /// </summary>
-        /// <returns>A Task representing the asynchronous operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when either the model path or the tags path is null, empty, or consists only of white spaces.</exception>
-        private async Task LoadModel()
-        {
-            _predictionPipe = await Task.Run(() => GetPredictionPipeline());
-            _predictionEngine = _mlContext.Model.CreatePredictionEngine<WDInputData, WDOutputData>(_predictionPipe);
-
-            LoadTags(TagsPath);
-            if (_tags?.Length > 0)
-            {
-                for (int i = 0; i < _tags.Length; i++)
-                {
-                    _tags[i] = _tags[i].Replace("_", " ");
-                }
-            }
-
-            _isModelLoaded = true;
-        }
-
-        /// <summary>
         /// Retrieves predictions for the specified image file path using the prediction engine, which is a machine learning model that has been trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
         /// </summary>
         /// <param name="imagePath">The path of the image file to make predictions on.</param>
@@ -243,22 +205,6 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Retrieves a prediction pipeline for making predictions using the ONNX model.
-        /// </summary>
-        /// <returns>An instance of ITransformer representing the prediction pipeline.</returns>
-        private ITransformer GetPredictionPipeline()
-        {
-            string[] inputColumns = new string[] { "input_1:0" };
-            string[] outputColumns = new string[] { "predictions_sigmoid" };
-
-            _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, _modelPath);
-
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable(new WDInputData[] { });
-
-            return _pipeline.Fit(emptyDv);
-        }
-
-        /// <summary>
         /// Loads tags from a CSV file and assigns them to the '_tags' field.
         /// </summary>
         /// <param name="csvPath">The path to the CSV file containing the tags.</param>
@@ -269,7 +215,5 @@ namespace SmartData.Lib.Services
                 _tags = File.ReadAllLines(csvPath);
             }
         }
-
-
     }
 }

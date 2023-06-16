@@ -1,7 +1,4 @@
-﻿using Microsoft.ML;
-using Microsoft.ML.Transforms.Onnx;
-
-using SmartData.Lib.Enums;
+﻿using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
@@ -10,16 +7,8 @@ using System.Diagnostics;
 
 namespace SmartData.Lib.Services
 {
-    public class ContentAwareCropService : IContentAwareCropService
+    public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService
     {
-        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
-
-        private readonly IImageProcessorService _imageProcessorService;
-
-        private MLContext _mlContext;
-        private OnnxScoringEstimator _pipeline;
-        private ITransformer _predictionPipe;
-        private PredictionEngine<Yolov4InputData, Yolov4OutputData> _predictionEngine;
 
         private float _scoreThreshold = 0.5f;
         /// <summary>
@@ -78,19 +67,6 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private string _modelPath;
-        public string ModelPath
-        {
-            get
-            {
-                return _modelPath;
-            }
-            set
-            {
-                _modelPath = value;
-            }
-        }
-
         private string[] _classesNames = new string[] { "person", "bicycle", "car", "motorbike", "aeroplane",
                 "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
                 "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella",
@@ -112,16 +88,6 @@ namespace SmartData.Lib.Services
 
         private float[] _xyScale = new float[] { 1.2f, 1.1f, 1.05f };
         private float[] _strides = new float[] { 8, 16, 32 };
-
-        private bool _isModelLoaded = false;
-        public bool IsModelLoaded
-        {
-            get => _isModelLoaded;
-            private set
-            {
-                _isModelLoaded = value;
-            }
-        }
 
         private int _lanczosRadius = 3;
         public int LanczosRadius
@@ -156,13 +122,17 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public ContentAwareCropService(IImageProcessorService imageProcessorService, string modelPath)
+        public ContentAwareCropService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath) : base(imageProcessorService, tagProcessorService, modelPath)
         {
-            _imageProcessorService = imageProcessorService;
+        }
 
-            ModelPath = modelPath;
-
-            _mlContext = new MLContext();
+        protected override string[] GetInputColumns()
+        {
+            return new string[] { "input_1:0" };
+        }
+        protected override string[] GetOutputColumns()
+        {
+            return new string[] { "Identity:0", "Identity_1:0", "Identity_2:0" };
         }
 
         /// <summary>
@@ -439,33 +409,6 @@ namespace SmartData.Lib.Services
         private float CalculateBoundingBoxArea(float[] boundinbBox)
         {
             return (boundinbBox[2] - boundinbBox[0]) * (boundinbBox[3] - boundinbBox[1]);
-        }
-
-        /// <summary>
-        /// Loads the machine learning model and initializes the prediction pipeline and engine.
-        /// </summary>
-        /// <returns>A Task representing the asynchronous operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when either the model path or the tags path is null, empty, or consists only of white spaces.</exception>
-        private async Task LoadModel()
-        {
-            _predictionPipe = await Task.Run(() => GetPredictionPipeline());
-            _predictionEngine = _mlContext.Model.CreatePredictionEngine<Yolov4InputData, Yolov4OutputData>(_predictionPipe);
-        }
-
-        /// <summary>
-        /// Constructs and returns the prediction pipeline for the YOLOv4 model.
-        /// </summary>
-        /// <returns>The prediction pipeline.</returns>
-        private ITransformer GetPredictionPipeline()
-        {
-            string[] inputColumns = new string[] { "input_1:0" };
-            string[] outputColumns = new string[] { "Identity:0", "Identity_1:0", "Identity_2:0" };
-
-            _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, _modelPath);
-
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable(new Yolov4InputData[] { });
-
-            return _pipeline.Fit(emptyDv);
         }
     }
 }

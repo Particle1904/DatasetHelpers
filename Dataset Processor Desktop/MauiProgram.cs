@@ -36,6 +36,7 @@ namespace Dataset_Processor_Desktop
             builder.Services.AddSingleton<IConfigsService, ConfigsService>();
             builder.Services.AddSingleton<IContentAwareCropService>(service =>
                 new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
+                    service.GetRequiredService<ITagProcessorService>(),
                     Path.Combine(_modelsPath, _YoloV4OnnxFilename))
             );
             builder.Services.AddSingleton<IAutoTaggerService>(service =>
