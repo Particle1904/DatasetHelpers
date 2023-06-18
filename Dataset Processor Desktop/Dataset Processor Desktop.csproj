@@ -99,6 +99,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="src\Views\CaptionGenerationView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="src\Views\ContentAwareCropView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -347,7 +347,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a hair length, false otherwise.</returns>
         private bool IsHairLength(string tag)
         {
-            string[] sizeKeywords = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "big hair" };
+            string[] sizeKeywords = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "long hair" };
 
             return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }

@@ -10,7 +10,6 @@ namespace SmartData.Lib.Services
         where TOutput : class, new()
     {
         protected readonly IImageProcessorService _imageProcessorService;
-        protected readonly ITagProcessorService _tagProcessorService;
 
         protected string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
@@ -39,10 +38,9 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public BaseAIConsumer(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath)
+        public BaseAIConsumer(IImageProcessorService imageProcessorService, string modelPath)
         {
             _imageProcessorService = imageProcessorService;
-            _tagProcessorService = tagProcessorService;
 
             ModelPath = modelPath;
 

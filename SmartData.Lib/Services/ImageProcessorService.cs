@@ -292,6 +292,56 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously processes an image for caption prediction by resizing it to 384x384 and converting it to a float array.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>An <see cref="BLIPInputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        public async Task<BLIPInputData> ProcessImageForCaptionPredictionAsync(string inputPath)
+        {
+            BLIPInputData inputData = new BLIPInputData();
+            inputData.pixel_values = new float[3 * 384 * 384];
+
+            int index = 0;
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _lanczosResampler,
+                    Compand = true,
+                    PadColor = new Rgb24(0, 0, 0),
+                    Size = new Size(384, 384),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Rgb24 pixel = ref pixelRow[x];
+
+                            float r = pixel.R * 1f / 255f;
+                            float g = pixel.G * 1f / 255f;
+                            float b = pixel.B * 1f / 255f;
+
+                            inputData.pixel_values[index++] = r;
+                            inputData.pixel_values[index++] = g;
+                            inputData.pixel_values[index++] = b;
+                        }
+                    }
+                });
+            }
+            return inputData;
+        }
+
+        /// <summary>
         /// Asynchronously processes an image for bounding box prediction by resizing it to 416x416 and converting it to a float array.
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>

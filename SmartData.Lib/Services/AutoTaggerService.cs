@@ -8,6 +8,8 @@ namespace SmartData.Lib.Services
 {
     public class AutoTaggerService : BaseAIConsumer<WDInputData, WDOutputData>, IAutoTaggerService
     {
+        protected readonly ITagProcessorService _tagProcessorService;
+
         private string[] _tags;
 
         private float _threshold = 0.2f;
@@ -42,8 +44,9 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, tagProcessorService, modelPath)
+        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
         {
+            _tagProcessorService = tagProcessorService;
             _tagsPath = tagsPath;
         }
 

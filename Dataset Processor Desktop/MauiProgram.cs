@@ -18,6 +18,7 @@ namespace Dataset_Processor_Desktop
             string _WDOnnxFilename = "wdModel.onnx";
             string _csvFilename = "wdTags.csv";
             string _YoloV4OnnxFilename = "yolov4.onnx";
+            string _BLIPOnnxFile = "blip.onnx";
 
             var builder = MauiApp.CreateBuilder();
             builder
@@ -36,14 +37,18 @@ namespace Dataset_Processor_Desktop
             builder.Services.AddSingleton<IConfigsService, ConfigsService>();
             builder.Services.AddSingleton<IContentAwareCropService>(service =>
                 new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
-                    service.GetRequiredService<ITagProcessorService>(),
-                    Path.Combine(_modelsPath, _YoloV4OnnxFilename))
-            );
+                    Path.Combine(_modelsPath, _YoloV4OnnxFilename)
+
+            ));
             builder.Services.AddSingleton<IAutoTaggerService>(service =>
                 new AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                     service.GetRequiredService<ITagProcessorService>(),
                     Path.Combine(_modelsPath, _WDOnnxFilename),
                     Path.Combine(_modelsPath, _csvFilename)
+            ));
+            builder.Services.AddSingleton<IAutoCaptionService>(service =>
+                new AutoCaptionService(service.GetRequiredService<IImageProcessorService>(),
+                    Path.Combine(_modelsPath, _BLIPOnnxFile)
             ));
 
             return builder.Build();

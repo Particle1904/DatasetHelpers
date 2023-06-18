@@ -122,7 +122,7 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public ContentAwareCropService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath) : base(imageProcessorService, tagProcessorService, modelPath)
+        public ContentAwareCropService(IImageProcessorService imageProcessorService, string modelPath) : base(imageProcessorService, modelPath)
         {
         }
 

@@ -6,7 +6,7 @@ namespace SmartData.Lib.Models
     {
         [ColumnName("input_ids")]
         [VectorType(1, 512)]
-        public long[]? Input_Ids { get; set; }
+        public long[] Input_Ids { get; set; } = new long[512];
 
         [ColumnName("pixel_values")]
         [VectorType(1, 3, 384, 384)]
