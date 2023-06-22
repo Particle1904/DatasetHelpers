@@ -71,7 +71,7 @@ namespace SmartData.Lib.Services
             progress.TotalFiles = files.Length;
             foreach (string file in files)
             {
-                VBuffer<float> prediction = await GetPredictionAsync(file);
+                float[] prediction = await GetPredictionAsync(file);
                 progress.UpdateProgress();
             }
         }
@@ -81,7 +81,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="imagePath">The path of the image file to make predictions on.</param>
         /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        private async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
+        private async Task<float[]> GetPredictionAsync(string inputImagePath)
         {
             BLIPInputData inputData = await _imageProcessorService.ProcessImageForCaptionPredictionAsync(inputImagePath);
 
@@ -89,18 +89,18 @@ namespace SmartData.Lib.Services
             var tokenized = _tokenizer.Encode(_sequenceLength, inputText);
             var inputs = tokenized.Select(x => x.InputIds).Where(x => x != 0).ToArray();
 
-            inputData.Input_Ids = new long[1, inputs.Length];
+            inputData.InputIds = new long[1, inputs.Length];
 
             for (int i = 0; i < 1; i++)
             {
                 for (int j = 0; j < inputs.Length; j++)
                 {
-                    inputData.Input_Ids[i, j] = inputs[j];
+                    inputData.InputIds[i, j] = inputs[j];
                 }
             }
 
             BLIPOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
-            return prediction.output;
+            return prediction.Output;
         }
     }
 }

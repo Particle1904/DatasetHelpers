@@ -6,6 +6,6 @@ namespace SmartData.Lib.Models
     {
         [ColumnName("input_1:0")]
         [VectorType(1, 448, 448, 3)]
-        public float[]? Input_1 { get; set; }
+        public float[]? Input1 { get; set; }
     }
 }

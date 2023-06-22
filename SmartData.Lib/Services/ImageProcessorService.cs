@@ -252,7 +252,7 @@ namespace SmartData.Lib.Services
         public async Task<WDInputData> ProcessImageForTagPredictionAsync(string inputPath)
         {
             WDInputData inputData = new WDInputData();
-            inputData.Input_1 = new float[448 * 448 * 3];
+            inputData.Input1 = new float[448 * 448 * 3];
 
             int index = 0;
             using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(inputPath))
@@ -281,9 +281,9 @@ namespace SmartData.Lib.Services
                             pixel.R = pixel.B;
                             pixel.B = temp;
 
-                            inputData.Input_1[index++] = pixel.R;
-                            inputData.Input_1[index++] = pixel.G;
-                            inputData.Input_1[index++] = pixel.B;
+                            inputData.Input1[index++] = pixel.R;
+                            inputData.Input1[index++] = pixel.G;
+                            inputData.Input1[index++] = pixel.B;
                         }
                     }
                 });
@@ -295,13 +295,13 @@ namespace SmartData.Lib.Services
         /// Asynchronously processes an image for caption prediction by resizing it to 384x384 and converting it to a float array.
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
-        /// <returns>An <see cref="BLIPInputData"/> object containing the processed image as a float array.</returns>
+        /// <returns>An <see cref="VITInputData"/> object containing the processed image as a float array.</returns>
         /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
         public async Task<BLIPInputData> ProcessImageForCaptionPredictionAsync(string inputPath)
         {
             BLIPInputData inputData = new BLIPInputData();
-            inputData.pixel_values = new float[3 * 384 * 384];
+            inputData.PixelValues = new float[3 * 384 * 384];
 
             int index = 0;
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
@@ -331,9 +331,9 @@ namespace SmartData.Lib.Services
                             float g = pixel.G * 1f / 255f;
                             float b = pixel.B * 1f / 255f;
 
-                            inputData.pixel_values[index++] = r;
-                            inputData.pixel_values[index++] = g;
-                            inputData.pixel_values[index++] = b;
+                            inputData.PixelValues[index++] = r;
+                            inputData.PixelValues[index++] = g;
+                            inputData.PixelValues[index++] = b;
                         }
                     }
                 });
@@ -351,7 +351,7 @@ namespace SmartData.Lib.Services
         public async Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath)
         {
             Yolov4InputData inputData = new Yolov4InputData();
-            inputData.Input_1 = new float[416 * 416 * 3];
+            inputData.Input1 = new float[416 * 416 * 3];
 
             int index = 0;
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
@@ -381,9 +381,9 @@ namespace SmartData.Lib.Services
                             float g = pixel.G * 1f / 255f;
                             float b = pixel.B * 1f / 255f;
 
-                            inputData.Input_1[index++] = r;
-                            inputData.Input_1[index++] = g;
-                            inputData.Input_1[index++] = b;
+                            inputData.Input1[index++] = r;
+                            inputData.Input1[index++] = g;
+                            inputData.Input1[index++] = b;
                         }
                     }
                 });

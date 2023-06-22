@@ -47,19 +47,21 @@
                     Text="Generate Tags"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagGenerationCommand}"/>
+            <!--
             <Button Grid.Row="5"
                     Text="Generate Captions"
                     VerticalOptions="Center"
-                    Command="{Binding NavigateToCaptionGenerationCommand}"/>
-            <Button Grid.Row="6"
+                    Command="{Binding NavigateToCaptionGenerationCommand}"/> 
+            -->
+            <Button Grid.Row="5"
                     Text="Process Tags"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagProcessingCommand}"/>
-            <Button Grid.Row="7"
+            <Button Grid.Row="6"
                     Text="Tag/Caption Editor"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagEditorCommand}"/>
-            <Button Grid.Row="8"
+            <Button Grid.Row="7"
                     Text="Settings"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToSettingsCommand}"/>

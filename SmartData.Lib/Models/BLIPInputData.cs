@@ -6,10 +6,10 @@ namespace SmartData.Lib.Models
     {
         [ColumnName("input_ids")]
         [VectorType(1, 128)]
-        public long[,]? Input_Ids { get; set; }
+        public long[,]? InputIds { get; set; }
 
         [ColumnName("pixel_values")]
         [VectorType(1, 3, 384, 384)]
-        public float[]? pixel_values { get; set; }
+        public float[]? PixelValues { get; set; }
     }
 }
