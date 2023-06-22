@@ -169,15 +169,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 await _tagProcessorService.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove, TagProcessingProgress);
                 if (RandomizeTags)
                 {
-                    await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath);
+                    TagProcessingProgress.Reset();
+                    await _tagProcessorService.RandomizeTagsOfFiles(InputFolderPath, TagProcessingProgress);
                 }
                 if (RenameFilesToCrescent)
                 {
-                    await _fileManipulatorService.RenameAllToCrescentAsync(InputFolderPath);
+                    TagProcessingProgress.Reset();
+                    await _fileManipulatorService.RenameAllToCrescentAsync(InputFolderPath, TagProcessingProgress);
                 }
                 if (ApplyRedundancyRemoval)
                 {
-                    await _tagProcessorService.ApplyRedundancyRemovalToFiles(InputFolderPath);
+                    TagProcessingProgress.Reset();
+                    await _tagProcessorService.ApplyRedundancyRemovalToFiles(InputFolderPath, TagProcessingProgress);
                 }
             }
             catch (Exception exception)

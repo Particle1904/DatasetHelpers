@@ -1,15 +1,24 @@
-﻿using Microsoft.ML.Data;
+﻿using BERTTokenizers;
+
+using Microsoft.ML.Data;
 
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 
+using System.Reflection;
+
 namespace SmartData.Lib.Services
 {
     public class AutoCaptionService : BaseAIConsumer<BLIPInputData, BLIPOutputData>, IAutoCaptionService
     {
+        private const int _sequenceLength = 512;
+        private BertUnasedCustomVocabulary _tokenizer;
+
         public AutoCaptionService(IImageProcessorService imageProcessorService, string modelPath) : base(imageProcessorService, modelPath)
         {
+            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            _tokenizer = new BertUnasedCustomVocabulary(Path.Combine(assemblyPath, "Vocabularies/base_uncased.txt"));
         }
 
         protected override string[] GetInputColumns()
@@ -62,7 +71,7 @@ namespace SmartData.Lib.Services
             progress.TotalFiles = files.Length;
             foreach (string file in files)
             {
-                var prediction = await GetPredictionAsync(file);
+                VBuffer<float> prediction = await GetPredictionAsync(file);
                 progress.UpdateProgress();
             }
         }
@@ -72,15 +81,24 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="imagePath">The path of the image file to make predictions on.</param>
         /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        private async Task<float[]> GetPredictionAsync(string inputImagePath)
+        private async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
         {
             BLIPInputData inputData = await _imageProcessorService.ProcessImageForCaptionPredictionAsync(inputImagePath);
-            // TODO: Add BERT Tokenization for string input.
-            inputData.Input_Ids = new long[1];
-            for (int i = 0; i < inputData.Input_Ids.Length; i++)
+
+            string[] inputText = new string[] { "a photograph of a" };
+            var tokenized = _tokenizer.Encode(_sequenceLength, inputText);
+            var inputs = tokenized.Select(x => x.InputIds).Where(x => x != 0).ToArray();
+
+            inputData.Input_Ids = new long[1, inputs.Length];
+
+            for (int i = 0; i < 1; i++)
             {
-                inputData.Input_Ids[i] = 0;
+                for (int j = 0; j < inputs.Length; j++)
+                {
+                    inputData.Input_Ids[i, j] = inputs[j];
+                }
             }
+
             BLIPOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
             return prediction.output;
         }

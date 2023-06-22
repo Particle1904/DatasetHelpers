@@ -5,8 +5,8 @@ namespace SmartData.Lib.Models
     public class BLIPInputData
     {
         [ColumnName("input_ids")]
-        [VectorType(1, 512)]
-        public long[] Input_Ids { get; set; } = new long[512];
+        [VectorType(1, 128)]
+        public long[,]? Input_Ids { get; set; }
 
         [ColumnName("pixel_values")]
         [VectorType(1, 3, 384, 384)]
