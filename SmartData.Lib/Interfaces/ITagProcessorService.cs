@@ -12,7 +12,7 @@ namespace SmartData.Lib.Interfaces
         public Task RandomizeTagsOfFiles(string inputFolderPath, Progress progress);
         public Task ApplyRedundancyRemovalToFiles(string inputFolderPath);
         public Task ApplyRedundancyRemovalToFiles(string inputFolderPath, Progress progress);
-        public Task CalculateListOfMostUsedTags(string inputFolderPath);
+        public string CalculateListOfMostFrequentTags(string inputFolderPath);
         public string ApplyRedundancyRemoval(string tags);
         public string GetCommaSeparatedString(List<string> predictedTags);
     }

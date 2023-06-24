@@ -129,7 +129,7 @@
                 </Grid.RowDefinitions>
                 
                 <Label Grid.Column="0" Grid.Row="0"
-                       Text="Switch between .caption and .text"/>
+                       Text="Switch between .caption and .txt"/>
                 <Button Grid.Column="1" Grid.Row="0"
                         Text="Switch"
                         Command="{Binding SwitchEditorTypeCommand}"

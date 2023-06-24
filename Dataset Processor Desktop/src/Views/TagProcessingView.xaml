@@ -12,6 +12,7 @@
             <RowDefinition Height="3*"/>
             <RowDefinition Height="3*"/>
             <RowDefinition Height="5*"/>
+            <RowDefinition Height="3*"/>
             <RowDefinition Height="1"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="3*"/>
@@ -153,38 +154,54 @@
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
                    Text="Would you like to apply redundancy removal to the tags? For example: if the processed tags have &quot;shirt&quot; and &quot;black shirt&quot;;&#x0a;it will strip &quot;shirt&quot; and keep &quot;black shirt&quot; since its more descriptive."/>
-        </Grid>        
-        
-        <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 
+        </Grid>
+
+        <Label Grid.Row="7" Grid.Column="0"
+               Text="Summary of tags by frequency:"/>
+        <ScrollView Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    HeightRequest="100">
+            <Label VerticalOptions="FillAndExpand"
+                   HorizontalOptions="FillAndExpand"                
+                   VerticalTextAlignment="Center"
+                   HorizontalTextAlignment="Start"
+                   Text="{Binding SortedByFrequency}"/>
+        </ScrollView>
+        <Button Grid.Row="7" Grid.Column="5"
+                Background="{StaticResource DarkPrimary}"
+                Command="{Binding CalculateByFrequencyCommand}"
+                Text="Calculate frequency"/>
+
+        <BoxView HeightRequest="1" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Label Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                Text="{Binding TagProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="9" Grid.Column="2"
+        <Button Grid.Row="10" Grid.Column="2"
                 BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding ProcessTagsCommand}"
                 Text="Process tags!"/>
 
-        <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding TagProcessingProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
                FontSize="Medium"
                TextColor="{StaticResource DarkSecondary}"
                Text="{Binding TaskStatusString}"/>
 
-        <Label Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="5" 
                TextColor="{StaticResource DarkSecondary}"
                Margin="0,0,0,0"
                VerticalTextAlignment="Center"
                HorizontalTextAlignment="Center"
                Text="Note: You can leave any of the text fields empty and still use the Randomize or Rename functionalities!"/>
-
     </Grid>
 </ContentView>

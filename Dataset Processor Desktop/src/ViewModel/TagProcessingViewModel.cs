@@ -120,9 +120,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private string _sortedByFrequency;
+        public string SortedByFrequency
+        {
+            get => _sortedByFrequency;
+            set
+            {
+                _sortedByFrequency = value;
+                OnPropertyChanged(nameof(SortedByFrequency));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessTagsCommand { get; private set; }
-
+        public RelayCommand CalculateByFrequencyCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
 
         public TagProcessingViewModel(ITagProcessorService tagProcessorService, IFileManipulatorService fileManipulatorService)
@@ -135,8 +146,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             ProcessTagsCommand = new RelayCommand(async () => await ProcessTagsAsync());
-
+            CalculateByFrequencyCommand = new RelayCommand(() => CalculateByFrequencyAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+
+            SortedByFrequency = "Click the button in the right to process tags by frequency.\nThis will use the .txt files in the input folder.";
 
             RandomizeTags = false;
             RenameFilesToCrescent = true;
@@ -219,6 +232,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     TaskStatus = Enums.ProcessingStatus.Finished;
                 }
+            }
+        }
+
+        public void CalculateByFrequencyAsync()
+        {
+            try
+            {
+                SortedByFrequency = _tagProcessorService.CalculateListOfMostFrequentTags(InputFolderPath);
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
             }
         }
     }

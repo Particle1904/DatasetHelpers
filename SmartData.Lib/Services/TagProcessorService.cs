@@ -180,11 +180,11 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputFolderPath">The path of the input folder containing the text files.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public async Task CalculateListOfMostUsedTags(string inputFolderPath)
+        public string CalculateListOfMostFrequentTags(string inputFolderPath)
         {
             Dictionary<string, uint> tags = new Dictionary<string, uint>();
 
-            foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt"))
+            foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt").Where(x => !x.Contains("sample_prompt_custom.txt")))
             {
                 string fileTags = File.ReadAllText(file);
                 string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "").Split(", ");
@@ -204,7 +204,6 @@ namespace SmartData.Lib.Services
             }
 
             var sorted = tags.OrderByDescending(x => x.Value).ToList();
-
             int files = Directory.GetFiles(inputFolderPath).Length;
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -212,14 +211,11 @@ namespace SmartData.Lib.Services
             {
                 string line = $"{tag.Key}={tag.Value}";
                 string formatted = line.Replace('_', ' ');
-
-                stringBuilder.AppendLine($"formatted{Environment.NewLine}");
+                stringBuilder.Append($"{formatted}, ");
             }
+            stringBuilder.Remove(stringBuilder.Length - 2, 2);
 
-
-            string filePath = Path.Combine(inputFolderPath, "tag-count.txt");
-
-            await File.WriteAllTextAsync(filePath, stringBuilder.ToString());
+            return stringBuilder.ToString();
         }
 
         /// <summary>
