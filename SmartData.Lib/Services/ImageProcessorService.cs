@@ -484,6 +484,7 @@ namespace SmartData.Lib.Services
                     string[] metadataSplit = metadataText.Value.Split("\n");
                     foreach (string item in metadataSplit)
                     {
+
                         metadata.Add(item);
                     }
                 }
@@ -491,7 +492,7 @@ namespace SmartData.Lib.Services
 
             if (metadata[1].StartsWith("Negative prompt: "))
             {
-                metadata[1].Replace("Negative prompt: ", "");
+                metadata[1] = metadata[1].Replace("Negative prompt: ", "");
             }
 
             return metadata;
