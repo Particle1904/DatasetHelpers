@@ -122,6 +122,47 @@ namespace SmartData.Lib.Services
             }
         }
 
+        public async Task<string> InterrogateImageFromStream(Stream imageStream)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
+            }
+
+            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
+
+            VBuffer<float> predictions = await GetPredictionAsync(imageStream).ConfigureAwait(false);
+            float[] values = predictions.GetValues().ToArray();
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] > _threshold)
+                {
+                    predictionsDict.Add(_tags[i], values[i]);
+                }
+            }
+
+            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
+
+            List<string> listOrdered = new List<string>();
+
+            foreach (KeyValuePair<string, float> item in sortedDict)
+            {
+                listOrdered.Add(item.Key);
+            }
+
+            foreach (string item in listOrdered)
+            {
+                item.Replace("_", " ");
+            }
+
+            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
+
+            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+
+            return redundantRemoved;
+        }
+
         /// <summary>
         /// Processes a list of tags from a file and generates a summarized version of the tags.
         /// </summary>
@@ -154,7 +195,6 @@ namespace SmartData.Lib.Services
         /// <returns>A list of tags ordered by their score in descending order.</returns>
         private async Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath, bool weightedCaptions = false)
         {
-
             Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
 
             VBuffer<float> predictions = await GetPredictionAsync(imagePath).ConfigureAwait(false);
@@ -202,6 +242,19 @@ namespace SmartData.Lib.Services
         private async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
         {
             WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(inputImagePath);
+
+            WDOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
+            return prediction.PredictionsSigmoid;
+        }
+
+        /// <summary>
+        /// Retrieves predictions for the specified image stream using the prediction engine, which is a machine learning model trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
+        /// </summary>
+        /// <param name="imageStream">The stream containing the image data to make predictions on.</param>
+        /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
+        private async Task<VBuffer<float>> GetPredictionAsync(Stream imageStream)
+        {
+            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(imageStream);
 
             WDOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
             return prediction.PredictionsSigmoid;

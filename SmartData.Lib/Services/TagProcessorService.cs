@@ -175,11 +175,10 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Calculates the count of each tag used in all the text files inside the specified folder 
-        /// and writes the results to a file named "tag-count.txt" in the same folder.
+        /// Calculates the count of each tag used in all the text files inside the specified folder.
         /// </summary>
         /// <param name="inputFolderPath">The path of the input folder containing the text files.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <returns>Returns a formatted string with the processed tags by each line.</returns>
         public string CalculateListOfMostFrequentTags(string inputFolderPath)
         {
             Dictionary<string, uint> tags = new Dictionary<string, uint>();
@@ -211,10 +210,8 @@ namespace SmartData.Lib.Services
             {
                 string line = $"{tag.Key}={tag.Value}";
                 string formatted = line.Replace('_', ' ');
-                stringBuilder.Append($"{formatted}, ");
+                stringBuilder.Append($"{formatted}{Environment.NewLine}");
             }
-            stringBuilder.Remove(stringBuilder.Length - 2, 2);
-
             return stringBuilder.ToString();
         }
 

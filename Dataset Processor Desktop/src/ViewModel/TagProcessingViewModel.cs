@@ -146,7 +146,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             ProcessTagsCommand = new RelayCommand(async () => await ProcessTagsAsync());
-            CalculateByFrequencyCommand = new RelayCommand(() => CalculateByFrequencyAsync());
+            CalculateByFrequencyCommand = new RelayCommand(CalculateByFrequencyAsync);
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
 
             SortedByFrequency = "Click the button in the right to process tags by frequency.\nThis will use the .txt files in the input folder.";

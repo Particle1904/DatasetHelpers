@@ -27,6 +27,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private View _captionGenerationView;
         private View _tagProcessingView;
         private View _tagEditorView;
+        private View _metadataView;
         private View _settingsView;
         #endregion
 
@@ -53,6 +54,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToCaptionGenerationCommand { get; private set; }
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagEditorCommand { get; private set; }
+        public RelayCommand NavigateToMetadataCommand { get; private set; }
         public RelayCommand NavigateToSettingsCommand { get; private set; }
 
         public MainPageViewModel()
@@ -76,6 +78,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToCaptionGenerationCommand = new RelayCommand(NavigateToCaptionGenerationView);
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
+            NavigateToMetadataCommand = new RelayCommand(NavigateToMetadataView);
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
 
             _configsService.LoadConfigurations();
@@ -154,6 +157,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             var tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();
             DynamicContentView = _tagEditorView;
+        }
+
+        public void NavigateToMetadataView()
+        {
+            if (_metadataView == null)
+            {
+                _metadataView = new MetadataView(_imageProcessorService, _autoTaggerService);
+            }
+            DynamicContentView = _metadataView;
         }
 
         public void NavigateToSettingsView()

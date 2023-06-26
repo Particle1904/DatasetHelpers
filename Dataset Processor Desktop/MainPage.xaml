@@ -62,6 +62,10 @@
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagEditorCommand}"/>
             <Button Grid.Row="7"
+                    Text="Metadata Viewer"
+                    VerticalOptions="Center"
+                    Command="{Binding NavigateToMetadataCommand}"/>
+            <Button Grid.Row="8"
                     Text="Settings"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToSettingsCommand}"/>

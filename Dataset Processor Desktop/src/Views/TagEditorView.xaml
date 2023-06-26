@@ -35,12 +35,12 @@
         <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding InputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
-                             BackgroundColor="{StaticResource DarkPrimary}"
-                             Command="{Binding OpenInputFolderCommand}"
-                             WidthRequest="30"
-                             HeightRequest="30"
-                             Padding="2"
-                             HorizontalOptions="End"/>
+                         BackgroundColor="{StaticResource DarkPrimary}"
+                         Command="{Binding OpenInputFolderCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"
+                         HorizontalOptions="End"/>
         </StackLayout>
 
         <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"

@@ -1,4 +1,5 @@
 ﻿using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 using SmartData.Lib.Enums;
@@ -292,6 +293,55 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously processes an image for tag prediction by resizing it to 448x448 and converting it to a float array.
+        /// </summary>
+        /// <param name="inputStream">The stream containing the image data to be processed.</param>
+        /// <returns>An <see cref="WDInputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">Thrown when the stream containing the image data is not found.</exception>
+        /// <exception cref="System.IO.IOException">Thrown when an I/O error occurs while opening the stream containing the image data.</exception>
+        public async Task<WDInputData> ProcessImageForTagPredictionAsync(Stream inputStream)
+        {
+            WDInputData inputData = new WDInputData();
+            inputData.Input1 = new float[448 * 448 * 3];
+
+            int index = 0;
+            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(inputStream))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _lanczosResampler,
+                    Compand = true,
+                    PadColor = new Bgr24(255, 255, 255),
+                    Size = new Size(448, 448),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Bgr24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Bgr24 pixel = ref pixelRow[x];
+                            byte temp = pixel.R;
+                            pixel.R = pixel.B;
+                            pixel.B = temp;
+
+                            inputData.Input1[index++] = pixel.R;
+                            inputData.Input1[index++] = pixel.G;
+                            inputData.Input1[index++] = pixel.B;
+                        }
+                    }
+                });
+            }
+            return inputData;
+        }
+
+        /// <summary>
         /// Asynchronously processes an image for caption prediction by resizing it to 384x384 and converting it to a float array.
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
@@ -415,6 +465,36 @@ namespace SmartData.Lib.Services
 
                 return blurredImageStream;
             }
+        }
+
+        /// <summary>
+        /// Asynchronously reads the metadata of an image from the provided stream.
+        /// </summary>
+        /// <param name="imageStream">The stream containing the image data.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains a list of strings representing the image metadata.</returns>
+        public async Task<List<string>> ReadImageMetadataAsync(Stream imageStream)
+        {
+            List<string> metadata = new List<string>(3);
+            using (Image image = await Image.LoadAsync(imageStream))
+            {
+                PngMetadata pngMetadata = image.Metadata.GetPngMetadata();
+                if (pngMetadata != null)
+                {
+                    PngTextData metadataText = pngMetadata.TextData.FirstOrDefault();
+                    string[] metadataSplit = metadataText.Value.Split("\n");
+                    foreach (string item in metadataSplit)
+                    {
+                        metadata.Add(item);
+                    }
+                }
+            }
+
+            if (metadata[1].StartsWith("Negative prompt: "))
+            {
+                metadata[1].Replace("Negative prompt: ", "");
+            }
+
+            return metadata;
         }
 
         /// <summary>

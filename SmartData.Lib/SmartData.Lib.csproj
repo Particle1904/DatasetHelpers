@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="BERTTokenizers" Version="1.2.0" />
     <PackageReference Include="Microsoft.ML" Version="3.0.0-preview.23266.6" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.15.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.15.1" />
     <PackageReference Include="Microsoft.ML.OnnxTransformer" Version="3.0.0-preview.23266.6" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
   </ItemGroup>

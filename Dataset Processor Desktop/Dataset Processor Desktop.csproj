@@ -60,17 +60,11 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\Icons\folder_opened.svg" />
+	  <None Remove="Resources\Images\drag_and_drop.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiImage Include="Resources\Icons\folder_opened.svg" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Platforms\Windows\Services\" />
-	  <Folder Include="Resources\Images\" />
-	  <Folder Include="src\Models\" />
-	  <Folder Include="src\Renders\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -81,7 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="CommunityToolkit.Maui" Version="5.1.0" />
+	  <PackageReference Include="CommunityToolkit.Maui" Version="5.2.0" />
 	  <PackageReference Include="WeCantSpell.Hunspell" Version="4.0.0" />
 	</ItemGroup>
 
@@ -103,6 +97,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="src\Views\ContentAwareCropView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="src\Views\MetadataView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="src\Views\SortView.xaml">

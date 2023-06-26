@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dataset_Processor_Desktop.src.Views.MetadataView"
+             xmlns:local="clr-namespace:Dataset_Processor_Desktop.src.Utilities">
+    <Grid VerticalOptions="Center" HorizontalOptions="Center"
+          ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+               FontSize="Title"
+               Text="Metadata viewer and interrogation"/>
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnSpacing="10"
+              VerticalOptions="Center"
+              HorizontalOptions="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="512"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"
+                  BackgroundColor="Transparent"
+                  MinimumHeightRequest="500"
+                  MinimumWidthRequest="300"
+                  MaximumHeightRequest="512"
+                  MaximumWidthRequest="512">
+                <Image Aspect="AspectFit"
+                       HorizontalOptions="CenterAndExpand"
+                       VerticalOptions="CenterAndExpand"
+                       Source="{Binding SelectedImage, Mode=TwoWay}">
+                </Image>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2"
+              VerticalOptions="FillAndExpand"
+              HorizontalOptions="FillAndExpand"
+              RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" 
+                   HorizontalTextAlignment="Start"
+                   Text="Positive prompt:"/>
+            <ScrollView Grid.Row="1" 
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+                <Editor VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        Text="{Binding PositivePrompt}"
+                        IsSpellCheckEnabled="False"
+                        FontSize="Default"
+                        FontFamily="OpenSansRegular">
+                </Editor>
+            </ScrollView>
+
+            <Label Grid.Row="2" 
+                   HorizontalTextAlignment="Start"
+                   Text="Negative prompt:"/>
+            <ScrollView Grid.Row="3" 
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+                <Editor VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        Text="{Binding NegativePrompt}"
+                        IsSpellCheckEnabled="False"
+                        FontSize="Default"
+                        FontFamily="OpenSansRegular">
+                </Editor>
+            </ScrollView>
+
+            <Label Grid.Row="4" 
+                   HorizontalTextAlignment="Start"
+                   Text="Parameters:"/>
+            <ScrollView Grid.Row="5" 
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand">
+                <Editor VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        Text="{Binding Parameters}"
+                        IsSpellCheckEnabled="False"
+                        FontSize="Default"
+                        FontFamily="OpenSansRegular">
+                </Editor>
+            </ScrollView>
+        </Grid>
+
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
+              RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>           
+
+            <Grid Grid.Row="0"
+                  VerticalOptions="FillAndExpand"
+                  HorizontalOptions="FillAndExpand"
+                  ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       Text="Threshold for predictions:"/>
+                <Slider Grid.Column="1" Grid.ColumnSpan="3"
+                        Minimum="0.1"
+                        Value="{Binding Threshold}"/>
+                <Label Grid.Column="4"
+                       Text="{Binding Threshold}"/>
+            </Grid>
+
+            <Label Grid.Row="1"
+                   HorizontalTextAlignment="Start"
+                   Text="WD 1.4 Interrogated tags:"/>
+
+            <ScrollView Grid.Row="2" 
+                        HorizontalOptions="FillAndExpand"
+                        VerticalOptions="FillAndExpand"
+                        HeightRequest="100">
+                <Editor VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        AutoSize="TextChanges"
+                        VerticalTextAlignment="Start"
+                        HorizontalTextAlignment="Start"
+                        IsTextPredictionEnabled="False"
+                        Text="{Binding PredictedTags}"
+                        IsSpellCheckEnabled="False"
+                        FontSize="Default"
+                        FontFamily="OpenSansRegular">
+                </Editor>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentView>
