@@ -122,6 +122,11 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Interrogates an image from a stream and returns a string representation of the predicted tags.
+        /// </summary>
+        /// <param name="imageStream">The stream containing the image data.</param>
+        /// <returns>A string representation of the predicted tags.</returns>
         public async Task<string> InterrogateImageFromStream(Stream imageStream)
         {
             if (!_isModelLoaded)
@@ -159,6 +164,8 @@ namespace SmartData.Lib.Services
             string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
 
             string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+
+            UnloadModel();
 
             return redundantRemoved;
         }

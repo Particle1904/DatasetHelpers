@@ -85,5 +85,17 @@ namespace SmartData.Lib.Services
             _predictionPipe = await Task.Run(() => GetPredictionPipeline<TInput>());
             _predictionEngine = _mlContext.Model.CreatePredictionEngine<TInput, TOutput>(_predictionPipe);
         }
+
+        /// <summary>
+        /// Unloads the machine learning model and releases associated resources.
+        /// </summary>
+        protected virtual void UnloadModel()
+        {
+            _predictionEngine.Dispose();
+            _predictionEngine = null;
+            _predictionPipe = null;
+
+            _isModelLoaded = false;
+        }
     }
 }
