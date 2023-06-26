@@ -88,20 +88,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task OpenFileAsync(Stream stream, CancellationToken cancellationToken)
         {
+            byte[] streamBytes;
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                streamBytes = memoryStream.ToArray();
+            }
+            MemoryStream imageStream = new MemoryStream(streamBytes);
+            MemoryStream metadataStream = new MemoryStream(streamBytes);
+            MemoryStream interrogationStream = new MemoryStream(streamBytes);
+
             try
             {
-                PredictedTags = "Generating tags...";
-                byte[] streamBytes;
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    await stream.CopyToAsync(memoryStream);
-                    streamBytes = memoryStream.ToArray();
-                }
-
-                MemoryStream imageStream = new MemoryStream(streamBytes);
-                MemoryStream metadataStream = new MemoryStream(streamBytes);
-                MemoryStream interrogationStream = new MemoryStream(streamBytes);
-
                 SelectedImage = ImageSource.FromStream(() => imageStream);
 
                 List<string> metadata = await _imageProcessorService.ReadImageMetadataAsync(metadataStream);
@@ -111,19 +109,26 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     NegativePrompt = metadata[1];
                     Parameters = metadata[2];
                 }
-                else
-                {
-                    PositivePrompt = string.Empty;
-                    NegativePrompt = string.Empty;
-                    Parameters = string.Empty;
-                }
-
-                _autoTaggerService.Threshold = (float)Threshold;
-                PredictedTags = await _autoTaggerService.InterrogateImageFromStream(interrogationStream);
             }
             catch (Exception)
             {
-                _loggerService.LatestLogMessage = "An error occurred while trying to read the image file. Only JPGE, JPG and PNG supported.";
+                PositivePrompt = string.Empty;
+                NegativePrompt = string.Empty;
+                Parameters = string.Empty;
+
+                _loggerService.LatestLogMessage = "An error occurred while trying to read the image metadata. Only PNG metadata supported.";
+            }
+
+            try
+            {
+                PredictedTags = "Generating tags...";
+                _autoTaggerService.Threshold = (float)Threshold;
+                PredictedTags = await _autoTaggerService.InterrogateImageFromStream(interrogationStream);
+            }
+            catch (Exception exception)
+            {
+                PredictedTags = string.Empty;
+                _loggerService.LatestLogMessage = $"An error occurred while trying to generate tags for the image. {exception.InnerException}";
             }
         }
     }
