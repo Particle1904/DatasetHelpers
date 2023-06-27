@@ -18,6 +18,33 @@ namespace SmartData.Lib.Services
 
             if (imageFiles.Length > 0)
             {
+                foreach (string file in imageFiles)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file);
+                    string fileExtension = Path.GetExtension(file);
+                    string newFileName = Path.Combine(inputPath, $"{fileName}_temp{fileExtension}");
+
+                    await Task.Run(() => File.Move(file, newFileName));
+
+                    string? txtFile = Directory.GetFiles(inputPath, $"{fileName}.txt").FirstOrDefault(file => File.Exists(file));
+                    if (txtFile != null)
+                    {
+                        string txtExtension = Path.GetExtension(txtFile);
+                        string newTxtName = Path.Combine(inputPath, $"{fileName}_temp{txtExtension}");
+                        await Task.Run(() => File.Move(txtFile, newTxtName));
+                    }
+
+                    string? captionFile = Directory.GetFiles(inputPath, $"{fileName}.caption").FirstOrDefault(file => File.Exists(file));
+                    if (captionFile != null)
+                    {
+                        string captionExtension = Path.GetExtension(captionFile);
+                        string newCaptionName = Path.Combine(inputPath, $"{fileName}_temp{captionExtension}");
+                        await Task.Run(() => File.Move(captionFile, newCaptionName));
+                    }
+                }
+
+                imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+
                 for (int i = 0; i < imageFiles.Length; i++)
                 {
                     string imageFileName = Path.GetFileNameWithoutExtension(imageFiles[i]);

@@ -53,7 +53,7 @@
               HorizontalOptions="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="512"/>
+                <ColumnDefinition Width="500"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -61,16 +61,26 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <Button Text="&lt;" 
-                            Command="{Binding PreviousItemCommand}"
-                            HeightRequest="50"
-                            WidthRequest="50"/>
+                <Button Grid.Row="0"
+                        Text="&lt;" 
+                        Command="{Binding PreviousItemCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
                 <Button Grid.Row="1"
-                            Text="&lt;&lt;&lt;" 
-                            Command="{Binding PreviousTenItemsCommand}"
-                            HeightRequest="50"
-                            WidthRequest="50"/>
+                        Text="&lt;&lt;" 
+                        Command="{Binding PreviousTenItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
+                <Button Grid.Row="2"
+                        Text="&lt;&lt;&lt;"
+                        Command="{Binding PreviousOneHundredItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
             </Grid>
 
             <Grid Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"
@@ -93,18 +103,27 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0"
-                            Text="&gt;"
-                            Command="{Binding NextItemCommand}"
-                            HeightRequest="50"
-                            WidthRequest="50"/>
+                        Text="&gt;"
+                        Command="{Binding NextItemCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
                 <Button Grid.Row="1"
-                            Text="&gt;&gt;&gt;"
-                            Command="{Binding NextTenItemsCommand}"
-                            HeightRequest="50"
-                            WidthRequest="50"/>
+                        Text="&gt;&gt;"
+                        Command="{Binding NextTenItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
+                <Button Grid.Row="2"
+                        Text="&gt;&gt;&gt;"
+                        Command="{Binding NextOneHundredItemsCommand}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        FontSize="Caption"/>
             </Grid>
         </Grid>
 
@@ -133,7 +152,7 @@
                 <Button Grid.Column="1" Grid.Row="0"
                         Text="Switch"
                         Command="{Binding SwitchEditorTypeCommand}"
-                        HeightRequest="40"/>
+                        HeightRequest="50"/>
 
                 <Label Grid.Column="0" Grid.Row="1" Text="Currently editing:"/>
                 <Label Grid.Column="1" Grid.Row="1" Text="{Binding CurrentType}"

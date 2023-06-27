@@ -93,8 +93,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public RelayCommand PreviousItemCommand { get; private set; }
         public RelayCommand PreviousTenItemsCommand { get; private set; }
+        public RelayCommand PreviousOneHundredItemsCommand { get; private set; }
         public RelayCommand NextItemCommand { get; private set; }
         public RelayCommand NextTenItemsCommand { get; private set; }
+        public RelayCommand NextOneHundredItemsCommand { get; private set; }
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand BlurImageCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -147,8 +149,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             PreviousItemCommand = new RelayCommand(GoToPreviousItem);
             PreviousTenItemsCommand = new RelayCommand(GoToPreviousTenItems);
+            PreviousOneHundredItemsCommand = new RelayCommand(GoToPreviousOneHundredItems);
             NextItemCommand = new RelayCommand(GoToNextItem);
             NextTenItemsCommand = new RelayCommand(GoToNextTenItems);
+            NextOneHundredItemsCommand = new RelayCommand(GoToNextOneHundredItems);
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
@@ -213,7 +217,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     _selectedItemIndex = 0;
                 }
+                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+                OnPropertyChanged(nameof(SelectedItemIndex));
+            }
+        }
 
+        public void GoToPreviousOneHundredItems()
+        {
+            if (_selectedItemIndex > 0)
+            {
+                _selectedItemIndex -= 100;
+                if (_selectedItemIndex < 0)
+                {
+                    _selectedItemIndex = 0;
+                }
                 SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 OnPropertyChanged(nameof(SelectedItemIndex));
             }
@@ -234,6 +251,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             if (_selectedItemIndex < ImageFiles.Count - 1)
             {
                 _selectedItemIndex += 10;
+                if (_selectedItemIndex > ImageFiles.Count - 1)
+                {
+                    _selectedItemIndex = ImageFiles.Count - 1;
+                }
+                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
+                OnPropertyChanged(nameof(SelectedItemIndex));
+            }
+        }
+
+        public void GoToNextOneHundredItems()
+        {
+            if (_selectedItemIndex < ImageFiles.Count - 1)
+            {
+                _selectedItemIndex += 100;
                 if (_selectedItemIndex > ImageFiles.Count - 1)
                 {
                     _selectedItemIndex = ImageFiles.Count - 1;
