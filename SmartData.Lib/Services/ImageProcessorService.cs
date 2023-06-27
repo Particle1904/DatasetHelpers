@@ -481,20 +481,35 @@ namespace SmartData.Lib.Services
                 if (pngMetadata != null)
                 {
                     PngTextData metadataText = pngMetadata.TextData.FirstOrDefault();
-                    string[] metadataSplit = metadataText.Value.Split("\n");
-                    foreach (string item in metadataSplit)
-                    {
 
-                        metadata.Add(item);
+                    if (metadataText.Value.Contains($"Negative prompt: "))
+                    {
+                        string[] split1 = metadataText.Value.Split($"Negative prompt: ");
+                        string[] split2 = split1[1].Split("Steps: ");
+
+                        metadata.Add(split1[0]);
+                        metadata.Add(split2[0]);
+                        metadata.Add($"Steps: {split2[1]}");
+                    }
+                    else
+                    {
+                        string[] split = metadataText.Value.Split($"Steps: ");
+
+                        metadata.Add(split[0]);
+                        metadata.Add(string.Empty);
+                        metadata.Add($"Steps: {split[1]}");
+                    }
+
+                    for (int i = 0; i < metadata.Count; i++)
+                    {
+                        if (metadata[i].EndsWith($"\n"))
+                        {
+                            string formatted = metadata[i].Remove(metadata[i].Length - 2, 2);
+                            metadata[i] = formatted;
+                        }
                     }
                 }
             }
-
-            if (metadata[1].StartsWith("Negative prompt: "))
-            {
-                metadata[1] = metadata[1].Replace("Negative prompt: ", "");
-            }
-
             return metadata;
         }
 

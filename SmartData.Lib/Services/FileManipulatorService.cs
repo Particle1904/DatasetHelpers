@@ -12,6 +12,11 @@ namespace SmartData.Lib.Services
         /// Only files with extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp" are considered to be image files.
         /// </summary>
         /// <param name="path">The path to the directory containing the files to rename.</param>
+        /// <remarks>
+        /// This method scans the specified directory for image files with the extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp". It renames each image file and its corresponding caption and text files by appending a number in ascending order to their names. The renaming process is performed in two steps:
+        /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
+        /// 2. The files are then renamed with a number in ascending order starting from 1.
+        /// </remarks>
         public async Task RenameAllToCrescentAsync(string inputPath)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
@@ -78,6 +83,11 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="path">The path to the directory containing the files to rename.</param>
         /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
+        /// /// <remarks>
+        /// This method scans the specified directory for image files with the extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp". It renames each image file and its corresponding caption and text files by appending a number in ascending order to their names. The renaming process is performed in two steps:
+        /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
+        /// 2. The files are then renamed with a number in ascending order starting from 1.
+        /// </remarks>
         public async Task RenameAllToCrescentAsync(string inputPath, Progress progress)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
