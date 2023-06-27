@@ -86,7 +86,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SelectedImage = ImageSource.FromFile("drag_and_drop.png");
         }
 
-        public async Task OpenFileAsync(Stream stream, CancellationToken cancellationToken)
+        public async Task OpenFileAsync(Stream stream)
         {
             byte[] streamBytes;
             using (MemoryStream memoryStream = new MemoryStream())
@@ -116,7 +116,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 NegativePrompt = string.Empty;
                 Parameters = string.Empty;
 
-                _loggerService.LatestLogMessage = "An error occurred while trying to read the image metadata. Only PNG metadata supported.";
+                _loggerService.LatestLogMessage = "An error occurred while trying to read the image metadata (if file is a PNG then generation metadata is probably empty). Only PNG metadata supported.";
             }
 
             try

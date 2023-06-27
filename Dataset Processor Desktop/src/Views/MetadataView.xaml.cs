@@ -13,6 +13,7 @@ public partial class MetadataView : ContentView
     private readonly IAutoTaggerService _autoTaggerService;
 
     private MetadataViewModel _viewModel;
+
     public MetadataView(IImageProcessorService imageProcessorService, IAutoTaggerService autoTaggerService)
     {
         InitializeComponent();
@@ -30,7 +31,7 @@ public partial class MetadataView : ContentView
                 var uiElement = this.ToPlatform(Handler.MauiContext);
                 DragDropExtensions.RegisterDragDrop(uiElement, async stream =>
                 {
-                    await _viewModel.OpenFileAsync(stream, CancellationToken.None);
+                    await _viewModel.OpenFileAsync(stream);
                 });
             }
         };
