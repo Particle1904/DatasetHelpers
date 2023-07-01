@@ -204,8 +204,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 else
                 {
-                    _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                    _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
                 }
+                await _loggerService.SaveExceptionStackTrace(exception);
             }
             finally
             {
@@ -225,8 +226,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     if (exception.GetType() == typeof(ArgumentException))
                     {
-                        _loggerService.LatestLogMessage = exception.Message;
+                        _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
                     }
+                    await _loggerService.SaveExceptionStackTrace(exception);
                 }
                 finally
                 {
@@ -235,7 +237,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public void CalculateByFrequencyAsync()
+        public async void CalculateByFrequencyAsync()
         {
             try
             {
@@ -243,7 +245,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                await _loggerService.SaveExceptionStackTrace(exception);
             }
         }
     }

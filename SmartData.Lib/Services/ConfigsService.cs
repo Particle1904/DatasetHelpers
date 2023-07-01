@@ -36,6 +36,17 @@ namespace SmartData.Lib.Services
             Configurations = new Config();
         }
 
+        /// <summary>
+        /// Loads the configuration values from the configuration file.
+        /// </summary>
+        /// <remarks>
+        /// This method first ensures that the configuration file exists by calling the <see cref="CreateConfigFileIfNotExist"/> method.
+        /// It then reads all lines from the configuration file and filters out any lines starting with '#' (comments).
+        /// Each remaining line represents a configuration option in the format "ConfigurationDescription=ConfigurationValue".
+        /// The method parses each line and assigns the corresponding configuration value to the appropriate property in the <see cref="Configurations"/> object.
+        /// If a folder path is specified in the configuration file, the method checks if the folder exists, and if not, assigns a default folder path.
+        /// </remarks>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task LoadConfigurations()
         {
             await CreateConfigFileIfNotExist();
@@ -52,27 +63,77 @@ namespace SmartData.Lib.Services
                 }
                 else if (line.StartsWith("DiscardedFolder"))
                 {
-                    Configurations.DiscardedFolder = GetStringConfig(line);
+                    string folder = GetStringConfig(line);
+                    if (Path.Exists(folder))
+                    {
+                        Configurations.DiscardedFolder = folder;
+                    }
+                    else
+                    {
+                        Configurations.DiscardedFolder = Path.Combine(AppContext.BaseDirectory, "discarded-images-output");
+                    }
                 }
                 else if (line.StartsWith("SortedFolder"))
                 {
-                    Configurations.SelectedFolder = GetStringConfig(line);
+                    string folder = GetStringConfig(line);
+                    if (Path.Exists(folder))
+                    {
+                        Configurations.SelectedFolder = folder;
+                    }
+                    else
+                    {
+                        Configurations.SelectedFolder = Path.Combine(AppContext.BaseDirectory, "sorted-images-output");
+                    }
                 }
                 else if (line.StartsWith("BackupFolder"))
                 {
-                    Configurations.BackupFolder = GetStringConfig(line);
+                    string folder = GetStringConfig(line);
+                    if (Path.Exists(folder))
+                    {
+                        Configurations.BackupFolder = folder;
+                    }
+                    else
+                    {
+                        Configurations.BackupFolder = Path.Combine(AppContext.BaseDirectory, "images-backup");
+                    }
                 }
                 else if (line.StartsWith("ResizedFolder"))
                 {
-                    Configurations.ResizedFolder = GetStringConfig(line);
+                    string folder = GetStringConfig(line);
+                    if (Path.Exists(folder))
+                    {
+                        Configurations.ResizedFolder = folder;
+                    }
+                    else
+                    {
+                        Configurations.ResizedFolder = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
+                    }
                 }
                 else if (line.StartsWith("CombinedFolder"))
                 {
-                    Configurations.CombinedOutputFolder = GetStringConfig(line);
+                    string folder = GetStringConfig(line);
+                    if (Path.Exists(folder))
+                    {
+                        Configurations.CombinedOutputFolder = folder;
+                    }
+                    else
+                    {
+                        Configurations.CombinedOutputFolder = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
+                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Saves the current configuration values to the configuration file.
+        /// </summary>
+        /// <remarks>
+        /// This method writes the current configuration values, including the tagger threshold, discarded folder, selected folder,
+        /// backup folder, resized folder, and combined folder, to the configuration file. Each configuration option is written as a
+        /// separate line in the file, following the format "ConfigurationDescription=ConfigurationValue". The file is overwritten
+        /// with the new configuration values.
+        /// </remarks>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SaveConfigurations()
         {
             List<string> configsList = new List<string>
@@ -97,9 +158,18 @@ namespace SmartData.Lib.Services
                 "\n",
             };
 
-            await File.WriteAllTextAsync(_cfgFilePath, string.Join(Environment.NewLine, configsList));
+            await File.WriteAllLinesAsync(_cfgFilePath, configsList);
         }
 
+        /// <summary>
+        /// Creates the configuration file if it doesn't already exist. Writes the default configuration values to the file.
+        /// </summary>
+        /// <remarks>
+        /// This method checks if the configuration file exists. If it doesn't, it creates the file and writes the default
+        /// configuration values to it. The default values include the descriptions and paths of various configuration options,
+        /// such as the tagger threshold, discarded folder, selected folder, backup folder, resized folder, and combined folder.
+        /// </remarks>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateConfigFileIfNotExist()
         {
             if (!File.Exists(_cfgFilePath))

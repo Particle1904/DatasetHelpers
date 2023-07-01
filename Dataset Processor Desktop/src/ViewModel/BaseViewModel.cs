@@ -12,6 +12,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         protected readonly IFolderPickerService _folderPickerService;
         protected readonly ILoggerService _loggerService;
         protected readonly IConfigsService _configsService;
+
         public IConfigsService ConfigsService
         {
             get => _configsService;

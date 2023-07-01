@@ -300,9 +300,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     });
                 }
             }
-            catch (Exception exception)
+            catch
             {
-                _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image!{Environment.NewLine}{exception.InnerException}";
+                _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! Error log will be saved inside the logs folder.";
             }
         }
 
@@ -314,9 +314,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
                 }
-                catch (Exception exception)
+                catch
                 {
-                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}";
+                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
                 }
             }
         }

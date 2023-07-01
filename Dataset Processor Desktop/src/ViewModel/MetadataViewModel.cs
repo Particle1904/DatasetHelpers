@@ -116,7 +116,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 NegativePrompt = string.Empty;
                 Parameters = string.Empty;
 
-                _loggerService.LatestLogMessage = "An error occurred while trying to read the image metadata (if file is a PNG then generation metadata is probably empty). Only PNG metadata supported.";
+                _loggerService.LatestLogMessage = $"An error occurred while trying to read the image metadata (if file is a PNG then generation metadata is probably empty).{Environment.NewLine}Only PNG metadata supported.";
             }
 
             try
@@ -128,7 +128,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             catch (Exception exception)
             {
                 PredictedTags = string.Empty;
-                _loggerService.LatestLogMessage = $"An error occurred while trying to generate tags for the image. {exception.InnerException}";
+                _loggerService.LatestLogMessage = $"An error occurred while trying to generate tags for the image! Error log will be saved inside the logs folder.";
+                await _loggerService.SaveExceptionStackTrace(exception);
             }
         }
     }

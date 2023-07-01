@@ -157,7 +157,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong! {exception.StackTrace}";
+                _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                await _loggerService.SaveExceptionStackTrace(exception);
             }
             finally
             {

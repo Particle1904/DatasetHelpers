@@ -32,6 +32,7 @@
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<AppxPackageDir>C:\Users\Leonardo\Desktop\Release\</AppxPackageDir>
 		<Nullable>annotations</Nullable>
+		<NeutralLanguage>en</NeutralLanguage>
 		
 		<!--
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>

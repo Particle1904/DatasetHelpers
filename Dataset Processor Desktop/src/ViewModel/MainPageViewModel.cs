@@ -81,7 +81,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToMetadataCommand = new RelayCommand(NavigateToMetadataView);
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
 
-            _configsService.LoadConfigurations();
+            try
+            {
+                _configsService.LoadConfigurations();
+            }
+            catch (Exception exception)
+            {
+                _loggerService.LatestLogMessage = "An error occured while trying to load the .cfg file. A brand new one will be generated instead.";
+                _loggerService.SaveExceptionStackTrace(exception);
+            }
         }
 
         public void NavigateToWelcomeView()
