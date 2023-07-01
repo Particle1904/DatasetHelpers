@@ -21,7 +21,7 @@ namespace Dataset_Processor_Desktop
 
             window.MinimumWidth = 1280;
             window.MinimumHeight = 960;
-            window.Title = "Dataset Processor All-in-one tools - v1.4";
+            window.Title = "Dataset Processor All-in-one tools - v1.5";
 
             return window;
         }
