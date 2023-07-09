@@ -59,6 +59,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 catch (Exception exception)
                 {
                     _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}";
+                    CurrentImageTags = string.Empty;
                 }
                 finally
                 {
@@ -317,6 +318,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 catch
                 {
                     _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
+                    CurrentImageTags = string.Empty;
                 }
             }
         }

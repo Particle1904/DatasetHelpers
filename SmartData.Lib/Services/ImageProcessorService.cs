@@ -502,9 +502,14 @@ namespace SmartData.Lib.Services
 
                     for (int i = 0; i < metadata.Count; i++)
                     {
-                        if (metadata[i].EndsWith($"\n"))
+                        if (metadata[i].EndsWith(", "))
                         {
                             string formatted = metadata[i].Remove(metadata[i].Length - 2, 2);
+                            metadata[i] = formatted;
+                        }
+                        else if (metadata[i].EndsWith(","))
+                        {
+                            string formatted = metadata[i].Remove(metadata[i].Length - 1, 1);
                             metadata[i] = formatted;
                         }
                     }
