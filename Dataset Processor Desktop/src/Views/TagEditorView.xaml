@@ -29,14 +29,12 @@
                        Text="Tag editor"/>
 
         <Button Grid.Row="1" Grid.Column="0"
-                        Background="{StaticResource DarkPrimary}"
-                        Command="{Binding SelectInputFolderCommand}"
-                        Text="Select Input folder:"/>
+                Command="{Binding SelectInputFolderCommand}"
+                Text="Select Input folder:"/>
 
         <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding InputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
-                         BackgroundColor="{StaticResource DarkPrimary}"
                          Command="{Binding OpenInputFolderCommand}"
                          WidthRequest="30"
                          HeightRequest="30"

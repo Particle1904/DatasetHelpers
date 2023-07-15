@@ -35,13 +35,11 @@
                Text="Resize images"/>
 
         <Button Grid.Row="1" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectInputFolderCommand}"
                 Text="Select Input folder:"/>
         <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding InputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
-                         BackgroundColor="{StaticResource DarkPrimary}"
                          Command="{Binding OpenInputFolderCommand}"
                          WidthRequest="30"
                          HeightRequest="30"
@@ -50,13 +48,11 @@
         </StackLayout>
 
         <Button Grid.Row="2" Grid.Column="0"
-                BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SelectOutputFolderCommand}"
                 Text="Select Output Folder:"/>
         <StackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding OutputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
-                         BackgroundColor="{StaticResource DarkPrimary}"
                          Command="{Binding OpenOutputFolderCommand}"
                          WidthRequest="30"
                          HeightRequest="30"
@@ -107,7 +103,6 @@
                Text="{Binding ResizeProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
         <Button Grid.Row="8" Grid.Column="2"
-                BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding ResizeImagesCommand}"
                 Text="Resize images!"/>
 

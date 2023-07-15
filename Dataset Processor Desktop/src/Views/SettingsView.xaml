@@ -40,7 +40,6 @@
                Text="{Binding ConfigsService.SelectedFolderDescription}"
                TextColor="{StaticResource DarkSecondary}"/>
         <Button Grid.Row="2" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectSortedFolderCommand}"
                 Text="Select Sorted folder:"/>       
         <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
@@ -51,7 +50,6 @@
                Text="{Binding ConfigsService.DiscardedFolderDescription}"
                TextColor="{StaticResource DarkSecondary}"/>
         <Button Grid.Row="4" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectDiscardedFolderCommand}"
                 Text="Select Discarded folder:"/>
         <Label Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4"
@@ -62,7 +60,6 @@
                Text="{Binding ConfigsService.BackupFolderDescription}"
                TextColor="{StaticResource DarkSecondary}"/>
         <Button Grid.Row="6" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectBackupFolderCommand}"
                 Text="Select Backup folder:"/>
         <Label Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4"
@@ -73,7 +70,6 @@
                Text="{Binding ConfigsService.ResizedFolderDescription}"
                TextColor="{StaticResource DarkSecondary}"/>
         <Button Grid.Row="8" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectResizedFolderCommand}"
                 Text="Select Resized folder:"/>
         <Label Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4"
@@ -84,7 +80,6 @@
                Text="{Binding ConfigsService.CombinedFolderDescription}"
                TextColor="{StaticResource DarkSecondary}"/>
         <Button Grid.Row="10" Grid.Column="0"
-                Background="{StaticResource DarkPrimary}"
                 Command="{Binding SelectCombinedOutputFolderCommand}"
                 Text="Select Combined folder:"/>
         <Label Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="4"
@@ -106,7 +101,6 @@
               BackgroundColor="{StaticResource Gray600}"/>
 
         <Button Grid.Row="14" Grid.Column="2"
-                BackgroundColor="{StaticResource DarkPrimary}"
                 Command="{Binding SaveSettingsCommand}"
                 Text="Save settings"/>
     </Grid>
