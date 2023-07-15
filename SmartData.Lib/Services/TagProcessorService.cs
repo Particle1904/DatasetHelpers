@@ -230,12 +230,18 @@ namespace SmartData.Lib.Services
             bool hasBreastSizeTag = false;
             bool hasMaleGenitaliaSizeTag = false;
             bool hasHairLengthTag = false;
+            bool hasHairColorTag = false;
+            bool hasEyesColorTag = false;
+            bool hasSkinColorTag = false;
 
             foreach (string tag in tagsSplit)
             {
                 bool isBreastSizeTag = IsBreastSize(tag);
                 bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
                 bool isHairLengthTag = IsHairLength(tag);
+                bool isHairColor = IsHairColor(tag);
+                bool isEyesColor = IsEyesColor(tag);
+                bool isSkinColor = IsSkinColor(tag);
                 bool isRedundant = false;
 
                 foreach (string processedTag in cleanedTags)
@@ -270,7 +276,22 @@ namespace SmartData.Lib.Services
                     cleanedTags.Add(tag);
                     hasHairLengthTag = true;
                 }
-                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isHairLengthTag && !isRedundant)
+                else if (isHairColor && !hasHairColorTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasHairColorTag = true;
+                }
+                else if (isEyesColor && !hasEyesColorTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasEyesColorTag = true;
+                }
+                else if (isSkinColor && !hasSkinColorTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasSkinColorTag = true;
+                }
+                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isHairLengthTag && !isHairColor && !isEyesColor && !isSkinColor && !isRedundant)
                 {
                     cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
@@ -318,7 +339,6 @@ namespace SmartData.Lib.Services
         private bool IsRedundantWith(string tag, string otherTag)
         {
             return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase) || Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase));
-            //return (tag.Contains(otherTag, StringComparison.OrdinalIgnoreCase) || otherTag.Contains(tag, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -355,6 +375,55 @@ namespace SmartData.Lib.Services
             string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
 
             return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a hair color.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a hair color, false otherwise.</returns>
+        private bool IsHairColor(string tag)
+        {
+            if (tag.Contains("hairband"))
+            {
+                return false;
+            }
+
+            string[] colorKeywords = { "blonde hair", "brown hair", "black hair", "blue hair", "pink hair", "purple hair",
+                "white hair", "grey hair", "red hair", "green hair", "orange hair", "aqua hair" };
+
+            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents eyes color.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents eyes color, false otherwise.</returns>
+        private bool IsEyesColor(string tag)
+        {
+            if (tag.Contains("eyeshadow"))
+            {
+                return false;
+            }
+
+            string[] colorKeywords = { "brown eyes", "black eyes", "blue eyes", "pink eyes", "purple eyes", "white eyes",
+                "grey eyes", "red eyes", "green eyes", "orange eyes", "aqua eyes", "yellow eyes" };
+
+            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents skin color.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents skin color, false otherwise.</returns>
+        private bool IsSkinColor(string tag)
+        {
+            string[] colorKeywords = { "black skin", "blue skin", "pink skin", "purple skin", "white skin", "grey skin",
+                "red skin", "green skin", "orange skin", "yellow skin" };
+
+            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>

@@ -77,7 +77,6 @@
 
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Maui" Version="5.2.0" />
-	  <PackageReference Include="WeCantSpell.Hunspell" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

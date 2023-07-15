@@ -6,12 +6,10 @@ namespace Dataset_Processor_Desktop
 {
     public partial class App : Application
     {
-
         public App()
         {
             InitializeComponent();
-            var culture = new CultureInfo("en-US");
-            Preferences.Set("Language", culture.Name);
+            SetDefaultLanguage("en-US");
             MainPage = new AppShell();
         }
 
@@ -22,8 +20,19 @@ namespace Dataset_Processor_Desktop
             window.MinimumWidth = 1280;
             window.MinimumHeight = 960;
             window.Title = "Dataset Processor All-in-one tools - v1.5";
-
             return window;
+        }
+
+        private void SetDefaultLanguage(string cultureCode)
+        {
+            CultureInfo culture = new CultureInfo(cultureCode);
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            Preferences.Set("Language", cultureCode);
         }
     }
 }
