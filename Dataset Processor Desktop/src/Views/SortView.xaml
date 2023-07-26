@@ -2,6 +2,8 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loca="clr-namespace:Dataset_Processor_Desktop"
+             xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.DatasetSortView">
     <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
           ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
@@ -12,6 +14,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="1"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
@@ -69,8 +72,8 @@
                              HeightRequest="30"
                              Padding="2"
                              HorizontalOptions="End"/>
-        </StackLayout>
-
+        </StackLayout>       
+        
         <Button Grid.Row="4" Grid.Column="0"
                Command="{Binding SelectBackupFolderCommand}"
                Text="Select Backup folder:"/>
@@ -83,12 +86,19 @@
                                  Padding="2"
                                  HorizontalOptions="End"/>
         </StackLayout>
-        
-
+       
         <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
 
-        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5">
+         <Label Grid.Row="6" Grid.Column="0"
+               Text="Select the Dimension Size for discarding images:"/>
+        <Picker Grid.Row="6" Grid.Column="1"
+                SelectedItem="{Binding Dimension}"
+                ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}"
+                VerticalOptions="Center">
+        </Picker>
+        
+        <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
@@ -104,20 +114,20 @@
                    Text="Backup images before processing?"/>
         </Grid>
 
-        <Label Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
+        <Label Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                Text="{Binding SortProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 
-        <Button Grid.Row="8" Grid.Column="2"
+        <Button Grid.Row="9" Grid.Column="2"
                 Command="{Binding SortImagesCommand}"
                 Text="Sort images!"/>
 
-        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
+        <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"
                      Progress="{Binding SortProgress.PercentFloat}"
                      ProgressColor="{StaticResource DarkPrimary}"/>
 
-        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalOptions="Center"
                VerticalOptions="Center"
                FontSize="Medium"

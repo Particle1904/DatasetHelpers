@@ -27,6 +27,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             set
             {
                 _imageFiles = value;
+                TotalImageFiles = _imageFiles.Count.ToString();
                 OnPropertyChanged(nameof(ImageFiles));
             }
         }
@@ -81,7 +82,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public string _wordsToHighlight;
+        private string _totalImageFiles;
+        public string TotalImageFiles
+        {
+            get => _totalImageFiles;
+            set
+            {
+                _totalImageFiles = $"Total files found: {value}";
+                OnPropertyChanged(nameof(TotalImageFiles));
+            }
+        }
+
+        private string _wordsToHighlight;
         public string WordsToHighlight
         {
             get => _wordsToHighlight;
@@ -89,6 +101,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _wordsToHighlight = value;
                 OnPropertyChanged(nameof(WordsToHighlight));
+            }
+        }
+
+        private string _wordsToFilter;
+        public string WordsToFilter
+        {
+            get => _wordsToFilter;
+            set
+            {
+                _wordsToFilter = value;
+                OnPropertyChanged(nameof(WordsToFilter));
             }
         }
 
@@ -102,6 +125,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand BlurImageCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
         public RelayCommand SwitchEditorTypeCommand { get; private set; }
+        public RelayCommand FilterFilesCommand { get; private set; }
+        public RelayCommand ClearFilterCommand { get; private set; }
 
         private bool _showBlurredImage;
 
@@ -158,6 +183,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             SwitchEditorTypeCommand = new RelayCommand(SwitchEditorType);
+            FilterFilesCommand = new RelayCommand(FilterFiles);
+            ClearFilterCommand = new RelayCommand(ClearFilter);
 
             _editingTxt = true;
 
@@ -170,25 +197,34 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             if (!string.IsNullOrEmpty(result))
             {
                 InputFolderPath = result;
-                try
+                LoadImagesFromInputFolder();
+            }
+        }
+
+        public void FilterFiles()
+        {
+            try
+            {
+                ImageFiles = _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter);
+            }
+            catch
+            {
+                _loggerService.LatestLogMessage = "No image files were found in the directory.";
+            }
+            finally
+            {
+                if (ImageFiles.Count != 0)
                 {
-                    ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
-                    if (ImageFiles.Count != 0)
-                    {
-                        ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
-                    }
+                    SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
-                catch
-                {
-                    _loggerService.LatestLogMessage = "No image files were found in the directory.";
-                }
-                finally
-                {
-                    if (ImageFiles.Count != 0)
-                    {
-                        SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                    }
-                }
+            }
+        }
+
+        public void ClearFilter()
+        {
+            if (!string.IsNullOrEmpty(InputFolderPath))
+            {
+                LoadImagesFromInputFolder();
             }
         }
 
@@ -319,6 +355,29 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
                     CurrentImageTags = string.Empty;
+                }
+            }
+        }
+
+        private void LoadImagesFromInputFolder()
+        {
+            try
+            {
+                ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
+                if (ImageFiles.Count != 0)
+                {
+                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                }
+            }
+            catch
+            {
+                _loggerService.LatestLogMessage = "No image files were found in the directory.";
+            }
+            finally
+            {
+                if (ImageFiles.Count != 0)
+                {
+                    SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
             }
         }

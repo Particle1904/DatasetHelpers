@@ -1,6 +1,7 @@
 ﻿using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -65,6 +66,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private SupportedDimensions _dimension;
+        public SupportedDimensions Dimension
+        {
+            get => _dimension;
+            set
+            {
+                _dimension = value;
+                OnPropertyChanged(nameof(Dimension));
+            }
+        }
+
         private Progress _sortProgress;
         public Progress SortProgress
         {
@@ -108,6 +120,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
             OpenDiscardedFolderCommand = new RelayCommand(async () => await OpenFolderAsync(DiscardedFolderPath));
             OpenBackupFolderCommand = new RelayCommand(async () => await OpenFolderAsync(BackupFolderPath));
+
+            Dimension = SupportedDimensions.Resolution512x512;
 
             TaskStatus = ProcessingStatus.Idle;
             IsUiLocked = false;
@@ -168,7 +182,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             TaskStatus = ProcessingStatus.Running;
             try
             {
-                await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _outputFolderPath, SortProgress, 512);
+                await _fileManipulatorService.SortImagesAsync(_inputFolderPath, _discardedFolderPath, _outputFolderPath, SortProgress, Dimension);
             }
             catch (Exception exception)
             {
