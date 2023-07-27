@@ -78,10 +78,12 @@
         </ScrollView>
         <Button Grid.Row="3" Grid.Column="3"
                 Command="{Binding FilterFilesCommand}"
-                Text="Filter images"/>
+                Text="Filter images"
+                IsEnabled="{Binding ButtonEnabled}"/>
         <Button Grid.Row="3" Grid.Column="4"
                 Command="{Binding ClearFilterCommand}"
-                Text="Clear filter"/>
+                Text="Clear filter"
+                IsEnabled="{Binding ButtonEnabled}"/>
 
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" ColumnSpacing="10"
               VerticalOptions="Center"

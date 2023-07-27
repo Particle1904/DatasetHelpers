@@ -115,6 +115,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _buttonEnabled;
+        public bool ButtonEnabled
+        {
+            get => _buttonEnabled;
+            set
+            {
+                _buttonEnabled = value;
+                OnPropertyChanged(nameof(ButtonEnabled));
+            }
+        }
+
         public RelayCommand PreviousItemCommand { get; private set; }
         public RelayCommand PreviousTenItemsCommand { get; private set; }
         public RelayCommand PreviousOneHundredItemsCommand { get; private set; }
@@ -183,8 +194,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             SwitchEditorTypeCommand = new RelayCommand(SwitchEditorType);
-            FilterFilesCommand = new RelayCommand(FilterFiles);
+            FilterFilesCommand = new RelayCommand(async () => await FilterFilesAsync());
             ClearFilterCommand = new RelayCommand(ClearFilter);
+            ButtonEnabled = true;
 
             _editingTxt = true;
 
@@ -201,11 +213,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public void FilterFiles()
+        public async Task FilterFilesAsync()
         {
             try
             {
-                ImageFiles = _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter);
+                ButtonEnabled = false;
+                ImageFiles = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter));
             }
             catch
             {
@@ -217,6 +230,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
+                ButtonEnabled = true;
             }
         }
 
