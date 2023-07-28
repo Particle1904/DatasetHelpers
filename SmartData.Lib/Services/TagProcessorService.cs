@@ -8,7 +8,7 @@ namespace SmartData.Lib.Services
 {
     public class TagProcessor : ITagProcessorService
     {
-        private string _txtSearchPattern = "*.txt";
+        private readonly string _txtSearchPattern = "*.txt";
 
         /// <summary>
         /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags.
@@ -186,7 +186,7 @@ namespace SmartData.Lib.Services
             foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt").Where(x => !x.Contains("sample_prompt_custom.txt")))
             {
                 string fileTags = File.ReadAllText(file);
-                string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "").Split(", ");
+                string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "", RegexOptions.None, TimeSpan.FromSeconds(10)).Replace(", ", ",").Split(",");
 
                 foreach (string splittedTag in split)
                 {
@@ -203,7 +203,6 @@ namespace SmartData.Lib.Services
             }
 
             var sorted = tags.OrderByDescending(x => x.Value).ToList();
-            int files = Directory.GetFiles(inputFolderPath).Length;
 
             StringBuilder stringBuilder = new StringBuilder();
             foreach (KeyValuePair<string, uint> tag in sorted)
@@ -251,7 +250,6 @@ namespace SmartData.Lib.Services
                         if (tag.Length < processedTag.Length)
                         {
                             isRedundant = true;
-                            continue;
                         }
                         else
                         {
@@ -336,9 +334,10 @@ namespace SmartData.Lib.Services
         /// <param name="tag">The tag to compare.</param>
         /// <param name="otherTag">The other tag to compare against.</param>
         /// <returns>True if the tags are redundant, false otherwise.</returns>
-        private bool IsRedundantWith(string tag, string otherTag)
+        private static bool IsRedundantWith(string tag, string otherTag)
         {
-            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase) || Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase));
+            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10)) ||
+                    Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10)));
         }
 
         /// <summary>
@@ -346,11 +345,11 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents a breast size, false otherwise.</returns>
-        private bool IsBreastSize(string tag)
+        private static bool IsBreastSize(string tag)
         {
             string[] sizeKeywords = { "small b", "medium b", "large b", "huge b", "flat chest" };
 
-            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -358,11 +357,11 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents a hair length, false otherwise.</returns>
-        private bool IsHairLength(string tag)
+        private static bool IsHairLength(string tag)
         {
-            string[] sizeKeywords = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "long hair" };
+            string[] lengthKeyword = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "long hair" };
 
-            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(lengthKeyword, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -370,11 +369,11 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents a male genitalia size, false otherwise.</returns>
-        private bool IsMaleGenitaliaSize(string tag)
+        private static bool IsMaleGenitaliaSize(string tag)
         {
             string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
 
-            return sizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -382,7 +381,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents a hair color, false otherwise.</returns>
-        private bool IsHairColor(string tag)
+        private static bool IsHairColor(string tag)
         {
             if (tag.Contains("hairband"))
             {
@@ -390,9 +389,9 @@ namespace SmartData.Lib.Services
             }
 
             string[] colorKeywords = { "blonde hair", "brown hair", "black hair", "blue hair", "pink hair", "purple hair",
-                "white hair", "grey hair", "red hair", "green hair", "orange hair", "aqua hair" };
+                "white hair", "grey hair", "gray hair", "red hair", "green hair", "orange hair", "aqua hair" };
 
-            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -400,7 +399,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents eyes color, false otherwise.</returns>
-        private bool IsEyesColor(string tag)
+        private static bool IsEyesColor(string tag)
         {
             if (tag.Contains("eyeshadow"))
             {
@@ -408,9 +407,9 @@ namespace SmartData.Lib.Services
             }
 
             string[] colorKeywords = { "brown eyes", "black eyes", "blue eyes", "pink eyes", "purple eyes", "white eyes",
-                "grey eyes", "red eyes", "green eyes", "orange eyes", "aqua eyes", "yellow eyes" };
+                "grey eyes", "gray eyes", "red eyes", "green eyes", "orange eyes", "aqua eyes", "yellow eyes" };
 
-            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -418,12 +417,12 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents skin color, false otherwise.</returns>
-        private bool IsSkinColor(string tag)
+        private static bool IsSkinColor(string tag)
         {
             string[] colorKeywords = { "black skin", "blue skin", "pink skin", "purple skin", "white skin", "grey skin",
-                "red skin", "green skin", "orange skin", "yellow skin" };
+                "gray skin", "red skin", "green skin", "orange skin", "yellow skin" };
 
-            return colorKeywords.Any(x => tag.Equals(x, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -434,7 +433,7 @@ namespace SmartData.Lib.Services
         /// <param name="tagsToEmphasize">A string of tags to bring to the front of the result list. Multiple tags should be separated by commas.</param>
         /// <param name="tagsToRemove">A string of tags to remove from the result list. Multiple tags should be separated by commas.</param>
         /// <returns>A comma-separated string of processed tags.</returns>
-        private string ProcessListOfTags(string predictedTags, string tagsToAdd, string tagsToEmphasize, string tagsToRemove)
+        private static string ProcessListOfTags(string predictedTags, string tagsToAdd, string tagsToEmphasize, string tagsToRemove)
         {
             List<string> tagsResult = new List<string>();
 
@@ -498,7 +497,7 @@ namespace SmartData.Lib.Services
         /// <param name="tagsToBeReplaced">The comma-separated list of replacement tags.</param>
         /// <returns>The modified string with the tags replaced.</returns>
         /// <exception cref="ArgumentException">Thrown when the number of tags to replace is not equal to the number of replacement tags.</exception>
-        private string ReplaceListOfTags(string tags, string tagsToReplace, string tagsToBeReplaced)
+        private static string ReplaceListOfTags(string tags, string tagsToReplace, string tagsToBeReplaced)
         {
             List<string> tagsResult = new List<string>();
 
@@ -533,7 +532,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tags">A string containing tags separated by commas.</param>
         /// <returns>A string with the same tags as the input, but in a random order.</returns>
-        private string RandomizeTags(string tags)
+        private static string RandomizeTags(string tags)
         {
             List<string> tagsSplit = tags.Replace(", ", ",").Split(",").ToList();
 

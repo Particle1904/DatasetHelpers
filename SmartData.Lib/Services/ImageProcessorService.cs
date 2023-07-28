@@ -11,7 +11,7 @@ namespace SmartData.Lib.Services
 {
     public class ImageProcessorService : IImageProcessorService
     {
-        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+        private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         private LanczosResampler _lanczosResampler;
 
@@ -20,7 +20,7 @@ namespace SmartData.Lib.Services
         private const float _blurRadius = 22f;
 
         private const ushort _divisor = 64;
-        private int _baseResolution = 512;
+        private readonly int _baseResolution = 512;
 
         private int _lanczosSamplerRadius = 3;
         public int LanczosSamplerRadius
@@ -44,23 +44,16 @@ namespace SmartData.Lib.Services
                 _sharpenSigma = Math.Clamp(value, 0.5f, 5.0f);
             }
         }
-        private bool _applySharpen = false;
-        public bool ApplySharpen
-        {
-            get => _applySharpen;
-            set
-            {
-                _applySharpen = value;
-            }
-        }
+
+        public bool ApplySharpen { get; set; } = false;
 
         public int BlocksPerRow { get; private set; }
-        private int _totalBlocks;
-        Dictionary<double, int> _aspectRatioToBlocks;
+        private readonly int _totalBlocks;
+        private readonly Dictionary<double, int> _aspectRatioToBlocks;
 
         public ImageProcessorService()
         {
-            int BlocksPerRow = _baseResolution / _divisor;
+            BlocksPerRow = _baseResolution / _divisor;
             _totalBlocks = BlocksPerRow * BlocksPerRow;
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
@@ -90,9 +83,9 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The path of the input image.</param>
         /// <param name="outputPath">The output path where the cropped and resized image will be saved.</param>
         /// <param name="results">The list of detected persons containing the bounding box information.</param>
-        /// <param name="boundingBoxScale">The scale factor to apply to the bounding box to include more context in the cropped image.</param>
+        /// <param name="expansionPercentage">The scale factor to apply to the bounding box to include more context in the cropped image.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float boundingBoxScale = 1.1f, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        public async Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float expansionPercentage, SupportedDimensions dimension)
         {
             if (results == null || results.Count == 0)
             {
@@ -115,8 +108,8 @@ namespace SmartData.Lib.Services
                 int width = (int)(boundingBox[2] - boundingBox[0]);
                 int height = (int)(boundingBox[3] - boundingBox[1]);
 
-                int scaledWidth = (int)(width * boundingBoxScale);
-                int scaledHeight = (int)(height * boundingBoxScale);
+                int scaledWidth = (int)(width * expansionPercentage);
+                int scaledHeight = (int)(height * expansionPercentage);
 
                 int scaledX1 = Math.Max(0, centerX - scaledWidth / 2);
                 int scaledY1 = Math.Max(0, centerY - scaledHeight / 2);
@@ -161,7 +154,7 @@ namespace SmartData.Lib.Services
                     Compand = true
                 }));
 
-                if (_applySharpen)
+                if (ApplySharpen)
                 {
                     resizedImage.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }
@@ -188,7 +181,7 @@ namespace SmartData.Lib.Services
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
@@ -220,7 +213,7 @@ namespace SmartData.Lib.Services
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
         /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath, outputPath, or progress parameter is null.</exception>
-        public async Task ResizeImagesAsync(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
@@ -334,56 +327,6 @@ namespace SmartData.Lib.Services
                             inputData.Input1[index++] = pixel.R;
                             inputData.Input1[index++] = pixel.G;
                             inputData.Input1[index++] = pixel.B;
-                        }
-                    }
-                });
-            }
-            return inputData;
-        }
-
-        /// <summary>
-        /// Asynchronously processes an image for caption prediction by resizing it to 384x384 and converting it to a float array.
-        /// </summary>
-        /// <param name="inputPath">The path of the image to be processed.</param>
-        /// <returns>An <see cref="VITInputData"/> object containing the processed image as a float array.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
-        public async Task<BLIPInputData> ProcessImageForCaptionPredictionAsync(string inputPath)
-        {
-            BLIPInputData inputData = new BLIPInputData();
-            inputData.PixelValues = new float[3 * 384 * 384];
-
-            int index = 0;
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
-            {
-                ResizeOptions resizeOptions = new ResizeOptions()
-                {
-                    Mode = ResizeMode.BoxPad,
-                    Position = AnchorPositionMode.Center,
-                    Sampler = _lanczosResampler,
-                    Compand = true,
-                    PadColor = new Rgb24(0, 0, 0),
-                    Size = new Size(384, 384),
-                };
-
-                image.Mutate(image => image.Resize(resizeOptions));
-
-                image.ProcessPixelRows(accessor =>
-                {
-                    for (int y = 0; y < accessor.Height; y++)
-                    {
-                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
-                        for (int x = 0; x < pixelRow.Length; x++)
-                        {
-                            ref Rgb24 pixel = ref pixelRow[x];
-
-                            float r = pixel.R * 1f / 255f;
-                            float g = pixel.G * 1f / 255f;
-                            float b = pixel.B * 1f / 255f;
-
-                            inputData.PixelValues[index++] = r;
-                            inputData.PixelValues[index++] = g;
-                            inputData.PixelValues[index++] = b;
                         }
                     }
                 });
@@ -507,7 +450,7 @@ namespace SmartData.Lib.Services
                             string formatted = metadata[i].Remove(metadata[i].Length - 2, 2);
                             metadata[i] = formatted;
                         }
-                        else if (metadata[i].EndsWith(","))
+                        else if (metadata[i].EndsWith(','))
                         {
                             string formatted = metadata[i].Remove(metadata[i].Length - 1, 1);
                             metadata[i] = formatted;
@@ -539,7 +482,7 @@ namespace SmartData.Lib.Services
         /// This method uses a Lanczos resampling algorithm for high-quality image resizing. The JPEG encoding quality is set to 100 and metadata is not skipped.
         /// </para>
         /// </remarks>
-        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
@@ -550,18 +493,6 @@ namespace SmartData.Lib.Services
                 int bucket = FindAspectRatioBucket(aspectRatio);
 
                 int blocks = _aspectRatioToBlocks.Values.Sum();
-
-                double bucketFraction = 0.0;
-                if (_aspectRatioToBlocks.ContainsKey(bucket))
-                {
-                    bucketFraction = _aspectRatioToBlocks[bucket] / (double)blocks;
-                }
-                else
-                {
-                    bucketFraction = 1.0 / (double)blocks;
-                }
-
-                double targetAspectRatio = Math.Sqrt(bucketFraction);
 
                 int targetWidth;
                 int targetHeight;
@@ -609,7 +540,7 @@ namespace SmartData.Lib.Services
                     image.Resize(resizeOptions);
                 });
 
-                if (_applySharpen)
+                if (ApplySharpen)
                 {
                     image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }

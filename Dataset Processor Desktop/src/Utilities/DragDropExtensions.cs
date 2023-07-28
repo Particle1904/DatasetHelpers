@@ -14,19 +14,16 @@ namespace Dataset_Processor_Desktop.src.Utilities
             element.AllowDrop = true;
             element.Drop += async (s, e) =>
             {
-                if (e.DataView.Contains(StandardDataFormats.StorageItems))
+                if (e.DataView.Contains(StandardDataFormats.StorageItems) && content is not null)
                 {
                     var items = await e.DataView.GetStorageItemsAsync();
                     foreach (var item in items)
                     {
                         if (item is StorageFile file)
                         {
-                            if (content is not null)
-                            {
-                                var buffer = await FileIO.ReadBufferAsync(file);
-                                var stream = buffer.AsStream();
-                                await content.Invoke(stream);
-                            }
+                            var buffer = await FileIO.ReadBufferAsync(file);
+                            var stream = buffer.AsStream();
+                            await content.Invoke(stream);
                         }
                     }
                 }

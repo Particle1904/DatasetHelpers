@@ -31,23 +31,12 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private string _tagsPath;
-        public string TagsPath
-        {
-            get
-            {
-                return _tagsPath;
-            }
-            set
-            {
-                _tagsPath = value;
-            }
-        }
+        public string TagsPath { get; set; }
 
         public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
         {
             _tagProcessorService = tagProcessorService;
-            _tagsPath = tagsPath;
+            TagsPath = tagsPath;
         }
 
         protected override async Task LoadModel()
@@ -156,11 +145,6 @@ namespace SmartData.Lib.Services
                 listOrdered.Add(item.Key);
             }
 
-            foreach (string item in listOrdered)
-            {
-                item.Replace("_", " ");
-            }
-
             string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
 
             string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
@@ -231,11 +215,6 @@ namespace SmartData.Lib.Services
                 {
                     listOrdered.Add(item.Key);
                 }
-            }
-
-            foreach (string item in listOrdered)
-            {
-                item.Replace("_", " ");
             }
 
             return listOrdered;

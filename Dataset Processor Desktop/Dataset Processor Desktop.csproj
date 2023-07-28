@@ -69,13 +69,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="C:\Users\Leonardo\Desktop\icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Maui" Version="5.2.0" />
 	</ItemGroup>
 

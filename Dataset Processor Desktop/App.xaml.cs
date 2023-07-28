@@ -23,7 +23,7 @@ namespace Dataset_Processor_Desktop
             return window;
         }
 
-        private void SetDefaultLanguage(string cultureCode)
+        private static void SetDefaultLanguage(string cultureCode)
         {
             CultureInfo culture = new CultureInfo(cultureCode);
             Thread.CurrentThread.CurrentCulture = culture;

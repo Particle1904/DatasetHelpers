@@ -172,7 +172,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 SortProgress.Reset();
             }
 
-            if (BackupImages == true)
+            if (BackupImages)
             {
                 TaskStatus = ProcessingStatus.BackingUp;
                 await _fileManipulatorService.BackupFiles(_inputFolderPath, _backupFolderPath);

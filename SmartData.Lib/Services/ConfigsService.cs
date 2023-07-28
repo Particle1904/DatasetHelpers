@@ -11,22 +11,22 @@ namespace SmartData.Lib.Services
 
         private readonly string _cfgFilePath = Path.Combine(AppContext.BaseDirectory, "config.cfg");
 
-        private string _taggerThresholdDescription = "#Threshold for AutoTagger, must be a decimal value between 0-1.0 | 0 meaning 0% and 1 is 100%. Values will be clamped if necessary.";
+        private readonly string _taggerThresholdDescription = "#Threshold for AutoTagger, must be a decimal value between 0-1.0 | 0 meaning 0% and 1 is 100%. Values will be clamped if necessary.";
         public string TaggerThresholdDescription { get => _taggerThresholdDescription.Replace("#", ""); }
 
-        private string _discardedFolderDescription = "#Folder for Discarded Images.";
+        private readonly string _discardedFolderDescription = "#Folder for Discarded Images.";
         public string DiscardedFolderDescription { get => _discardedFolderDescription.Replace("#", ""); }
 
-        private string _selectedFolderDescription = "#Folder for Selected Images. This is also the folder the Resize page will use as Input.";
+        private readonly string _selectedFolderDescription = "#Folder for Selected Images. This is also the folder the Resize page will use as Input.";
         public string SelectedFolderDescription { get => _selectedFolderDescription.Replace("#", ""); }
 
-        private string _backupFolderDescription = "#Folder for Backup.";
+        private readonly string _backupFolderDescription = "#Folder for Backup.";
         public string BackupFolderDescription { get => _backupFolderDescription.Replace("#", ""); }
 
-        private string _resizedFolderDescription = "#Folder for Resized images output. This is also the folder the Generate page will use as Input.";
+        private readonly string _resizedFolderDescription = "#Folder for Resized images output. This is also the folder the Generate page will use as Input.";
         public string ResizedFolderDescription { get => _resizedFolderDescription.Replace("#", ""); }
 
-        private string _combinedFolderDescription = "#Folder for Generated Tags and their corresponding Images. This is also the folder the Processor and Tag Editor pages will use as Input.";
+        private readonly string _combinedFolderDescription = "#Folder for Generated Tags and their corresponding Images. This is also the folder the Processor and Tag Editor pages will use as Input.";
         public string CombinedFolderDescription { get => _combinedFolderDescription.Replace("#", ""); }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -53,73 +53,33 @@ namespace SmartData.Lib.Services
 
             string[] file = await File.ReadAllLinesAsync(_cfgFilePath);
 
-            IEnumerable<string> configLines = file.Where(x => !x.StartsWith("#"));
+            IEnumerable<string> configLines = file.Where(x => !x.StartsWith('#'));
 
             foreach (string line in configLines)
             {
                 if (line.StartsWith("TaggerThreshold"))
                 {
-                    Configurations.TaggerThreshold = GetFloatConfig(line);
+                    Configurations.TaggerThreshold = GetFloatConfig(line, 0.35f);
                 }
                 else if (line.StartsWith("DiscardedFolder"))
                 {
-                    string folder = GetStringConfig(line);
-                    if (Path.Exists(folder))
-                    {
-                        Configurations.DiscardedFolder = folder;
-                    }
-                    else
-                    {
-                        Configurations.DiscardedFolder = Path.Combine(AppContext.BaseDirectory, "discarded-images-output");
-                    }
+                    Configurations.DiscardedFolder = GetConfiguredFolder(line, "discarded-images-output");
                 }
                 else if (line.StartsWith("SortedFolder"))
                 {
-                    string folder = GetStringConfig(line);
-                    if (Path.Exists(folder))
-                    {
-                        Configurations.SelectedFolder = folder;
-                    }
-                    else
-                    {
-                        Configurations.SelectedFolder = Path.Combine(AppContext.BaseDirectory, "sorted-images-output");
-                    }
+                    Configurations.SelectedFolder = GetConfiguredFolder(line, "sorted-images-output");
                 }
                 else if (line.StartsWith("BackupFolder"))
                 {
-                    string folder = GetStringConfig(line);
-                    if (Path.Exists(folder))
-                    {
-                        Configurations.BackupFolder = folder;
-                    }
-                    else
-                    {
-                        Configurations.BackupFolder = Path.Combine(AppContext.BaseDirectory, "images-backup");
-                    }
+                    Configurations.BackupFolder = GetConfiguredFolder(line, "images-backup");
                 }
                 else if (line.StartsWith("ResizedFolder"))
                 {
-                    string folder = GetStringConfig(line);
-                    if (Path.Exists(folder))
-                    {
-                        Configurations.ResizedFolder = folder;
-                    }
-                    else
-                    {
-                        Configurations.ResizedFolder = Path.Combine(AppContext.BaseDirectory, "resized-images-output");
-                    }
+                    Configurations.ResizedFolder = GetConfiguredFolder(line, "resized-images-output");
                 }
                 else if (line.StartsWith("CombinedFolder"))
                 {
-                    string folder = GetStringConfig(line);
-                    if (Path.Exists(folder))
-                    {
-                        Configurations.CombinedOutputFolder = folder;
-                    }
-                    else
-                    {
-                        Configurations.CombinedOutputFolder = Path.Combine(AppContext.BaseDirectory, "combined-images-output");
-                    }
+                    Configurations.CombinedOutputFolder = GetConfiguredFolder(line, "combined-images-output");
                 }
             }
         }
@@ -204,23 +164,47 @@ namespace SmartData.Lib.Services
         /// Parses a float value from a configuration line in the format "key=value".
         /// </summary>
         /// <param name="line">The configuration line to parse.</param>
-        /// <returns>The parsed float value.</returns>
-        private float GetFloatConfig(string line)
+        /// <param name="defaultValue">The default value to be returned if parsing fails.</param>
+        /// <returns>The parsed float value. If parsing fails, the default value is returned.</returns>
+        private static float GetFloatConfig(string line, float defaultValue)
         {
-            string[] splitLine = line.Split("=");
-            float.TryParse(splitLine.Last(), out float value);
-            return value;
+            string[] splitLine = line.Split('=');
+            if (float.TryParse(splitLine[splitLine.Length - 1], out float value))
+            {
+                return value;
+            }
+
+            return defaultValue;
         }
 
         /// <summary>
         /// Gets the string configuration value from the specified configuration line.
         /// </summary>
         /// <param name="line">The configuration line to retrieve the value from.</param>
-        /// <returns>The string configuration value.</returns>
-        private string GetStringConfig(string line)
+        /// <returns>The string configuration value extracted from the "key=value" format.</returns>
+        private static string GetStringConfig(string line)
         {
-            string[] splitLine = line.Split("=");
-            return splitLine.Last();
+            string[] splitLine = line.Split('=');
+            return splitLine[splitLine.Length - 1];
+        }
+
+        /// <summary>
+        /// Gets the configured folder path from the specified configuration line or uses the default folder path if the configured path does not exist.
+        /// </summary>
+        /// <param name="line">The configuration line to retrieve the folder path from.</param>
+        /// <param name="defaultFolder">The default folder path to be used if the configured folder path does not exist.</param>
+        /// <returns>The configured folder path or the default folder path if the configured path does not exist.</returns>
+        private static string GetConfiguredFolder(string line, string defaultFolder)
+        {
+            string folder = GetStringConfig(line);
+            if (Path.Exists(folder))
+            {
+                return folder;
+            }
+            else
+            {
+                return Path.Combine(AppContext.BaseDirectory, defaultFolder);
+            }
         }
 
         public virtual void OnPropertyChanged(string? propertyName = null)

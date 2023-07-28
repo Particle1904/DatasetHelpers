@@ -18,15 +18,7 @@ namespace SmartData.Lib.Services
         protected PredictionEngine<TInput, TOutput> _predictionEngine;
         protected ITransformer _predictionPipe;
 
-        protected string _modelPath;
-        public string ModelPath
-        {
-            get => _modelPath;
-            set
-            {
-                _modelPath = value;
-            }
-        }
+        public string ModelPath { get; set; }
 
         protected bool _isModelLoaded = false;
         public bool IsModelLoaded
@@ -38,7 +30,7 @@ namespace SmartData.Lib.Services
             }
         }
 
-        public BaseAIConsumer(IImageProcessorService imageProcessorService, string modelPath)
+        protected BaseAIConsumer(IImageProcessorService imageProcessorService, string modelPath)
         {
             _imageProcessorService = imageProcessorService;
 
@@ -68,9 +60,9 @@ namespace SmartData.Lib.Services
             string[] inputColumns = GetInputColumns();
             string[] outputColumns = GetOutputColumns();
 
-            _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, _modelPath);
+            _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath);
 
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(new TData[] { });
+            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());
 
             return _pipeline.Fit(emptyDv);
         }

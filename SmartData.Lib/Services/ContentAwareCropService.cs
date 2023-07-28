@@ -67,7 +67,7 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private string[] _classesNames = new string[] { "person", "bicycle", "car", "motorbike", "aeroplane",
+        private readonly string[] _classesNames = new string[] { "person", "bicycle", "car", "motorbike", "aeroplane",
                 "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
                 "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella",
                 "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat",
@@ -77,17 +77,17 @@ namespace SmartData.Lib.Services
                 "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock",
                 "vase", "scissors", "teddy bear", "hair drier", "toothbrush" };
 
-        private int[] _shapes = new int[] { 52, 26, 13 };
+        private readonly int[] _shapes = new int[] { 52, 26, 13 };
 
-        private float[][][] _anchors = new float[][][]
+        private readonly float[][][] _anchors = new float[][][]
             {
                 new float[][] { new float[] { 12, 16 }, new float[] { 19, 36 }, new float[] { 40, 28 } },
                 new float[][] { new float[] { 36, 75 }, new float[] { 76, 55 }, new float[] { 72, 146 } },
                 new float[][] { new float[] { 142, 110 }, new float[] { 192, 243 }, new float[] { 459, 401 } }
             };
 
-        private float[] _xyScale = new float[] { 1.2f, 1.1f, 1.05f };
-        private float[] _strides = new float[] { 8, 16, 32 };
+        private readonly float[] _xyScale = new float[] { 1.2f, 1.1f, 1.05f };
+        private readonly float[] _strides = new float[] { 8, 16, 32 };
 
         private int _lanczosRadius = 3;
         public int LanczosRadius
@@ -99,15 +99,7 @@ namespace SmartData.Lib.Services
             }
         }
 
-        private bool _applySharpen;
-        public bool ApplySharpen
-        {
-            get => _applySharpen;
-            set
-            {
-                _applySharpen = value;
-            }
-        }
+        public bool ApplySharpen { get; set; }
 
         private double _sharpenSigma;
         public double SharpenSigma
@@ -149,7 +141,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The input path containing the images to process.</param>
         /// <param name="outputPath">The output path to store the cropped images.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        public async Task ProcessCroppedImage(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             if (!_isModelLoaded)
             {
@@ -192,7 +184,7 @@ namespace SmartData.Lib.Services
         /// <param name="outputPath">The output path to store the cropped images.</param>
         /// <param name="progress">The progress object to track the processing progress.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
+        public async Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension)
         {
             if (!_isModelLoaded)
             {
@@ -340,7 +332,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="x">The input value.</param>
         /// <returns>The sigmoid value of the input.</returns>
-        private float Sigmoid(float x)
+        private static float Sigmoid(float x)
         {
             return 1f / (1f + (float)Math.Exp(-x));
         }
@@ -386,7 +378,7 @@ namespace SmartData.Lib.Services
         /// <param name="boundingBox1">The coordinates of the first bounding box: [x1, y1, x2, y2].</param>
         /// <param name="boundingBox2">The coordinates of the second bounding box: [x1, y1, x2, y2].</param>
         /// <returns>The IoU value between the two bounding boxes.</returns>
-        private float CalculateIoU(float[] boundingBox1, float[] boundingBox2)
+        private static float CalculateIoU(float[] boundingBox1, float[] boundingBox2)
         {
             var area1 = CalculateBoundingBoxArea(boundingBox1);
             var area2 = CalculateBoundingBoxArea(boundingBox2);
@@ -406,7 +398,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="boundingBox">The coordinates of the bounding box: [x1, y1, x2, y2].</param>
         /// <returns>The area of the bounding box.</returns>
-        private float CalculateBoundingBoxArea(float[] boundinbBox)
+        private static float CalculateBoundingBoxArea(float[] boundinbBox)
         {
             return (boundinbBox[2] - boundinbBox[0]) * (boundinbBox[3] - boundinbBox[1]);
         }

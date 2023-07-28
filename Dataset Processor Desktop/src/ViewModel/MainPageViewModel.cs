@@ -42,7 +42,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             set
             {
                 _dynamicContentView = value;
-                OnPropertyChanged("DynamicContentView");
+                OnPropertyChanged(nameof(DynamicContentView));
             }
         }
 

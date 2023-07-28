@@ -6,27 +6,16 @@ namespace Dataset_Processor_Desktop.src.Services
 {
     public class FolderPickerService : IFolderPickerService
     {
-        private CancellationToken _cancelToken;
-
-        public CancellationToken CancelToken
-        {
-            get => _cancelToken;
-            set { _cancelToken = value; }
-        }
+        public CancellationToken CancelToken { get; set; }
 
         public FolderPickerService()
         {
-            _cancelToken = new CancellationToken();
+            CancelToken = new CancellationToken();
         }
 
         public async Task<string> PickFolderAsync()
         {
-            //if (DeviceInfo.Platform != DevicePlatform.WinUI)
-            //{
-            //    throw new PlatformNotSupportedException("This platform is not supported!");
-            //}
-
-            FolderPickerResult result = await FolderPicker.Default.PickAsync(_cancelToken);
+            FolderPickerResult result = await FolderPicker.Default.PickAsync(CancelToken);
             if (!result.IsSuccessful)
             {
                 return "";

@@ -16,11 +16,11 @@ namespace SmartData.Lib.Services
             {
                 _latestLogMessage = value;
                 OnPropertyChanged(nameof(LatestLogMessage));
-                CleanLogMessage(TimeSpan.FromSeconds(60));
+                _ = CleanLogMessageAsync(TimeSpan.FromSeconds(60));
             }
         }
 
-        private Stopwatch _stopwatch = new Stopwatch();
+        private readonly Stopwatch _stopwatch = new Stopwatch();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -36,7 +36,7 @@ namespace SmartData.Lib.Services
         /// It raises the <see cref="PropertyChanged"/> event for the "LatestLogMessage" property to notify any subscribers of the change.
         /// Finally, it stops the stopwatch and the method execution completes.
         /// </remarks>
-        private async void CleanLogMessage(TimeSpan timeSpan)
+        private async Task CleanLogMessageAsync(TimeSpan timeSpan)
         {
             _stopwatch.Restart();
             await Task.Delay(timeSpan);

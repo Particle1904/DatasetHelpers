@@ -2,6 +2,7 @@ using Dataset_Processor_Desktop.src.ViewModel;
 
 using SmartData.Lib.Interfaces;
 
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Dataset_Processor_Desktop.src.Views;
@@ -54,7 +55,7 @@ public partial class TagEditorView : ContentView
         }
         catch (TaskCanceledException)
         {
-            return;
+            Debug.WriteLine("Task canceled.");
         }
     }
 
@@ -93,7 +94,7 @@ public partial class TagEditorView : ContentView
         FormattedString formattedString = new FormattedString();
 
         string regexSearchPattern = $@"\b({string.Join("|", wordsToHighlighSplit)})\b";
-        Regex regex = new Regex(regexSearchPattern, RegexOptions.IgnoreCase);
+        Regex regex = new Regex(regexSearchPattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10));
 
         for (int i = 0; i < parts.Length; i++)
         {

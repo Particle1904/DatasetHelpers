@@ -6,7 +6,7 @@ namespace SmartData.Lib.Services
 {
     public class FileManipulatorService : IFileManipulatorService
     {
-        private string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+        private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         /// <summary>
         /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
@@ -157,9 +157,17 @@ namespace SmartData.Lib.Services
             return imageFiles;
         }
 
-        public List<string> GetFilteredImageFiles(string inputPath, string textFileExtension, string wordsToFilter)
+        /// <summary>
+        /// Retrieves a list of image files from the specified input path that contain any of the specified words in their captions.
+        /// </summary>
+        /// <param name="inputPath">The directory path to search for image files.</param>
+        /// <param name="txtFileExtension">The file extension for text files containing captions (must be either ".txt" or ".caption").</param>
+        /// <param name="wordsToFilter">A comma-separated string of words to filter the image files by.</param>
+        /// <returns>A sorted list of image files whose captions contain any of the specified words.</returns>
+        /// <exception cref="ArgumentException">Thrown when the provided txtFileExtension is not ".txt" or ".caption".</exception>
+        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter)
         {
-            if (!textFileExtension.Equals(".txt") && !textFileExtension.Equals(".caption"))
+            if (!txtFileExtension.Equals(".txt") && !txtFileExtension.Equals(".caption"))
             {
                 throw new ArgumentException("File extension must be either .txt or .caption.");
             }
@@ -171,13 +179,12 @@ namespace SmartData.Lib.Services
 
             foreach (string image in imageFiles)
             {
-                string caption = GetTextFromFile(image, textFileExtension);
+                string caption = GetTextFromFile(image, txtFileExtension);
                 foreach (string tag in wordsSplit)
                 {
                     if (caption.Contains(tag))
                     {
                         filteredImageFiles.Add(image);
-                        break;
                     }
                 }
             }
@@ -191,9 +198,9 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="imageFilePath">The file path of the image to retrieve tags for.</param>
         /// <returns>A string containing the tags associated with the specified image.</returns>
-        public string GetTextFromFile(string imageFilePath, string textFileExtension)
+        public string GetTextFromFile(string imageFilePath, string txtFileExtension)
         {
-            string txtFilePath = Path.ChangeExtension(imageFilePath, textFileExtension);
+            string txtFilePath = Path.ChangeExtension(imageFilePath, txtFileExtension);
 
             string result = File.ReadAllText(txtFilePath);
 
@@ -221,7 +228,7 @@ namespace SmartData.Lib.Services
         /// <param name="dimension">The supported dimension to compare the image size against.</param>
         /// <param name="file">The path to the image file to be sorted.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous sorting operation.</returns>
-        private async Task SortImageAsync(string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension, string file)
+        private static async Task SortImageAsync(string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension, string file)
         {
             string fileName = Path.GetFileName(file);
             using (Image image = Image.Load(file))
@@ -254,7 +261,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The path of the directory where the file and associated files exist.</param>
         /// <param name="file">The path of the file to be renamed.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous renaming operation.</returns>
-        private async Task RenameFileToTemporaryName(string inputPath, string file)
+        private static async Task RenameFileToTemporaryName(string inputPath, string file)
         {
             string fileName = Path.GetFileNameWithoutExtension(file);
             string fileExtension = Path.GetExtension(file);
@@ -262,20 +269,17 @@ namespace SmartData.Lib.Services
 
             await Task.Run(() => File.Move(file, newFileName));
 
-            string? txtFile = Directory.GetFiles(inputPath, $"{fileName}.txt").FirstOrDefault(file => File.Exists(file));
-            if (txtFile != null)
-            {
-                string txtExtension = Path.GetExtension(txtFile);
-                string newTxtName = Path.Combine(inputPath, $"{fileName}_temp{txtExtension}");
-                await Task.Run(() => File.Move(txtFile, newTxtName));
-            }
+            string[] supportedFileExtensions = new string[] { ".txt", ".caption" };
 
-            string? captionFile = Directory.GetFiles(inputPath, $"{fileName}.caption").FirstOrDefault(file => File.Exists(file));
-            if (captionFile != null)
+            foreach (string extension in supportedFileExtensions)
             {
-                string captionExtension = Path.GetExtension(captionFile);
-                string newCaptionName = Path.Combine(inputPath, $"{fileName}_temp{captionExtension}");
-                await Task.Run(() => File.Move(captionFile, newCaptionName));
+                string filePath = Path.Combine(inputPath, $"{fileName}{extension}");
+                if (File.Exists(filePath))
+                {
+                    string txtExtension = Path.GetExtension(filePath);
+                    string newTxtName = Path.Combine(inputPath, $"{fileName}_temp{txtExtension}");
+                    await Task.Run(() => File.Move(filePath, newTxtName));
+                }
             }
         }
 
@@ -287,24 +291,21 @@ namespace SmartData.Lib.Services
         /// <param name="imageFiles">An array of image file paths.</param>
         /// <param name="i">The index of the current file in the imageFiles array.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous renaming operation.</returns>
-        private async Task RenameFileToCrescentName(string inputPath, string[] imageFiles, int i)
+        private static async Task RenameFileToCrescentName(string inputPath, string[] imageFiles, int i)
         {
             string imageFileName = Path.GetFileNameWithoutExtension(imageFiles[i]);
 
-            string? txtFile = Directory.GetFiles(inputPath, $"{imageFileName}.txt").FirstOrDefault(file => File.Exists(file));
-            if (txtFile != null)
-            {
-                string txtExtension = Path.GetExtension(txtFile);
-                string newTxtName = Path.Combine(inputPath, $"{i + 1}{txtExtension}");
-                await Task.Run(() => File.Move(txtFile, newTxtName));
-            }
+            string[] supportedFileExtensions = new string[] { ".txt", ".caption" };
 
-            string? captionFile = Directory.GetFiles(inputPath, $"{imageFileName}.caption").FirstOrDefault(file => File.Exists(file));
-            if (captionFile != null)
+            foreach (string extension in supportedFileExtensions)
             {
-                string captionExtension = Path.GetExtension(captionFile);
-                string newCaptionName = Path.Combine(inputPath, $"{i + 1}{captionExtension}");
-                await Task.Run(() => File.Move(captionFile, newCaptionName));
+                string filePath = Path.Combine(inputPath, $"{imageFileName}{extension}");
+                if (File.Exists(filePath))
+                {
+                    string txtExtension = Path.GetExtension(filePath);
+                    string newTxtName = Path.Combine(inputPath, $"{i + 1}{txtExtension}");
+                    await Task.Run(() => File.Move(filePath, newTxtName));
+                }
             }
 
             string imageExtension = Path.GetExtension(imageFiles[i]);
