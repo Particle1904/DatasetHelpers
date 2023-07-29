@@ -276,11 +276,11 @@ namespace SmartData.Lib.Services
                 }
                 else if (isHairColor && !hasHairColorTag)
                 {
-                    if (tagsSplit.Any(x => x.Equals("two-toned hair")))
+                    if (tagsSplit.Any(x => x.Equals("two-tone hair", StringComparison.OrdinalIgnoreCase)))
                     {
                         cleanedTags.Add(tag);
                     }
-                    else if (tagsSplit.Any(x => x.Equals("multicolored hair")))
+                    else if (tagsSplit.Any(x => x.Equals("multicolored hair", StringComparison.OrdinalIgnoreCase)))
                     {
                         cleanedTags.Add(tag);
                     }
