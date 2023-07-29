@@ -10,6 +10,7 @@ namespace SmartData.Lib.Interfaces
         public int LanczosRadius { get; set; }
         public bool ApplySharpen { get; set; }
         public double SharpenSigma { get; set; }
+        public int MinimumResolutionForSigma { get; set; }
         public float ScoreThreshold { get; set; }
         public float IouThreshold { get; set; }
         public float ExpansionPercentage { get; set; }

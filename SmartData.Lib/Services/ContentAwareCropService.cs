@@ -114,6 +114,16 @@ namespace SmartData.Lib.Services
             }
         }
 
+        private int _minimumResolutionForSigma;
+        public int MinimumResolutionForSigma
+        {
+            get => _minimumResolutionForSigma;
+            set
+            {
+                _minimumResolutionForSigma = Math.Clamp(value, 256, ushort.MaxValue);
+            }
+        }
+
         public ContentAwareCropService(IImageProcessorService imageProcessorService, string modelPath) : base(imageProcessorService, modelPath)
         {
         }
@@ -162,6 +172,7 @@ namespace SmartData.Lib.Services
             _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
             _imageProcessorService.ApplySharpen = ApplySharpen;
             _imageProcessorService.SharpenSigma = (float)SharpenSigma;
+            _imageProcessorService.MinimumResolutionForSigma = MinimumResolutionForSigma;
             foreach (string file in filesList)
             {
                 await ProcessingRoutine(outputPath, dimension, file);
@@ -207,6 +218,7 @@ namespace SmartData.Lib.Services
             _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
             _imageProcessorService.ApplySharpen = ApplySharpen;
             _imageProcessorService.SharpenSigma = (float)SharpenSigma;
+            _imageProcessorService.MinimumResolutionForSigma = MinimumResolutionForSigma;
             foreach (string file in filesList)
             {
                 await ProcessingRoutine(outputPath, dimension, file);

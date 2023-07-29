@@ -276,8 +276,19 @@ namespace SmartData.Lib.Services
                 }
                 else if (isHairColor && !hasHairColorTag)
                 {
-                    cleanedTags.Add(tag);
-                    hasHairColorTag = true;
+                    if (tagsSplit.Any(x => x.Equals("two-toned hair")))
+                    {
+                        cleanedTags.Add(tag);
+                    }
+                    else if (tagsSplit.Any(x => x.Equals("multicolored hair")))
+                    {
+                        cleanedTags.Add(tag);
+                    }
+                    else
+                    {
+                        cleanedTags.Add(tag);
+                        hasHairColorTag = true;
+                    }
                 }
                 else if (isEyesColor && !hasEyesColorTag)
                 {

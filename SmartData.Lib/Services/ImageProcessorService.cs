@@ -45,6 +45,16 @@ namespace SmartData.Lib.Services
             }
         }
 
+        private int _minimumResolutionForSigma;
+        public int MinimumResolutionForSigma
+        {
+            get => _minimumResolutionForSigma;
+            set
+            {
+                _minimumResolutionForSigma = Math.Clamp(value, 256, ushort.MaxValue);
+            }
+        }
+
         public bool ApplySharpen { get; set; } = false;
 
         public int BlocksPerRow { get; private set; }
@@ -57,6 +67,7 @@ namespace SmartData.Lib.Services
             _totalBlocks = BlocksPerRow * BlocksPerRow;
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
+            MinimumResolutionForSigma = 512;
         }
 
         /// <summary>
@@ -488,6 +499,9 @@ namespace SmartData.Lib.Services
 
             using (Image image = await Image.LoadAsync(inputPath))
             {
+                int originalWidth = image.Width;
+                int originalHeight = image.Height;
+
                 double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
 
                 int bucket = FindAspectRatioBucket(aspectRatio);
@@ -540,7 +554,7 @@ namespace SmartData.Lib.Services
                     image.Resize(resizeOptions);
                 });
 
-                if (ApplySharpen)
+                if (ApplySharpen && (originalWidth >= MinimumResolutionForSigma || originalHeight >= MinimumResolutionForSigma))
                 {
                     image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }

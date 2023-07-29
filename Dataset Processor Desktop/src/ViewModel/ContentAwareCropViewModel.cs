@@ -154,6 +154,24 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private int _minimumResolutionForSigma;
+        public string MinimumResolutionForSigma
+        {
+            get => _minimumResolutionForSigma.ToString();
+            set
+            {
+                try
+                {
+                    _minimumResolutionForSigma = int.Parse(value);
+                    OnPropertyChanged(nameof(MinimumResolutionForSigma));
+                }
+                catch
+                {
+                    _loggerService.LatestLogMessage = $"Minimum resolution for sigma needs to be a number between 256 and 65535.";
+                }
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -177,7 +195,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             LanczosRadius = 3.0d;
             ApplySharpen = false;
-            SharpenSigma = 1.0d;
+            SharpenSigma = 0.7d;
+            MinimumResolutionForSigma = "1024";
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -238,7 +257,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _contentAwareCropService.LanczosRadius = (int)LanczosRadius;
                 _contentAwareCropService.ApplySharpen = ApplySharpen;
                 _contentAwareCropService.SharpenSigma = (float)SharpenSigma;
-
+                _contentAwareCropService.MinimumResolutionForSigma = _minimumResolutionForSigma;
                 await _contentAwareCropService.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
             }
             catch (Exception exception)
