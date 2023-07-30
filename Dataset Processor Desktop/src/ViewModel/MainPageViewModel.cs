@@ -161,9 +161,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService);
             }
-
             var tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();
+
             DynamicContentView = _tagEditorView;
         }
 

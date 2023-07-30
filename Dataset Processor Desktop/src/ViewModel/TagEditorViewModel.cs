@@ -218,7 +218,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             try
             {
                 ButtonEnabled = false;
-                ImageFiles = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter));
+                List<string> searchResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter));
+                if (searchResult.Count > 0)
+                {
+                    SelectedItemIndex = 0;
+                    ImageFiles = searchResult;
+                }
             }
             catch
             {
