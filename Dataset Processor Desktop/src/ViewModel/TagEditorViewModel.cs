@@ -224,6 +224,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     SelectedItemIndex = 0;
                     ImageFiles = searchResult;
                 }
+                else
+                {
+                    _loggerService.LatestLogMessage = "No images found!";
+                }
             }
             catch
             {
