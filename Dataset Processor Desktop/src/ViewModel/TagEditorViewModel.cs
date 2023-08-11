@@ -390,6 +390,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 if (ImageFiles.Count != 0)
                 {
                     ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    SelectedItemIndex = 0;
                 }
             }
             catch

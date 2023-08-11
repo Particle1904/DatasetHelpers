@@ -83,7 +83,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         protected virtual void UnloadModel()
         {
-            _predictionEngine.Dispose();
+            _predictionEngine?.Dispose();
             _predictionEngine = null;
             _predictionPipe = null;
 
