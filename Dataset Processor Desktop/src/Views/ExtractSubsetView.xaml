@@ -15,6 +15,7 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -118,5 +119,12 @@
                FontSize="Medium"
                TextColor="{StaticResource DarkSecondary}"
                Text="{Binding TaskStatusString}"/>
+
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
+               TextColor="{StaticResource DarkSecondary}"
+               Margin="0,0,0,0"
+               VerticalTextAlignment="Center"
+               HorizontalOptions="Center"
+               Text="Note: If a .txt or .caption file doesn't exist, this feature will ignore it and attempt to find the next one, but no errors will be shown in the user interface.&#x0a;So, if your dataset doesn't include .txt or .caption files, deselect the corresponding checkbox to avoid unnecessary processing."/>
     </Grid>
 </ContentView>

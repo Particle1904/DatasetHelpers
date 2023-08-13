@@ -134,14 +134,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 if (SearchTags)
                 {
                     FilterProgress.Reset();
-                    tagsResult = _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, FilterProgress);
+                    tagsResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, FilterProgress));
                 }
 
                 List<string> captionsResult = new List<string>();
                 if (SearchCaptions)
                 {
                     FilterProgress.Reset();
-                    captionsResult = _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter, FilterProgress);
+                    captionsResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter, FilterProgress));
                 }
 
                 List<string> result = captionsResult.Union(tagsResult).ToList();
@@ -151,8 +151,15 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
-                await _loggerService.SaveExceptionStackTrace(exception);
+                if (exception.GetType() == typeof(FileNotFoundException))
+                {
+                    _loggerService.LatestLogMessage = $"{exception.Message}";
+                }
+                else
+                {
+                    _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    await _loggerService.SaveExceptionStackTrace(exception);
+                }
             }
             finally
             {

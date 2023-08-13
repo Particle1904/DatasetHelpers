@@ -230,15 +230,22 @@ namespace SmartData.Lib.Services
 
             foreach (string image in imageFiles)
             {
-                string caption = GetTextFromFile(image, txtFileExtension);
-                foreach (string tag in wordsSplit)
+                try
                 {
-                    string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
-                    if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                    string caption = GetTextFromFile(image, txtFileExtension);
+                    foreach (string tag in wordsSplit)
                     {
-                        filteredImageFiles.Add(image);
-                        break;
+                        string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
+                        if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                        {
+                            filteredImageFiles.Add(image);
+                            break;
+                        }
                     }
+                }
+                catch (FileNotFoundException)
+                {
+                    continue;
                 }
             }
 
@@ -271,17 +278,27 @@ namespace SmartData.Lib.Services
 
             foreach (string image in imageFiles)
             {
-                string caption = GetTextFromFile(image, txtFileExtension);
-                foreach (string tag in wordsSplit)
+                try
                 {
-                    string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
-                    if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                    string caption = GetTextFromFile(image, txtFileExtension);
+                    foreach (string tag in wordsSplit)
                     {
-                        filteredImageFiles.Add(image);
-                        break;
+                        string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
+                        if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                        {
+                            filteredImageFiles.Add(image);
+                            break;
+                        }
                     }
                 }
-                progress.UpdateProgress();
+                catch (FileNotFoundException)
+                {
+                    continue;
+                }
+                finally
+                {
+                    progress.UpdateProgress();
+                }
             }
 
             filteredImageFiles.Sort((a, b) => string.Compare(a, b));
