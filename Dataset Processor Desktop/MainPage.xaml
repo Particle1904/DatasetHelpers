@@ -26,6 +26,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
@@ -61,10 +62,13 @@
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagEditorCommand}"/>
             <Button Grid.Row="8"
+                    Text="Extract Subset"
+                    Command="{Binding NavigateToExtractSubsetCommand}"/>
+            <Button Grid.Row="9"
                     Text="Metadata Viewer"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToMetadataCommand}"/>
-            <Button Grid.Row="9"
+            <Button Grid.Row="10"
                     Text="Settings"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToSettingsCommand}"/>

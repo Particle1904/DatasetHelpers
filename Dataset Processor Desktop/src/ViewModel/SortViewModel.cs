@@ -175,7 +175,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             if (BackupImages)
             {
                 TaskStatus = ProcessingStatus.BackingUp;
-                await _fileManipulatorService.BackupFiles(_inputFolderPath, _backupFolderPath);
+                await _fileManipulatorService.BackupFilesAsync(_inputFolderPath, _backupFolderPath);
                 TaskStatus = ProcessingStatus.Idle;
             }
 

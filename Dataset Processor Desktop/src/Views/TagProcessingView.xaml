@@ -134,6 +134,7 @@
                 <ColumnDefinition Width="40"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
+            
             <CheckBox Grid.Row="0" Grid.Column="0"
                       IsChecked="{Binding RandomizeTags}"/>
             <Label Grid.Row="0" Grid.Column="1"
@@ -171,7 +172,7 @@
                 Text="Calculate frequency"/>
 
         <BoxView HeightRequest="1" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" 
-              BackgroundColor="{StaticResource Gray600}"/>
+                 BackgroundColor="{StaticResource Gray600}"/>
 
         <Label Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
                HorizontalTextAlignment="Center"

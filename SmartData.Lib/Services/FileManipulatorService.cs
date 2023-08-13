@@ -2,6 +2,8 @@
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
+using System.Text.RegularExpressions;
+
 namespace SmartData.Lib.Services
 {
     public class FileManipulatorService : IFileManipulatorService
@@ -134,7 +136,7 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The full path of the directory containing the image files to backup.</param>
         /// <param name="backupPath">The full path of the directory to copy the image files to.</param>
         /// <exception cref="System.IO.IOException">Thrown when an I/O error occurs during file copying.</exception>
-        public async Task BackupFiles(string inputPath, string backupPath)
+        public async Task BackupFilesAsync(string inputPath, string backupPath)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
@@ -142,6 +144,55 @@ namespace SmartData.Lib.Services
             {
                 string finalPath = Path.Combine(Path.GetFileName(image), backupPath);
                 await Task.Run(() => File.Copy(image, finalPath));
+            }
+        }
+
+        /// <summary>
+        /// Creates a subset of files based on the provided list by copying them to the specified output path. 
+        /// If accompanying '.txt' and '.caption' files exist, they are also copied.
+        /// </summary>
+        /// <param name="files">A list of file paths to create a subset from.</param>
+        /// <param name="outputPath">The path to the output folder where the subset files will be copied.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task CreateSubsetAsync(List<string> files, string outputPath)
+        {
+            foreach (string file in files)
+            {
+                string folderPath = Path.GetDirectoryName(file);
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+
+                string outputImageFile = Path.Combine(outputPath, $"{Path.GetFileName(file)}");
+                await Task.Run(() => File.Copy(file, outputImageFile, true));
+
+                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.txt", outputPath);
+                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.caption", outputPath);
+            }
+        }
+
+        /// <summary>
+        /// Creates a subset of files based on the provided list by copying them to the specified output path. 
+        /// If accompanying '.txt' and '.caption' files exist, they are also copied.
+        /// </summary>
+        /// <param name="files">A list of file paths to create a subset from.</param>
+        /// <param name="outputPath">The path to the output folder where the subset files will be copied.</param>
+        /// <param name="progress">An instance of the Progress class to track the progress of the image sorting operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task CreateSubsetAsync(List<string> files, string outputPath, Progress progress)
+        {
+            progress.TotalFiles = files.Count;
+
+            foreach (string file in files)
+            {
+                string folderPath = Path.GetDirectoryName(file);
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+
+                string outputImageFile = Path.Combine(outputPath, $"{Path.GetFileName(file)}");
+                await Task.Run(() => File.Copy(file, outputImageFile, true));
+
+                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.txt", outputPath);
+                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.caption", outputPath);
+
+                progress.UpdateProgress();
             }
         }
 
@@ -182,11 +233,55 @@ namespace SmartData.Lib.Services
                 string caption = GetTextFromFile(image, txtFileExtension);
                 foreach (string tag in wordsSplit)
                 {
-                    if (caption.Contains(tag))
+                    string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
+                    if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
                     {
                         filteredImageFiles.Add(image);
+                        break;
                     }
                 }
+            }
+
+            filteredImageFiles.Sort((a, b) => string.Compare(a, b));
+            return filteredImageFiles;
+        }
+
+        /// <summary>
+        /// Retrieves a list of image files from the specified input path that contain any of the specified words in their captions.
+        /// </summary>
+        /// <param name="inputPath">The directory path to search for image files.</param>
+        /// <param name="txtFileExtension">The file extension for text files containing captions (must be either ".txt" or ".caption").</param>
+        /// <param name="wordsToFilter">A comma-separated string of words to filter the image files by.</param>
+        /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
+        /// <returns>A sorted list of image files whose captions contain any of the specified words.</returns>
+        /// <exception cref="ArgumentException">Thrown when the provided txtFileExtension is not ".txt" or ".caption".</exception>
+        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, Progress progress)
+        {
+            if (!txtFileExtension.Equals(".txt") && !txtFileExtension.Equals(".caption"))
+            {
+                throw new ArgumentException("File extension must be either .txt or .caption.");
+            }
+
+            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+
+            progress.TotalFiles = imageFiles.Count;
+
+            List<string> filteredImageFiles = new List<string>();
+            string[] wordsSplit = wordsToFilter.Replace(", ", ",").Split(",");
+
+            foreach (string image in imageFiles)
+            {
+                string caption = GetTextFromFile(image, txtFileExtension);
+                foreach (string tag in wordsSplit)
+                {
+                    string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
+                    if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                    {
+                        filteredImageFiles.Add(image);
+                        break;
+                    }
+                }
+                progress.UpdateProgress();
             }
 
             filteredImageFiles.Sort((a, b) => string.Compare(a, b));
@@ -311,6 +406,23 @@ namespace SmartData.Lib.Services
             string imageExtension = Path.GetExtension(imageFiles[i]);
             string newImageName = Path.Combine(inputPath, $"{i + 1}{imageExtension}");
             await Task.Run(() => File.Move(imageFiles[i], newImageName));
+        }
+
+        /// <summary>
+        /// Copies an optional file from the source directory to the target directory if it exists.
+        /// </summary>
+        /// <param name="sourceDirectory">The source directory containing the optional file.</param>
+        /// <param name="fileName">The name of the optional file.</param>
+        /// <param name="targetDirectory">The target directory where the optional file will be copied.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private static async Task CopyOptionalFileAsync(string sourceDirectory, string fileName, string targetDirectory)
+        {
+            string sourceFilePath = Path.Combine(sourceDirectory, fileName);
+            if (File.Exists(sourceFilePath))
+            {
+                string targetFilePath = Path.Combine(targetDirectory, fileName);
+                await Task.Run(() => File.Copy(sourceFilePath, targetFilePath, true));
+            }
         }
     }
 }

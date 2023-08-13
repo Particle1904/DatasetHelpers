@@ -80,6 +80,9 @@
 	  <Compile Update="src\Views\ContentAwareCropView.xaml.cs">
 	    <DependentUpon>ContentAwareCropView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="src\Views\ExtractSubsetView.xaml.cs">
+	    <DependentUpon>ExtractSubsetView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="src\Views\SortView.xaml.cs">
 	    <DependentUpon>SortView.xaml</DependentUpon>
 	  </Compile>
@@ -90,6 +93,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="src\Views\ContentAwareCropView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="src\Views\ExtractSubsetView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="src\Views\MetadataView.xaml">

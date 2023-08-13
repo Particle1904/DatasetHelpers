@@ -23,6 +23,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private string _tagsToAdd;
         public string TagsToAdd
+
         {
             get => _tagsToAdd;
             set

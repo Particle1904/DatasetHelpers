@@ -26,6 +26,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private View _captionProcessingView;
         private View _tagProcessingView;
         private View _tagEditorView;
+        private View _extractSubsetView;
         private View _metadataView;
         private View _settingsView;
         #endregion
@@ -53,6 +54,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToCaptionProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagEditorCommand { get; private set; }
+        public RelayCommand NavigateToExtractSubsetCommand { get; private set; }
         public RelayCommand NavigateToMetadataCommand { get; private set; }
         public RelayCommand NavigateToSettingsCommand { get; private set; }
 
@@ -76,6 +78,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToCaptionProcessingCommand = new RelayCommand(NavigateToCaptionProcessingView);
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
+            NavigateToExtractSubsetCommand = new RelayCommand(NavigateToExtractSubsetView);
             NavigateToMetadataCommand = new RelayCommand(NavigateToMetadataView);
             NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
 
@@ -159,10 +162,19 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService);
             }
-            var tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
+            TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();
 
             DynamicContentView = _tagEditorView;
+        }
+
+        public void NavigateToExtractSubsetView()
+        {
+            if (_extractSubsetView == null)
+            {
+                _extractSubsetView = new ExtractSubsetView(_fileManipulatorService);
+            }
+            DynamicContentView = _extractSubsetView;
         }
 
         public void NavigateToMetadataView()
