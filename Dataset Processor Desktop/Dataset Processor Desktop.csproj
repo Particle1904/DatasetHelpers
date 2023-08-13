@@ -86,7 +86,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="src\Views\CaptionGenerationView.xaml">
+	  <MauiXaml Update="src\Views\CaptionProcessingView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="src\Views\ContentAwareCropView.xaml">

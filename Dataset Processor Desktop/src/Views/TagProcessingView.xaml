@@ -29,7 +29,7 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
-        <Label x:Name="TitleLabel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" 
                HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                FontSize="Title"
                Text="Mass process tag files"/>
@@ -108,7 +108,7 @@
                     IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
-                    Text="{Binding TagsToReplace}"/>
+                    Text="{Binding TagsToBeReplaced}"/>
         </ScrollView>
         <ScrollView Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2"
                     HorizontalOptions="FillAndExpand"
@@ -121,7 +121,7 @@
                     IsTextPredictionEnabled="False"
                     AutoSize="TextChanges"
                     Placeholder="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
-                    Text="{Binding TagsToBeReplaced}"/>
+                    Text="{Binding TagsToReplace}"/>
         </ScrollView>
 
         <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5">

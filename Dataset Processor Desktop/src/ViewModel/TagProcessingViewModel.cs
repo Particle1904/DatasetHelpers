@@ -54,17 +54,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        private string _tagsToReplace;
-        public string TagsToReplace
-        {
-            get => _tagsToReplace;
-            set
-            {
-                _tagsToReplace = value;
-                OnPropertyChanged(nameof(TagsToReplace));
-            }
-        }
-
         private string _tagsToBeReplaced;
         public string TagsToBeReplaced
         {
@@ -73,6 +62,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _tagsToBeReplaced = value;
                 OnPropertyChanged(nameof(TagsToBeReplaced));
+            }
+        }
+
+        private string _tagsToReplace;
+        public string TagsToReplace
+        {
+            get => _tagsToReplace;
+            set
+            {
+                _tagsToReplace = value;
+                OnPropertyChanged(nameof(TagsToReplace));
             }
         }
 
@@ -158,7 +158,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SelectInputFolderAsync()
         {
-            var result = await _folderPickerService.PickFolderAsync();
+            string result = await _folderPickerService.PickFolderAsync();
             if (!string.IsNullOrEmpty(result))
             {
                 InputFolderPath = result;
@@ -220,7 +220,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
                 try
                 {
-                    await _tagProcessorService.ProcessTagsReplacement(InputFolderPath, TagsToReplace, TagsToBeReplaced, TagProcessingProgress);
+                    await _tagProcessorService.ProcessTagsReplacement(InputFolderPath, TagsToBeReplaced, TagsToReplace, TagProcessingProgress);
                 }
                 catch (Exception exception)
                 {

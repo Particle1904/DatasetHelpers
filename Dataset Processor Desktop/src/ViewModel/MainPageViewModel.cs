@@ -12,7 +12,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IAutoTaggerService _autoTaggerService;
-        private readonly IAutoCaptionService _autoCaptionService;
         private readonly ITagProcessorService _tagProcessorService;
         private readonly IContentAwareCropService _contentAwareCropService;
 
@@ -24,7 +23,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private View _contentAwareCropView;
         private View _resizeImagesView;
         private View _tagGenerationView;
-        private View _captionGenerationView;
+        private View _captionProcessingView;
         private View _tagProcessingView;
         private View _tagEditorView;
         private View _metadataView;
@@ -51,7 +50,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToContentAwareCropCommand { get; private set; }
         public RelayCommand NavigateToResizeImagesCommand { get; private set; }
         public RelayCommand NavigateToTagGenerationCommand { get; private set; }
-        public RelayCommand NavigateToCaptionGenerationCommand { get; private set; }
+        public RelayCommand NavigateToCaptionProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagEditorCommand { get; private set; }
         public RelayCommand NavigateToMetadataCommand { get; private set; }
@@ -62,7 +61,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _fileManipulatorService = Application.Current.Handler.MauiContext.Services.GetService<IFileManipulatorService>();
             _imageProcessorService = Application.Current.Handler.MauiContext.Services.GetService<IImageProcessorService>();
             _autoTaggerService = Application.Current.Handler.MauiContext.Services.GetService<IAutoTaggerService>();
-            _autoCaptionService = Application.Current.Handler.MauiContext.Services.GetService<IAutoCaptionService>();
             _tagProcessorService = Application.Current.Handler.MauiContext.Services.GetService<ITagProcessorService>();
             _contentAwareCropService = Application.Current.Handler.MauiContext.Services.GetService<IContentAwareCropService>();
 
@@ -75,7 +73,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToContentAwareCropCommand = new RelayCommand(NavigateToContentAwareCropView);
             NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
             NavigateToTagGenerationCommand = new RelayCommand(NavigateToTagGenerationView);
-            NavigateToCaptionGenerationCommand = new RelayCommand(NavigateToCaptionGenerationView);
+            NavigateToCaptionProcessingCommand = new RelayCommand(NavigateToCaptionProcessingView);
             NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
             NavigateToMetadataCommand = new RelayCommand(NavigateToMetadataView);
@@ -137,13 +135,13 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             DynamicContentView = _tagGenerationView;
         }
 
-        public void NavigateToCaptionGenerationView()
+        public void NavigateToCaptionProcessingView()
         {
-            if (_captionGenerationView == null)
+            if (_captionProcessingView == null)
             {
-                _captionGenerationView = new CaptionGenerationView(_fileManipulatorService, _autoCaptionService);
+                _captionProcessingView = new CaptionProcessingView(_tagProcessorService, _fileManipulatorService);
             }
-            DynamicContentView = _captionGenerationView;
+            DynamicContentView = _captionProcessingView;
         }
 
         public void NavigateToTagProcessingView()

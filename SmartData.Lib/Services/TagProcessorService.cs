@@ -9,6 +9,7 @@ namespace SmartData.Lib.Services
     public class TagProcessor : ITagProcessorService
     {
         private readonly string _txtSearchPattern = "*.txt";
+        private readonly string _captionSearchPattern = "*.caption";
 
         /// <summary>
         /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags.
@@ -57,20 +58,60 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Performs search and replace operations on captions within files asynchronously.
+        /// </summary>
+        /// <param name="inputFolderPath">The folder path where the caption files are located.</param>
+        /// <param name="wordsToBeReplaced">The words to be replaced in the captions.</param>
+        /// <param name="wordsToReplace">The replacement words for the search operation.</param>
+        public async Task FindAndReplace(string inputFolderPath, string wordsToBeReplaced, string wordsToReplace)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _captionSearchPattern);
+
+            foreach (string file in files)
+            {
+                string readCaption = await File.ReadAllTextAsync(file);
+                string processedCaption = ProcessSearchAndReplace(readCaption, wordsToBeReplaced, wordsToReplace);
+                await File.WriteAllTextAsync(file, processedCaption);
+            }
+        }
+
+        /// <summary>
+        /// Performs search and replace operations on captions within files asynchronously, with progress tracking.
+        /// </summary>
+        /// <param name="inputFolderPath">The folder path where the caption files are located.</param>
+        /// <param name="wordsToBeReplaced">The words to be replaced in the captions.</param>
+        /// <param name="wordsToReplace">The replacement words for the search operation.</param>
+        /// <param name="progress">The progress object to update progress of processing.</param>
+        public async Task FindAndReplace(string inputFolderPath, string wordsToBeReplaced, string wordsToReplace, Progress progress)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _captionSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
+            {
+                string readCaption = await File.ReadAllTextAsync(file);
+                string processedCaption = ProcessSearchAndReplace(readCaption, wordsToBeReplaced, wordsToReplace);
+                await File.WriteAllTextAsync(file, processedCaption);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
         /// Processes the replacement of tags in all text files within the specified input folder path with the specified tags to replace and tags to be replaced.
         /// </summary>
         /// <param name="inputFolderPath">The input folder path containing the text files to be processed.</param>
         /// <param name="tagsToReplace">The comma-separated list of tags to replace.</param>
         /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToReplace, string tagsToBeReplaced)
+        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToBeReplaced, string tagsToReplace)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
             foreach (var file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
-                string processedTags = ReplaceListOfTags(readTags, tagsToReplace, tagsToBeReplaced);
+                string processedTags = ReplaceListOfTags(readTags, tagsToBeReplaced, tagsToReplace);
                 await File.WriteAllTextAsync(file, processedTags);
             }
         }
@@ -83,7 +124,7 @@ namespace SmartData.Lib.Services
         /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
         /// <param name="progress">The Progress object used to track the progress of the operation.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToReplace, string tagsToBeReplaced, Progress progress)
+        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToBeReplaced, string tagsToReplace, Progress progress)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
@@ -92,7 +133,7 @@ namespace SmartData.Lib.Services
             foreach (var file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
-                string processedTags = ReplaceListOfTags(readTags, tagsToReplace, tagsToBeReplaced);
+                string processedTags = ReplaceListOfTags(readTags, tagsToBeReplaced, tagsToReplace);
                 await File.WriteAllTextAsync(file, processedTags);
                 progress.UpdateProgress();
             }
@@ -437,6 +478,39 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Processes search and replace operations on the provided captions.
+        /// </summary>
+        /// <param name="captions">The original caption content.</param>
+        /// <param name="wordsToBeReplaced">The words to be replaced.</param>
+        /// <param name="wordsToReplace">The replacement words.</param>
+        /// <returns>The caption content after search and replace operations.</returns>
+        private static string ProcessSearchAndReplace(string captions, string wordsToBeReplaced, string wordsToReplace)
+        {
+            string[] wordsToBeReplacedSplit = wordsToBeReplaced.Replace(", ", ",").Split(",");
+            string[] wordsToReplaceSplit = wordsToReplace.Replace(", ", ",").Split(",");
+
+            if (wordsToReplaceSplit.Length != wordsToBeReplacedSplit.Length)
+            {
+                throw new ArgumentException("Amount must be the same!");
+            }
+
+            string[] captionsSplit = captions.Replace(", ", ",").Split(",");
+
+            for (int i = 0; i < captionsSplit.Length; i++)
+            {
+                for (int j = 0; j < wordsToBeReplacedSplit.Length; j++)
+                {
+                    if (!captionsSplit[i].Contains(wordsToReplaceSplit[j]))
+                    {
+                        captionsSplit[i] = Regex.Replace(captionsSplit[i], $@"\b{Regex.Escape(wordsToBeReplacedSplit[j])}\b", wordsToReplaceSplit[j]);
+                    }
+                }
+            }
+
+            return string.Join(", ", captionsSplit);
+        }
+
+        /// <summary>
         /// This method takes a list of tags and processes them based on user input and predictions from a machine learning (ML) model. It first adds the user-input tags to the result list, then adds the tags that should be emphasized (brought to the front of the list), and finally adds the tags predicted by the ML model. The method also removes any unwanted tags. The processed tags are returned as a comma-separated string.
         /// </summary>
         /// <param name="predictedTags">An IEnumerable of predicted tags from the ML model.</param>
@@ -504,16 +578,16 @@ namespace SmartData.Lib.Services
         /// Replaces a list of tags in a string with another list of tags.
         /// </summary>
         /// <param name="tags">The original string containing the tags.</param>
-        /// <param name="tagsToReplace">The comma-separated list of tags to be replaced.</param>
-        /// <param name="tagsToBeReplaced">The comma-separated list of replacement tags.</param>
+        /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
+        /// <param name="tagsToReplace">The comma-separated list of replacement tags.</param>
         /// <returns>The modified string with the tags replaced.</returns>
         /// <exception cref="ArgumentException">Thrown when the number of tags to replace is not equal to the number of replacement tags.</exception>
-        private static string ReplaceListOfTags(string tags, string tagsToReplace, string tagsToBeReplaced)
+        private static string ReplaceListOfTags(string tags, string tagsToBeReplaced, string tagsToReplace)
         {
             List<string> tagsResult = new List<string>();
 
-            string[] tagsToReplaceSplit = tagsToReplace.Replace(", ", ",").Split(",");
             string[] tagsToBeReplacedSplit = tagsToBeReplaced.Replace(", ", ",").Split(",");
+            string[] tagsToReplaceSplit = tagsToReplace.Replace(", ", ",").Split(",");
 
             if (tagsToReplaceSplit.Length != tagsToBeReplacedSplit.Length)
             {
@@ -524,10 +598,10 @@ namespace SmartData.Lib.Services
 
             foreach (string tag in tagsSplit)
             {
-                if (tagsToReplaceSplit.Contains(tag))
+                if (tagsToBeReplacedSplit.Contains(tag))
                 {
-                    int index = Array.IndexOf(tagsToReplaceSplit, tag);
-                    tagsResult.Add(tagsToBeReplacedSplit[index]);
+                    int index = Array.IndexOf(tagsToBeReplacedSplit, tag);
+                    tagsResult.Add(tagsToReplaceSplit[index]);
                 }
                 else
                 {
