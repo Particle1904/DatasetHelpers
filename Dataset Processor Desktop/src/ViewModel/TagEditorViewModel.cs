@@ -115,6 +115,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        public string CurrentAndTotal
+        {
+            get => $"Current viewing: {SelectedItemIndex + 1}/{ImageFiles.Count}.";
+        }
+
         private bool _buttonEnabled;
         public bool ButtonEnabled
         {
@@ -168,7 +173,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _currentImageTags = value;
                 OnPropertyChanged(nameof(CurrentImageTags));
-
+                OnPropertyChanged(nameof(CurrentAndTotal));
                 string txtFile = Path.ChangeExtension(_imageFiles[_selectedItemIndex], CurrentType);
                 _fileManipulatorService.SaveTextForImage(txtFile, _currentImageTags);
             }
@@ -395,6 +400,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
                     SelectedItemIndex = 0;
+                    OnPropertyChanged(nameof(CurrentAndTotal));
                 }
             }
             catch

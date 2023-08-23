@@ -57,7 +57,11 @@
             <Label Grid.Column="1"
                    Text="{Binding TotalImageFiles}"
                    VerticalOptions="Center"
-                   HorizontalOptions="Center"/>            
+                   HorizontalOptions="Center"/>
+            <Label Grid.Column="2"
+                   Text="{Binding CurrentAndTotal}"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Center"/>
         </Grid>        
 
         <ScrollView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
