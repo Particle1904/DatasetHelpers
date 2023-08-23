@@ -223,15 +223,19 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 {
                     SelectedItemIndex = 0;
                     ImageFiles = searchResult;
+                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
                 }
                 else
                 {
                     _loggerService.LatestLogMessage = "No images found!";
                 }
             }
-            catch
+            catch (Exception exception)
             {
-                _loggerService.LatestLogMessage = "No image files were found in the directory.";
+                if (exception.GetType() == typeof(FileNotFoundException))
+                {
+                    _loggerService.LatestLogMessage = "No image files were found in the directory.";
+                }
             }
             finally
             {
