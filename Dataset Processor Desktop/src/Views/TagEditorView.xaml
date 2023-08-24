@@ -62,6 +62,10 @@
                    Text="{Binding CurrentAndTotal}"
                    VerticalOptions="Center"
                    HorizontalOptions="Center"/>
+            <HorizontalStackLayout Grid.Column="3" Grid.ColumnSpan="2">
+                <CheckBox IsChecked="{Binding IsExactFilter}"/>
+                <Label Text="Perform only exact matches when filtering?"/>
+            </HorizontalStackLayout>            
         </Grid>        
 
         <ScrollView Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 

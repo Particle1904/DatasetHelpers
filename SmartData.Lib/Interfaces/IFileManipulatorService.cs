@@ -12,7 +12,7 @@ namespace SmartData.Lib.Interfaces
         public void CreateFolderIfNotExist(string folderName);
         public Task BackupFilesAsync(string inputPath, string backupPath);
         public List<string> GetImageFiles(string inputPath);
-        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter);
+        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, bool exactMatchesOnly);
         public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, Progress progress);
         public string GetTextFromFile(string imageFilePath, string txtFileExtension);
         public void SaveTextForImage(string filePath, string textToSave);

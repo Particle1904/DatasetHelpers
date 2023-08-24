@@ -1,6 +1,7 @@
 ﻿using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Models;
 
 using System.Text.RegularExpressions;
 
@@ -216,17 +217,28 @@ namespace SmartData.Lib.Services
         /// <param name="wordsToFilter">A comma-separated string of words to filter the image files by.</param>
         /// <returns>A sorted list of image files whose captions contain any of the specified words.</returns>
         /// <exception cref="ArgumentException">Thrown when the provided txtFileExtension is not ".txt" or ".caption".</exception>
-        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter)
+        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, bool exactMatchesOnly)
         {
             if (!txtFileExtension.Equals(".txt") && !txtFileExtension.Equals(".caption"))
             {
                 throw new ArgumentException("File extension must be either .txt or .caption.");
             }
 
+            FilterSettings filterSettings = ParseFilterString(wordsToFilter);
             List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
 
             List<string> filteredImageFiles = new List<string>();
-            string[] wordsSplit = wordsToFilter.Replace(", ", ",").Split(",");
+            filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
+
+            List<string> unwantedImageFiles = new List<string>();
+            unwantedImageFiles = FilterImageFiles(txtFileExtension, filteredImageFiles, filterSettings.ExcludeTags, false);
+
+            return filteredImageFiles.Except(unwantedImageFiles).ToList();
+        }
+
+        private List<string> FilterImageFiles(string txtFileExtension, List<string> imageFiles, string[] wordsSplit, bool exactMatch)
+        {
+            List<string> filteredImageFiles = new List<string>();
 
             foreach (string image in imageFiles)
             {
@@ -235,11 +247,26 @@ namespace SmartData.Lib.Services
                     string caption = GetTextFromFile(image, txtFileExtension);
                     foreach (string tag in wordsSplit)
                     {
-                        string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
-                        if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                        if (exactMatch)
                         {
-                            filteredImageFiles.Add(image);
-                            break;
+                            string[] captionSplit = caption.Replace(", ", ",").Split(",");
+                            foreach (string keyword in captionSplit)
+                            {
+                                if (tag.Equals(keyword, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    filteredImageFiles.Add(image);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
+                            if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                            {
+                                filteredImageFiles.Add(image);
+                                break;
+                            }
                         }
                     }
                 }
@@ -249,7 +276,6 @@ namespace SmartData.Lib.Services
                 }
             }
 
-            filteredImageFiles.Sort((a, b) => string.Compare(a, b));
             return filteredImageFiles;
         }
 
@@ -440,6 +466,38 @@ namespace SmartData.Lib.Services
                 string targetFilePath = Path.Combine(targetDirectory, fileName);
                 await Task.Run(() => File.Copy(sourceFilePath, targetFilePath, true));
             }
+        }
+
+        /// <summary>
+        /// Parses a comma-separated string of tags to create a <see cref="TagFilterSettings"/> instance.
+        /// Tags can be included or excluded using a "-" prefix. Returns the settings with parsed tags.
+        /// </summary>
+        /// <param name="wordsToFilter">The comma-separated string of tags/keywords to parse.</param>
+        /// <returns>A <see cref="TagFilterSettings"/> instance containing parsed include and exclude tags.</returns>
+        private static FilterSettings ParseFilterString(string wordsToFilter)
+        {
+            string[] tagsSplit = wordsToFilter.Replace(", ", ",").Split(",");
+
+            List<string> includeTags = new List<string>();
+            List<string> excludeTags = new List<string>();
+
+            for (int i = 0; i < tagsSplit.Length; i++)
+            {
+                if (!tagsSplit[i].Contains("-"))
+                {
+                    includeTags.Add(tagsSplit[i]);
+                }
+                else
+                {
+                    excludeTags.Add(tagsSplit[i].Replace("-", ""));
+                }
+            }
+
+            return new FilterSettings()
+            {
+                IncludeTags = includeTags.ToArray(),
+                ExcludeTags = excludeTags.ToArray()
+            };
         }
     }
 }

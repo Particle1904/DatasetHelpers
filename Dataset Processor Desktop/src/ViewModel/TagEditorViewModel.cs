@@ -114,6 +114,16 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 OnPropertyChanged(nameof(WordsToFilter));
             }
         }
+        private bool _isExactFilter;
+        public bool IsExactFilter
+        {
+            get => _isExactFilter;
+            set
+            {
+                _isExactFilter = value;
+                OnPropertyChanged(nameof(IsExactFilter));
+            }
+        }
 
         public string CurrentAndTotal
         {
@@ -202,6 +212,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             FilterFilesCommand = new RelayCommand(async () => await FilterFilesAsync());
             ClearFilterCommand = new RelayCommand(ClearFilter);
             ButtonEnabled = true;
+            IsExactFilter = false;
 
             _editingTxt = true;
 
@@ -223,7 +234,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             try
             {
                 ButtonEnabled = false;
-                List<string> searchResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter));
+                List<string> searchResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter, IsExactFilter));
                 if (searchResult.Count > 0)
                 {
                     SelectedItemIndex = 0;
