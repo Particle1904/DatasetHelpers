@@ -1,5 +1,8 @@
 using Dataset_Processor_Desktop.src.ViewModel;
 
+using SharpHook;
+using SharpHook.Native;
+
 using SmartData.Lib.Interfaces;
 
 using System.Diagnostics;
@@ -7,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace Dataset_Processor_Desktop.src.Views;
 
-public partial class TagEditorView : ContentView
+public partial class TagEditorView : ContentView, IDisposable
 {
     private readonly IFileManipulatorService _fileManipulatorService;
     private readonly IImageProcessorService _imageProcessorService;
@@ -21,7 +24,11 @@ public partial class TagEditorView : ContentView
     private FormattedString _labelFormattedString;
 
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    private TimeSpan _waitTimeInMilliseconds = TimeSpan.FromSeconds(3);
+    private TimeSpan _highlightUpdateDelay = TimeSpan.FromSeconds(3);
+
+    SimpleGlobalHook _keyboardHook;
+    Stopwatch _keyboardTimer;
+    private TimeSpan _keyboardEventsDelay = TimeSpan.FromSeconds(0.5);
 
     public TagEditorView(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
     {
@@ -36,6 +43,13 @@ public partial class TagEditorView : ContentView
         EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnTextChanged(sender, args));
         EditorTags.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnTextChanged(sender, args));
 
+        _keyboardTimer = new Stopwatch();
+        _keyboardTimer.Start();
+
+        _keyboardHook = new SimpleGlobalHook(true);
+        _keyboardHook.KeyPressed += OnKeyDown;
+        _keyboardHook.RunAsync();
+
         _labelFormattedString = new FormattedString();
     }
 
@@ -47,7 +61,7 @@ public partial class TagEditorView : ContentView
 
         try
         {
-            await Task.Delay(_waitTimeInMilliseconds, _cancellationTokenSource.Token);
+            await Task.Delay(_highlightUpdateDelay, _cancellationTokenSource.Token);
             if (!_cancellationTokenSource.IsCancellationRequested)
             {
                 action.Invoke();
@@ -121,5 +135,47 @@ public partial class TagEditorView : ContentView
         }
 
         return formattedString;
+    }
+
+    private void OnKeyDown(object sender, KeyboardHookEventArgs e)
+    {
+        if (_keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds)
+        {
+            return;
+        }
+
+        if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF1)
+        {
+            _viewModel.GoToPreviousItem();
+        }
+        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF2)
+        {
+            _viewModel.GoToNextItem();
+        }
+        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF3)
+        {
+            _viewModel.GoToPreviousTenItems();
+        }
+        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF4)
+        {
+            _viewModel.GoToNextTenItems();
+        }
+        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF5)
+        {
+            _viewModel.GoToPreviousOneHundredItems();
+        }
+        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF6)
+        {
+            _viewModel.GoToNextOneHundredItems();
+        }
+
+        _keyboardTimer.Restart();
+    }
+
+    public void Dispose()
+    {
+        _keyboardHook.KeyPressed -= OnKeyDown;
+        _keyboardHook?.Dispose();
+        _keyboardHook = null;
     }
 }
