@@ -28,7 +28,7 @@ public partial class TagEditorView : ContentView, IDisposable
 
     SimpleGlobalHook _keyboardHook;
     Stopwatch _keyboardTimer;
-    private TimeSpan _keyboardEventsDelay = TimeSpan.FromSeconds(0.5);
+    private TimeSpan _keyboardEventsDelay = TimeSpan.FromSeconds(0.1);
 
     public TagEditorView(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
     {
@@ -144,32 +144,35 @@ public partial class TagEditorView : ContentView, IDisposable
             return;
         }
 
-        if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF1)
+        MainThread.InvokeOnMainThreadAsync(() =>
         {
-            _viewModel.GoToPreviousItem();
-        }
-        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF2)
-        {
-            _viewModel.GoToNextItem();
-        }
-        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF3)
-        {
-            _viewModel.GoToPreviousTenItems();
-        }
-        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF4)
-        {
-            _viewModel.GoToNextTenItems();
-        }
-        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF5)
-        {
-            _viewModel.GoToPreviousOneHundredItems();
-        }
-        else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF6)
-        {
-            _viewModel.GoToNextOneHundredItems();
-        }
+            if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF1)
+            {
+                _viewModel.GoToPreviousItem();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF2)
+            {
+                _viewModel.GoToNextItem();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF3)
+            {
+                _viewModel.GoToPreviousTenItems();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF4)
+            {
+                _viewModel.GoToNextTenItems();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF5)
+            {
+                _viewModel.GoToPreviousOneHundredItems();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF6)
+            {
+                _viewModel.GoToNextOneHundredItems();
+            }
 
-        _keyboardTimer.Restart();
+            _keyboardTimer.Restart();
+        });
     }
 
     public void Dispose()
