@@ -236,6 +236,14 @@ namespace SmartData.Lib.Services
             return filteredImageFiles.Except(unwantedImageFiles).ToList();
         }
 
+        /// <summary>
+        /// Filters a list of image files based on specified criteria.
+        /// </summary>
+        /// <param name="txtFileExtension">The file extension to filter image files by (e.g., ".txt", ".caption").</param>
+        /// <param name="imageFiles">The list of image file paths to be filtered.</param>
+        /// <param name="wordsSplit">An array of tags or keywords to filter by.</param>
+        /// <param name="exactMatch">A flag indicating whether to perform an exact tag match or partial match.</param>
+        /// <returns>A list of filtered image file paths that match the specified criteria.</returns>
         private List<string> FilterImageFiles(string txtFileExtension, List<string> imageFiles, string[] wordsSplit, bool exactMatch)
         {
             List<string> filteredImageFiles = new List<string>();

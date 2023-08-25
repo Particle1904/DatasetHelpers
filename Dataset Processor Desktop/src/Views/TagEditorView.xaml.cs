@@ -48,6 +48,7 @@ public partial class TagEditorView : ContentView, IDisposable
 
         _keyboardHook = new SimpleGlobalHook(true);
         _keyboardHook.KeyPressed += OnKeyDown;
+        _keyboardHook.MousePressed += OnMouseButtonDown;
         _keyboardHook.RunAsync();
 
         _labelFormattedString = new FormattedString();
@@ -169,6 +170,36 @@ public partial class TagEditorView : ContentView, IDisposable
             else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF6)
             {
                 _viewModel.GoToNextOneHundredItems();
+            }
+            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF8)
+            {
+                Task.Run(() => _viewModel.BlurImageAsync());
+            }
+
+            _keyboardTimer.Restart();
+        });
+    }
+
+    private void OnMouseButtonDown(object sender, MouseHookEventArgs e)
+    {
+        if (_keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds)
+        {
+            return;
+        }
+
+        MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            if (e.RawEvent.Mouse.Button == MouseButton.Button4)
+            {
+                _viewModel.GoToPreviousItem();
+            }
+            else if (e.RawEvent.Mouse.Button == MouseButton.Button5)
+            {
+                _viewModel.GoToNextItem();
+            }
+            else if (e.RawEvent.Mouse.Button == MouseButton.Button3)
+            {
+                Task.Run(() => _viewModel.BlurImageAsync());
             }
 
             _keyboardTimer.Restart();
