@@ -79,7 +79,6 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
             foreach (string file in files)
             {
                 await PostProcessTags(outputPath, weightedCaptions, file);
@@ -107,6 +106,52 @@ namespace SmartData.Lib.Services
             foreach (string file in files)
             {
                 await PostProcessTags(outputPath, weightedCaptions, file);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously generates tags for images in the specified input path using a pre-trained model and appends the results to existing tag files in the specified output path.
+        /// </summary>
+        /// <param name="inputPath">The path to the folder containing the input images.</param>
+        /// <param name="outputPath">The path to the folder where the output tag files will be saved.</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, bool weightedCaptions = false)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
+            }
+
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            foreach (string file in files)
+            {
+                await PostProcessTagsAndAppendToFile(outputPath, weightedCaptions, file);
+            }
+        }
+
+        /// <summary>
+        /// Generates tags for the image files in the specified input folder, appends the results to text files in the specified output folder,
+        /// and updates the progress object with the status of the operation.
+        /// </summary>
+        /// <param name="inputPath">The path to the input folder containing image files.</param>
+        /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
+        /// <param name="progress">The progress object to update with the status of the operation.</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
+            }
+
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            progress.TotalFiles = files.Length;
+            foreach (string file in files)
+            {
+                await PostProcessTagsAndAppendToFile(outputPath, weightedCaptions, file);
                 progress.UpdateProgress();
             }
         }
@@ -177,6 +222,46 @@ namespace SmartData.Lib.Services
             File.Move(tempFile, finalFile);
 
             await File.WriteAllTextAsync(resultPath, redundantRemoved);
+        }
+
+        /// <summary>
+        /// Processes a list of tags from a file and appends a summarized version of the tags to an existing caption.
+        /// If the existing caption file doesn't exist, generates the summarized tags from scratch.
+        /// The combined result is then saved to the specified output path.
+        /// </summary>
+        /// <param name="outputPath">The output path where the combined result will be saved.</param>
+        /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
+        /// <param name="file">The input file containing the existing caption and tags to be processed.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task PostProcessTagsAndAppendToFile(string outputPath, bool weightedCaptions, string file)
+        {
+            string txtFile = Path.ChangeExtension(file, ".txt");
+
+            if (File.Exists(txtFile))
+            {
+                string existingCaption = await File.ReadAllTextAsync(txtFile);
+
+                List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
+                string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
+
+                string existingPlusGenerated = $"{existingCaption}, {commaSeparated}";
+
+                string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(existingPlusGenerated);
+
+                string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
+
+                string tempFile = Path.Combine(outputPath, $"temp_{Path.GetFileName(file)}");
+                File.Move(file, tempFile);
+
+                string finalFile = tempFile.Replace("temp_", "");
+                File.Move(tempFile, finalFile);
+
+                await File.WriteAllTextAsync(resultPath, redundantRemoved);
+            }
+            else
+            {
+                await PostProcessTags(outputPath, weightedCaptions, file);
+            }
         }
 
         /// <summary>

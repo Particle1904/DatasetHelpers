@@ -79,6 +79,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _appendCaptionsToFile;
+        public bool AppendCaptionsToFile
+        {
+            get => _appendCaptionsToFile;
+            set
+            {
+                _appendCaptionsToFile = value;
+                OnPropertyChanged(nameof(AppendCaptionsToFile));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -153,7 +164,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                if (AppendCaptionsToFile)
+                {
+                    await _autoTaggerService.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                }
+                else
+                {
+                    await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                }
             }
             catch (Exception exception)
             {
