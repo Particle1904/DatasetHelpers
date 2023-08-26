@@ -73,7 +73,7 @@
                     VerticalOptions="FillAndExpand"
                     HeightRequest="50"
                     VerticalScrollBarVisibility="Default">
-            <Editor Placeholder="This is where you can add tags to filter out. For example: 'tag1, tag2'."
+            <Editor Placeholder="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."
                     VerticalOptions="FillAndExpand"
                     HorizontalOptions="FillAndExpand"
                     AutoSize="TextChanges"

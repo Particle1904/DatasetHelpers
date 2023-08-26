@@ -227,13 +227,59 @@ namespace SmartData.Lib.Services
             FilterSettings filterSettings = ParseFilterString(wordsToFilter);
             List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
 
+            List<string> filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
+            List<string> filteredImageFilesByAnd = FilterImageFilesByMultiple(txtFileExtension, imageFiles, filterSettings.AndTags);
+
+            List<string> resultUnion = filteredImageFiles.Union(filteredImageFilesByAnd).ToList();
+
+            List<string> unwantedImageFiles = FilterImageFiles(txtFileExtension, resultUnion, filterSettings.ExcludeTags, true);
+
+            return resultUnion.Except(unwantedImageFiles).ToList();
+        }
+
+        /// <summary>
+        /// Filters a list of image files based on multiple tags, ensuring that all tags in a tag group are present in the image's caption.
+        /// </summary>
+        /// <param name="txtFileExtension">The file extension for the text files containing captions.</param>
+        /// <param name="imageFiles">The list of image files to filter.</param>
+        /// <param name="wordsSplit">An array of tags to filter the image files by, where compound tags are specified using "AND".</param>
+        /// <returns>A list of filtered image files that match the specified tag conditions.</returns>
+        private List<string> FilterImageFilesByMultiple(string txtFileExtension, List<string> imageFiles, string[] wordsSplit)
+        {
             List<string> filteredImageFiles = new List<string>();
-            filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
 
-            List<string> unwantedImageFiles = new List<string>();
-            unwantedImageFiles = FilterImageFiles(txtFileExtension, filteredImageFiles, filterSettings.ExcludeTags, false);
+            foreach (string image in imageFiles)
+            {
+                try
+                {
+                    string caption = GetTextFromFile(image, txtFileExtension);
+                    foreach (string tag in wordsSplit)
+                    {
+                        string[] andSplit = tag.Replace(" AND ", "AND").Split("AND");
+                        if (andSplit.Length <= 1)
+                        {
+                            throw new ArgumentException($"AND syntax needs 2 or more tags separated by AND. Example: \"tag1 and tag2\".");
+                        }
 
-            return filteredImageFiles.Except(unwantedImageFiles).ToList();
+                        string[] captionSplit = caption.Replace(", ", ",").Split(",");
+                        if (andSplit.Intersect(captionSplit).Count() == andSplit.Length)
+                        {
+                            filteredImageFiles.Add(image);
+                            break;
+                        }
+                    }
+                }
+                catch (FileNotFoundException)
+                {
+                    continue;
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+            }
+
+            return filteredImageFiles;
         }
 
         /// <summary>
@@ -488,23 +534,30 @@ namespace SmartData.Lib.Services
 
             List<string> includeTags = new List<string>();
             List<string> excludeTags = new List<string>();
+            List<string> andTags = new List<string>();
 
             for (int i = 0; i < tagsSplit.Length; i++)
             {
-                if (!tagsSplit[i].Contains("-"))
+                if (tagsSplit[i].Contains("!"))
                 {
-                    includeTags.Add(tagsSplit[i]);
+                    excludeTags.Add(tagsSplit[i].Replace("!", ""));
+
+                }
+                else if (tagsSplit[i].Contains("AND"))
+                {
+                    andTags.Add(tagsSplit[i]);
                 }
                 else
                 {
-                    excludeTags.Add(tagsSplit[i].Replace("-", ""));
+                    includeTags.Add(tagsSplit[i]);
                 }
             }
 
             return new FilterSettings()
             {
                 IncludeTags = includeTags.ToArray(),
-                ExcludeTags = excludeTags.ToArray()
+                ExcludeTags = excludeTags.ToArray(),
+                AndTags = andTags.ToArray()
             };
         }
     }
