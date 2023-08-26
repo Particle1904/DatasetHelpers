@@ -269,19 +269,23 @@ namespace SmartData.Lib.Services
 
             bool hasBreastSizeTag = false;
             bool hasMaleGenitaliaSizeTag = false;
+            bool hasMaleGenitaliaStateTag = false;
             bool hasHairLengthTag = false;
             bool hasHairColorTag = false;
             bool hasEyesColorTag = false;
             bool hasSkinColorTag = false;
+            bool hasClothingAsideTag = false;
 
             foreach (string tag in tagsSplit)
             {
                 bool isBreastSizeTag = IsBreastSize(tag);
                 bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
+                bool isMaleGenitaliaStateTag = IsMaleGenitaliaState(tag);
                 bool isHairLengthTag = IsHairLength(tag);
                 bool isHairColor = IsHairColor(tag);
                 bool isEyesColor = IsEyesColor(tag);
                 bool isSkinColor = IsSkinColor(tag);
+                bool isClothingAsideTag = IsClothingAside(tag);
                 bool isRedundant = false;
 
                 foreach (string processedTag in cleanedTags)
@@ -309,6 +313,11 @@ namespace SmartData.Lib.Services
                 {
                     cleanedTags.Add(tag);
                     hasMaleGenitaliaSizeTag = true;
+                }
+                else if (isMaleGenitaliaStateTag && !hasMaleGenitaliaStateTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasMaleGenitaliaStateTag = true;
                 }
                 else if (isHairLengthTag && !hasHairLengthTag)
                 {
@@ -341,14 +350,21 @@ namespace SmartData.Lib.Services
                     cleanedTags.Add(tag);
                     hasSkinColorTag = true;
                 }
-                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isHairLengthTag && !isHairColor && !isEyesColor && !isSkinColor && !isRedundant)
+                else if (isClothingAsideTag && !hasClothingAsideTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasClothingAsideTag = true;
+                }
+                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isMaleGenitaliaStateTag && !isHairLengthTag &&
+                         !isHairColor && !isEyesColor && !isSkinColor && !isClothingAsideTag && !isRedundant)
                 {
                     cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
                 }
             }
 
-            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo", "general" };
+            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo",
+                "general", "meme", "meme attire" };
             foreach (string tagToRemove in tagsToRemove)
             {
                 cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
@@ -429,6 +445,18 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Determines if the given tag represents a male genitalia state.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a male genitalia state, false otherwise.</returns>
+        private static bool IsMaleGenitaliaState(string tag)
+        {
+            string[] sizeKeywords = { "flaccid", "erection" };
+
+            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Determines if the given tag represents a hair color.
         /// </summary>
         /// <param name="tag">The tag to check.</param>
@@ -473,6 +501,20 @@ namespace SmartData.Lib.Services
         {
             string[] colorKeywords = { "black skin", "blue skin", "pink skin", "purple skin", "white skin", "grey skin",
                 "gray skin", "red skin", "green skin", "orange skin", "yellow skin" };
+
+            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a piece of clothing to the side.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a piece of clothing to the side, false otherwise.</returns>
+        private static bool IsClothingAside(string tag)
+        {
+            string[] colorKeywords = { "clothing aside", "panties aside", "bikini bottom aside", "leotard aside",
+                "swimsuit aside", "buruma aside", "thong aside", "shorts aside", "fundoshi aside", "pelvic curtain aside",
+                "dress aside", "skirt aside", "apron aside", "bodysuit aside" };
 
             return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }

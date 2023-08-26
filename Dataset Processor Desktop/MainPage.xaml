@@ -50,13 +50,13 @@
                     VerticalOptions="Center"
                     Command="{Binding NavigateToTagGenerationCommand}"/>
             <Button Grid.Row="5"
-                    Text="Process Tags"
-                    VerticalOptions="Center"
-                    Command="{Binding NavigateToTagProcessingCommand}"/>
-            <Button Grid.Row="6"
                     Text="Process Captions"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToCaptionProcessingCommand}"/>
+            <Button Grid.Row="6"
+                    Text="Process Tags"
+                    VerticalOptions="Center"
+                    Command="{Binding NavigateToTagProcessingCommand}"/>            
             <Button Grid.Row="7"
                     Text="Tag/Caption Editor"
                     VerticalOptions="Center"
