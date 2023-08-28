@@ -140,7 +140,7 @@ public partial class TagEditorView : ContentView, IDisposable
 
     private void OnKeyDown(object sender, KeyboardHookEventArgs e)
     {
-        if (_keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds)
+        if (CanProcessHook())
         {
             return;
         }
@@ -182,7 +182,7 @@ public partial class TagEditorView : ContentView, IDisposable
 
     private void OnMouseButtonDown(object sender, MouseHookEventArgs e)
     {
-        if (_keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds)
+        if (CanProcessHook())
         {
             return;
         }
@@ -204,6 +204,11 @@ public partial class TagEditorView : ContentView, IDisposable
 
             _keyboardTimer.Restart();
         });
+    }
+
+    private bool CanProcessHook()
+    {
+        return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds;
     }
 
     public void Dispose()

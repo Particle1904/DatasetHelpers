@@ -244,7 +244,7 @@ namespace SmartData.Lib.Services
                 List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
                 string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
 
-                string existingPlusGenerated = $"{existingCaption}, {commaSeparated}";
+                string existingPlusGenerated = $"{existingCaption.Replace("_", " ")}, {commaSeparated}";
 
                 string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(existingPlusGenerated);
 
