@@ -1,4 +1,5 @@
-﻿using Dataset_Processor_Desktop.src.Utilities;
+﻿using Dataset_Processor_Desktop.src.Enums;
+using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.Views;
 
 using SmartData.Lib.Interfaces;
@@ -19,17 +20,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         #region Definition of App Views.
         private View _dynamicContentView;
 
-        private View _welcomePage;
-        private View _datasetSortView;
-        private View _contentAwareCropView;
-        private View _resizeImagesView;
-        private View _tagGenerationView;
-        private View _captionProcessingView;
-        private View _tagProcessingView;
-        private View _tagEditorView;
-        private View _extractSubsetView;
-        private View _metadataView;
-        private View _settingsView;
+        private Dictionary<AppViews, View> views;
+
         #endregion
 
         public string LatestLogMessage
@@ -70,19 +62,34 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
-            _welcomePage = new WelcomeView();
-            _dynamicContentView = _welcomePage;
-            NavigateToWelcomePageCommand = new RelayCommand(NavigateToWelcomeView);
-            NavigateToDatasetSortCommand = new RelayCommand(NavigateToDatasetSortView);
-            NavigateToContentAwareCropCommand = new RelayCommand(NavigateToContentAwareCropView);
-            NavigateToResizeImagesCommand = new RelayCommand(NavigateToResizeImagesView);
-            NavigateToTagGenerationCommand = new RelayCommand(NavigateToTagGenerationView);
-            NavigateToCaptionProcessingCommand = new RelayCommand(NavigateToCaptionProcessingView);
-            NavigateToTagProcessingCommand = new RelayCommand(NavigateToTagProcessingView);
+            views = new Dictionary<AppViews, View>()
+            {
+                { AppViews.Welcome, new WelcomeView() },
+                { AppViews.DatasetSort, new DatasetSortView(_fileManipulatorService) },
+                { AppViews.ContentAwareCrop, new ContentAwareCroppingView(_fileManipulatorService, _contentAwareCropService) },
+                { AppViews.ResizeImages, new ResizeImagesView(_fileManipulatorService, _imageProcessorService) },
+                { AppViews.TagGeneration, new TagGenerationView(_fileManipulatorService, _autoTaggerService) },
+                { AppViews.CaptionProcessing, new CaptionProcessingView(_tagProcessorService, _fileManipulatorService) },
+                { AppViews.TagProcessing, new TagProcessingView(_tagProcessorService, _fileManipulatorService) },
+                { AppViews.TagEditor, new TagEditorView(_fileManipulatorService, _imageProcessorService, _inputHooksService) },
+                { AppViews.ExtractSubset, new ExtractSubsetView(_fileManipulatorService) },
+                { AppViews.Metadata, new MetadataView(_imageProcessorService, _autoTaggerService) },
+                { AppViews.Settings, new SettingsView() }
+            };
+
+            _dynamicContentView = views[AppViews.Welcome];
+
+            NavigateToWelcomePageCommand = new RelayCommand(() => NavigateToPage(AppViews.Welcome));
+            NavigateToDatasetSortCommand = new RelayCommand(() => NavigateToPage(AppViews.DatasetSort));
+            NavigateToContentAwareCropCommand = new RelayCommand(() => NavigateToPage(AppViews.ContentAwareCrop));
+            NavigateToResizeImagesCommand = new RelayCommand(() => NavigateToPage(AppViews.ResizeImages));
+            NavigateToTagGenerationCommand = new RelayCommand(() => NavigateToPage(AppViews.TagGeneration));
+            NavigateToCaptionProcessingCommand = new RelayCommand(() => NavigateToPage(AppViews.CaptionProcessing));
+            NavigateToTagProcessingCommand = new RelayCommand(() => NavigateToPage(AppViews.TagProcessing));
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
-            NavigateToExtractSubsetCommand = new RelayCommand(NavigateToExtractSubsetView);
-            NavigateToMetadataCommand = new RelayCommand(NavigateToMetadataView);
-            NavigateToSettingsCommand = new RelayCommand(NavigateToSettingsView);
+            NavigateToExtractSubsetCommand = new RelayCommand(() => NavigateToPage(AppViews.ExtractSubset));
+            NavigateToMetadataCommand = new RelayCommand(() => NavigateToPage(AppViews.Metadata));
+            NavigateToSettingsCommand = new RelayCommand(() => NavigateToPage(AppViews.Settings));
 
             try
             {
@@ -93,108 +100,22 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _loggerService.LatestLogMessage = "An error occured while trying to load the .cfg file. A brand new one will be generated instead.";
                 _loggerService.SaveExceptionStackTrace(exception);
             }
+
+            _inputHooksService.IsActive = true;
         }
 
-        public void NavigateToWelcomeView()
+        public void NavigateToPage(AppViews view)
         {
-            if (_welcomePage == null)
-            {
-                _welcomePage = new WelcomeView();
-            }
-            DynamicContentView = _welcomePage;
-        }
-
-        public void NavigateToDatasetSortView()
-        {
-            if (_datasetSortView == null)
-            {
-                _datasetSortView = new DatasetSortView(_fileManipulatorService);
-            }
-            DynamicContentView = _datasetSortView;
-        }
-
-        public void NavigateToContentAwareCropView()
-        {
-            if (_contentAwareCropView == null)
-            {
-                _contentAwareCropView = new ContentAwareCroppingView(_fileManipulatorService, _contentAwareCropService);
-            }
-            DynamicContentView = _contentAwareCropView;
-        }
-
-        public void NavigateToResizeImagesView()
-        {
-            if (_resizeImagesView == null)
-            {
-                _resizeImagesView = new ResizeImagesView(_fileManipulatorService, _imageProcessorService);
-            }
-            DynamicContentView = _resizeImagesView;
-        }
-
-        public void NavigateToTagGenerationView()
-        {
-            if (_tagGenerationView == null)
-            {
-                _tagGenerationView = new TagGenerationView(_fileManipulatorService, _autoTaggerService);
-            }
-            DynamicContentView = _tagGenerationView;
-        }
-
-        public void NavigateToCaptionProcessingView()
-        {
-            if (_captionProcessingView == null)
-            {
-                _captionProcessingView = new CaptionProcessingView(_tagProcessorService, _fileManipulatorService);
-            }
-            DynamicContentView = _captionProcessingView;
-        }
-
-        public void NavigateToTagProcessingView()
-        {
-            if (_tagProcessingView == null)
-            {
-                _tagProcessingView = new TagProcessingView(_tagProcessorService, _fileManipulatorService);
-            }
-            DynamicContentView = _tagProcessingView;
+            SetAllViewsAsInactive();
+            SetViewAsActive(view);
+            DynamicContentView = views[view];
         }
 
         public void NavigateToTagEditorView()
         {
-            if (_tagEditorView == null)
-            {
-                _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService, _inputHooksService);
-            }
-            TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
+            TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)views[AppViews.TagEditor].BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();
-
-            DynamicContentView = _tagEditorView;
-        }
-
-        public void NavigateToExtractSubsetView()
-        {
-            if (_extractSubsetView == null)
-            {
-                _extractSubsetView = new ExtractSubsetView(_fileManipulatorService);
-            }
-            DynamicContentView = _extractSubsetView;
-        }
-
-        public void NavigateToMetadataView()
-        {
-            if (_metadataView == null)
-            {
-                _metadataView = new MetadataView(_imageProcessorService, _autoTaggerService);
-            }
-            DynamicContentView = _metadataView;
-        }
-
-        public void NavigateToSettingsView()
-        {
-            if (_settingsView == null)
-            {
-                _settingsView = new SettingsView();
-            }
-            DynamicContentView = _settingsView;
+            NavigateToPage(AppViews.TagEditor);
         }
 
         private void OnLoggerServicePropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -202,6 +123,30 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             if (args.PropertyName == nameof(ILoggerService.LatestLogMessage))
             {
                 OnPropertyChanged(nameof(LatestLogMessage));
+            }
+        }
+
+        private void SetAllViewsAsInactive()
+        {
+            foreach (var item in views)
+            {
+                BaseViewModel bindingContext = (BaseViewModel)item.Value.BindingContext;
+                if (bindingContext != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"{item.Value.GetType()}");
+                    System.Diagnostics.Debug.WriteLine($"{bindingContext.IsActive} | ");
+                    bindingContext.IsActive = false;
+                    System.Diagnostics.Debug.Write($"{bindingContext.IsActive}{Environment.NewLine}.");
+                }
+            }
+        }
+
+        private void SetViewAsActive(AppViews view)
+        {
+            BaseViewModel bindingContext = (BaseViewModel)views[view].BindingContext;
+            if (bindingContext != null)
+            {
+                bindingContext.IsActive = true;
             }
         }
     }

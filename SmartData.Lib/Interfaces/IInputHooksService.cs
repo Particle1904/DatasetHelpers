@@ -13,5 +13,7 @@
         public event EventHandler MouseButton3;
         public event EventHandler MouseButton4;
         public event EventHandler MouseButton5;
+
+        public bool IsActive { get; set; }
     }
 }

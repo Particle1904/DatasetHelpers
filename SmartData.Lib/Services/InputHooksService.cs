@@ -25,6 +25,8 @@ namespace SmartData.Lib.Services
         public event EventHandler MouseButton4;
         public event EventHandler MouseButton5;
 
+        public bool IsActive { get; set; } = false;
+
         public InputHooksService()
         {
             _keyboardTimer = new Stopwatch();
@@ -150,7 +152,7 @@ namespace SmartData.Lib.Services
 
         private bool CanProcessHook()
         {
-            return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds;
+            return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds && IsActive;
         }
 
         public void Dispose()

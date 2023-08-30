@@ -41,7 +41,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _selectedItemIndex = value;
                 OnPropertyChanged(nameof(SelectedItemIndex));
-                if (_imageFiles.Count > 0)
+                if (_imageFiles?.Count > 0)
                 {
                     SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
@@ -128,7 +128,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public string CurrentAndTotal
         {
-            get => $"Current viewing: {SelectedItemIndex + 1}/{ImageFiles.Count}.";
+            get => $"Current viewing: {SelectedItemIndex + 1}/{ImageFiles?.Count}.";
         }
 
         private bool _buttonEnabled;
@@ -198,8 +198,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             InputFolderPath = _configsService.Configurations.CombinedOutputFolder;
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
-
-            ImageFiles = _fileManipulatorService.GetImageFiles(InputFolderPath);
 
             PreviousItemCommand = new RelayCommand(GoToPreviousItem);
             PreviousTenItemsCommand = new RelayCommand(GoToPreviousTenItems);
@@ -443,52 +441,82 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private void OnF1ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+            }
         }
 
         private void OnF2ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToNextItem);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToNextItem);
+            }
         }
 
         private void OnF3ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToPreviousTenItems);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToPreviousTenItems);
+            }
         }
 
         private void OnF4ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToNextTenItems);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToNextTenItems);
+            }
         }
 
         private void OnF5ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToPreviousOneHundredItems);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToPreviousOneHundredItems);
+            }
         }
 
         private void OnF6ButtonDown(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToNextOneHundredItems);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToNextOneHundredItems);
+            }
         }
 
         private void OnF8ButtonDown(object sender, EventArgs e)
         {
-            Task.Run(BlurImageAsync);
+            if (IsActive)
+            {
+                Task.Run(BlurImageAsync);
+            }
         }
 
         private void OnMouseButton3Down(object sender, EventArgs e)
         {
-            Task.Run(BlurImageAsync);
+            if (IsActive)
+            {
+                Task.Run(BlurImageAsync);
+            }
         }
 
         private void OnMouseButton4Down(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+            }
         }
 
         private void OnMouseButton5Down(object sender, EventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(GoToNextItem);
+            if (IsActive)
+            {
+                MainThread.BeginInvokeOnMainThread(GoToNextItem);
+            }
         }
     }
 }
