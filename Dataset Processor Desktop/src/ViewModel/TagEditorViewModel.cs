@@ -241,7 +241,23 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _inputHooksService.MouseButton5 += OnMouseButton5Down;
         }
 
-        public async Task SelectInputFolderAsync()
+        public void UpdateCurrentSelectedTags()
+        {
+            if (SelectedImage != null)
+            {
+                try
+                {
+                    CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
+                }
+                catch
+                {
+                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
+                    CurrentImageTags = string.Empty;
+                }
+            }
+        }
+
+        private async Task SelectInputFolderAsync()
         {
             string result = await _folderPickerService.PickFolderAsync();
             if (!string.IsNullOrEmpty(result))
@@ -251,7 +267,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public async Task FilterFilesAsync()
+        private async Task FilterFilesAsync()
         {
             try
             {
@@ -285,7 +301,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public void ClearFilter()
+        private void ClearFilter()
         {
             if (!string.IsNullOrEmpty(InputFolderPath))
             {
@@ -293,20 +309,19 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public void SwitchEditorType()
+        private void SwitchEditorType()
         {
             _editingTxt = !_editingTxt;
             OnPropertyChanged(nameof(CurrentType));
             UpdateCurrentSelectedTags();
         }
 
-        public void GoToItem(int indexNumber)
+        private void GoToItem(int indexNumber)
         {
             if (_imageFiles?.Count != 0)
             {
                 SelectedItemIndex += indexNumber;
                 SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
             }
         }
 
@@ -319,7 +334,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public async Task BlurImageAsync()
+        private async Task BlurImageAsync()
         {
             _showBlurredImage = !_showBlurredImage;
             try
@@ -348,22 +363,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             catch
             {
                 _loggerService.LatestLogMessage = $"Something went wrong while loading blurred image! Error log will be saved inside the logs folder.";
-            }
-        }
-
-        public void UpdateCurrentSelectedTags()
-        {
-            if (SelectedImage != null)
-            {
-                try
-                {
-                    CurrentImageTags = _fileManipulatorService.GetTextFromFile(_imageFiles[_selectedItemIndex], CurrentType);
-                }
-                catch
-                {
-                    _loggerService.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
-                    CurrentImageTags = string.Empty;
-                }
             }
         }
 

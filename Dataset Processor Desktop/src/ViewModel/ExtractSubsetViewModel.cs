@@ -53,6 +53,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _isExactFilter;
+        public bool IsExactFilter
+        {
+            get => _isExactFilter;
+            set
+            {
+                _isExactFilter = value;
+                OnPropertyChanged(nameof(IsExactFilter));
+            }
+        }
+
         private string _tagsToFilter;
         public string TagsToFilter
         {
@@ -131,9 +142,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             try
             {
                 List<string> tagsResult = new List<string>();
+
                 if (SearchTags)
                 {
-                    FilterProgress.Reset();
                     tagsResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, FilterProgress));
                 }
 
@@ -154,6 +165,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 if (exception.GetType() == typeof(FileNotFoundException))
                 {
                     _loggerService.LatestLogMessage = $"{exception.Message}";
+                }
+                else if (exception.GetType() == typeof(ArgumentNullException))
+                {
+                    _loggerService.LatestLogMessage = exception.Message;
                 }
                 else
                 {

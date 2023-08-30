@@ -180,6 +180,11 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateSubsetAsync(List<string> files, string outputPath, Progress progress)
         {
+            if (string.IsNullOrWhiteSpace(outputPath))
+            {
+                throw new ArgumentNullException($"Please select an output folder!");
+            }
+
             progress.TotalFiles = files.Count;
 
             foreach (string file in files)

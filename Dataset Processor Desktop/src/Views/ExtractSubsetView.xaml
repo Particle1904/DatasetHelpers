@@ -61,6 +61,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
@@ -79,6 +80,12 @@
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
                    Text="Would you like to search the .caption files?"/>
+            <CheckBox Grid.Row="2" Grid.Column="0"
+                        IsChecked="{Binding IsExactFilter}"/>
+            <Label Grid.Row="2" Grid.Column="1"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   Text="Perform only exact matches when filtering (complex searches using '!' or 'AND' operators only work with this option enabled)?"/>
         </Grid>
 
         <Label Grid.Row="4" Grid.Column="0"
@@ -93,7 +100,7 @@
                     HorizontalTextAlignment="Start"
                     IsTextPredictionEnabled="False"
                     AutoSize="Disabled"
-                    Placeholder="Enter tags or keywords that you want to use to filter the subset of the dataset. For example: 'tag1, tag2'."
+                    Placeholder="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."
                     Text="{Binding TagsToFilter}"/>
         </ScrollView>
         <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
