@@ -212,13 +212,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NextItemCommand = new RelayCommand(() => GoToItem(1));
             NextTenItemsCommand = new RelayCommand(() => GoToItem(10));
             NextOneHundredItemsCommand = new RelayCommand(() => GoToItem(100));
-            RandomizeCurrentImageCommand = new RelayCommand(() =>
-            {
-                if (_imageFiles?.Count != null)
-                {
-                    GoToItem(SelectedItemIndex = _random.Next(0, _imageFiles.Count));
-                }
-            });
+            RandomizeCurrentImageCommand = new RelayCommand(GoToRandomItem);
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
@@ -320,8 +314,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_imageFiles?.Count != 0)
             {
-                Random random = new Random();
-                SelectedItemIndex = random.Next(0, _imageFiles.Count);
+                SelectedItemIndex = _random.Next(0, _imageFiles.Count);
                 SelectedImage = ImageSource.FromFile(_imageFiles[SelectedItemIndex]);
             }
         }
