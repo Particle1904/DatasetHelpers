@@ -145,7 +145,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
                 if (SearchTags)
                 {
-                    tagsResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, FilterProgress));
+                    tagsResult = await Task.Run(() => _fileManipulatorService.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, IsExactFilter));
                 }
 
                 List<string> captionsResult = new List<string>();
