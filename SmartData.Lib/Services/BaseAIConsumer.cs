@@ -81,6 +81,11 @@ namespace SmartData.Lib.Services
         /// <summary>
         /// Unloads the machine learning model and releases associated resources.
         /// </summary>
+        /// <remarks>
+        /// This method disposes of the prediction engine and releases any resources
+        /// associated with it, setting the prediction engine and prediction pipeline to null.
+        /// After calling this method, the model will no longer be loaded.
+        /// </remarks>
         protected virtual void UnloadModel()
         {
             _predictionEngine?.Dispose();

@@ -1,4 +1,6 @@
-﻿using Dataset_Processor_Desktop.src.Enums;
+﻿// Ignore Spelling: Metadata
+
+using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.Views;
 

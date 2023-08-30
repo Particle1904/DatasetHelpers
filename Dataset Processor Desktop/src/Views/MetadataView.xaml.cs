@@ -1,3 +1,5 @@
+// Ignore Spelling: Metadata
+
 using Dataset_Processor_Desktop.src.Utilities;
 using Dataset_Processor_Desktop.src.ViewModel;
 
@@ -31,7 +33,10 @@ public partial class MetadataView : ContentView
                 var uiElement = this.ToPlatform(Handler.MauiContext);
                 DragDropExtensions.RegisterDragDrop(uiElement, async stream =>
                 {
-                    await _viewModel.OpenFileAsync(stream);
+                    if (!_viewModel.IsGenerating)
+                    {
+                        await _viewModel.OpenFileAsync(stream);
+                    }
                 });
             }
         };

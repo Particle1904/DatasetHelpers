@@ -314,7 +314,7 @@ namespace SmartData.Lib.Services
         {
             WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(inputImagePath);
 
-            WDOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
+            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
             return prediction.PredictionsSigmoid;
         }
 
@@ -327,7 +327,7 @@ namespace SmartData.Lib.Services
         {
             WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(imageStream);
 
-            WDOutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
+            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
             return prediction.PredictionsSigmoid;
         }
 

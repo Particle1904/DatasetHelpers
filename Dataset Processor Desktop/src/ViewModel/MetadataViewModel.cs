@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Interfaces;
+﻿// Ignore Spelling: Metadata
+
+using SmartData.Lib.Interfaces;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
@@ -76,6 +78,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        public bool IsGenerating { get; private set; } = false;
+
         public MetadataViewModel(IImageProcessorService imageProcessorService, IAutoTaggerService autoTaggerService)
         {
             _imageProcessorService = imageProcessorService;
@@ -88,6 +92,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task OpenFileAsync(Stream stream)
         {
+            IsGenerating = true;
             byte[] streamBytes;
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -131,6 +136,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _loggerService.LatestLogMessage = $"An error occurred while trying to generate tags for the image! Error log will be saved inside the logs folder.";
                 await _loggerService.SaveExceptionStackTrace(exception);
             }
+            IsGenerating = false;
         }
     }
 }

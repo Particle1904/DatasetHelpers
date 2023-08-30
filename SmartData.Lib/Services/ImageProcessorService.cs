@@ -1,4 +1,6 @@
-﻿using SixLabors.ImageSharp.Formats.Jpeg;
+﻿// Ignore Spelling: Metadata Lanczos
+
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
