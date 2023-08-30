@@ -87,14 +87,28 @@
                     Keyboard="Text">
             </Editor>
         </ScrollView>
-        <Button Grid.Row="3" Grid.Column="3"
-                Command="{Binding FilterFilesCommand}"
-                Text="Filter images"
-                IsEnabled="{Binding ButtonEnabled}"/>
-        <Button Grid.Row="3" Grid.Column="4"
-                Command="{Binding ClearFilterCommand}"
-                Text="Clear filter"
-                IsEnabled="{Binding ButtonEnabled}"/>
+        
+        <Grid Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Command="{Binding FilterFilesCommand}"
+                    Text="Filter images"
+                    IsEnabled="{Binding ButtonEnabled}"/>
+            <Button Grid.Column="1"
+                    Command="{Binding ClearFilterCommand}"
+                    Text="Clear filter"
+                    IsEnabled="{Binding ButtonEnabled}"/>
+            <ImageButton Grid.Column="2"
+                         Source="dice.png"
+                         Command="{Binding RandomizeCurrentImageCommand}"
+                         WidthRequest="40"
+                         Padding="2"
+                         HorizontalOptions="End"/>
+        </Grid>        
 
         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" ColumnSpacing="10"
               VerticalOptions="Center"

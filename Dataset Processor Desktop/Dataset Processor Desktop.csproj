@@ -61,11 +61,13 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\Icons\folder_opened.svg" />
+	  <None Remove="Resources\Icons\dice.svg" />
 	  <None Remove="Resources\Images\drag_and_drop.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiImage Include="Resources\Icons\folder_opened.svg" />
+	  <MauiImage Include="Resources\Icons\dice.svg" />
 	</ItemGroup>
 
 	<ItemGroup>

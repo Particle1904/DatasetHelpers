@@ -9,6 +9,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IImageProcessorService _imageProcessorService;
         private readonly IInputHooksService _inputHooksService;
+        private Random _random;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -39,12 +40,16 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _selectedItemIndex;
             set
             {
-                _selectedItemIndex = value;
-                OnPropertyChanged(nameof(SelectedItemIndex));
                 if (_imageFiles?.Count > 0)
                 {
+                    _selectedItemIndex = Math.Clamp(value, 0, _imageFiles.Count - 1);
                     SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
+                else
+                {
+                    _selectedItemIndex = 0;
+                }
+                OnPropertyChanged(nameof(SelectedItemIndex));
             }
         }
 
@@ -154,6 +159,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand SwitchEditorTypeCommand { get; private set; }
         public RelayCommand FilterFilesCommand { get; private set; }
         public RelayCommand ClearFilterCommand { get; private set; }
+        public RelayCommand RandomizeCurrentImageCommand { get; private set; }
 
         private bool _showBlurredImage;
 
@@ -195,22 +201,32 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _fileManipulatorService = fileManipulatorService;
             _imageProcessorService = imageProcessorService;
             _inputHooksService = inputHooksService;
+            _random = new Random();
 
             InputFolderPath = _configsService.Configurations.CombinedOutputFolder;
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
 
-            PreviousItemCommand = new RelayCommand(GoToPreviousItem);
-            PreviousTenItemsCommand = new RelayCommand(GoToPreviousTenItems);
-            PreviousOneHundredItemsCommand = new RelayCommand(GoToPreviousOneHundredItems);
-            NextItemCommand = new RelayCommand(GoToNextItem);
-            NextTenItemsCommand = new RelayCommand(GoToNextTenItems);
-            NextOneHundredItemsCommand = new RelayCommand(GoToNextOneHundredItems);
+            PreviousItemCommand = new RelayCommand(() => GoToItem(-1));
+            PreviousTenItemsCommand = new RelayCommand(() => GoToItem(-10));
+            PreviousOneHundredItemsCommand = new RelayCommand(() => GoToItem(-100));
+            NextItemCommand = new RelayCommand(() => GoToItem(1));
+            NextTenItemsCommand = new RelayCommand(() => GoToItem(10));
+            NextOneHundredItemsCommand = new RelayCommand(() => GoToItem(100));
+            RandomizeCurrentImageCommand = new RelayCommand(() =>
+            {
+                if (_imageFiles?.Count != null)
+                {
+                    GoToItem(SelectedItemIndex = _random.Next(0, _imageFiles.Count));
+                }
+            });
+
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
             SwitchEditorTypeCommand = new RelayCommand(SwitchEditorType);
             FilterFilesCommand = new RelayCommand(async () => await FilterFilesAsync());
             ClearFilterCommand = new RelayCommand(ClearFilter);
+
             ButtonEnabled = true;
             IsExactFilter = false;
 
@@ -290,79 +306,23 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             UpdateCurrentSelectedTags();
         }
 
-        public void GoToPreviousItem()
+        public void GoToItem(int indexNumber)
         {
-            if (_selectedItemIndex > 0)
+            if (_imageFiles?.Count != 0)
             {
-                _selectedItemIndex--;
+                SelectedItemIndex += indexNumber;
                 SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 OnPropertyChanged(nameof(SelectedItemIndex));
             }
         }
 
-        public void GoToPreviousTenItems()
+        private void GoToRandomItem()
         {
-            if (_selectedItemIndex > 0)
+            if (_imageFiles?.Count != 0)
             {
-                _selectedItemIndex -= 10;
-                if (_selectedItemIndex < 0)
-                {
-                    _selectedItemIndex = 0;
-                }
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
-            }
-        }
-
-        public void GoToPreviousOneHundredItems()
-        {
-            if (_selectedItemIndex > 0)
-            {
-                _selectedItemIndex -= 100;
-                if (_selectedItemIndex < 0)
-                {
-                    _selectedItemIndex = 0;
-                }
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
-            }
-        }
-
-        public void GoToNextItem()
-        {
-            if (_selectedItemIndex < ImageFiles.Count - 1)
-            {
-                _selectedItemIndex++;
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
-            }
-        }
-
-        public void GoToNextTenItems()
-        {
-            if (_selectedItemIndex < ImageFiles.Count - 1)
-            {
-                _selectedItemIndex += 10;
-                if (_selectedItemIndex > ImageFiles.Count - 1)
-                {
-                    _selectedItemIndex = ImageFiles.Count - 1;
-                }
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
-            }
-        }
-
-        public void GoToNextOneHundredItems()
-        {
-            if (_selectedItemIndex < ImageFiles.Count - 1)
-            {
-                _selectedItemIndex += 100;
-                if (_selectedItemIndex > ImageFiles.Count - 1)
-                {
-                    _selectedItemIndex = ImageFiles.Count - 1;
-                }
-                SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
-                OnPropertyChanged(nameof(SelectedItemIndex));
+                Random random = new Random();
+                SelectedItemIndex = random.Next(0, _imageFiles.Count);
+                SelectedImage = ImageSource.FromFile(_imageFiles[SelectedItemIndex]);
             }
         }
 
@@ -443,7 +403,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(-1));
             }
         }
 
@@ -451,7 +411,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToNextItem);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(1));
             }
         }
 
@@ -459,7 +419,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToPreviousTenItems);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(-10));
             }
         }
 
@@ -467,7 +427,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToNextTenItems);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(10));
             }
         }
 
@@ -475,7 +435,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToPreviousOneHundredItems);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(-100));
             }
         }
 
@@ -483,7 +443,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToNextOneHundredItems);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(100));
             }
         }
 
@@ -507,7 +467,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(-1));
             }
         }
 
@@ -515,7 +475,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (IsActive)
             {
-                MainThread.BeginInvokeOnMainThread(GoToNextItem);
+                MainThread.BeginInvokeOnMainThread(() => GoToItem(1));
             }
         }
     }
