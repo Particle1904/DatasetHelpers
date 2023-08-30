@@ -8,6 +8,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
     {
         private readonly IFileManipulatorService _fileManipulatorService;
         private readonly IImageProcessorService _imageProcessorService;
+        private readonly IInputHooksService _inputHooksService;
 
         private string _inputFolderPath;
         public string InputFolderPath
@@ -189,10 +190,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        public TagEditorViewModel(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService)
+        public TagEditorViewModel(IFileManipulatorService fileManipulatorService, IImageProcessorService imageProcessorService, IInputHooksService inputHooksService)
         {
             _fileManipulatorService = fileManipulatorService;
             _imageProcessorService = imageProcessorService;
+            _inputHooksService = inputHooksService;
 
             InputFolderPath = _configsService.Configurations.CombinedOutputFolder;
             _fileManipulatorService.CreateFolderIfNotExist(InputFolderPath);
@@ -217,6 +219,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _editingTxt = true;
 
             SelectedItemIndex = 0;
+
+            _inputHooksService.ButtonF1 += OnF1ButtonDown;
+            _inputHooksService.ButtonF2 += OnF2ButtonDown;
+            _inputHooksService.ButtonF3 += OnF3ButtonDown;
+            _inputHooksService.ButtonF4 += OnF4ButtonDown;
+            _inputHooksService.ButtonF5 += OnF5ButtonDown;
+            _inputHooksService.ButtonF6 += OnF6ButtonDown;
+            _inputHooksService.ButtonF8 += OnF8ButtonDown;
+
+            _inputHooksService.MouseButton3 += OnMouseButton3Down;
+            _inputHooksService.MouseButton4 += OnMouseButton4Down;
+            _inputHooksService.MouseButton5 += OnMouseButton5Down;
         }
 
         public async Task SelectInputFolderAsync()
@@ -425,6 +439,56 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     SelectedImage = ImageSource.FromFile(_imageFiles[_selectedItemIndex]);
                 }
             }
+        }
+
+        private void OnF1ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+        }
+
+        private void OnF2ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToNextItem);
+        }
+
+        private void OnF3ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToPreviousTenItems);
+        }
+
+        private void OnF4ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToNextTenItems);
+        }
+
+        private void OnF5ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToPreviousOneHundredItems);
+        }
+
+        private void OnF6ButtonDown(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToNextOneHundredItems);
+        }
+
+        private void OnF8ButtonDown(object sender, EventArgs e)
+        {
+            Task.Run(BlurImageAsync);
+        }
+
+        private void OnMouseButton3Down(object sender, EventArgs e)
+        {
+            Task.Run(BlurImageAsync);
+        }
+
+        private void OnMouseButton4Down(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToPreviousItem);
+        }
+
+        private void OnMouseButton5Down(object sender, EventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(GoToNextItem);
         }
     }
 }

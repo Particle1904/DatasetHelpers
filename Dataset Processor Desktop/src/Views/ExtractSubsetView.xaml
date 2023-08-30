@@ -44,7 +44,6 @@
                          HorizontalOptions="End"/>
         </StackLayout>
 
-
         <Button Grid.Row="2" Grid.Column="0"
                 Command="{Binding SelectOutputFolderCommand}"
                 Text="Select Input folder:"/>

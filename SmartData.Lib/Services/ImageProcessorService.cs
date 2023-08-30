@@ -466,6 +466,8 @@ namespace SmartData.Lib.Services
                             string formatted = metadata[i].Remove(metadata[i].Length - 1, 1);
                             metadata[i] = formatted;
                         }
+
+                        metadata[i] = metadata[i].TrimEnd();
                     }
                 }
             }

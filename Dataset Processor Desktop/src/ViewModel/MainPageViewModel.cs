@@ -14,6 +14,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly IAutoTaggerService _autoTaggerService;
         private readonly ITagProcessorService _tagProcessorService;
         private readonly IContentAwareCropService _contentAwareCropService;
+        private readonly IInputHooksService _inputHooksService;
 
         #region Definition of App Views.
         private View _dynamicContentView;
@@ -39,7 +40,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public View DynamicContentView
         {
             get => _dynamicContentView;
-            set
+            protected set
             {
                 _dynamicContentView = value;
                 OnPropertyChanged(nameof(DynamicContentView));
@@ -65,6 +66,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _autoTaggerService = Application.Current.Handler.MauiContext.Services.GetService<IAutoTaggerService>();
             _tagProcessorService = Application.Current.Handler.MauiContext.Services.GetService<ITagProcessorService>();
             _contentAwareCropService = Application.Current.Handler.MauiContext.Services.GetService<IContentAwareCropService>();
+            _inputHooksService = Application.Current.Handler.MauiContext.Services.GetService<IInputHooksService>();
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -160,7 +162,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             if (_tagEditorView == null)
             {
-                _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService);
+                _tagEditorView = new TagEditorView(_fileManipulatorService, _imageProcessorService, _inputHooksService);
             }
             TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_tagEditorView.BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();

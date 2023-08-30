@@ -65,6 +65,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public bool IsActive { get; set; } = false;
+
         public BaseViewModel()
         {
             _folderPickerService = Application.Current.Handler.MauiContext.Services.GetService<IFolderPickerService>();

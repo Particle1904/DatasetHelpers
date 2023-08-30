@@ -45,6 +45,7 @@ namespace Dataset_Processor_Desktop
                     Path.Combine(_modelsPath, _WDOnnxFilename),
                     Path.Combine(_modelsPath, _csvFilename)
             ));
+            builder.Services.AddSingleton<IInputHooksService, InputHooksService>();
 
             return builder.Build();
         }
