@@ -214,18 +214,21 @@
                 <Button Grid.Column="1" Grid.Row="0"
                         Text="Switch"
                         Command="{Binding SwitchEditorTypeCommand}"
-                        HeightRequest="50"/>
+                        HeightRequest="40"/>
 
-                <Label Grid.Column="0" Grid.Row="1" Text="Currently editing:"/>
-                <Label Grid.Column="1" Grid.Row="1" Text="{Binding CurrentType}"
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"/>
+                <Label Grid.Column="0" Grid.Row="1" Text="{Binding CurrentType, StringFormat='Currently editing: {0}'}"/>
+                <ImageButton Grid.Column="1" Grid.Row="1"
+                             Source="content_copy.png"
+                             Command="{Binding CopyCurrentImageTagsCommand}"
+                             WidthRequest="30"
+                             Padding="2"
+                             HorizontalOptions="End"/>
             </Grid>
 
             <ScrollView Grid.Row="1"
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand"
-                        HeightRequest="200">
+                        HeightRequest="190">
                 <Editor x:Name="EditorTags"
                         Placeholder="This is where you can edit the tags/captions."
                         VerticalOptions="FillAndExpand"
@@ -237,7 +240,7 @@
                         Text="{Binding CurrentImageTags}"
                         IsSpellCheckEnabled="True"
                         TextChanged="OnTextChanged"
-                        FontSize="Default"
+                        FontSize="13"
                         FontFamily="OpenSansRegular"
                         Keyboard="Text">
                 </Editor>
@@ -246,12 +249,13 @@
             <ScrollView Grid.Row="2"
                         HorizontalOptions="FillAndExpand"
                         VerticalOptions="FillAndExpand"
-                        HeightRequest="200">
+                        HeightRequest="190">
                 <Label x:Name="LabelFormatted"
-                       Padding="11"
-                       FontSize="Default" 
+                       Padding="9.5"
+                       FontSize="13" 
                        FontFamily="OpenSansRegular"
                        VerticalTextAlignment="Start"
+                       HorizontalTextAlignment="Start"
                        HorizontalOptions="FillAndExpand"
                        VerticalOptions="FillAndExpand"/>
             </ScrollView>
@@ -284,12 +288,5 @@
                    Margin="0,0,0,0"
                    TextColor="{StaticResource DarkSecondary}"
                    Text="Note: text changes are automatically saved whenever you type anything in the Text Box."/>
-
-        <Label Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5"
-                   HorizontalTextAlignment="Center"
-                   VerticalTextAlignment="Start"
-                   Margin="0,0,0,0"
-                   TextColor="{StaticResource DarkSecondary}"
-                   Text="Note: the search functionality can be very expensive and take a few seconds to complete!"/>
     </Grid>
 </ContentView>

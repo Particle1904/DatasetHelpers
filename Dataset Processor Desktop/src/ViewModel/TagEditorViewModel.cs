@@ -160,6 +160,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand FilterFilesCommand { get; private set; }
         public RelayCommand ClearFilterCommand { get; private set; }
         public RelayCommand RandomizeCurrentImageCommand { get; private set; }
+        public RelayCommand CopyCurrentImageTagsCommand { get; private set; }
 
         private bool _showBlurredImage;
 
@@ -213,6 +214,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NextTenItemsCommand = new RelayCommand(() => GoToItem(10));
             NextOneHundredItemsCommand = new RelayCommand(() => GoToItem(100));
             RandomizeCurrentImageCommand = new RelayCommand(GoToRandomItem);
+            CopyCurrentImageTagsCommand = new RelayCommand(async () => await CopyToClipboard(CurrentImageTags));
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             BlurImageCommand = new RelayCommand(async () => await BlurImageAsync());

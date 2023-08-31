@@ -85,7 +85,7 @@ public partial class TagEditorView : ContentView
         MainThread.BeginInvokeOnMainThread(() =>
         {
             LabelFormatted.FormattedText = _labelFormattedString;
-            LabelFormatted.FontSize = EditorTags.FontSize + 0.40f;
+            LabelFormatted.FontSize = EditorTags.FontSize + 0.80f;
         });
     }
 
