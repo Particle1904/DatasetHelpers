@@ -5,6 +5,8 @@ using SmartData.Lib.Interfaces;
 
 using System.ComponentModel;
 
+using TextCopy;
+
 namespace Dataset_Processor_Desktop.src.ViewModel
 {
     public class BaseViewModel : INotifyPropertyChanged
@@ -74,12 +76,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _configsService = Application.Current.Handler.MauiContext.Services.GetService<IConfigsService>();
         }
 
-        public virtual void OnPropertyChanged(string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName = null)
         {
             MainThread.InvokeOnMainThreadAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName)));
         }
 
-        public async Task OpenFolderAsync(string folderPath)
+        protected async Task OpenFolderAsync(string folderPath)
         {
             try
             {
@@ -88,6 +90,14 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             catch
             {
                 _loggerService.LatestLogMessage = "Unable to open the folder!";
+            }
+        }
+
+        protected async Task CopyToClipboard(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                await ClipboardService.SetTextAsync(text);
             }
         }
     }

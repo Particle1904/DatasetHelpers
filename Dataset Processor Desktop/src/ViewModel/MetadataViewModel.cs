@@ -1,5 +1,7 @@
 ﻿// Ignore Spelling: Metadata
 
+using Dataset_Processor_Desktop.src.Utilities;
+
 using SmartData.Lib.Interfaces;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
@@ -78,6 +80,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        public RelayCommand CopyPositivePromptCommand { get; private set; }
+        public RelayCommand CopyNegativePromptCommand { get; private set; }
+        public RelayCommand CopySeedParameterCommand { get; private set; }
+        public RelayCommand CopyPredictedPromptCommand { get; private set; }
+
         public bool IsGenerating { get; private set; } = false;
 
         public MetadataViewModel(IImageProcessorService imageProcessorService, IAutoTaggerService autoTaggerService)
@@ -86,6 +93,11 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _autoTaggerService = autoTaggerService;
 
             Threshold = _configsService.Configurations.TaggerThreshold;
+
+            CopyPositivePromptCommand = new RelayCommand(async () => await CopyToClipboard(PositivePrompt));
+            CopyNegativePromptCommand = new RelayCommand(async () => await CopyToClipboard(NegativePrompt));
+            CopySeedParameterCommand = new RelayCommand(async () => await CopyToClipboard(GetSeedFromParameters(Parameters)));
+            CopyPredictedPromptCommand = new RelayCommand(async () => await CopyToClipboard(PredictedTags));
 
             SelectedImage = ImageSource.FromFile("drag_and_drop.png");
         }
@@ -137,6 +149,23 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 await _loggerService.SaveExceptionStackTrace(exception);
             }
             IsGenerating = false;
+        }
+
+        private string GetSeedFromParameters(string parameters)
+        {
+            string[] parametersSplit = parameters.Split(",");
+
+            string seed = null;
+            foreach (string parameter in parametersSplit)
+            {
+                if (parameter.Contains("Seed"))
+                {
+                    string[] parameterSplit = parameter.Split(":");
+                    seed = parameterSplit.Last().Trim();
+                }
+            }
+
+            return seed;
         }
     }
 }

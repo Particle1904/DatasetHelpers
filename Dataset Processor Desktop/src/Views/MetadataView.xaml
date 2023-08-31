@@ -51,76 +51,135 @@
               RowSpacing="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="2*"/>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="2*"/>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" 
-                   HorizontalTextAlignment="Start"
-                   Text="Positive prompt:"/>
-            <ScrollView Grid.Row="1" 
-                        HorizontalOptions="FillAndExpand"
-                        VerticalOptions="FillAndExpand"
-                        MaximumHeightRequest="120">
-                <Editor VerticalOptions="FillAndExpand"
-                        HorizontalOptions="FillAndExpand"
-                        AutoSize="TextChanges"
-                        VerticalTextAlignment="Start"
-                        HorizontalTextAlignment="Start"
-                        IsTextPredictionEnabled="False"
-                        Text="{Binding PositivePrompt}"
-                        IsSpellCheckEnabled="False"
-                        FontSize="Default"
-                        FontFamily="OpenSansRegular">
-                </Editor>
-            </ScrollView>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="2" 
-                   HorizontalTextAlignment="Start"
-                   Text="Negative prompt:"/>
-            <ScrollView Grid.Row="3" 
-                        HorizontalOptions="FillAndExpand"
-                        VerticalOptions="FillAndExpand"
-                        MaximumHeightRequest="120">
-                <Editor VerticalOptions="FillAndExpand"
-                        HorizontalOptions="FillAndExpand"
-                        AutoSize="TextChanges"
-                        VerticalTextAlignment="Start"
-                        HorizontalTextAlignment="Start"
-                        IsTextPredictionEnabled="False"
-                        Text="{Binding NegativePrompt}"
-                        IsSpellCheckEnabled="False"
-                        FontSize="Default"
-                        FontFamily="OpenSansRegular">
-                </Editor>
-            </ScrollView>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
 
-            <Label Grid.Row="4" 
-                   HorizontalTextAlignment="Start"
-                   Text="Parameters:"/>
-            <ScrollView Grid.Row="5" 
-                        HorizontalOptions="FillAndExpand"
-                        VerticalOptions="FillAndExpand"
-                        MaximumHeightRequest="120">
-                <Editor VerticalOptions="FillAndExpand"
-                        HorizontalOptions="FillAndExpand"
-                        AutoSize="TextChanges"
-                        VerticalTextAlignment="Start"
-                        HorizontalTextAlignment="Start"
-                        IsTextPredictionEnabled="False"
-                        Text="{Binding Parameters}"
-                        IsSpellCheckEnabled="False"
-                        FontSize="Default"
-                        FontFamily="OpenSansRegular">
-                </Editor>
-            </ScrollView>
+                <Label Grid.Column="0" Grid.Row="0"
+                       HorizontalOptions="StartAndExpand"
+                       HorizontalTextAlignment="Start"
+                       Text="Positive prompt:"/>
+                <ImageButton Grid.Column="1" Grid.Row="0"
+                             Source="content_copy.png"
+                             HorizontalOptions="End"
+                             Command="{Binding CopyPositivePromptCommand}"
+                             WidthRequest="30"
+                             HeightRequest="30"
+                             Padding="2"/>
+
+                <ScrollView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" 
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            MaximumHeightRequest="120">
+                    <Editor VerticalOptions="FillAndExpand"
+                            HorizontalOptions="FillAndExpand"
+                            AutoSize="TextChanges"
+                            VerticalTextAlignment="Start"
+                            HorizontalTextAlignment="Start"
+                            IsTextPredictionEnabled="False"
+                            Text="{Binding PositivePrompt}"
+                            IsSpellCheckEnabled="False"
+                            FontSize="Default"
+                            FontFamily="OpenSansRegular">
+                    </Editor>
+                </ScrollView>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0"
+                       HorizontalOptions="StartAndExpand"
+                       HorizontalTextAlignment="Start"
+                       Text="Negative prompt:"/>
+                <ImageButton Grid.Column="1" Grid.Row="0"
+                             Source="content_copy.png"
+                             HorizontalOptions="End"
+                             Command="{Binding CopyNegativePromptCommand}"
+                             WidthRequest="30"
+                             HeightRequest="30"
+                             Padding="2"/>
+                <ScrollView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" 
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            MaximumHeightRequest="120">
+                    <Editor VerticalOptions="FillAndExpand"
+                            HorizontalOptions="FillAndExpand"
+                            AutoSize="TextChanges"
+                            VerticalTextAlignment="Start"
+                            HorizontalTextAlignment="Start"
+                            IsTextPredictionEnabled="False"
+                            Text="{Binding NegativePrompt}"
+                            IsSpellCheckEnabled="False"
+                            FontSize="Default"
+                            FontFamily="OpenSansRegular">
+                    </Editor>
+                </ScrollView>
+            </Grid>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0"
+                       HorizontalOptions="StartAndExpand"
+                       HorizontalTextAlignment="Start"
+                       Text="Parameters:"/>
+                <ImageButton Grid.Column="1" Grid.Row="0"
+                             Source="content_copy.png"
+                             HorizontalOptions="End"
+                             Command="{Binding CopySeedParameterCommand}"
+                             WidthRequest="30"
+                             HeightRequest="30"
+                             Padding="2"/>
+                <ScrollView Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" 
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            MaximumHeightRequest="120">
+                    <Editor VerticalOptions="FillAndExpand"
+                            HorizontalOptions="FillAndExpand"
+                            AutoSize="TextChanges"
+                            VerticalTextAlignment="Start"
+                            HorizontalTextAlignment="Start"
+                            IsTextPredictionEnabled="False"
+                            Text="{Binding Parameters}"
+                            IsSpellCheckEnabled="False"
+                            FontSize="Default"
+                            FontFamily="OpenSansRegular">
+                    </Editor>
+                </ScrollView>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5"
-              RowSpacing="10">
+              RowSpacing="10"
+              Padding="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
@@ -148,9 +207,23 @@
                        Text="{Binding Threshold}"/>
             </Grid>
 
-            <Label Grid.Row="1"
-                   HorizontalTextAlignment="Start"
-                   Text="WD 1.4 Interrogated tags:"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       HorizontalTextAlignment="Start"
+                       Text="WD 1.4 Interrogated tags:"/>
+                <ImageButton Grid.Column="1"
+                             Source="content_copy.png"
+                             HorizontalOptions="End"
+                             Command="{Binding CopyPredictedPromptCommand}"
+                             WidthRequest="30"
+                             HeightRequest="30"
+                             Padding="2"/>
+            </Grid>            
 
             <ScrollView Grid.Row="2" 
                         HorizontalOptions="FillAndExpand"

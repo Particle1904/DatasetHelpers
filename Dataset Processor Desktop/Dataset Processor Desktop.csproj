@@ -62,16 +62,19 @@
 	<ItemGroup>
 	  <None Remove="Resources\Icons\folder_opened.svg" />
 	  <None Remove="Resources\Icons\dice.svg" />
+	  <None Remove="Resources\Icons\content_copy.svg" />
 	  <None Remove="Resources\Images\drag_and_drop.png" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiImage Include="Resources\Icons\folder_opened.svg" />
 	  <MauiImage Include="Resources\Icons\dice.svg" />
+	<MauiImage Include="Resources\Icons\content_copy.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Maui" Version="5.3.0" />
+	  <PackageReference Include="TextCopy" Version="6.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>
