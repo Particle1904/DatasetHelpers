@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.WelcomeView">
     <VerticalStackLayout Spacing="50" Padding="20" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" WidthRequest="1024">
-        <Label Text="Welcome to the Dataset Processor App!"
+        <Label Text="Welcome to the Dataset All-in-one tools"
                VerticalOptions="Center" 
                HorizontalOptions="Center"
                FontSize="Header"/>
@@ -13,24 +13,51 @@
                    HorizontalTextAlignment="Center"
                    FontSize="Medium"
                    Margin="0,0,0,40"/>
-            <Label Text="Use the Sort Page to discard images with low resolution (image with Width or Height lower than 512) and/or backup images."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
-            <Label Text="Use the Content Aware Crop View to automatically crop images using Content Aware techniques and Object Detection with the YoloV4 model."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
-            <Label Text="Use the Resize Images Page to resize images respecting original Aspect Ratio to be used for Bucketing (it will Upscale if necessary)."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
-            <Label Text="Use the Generate Tags Page to generate Tags using the WD 1.4 Model; BLIP Captioning is planned for future updates."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
-            <Label Text="Use the Process Tags Page to mass edit .txt files with tags, it can add, remove, give emphasis and randomize tags."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
-            <Label Text="Use the Tag Editor to manually edit Tags for files, the editor automatically saves any changes (it will create a new one if necessary)."
-                   HorizontalTextAlignment="Start"
-                   FontSize="Small"/>
+            <Grid RowSpacing="10" ColumnSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0"
+                       Text="Open the Wiki page to read the documentation"
+                       FontSize="Small"/>
+                <Button Grid.Row="0" Grid.Column="1"
+                        Command="{Binding OpenWikiPageCommand}"
+                        Text="Open Wiki page"
+                        FontSize="Small"/>
+
+                <Label Grid.Row="1" Grid.Column="0"
+                       Text="Open the Issues page to post or search for an issue"
+                       FontSize="Small"/>
+                <Button Grid.Row="1" Grid.Column="1"
+                        Command="{Binding OpenIssuesPageCommand}"
+                        Text="Open Issues page"
+                        FontSize="Small"/>
+
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        Command="{Binding OpenRepositoryPageCommand}"
+                        Text="Open GitHub repository page"
+                        FontSize="Small"/>
+                
+                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                        Command="{Binding OpenReleasesPageCommand}"
+                        Text="Open Releases page"
+                        FontSize="Small"/>
+
+                <Label Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                       Text="Feature requests are welcome, feel free to post it as an issue in the GitHub repository!"
+                       HorizontalTextAlignment="Center"
+                       FontSize="Small"
+                       TextColor="{StaticResource DarkSecondaryDark}"/>
+            </Grid>
         </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentView>

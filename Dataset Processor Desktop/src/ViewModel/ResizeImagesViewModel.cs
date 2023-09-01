@@ -1,4 +1,6 @@
-﻿using Dataset_Processor_Desktop.src.Enums;
+﻿// Ignore Spelling: Lanczos
+
+using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Enums;

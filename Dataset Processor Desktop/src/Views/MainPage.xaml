@@ -95,9 +95,13 @@
                    Padding="10"
                    CornerRadius="0"
                    BorderColor="{StaticResource DarkPrimary}">
-                <ScrollView >
-                    <Label Text="{Binding LatestLogMessage}"/>
-                </ScrollView>
+                <VerticalStackLayout>
+                    <Label Text="Log messages:"
+                           FontSize="Caption"/>
+                    <ScrollView>
+                        <Label Text="{Binding LatestLogMessage}"/>
+                    </ScrollView>
+                </VerticalStackLayout>                
             </Frame>
         </Grid>
     </Grid>
