@@ -101,7 +101,7 @@
         
         <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5"
                HorizontalTextAlignment="Center"
-               Text="Note: Lower Threshold values can capture false positives. 0.35 is usually a good starting point for anime.&#xa;With photographs you can usually go with lower values like 0.20 or 0.25 since the Auto Tagger wasn't really trained to be used with photos.&#xa;If your dataset is big, like 300+ images, consider using higher a threshold value like 0.5-0.6 to avoid too many false positives."/>
+               Text="Note: Lower Threshold values can capture false positives. 0.35 is usually a good starting point for anime.&#xa;With photographs you can usually go with lower values like 0.20 or 0.25 since the Auto Tagger wasn't really trained to be used with photos.&#xa;If your dataset is big, like 300+ images, consider using a higher threshold value like 0.5-0.6 to avoid too many false positives."/>
 
         <BoxView HeightRequest="1" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" 
               BackgroundColor="{StaticResource Gray600}"/>
