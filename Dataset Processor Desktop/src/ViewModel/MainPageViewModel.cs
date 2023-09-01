@@ -135,10 +135,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 BaseViewModel bindingContext = (BaseViewModel)item.Value.BindingContext;
                 if (bindingContext != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"{item.Value.GetType()}");
-                    System.Diagnostics.Debug.WriteLine($"{bindingContext.IsActive} | ");
                     bindingContext.IsActive = false;
-                    System.Diagnostics.Debug.Write($"{bindingContext.IsActive}{Environment.NewLine}.");
                 }
             }
         }

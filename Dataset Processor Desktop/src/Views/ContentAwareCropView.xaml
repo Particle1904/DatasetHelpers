@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.ContentAwareCroppingView">
-    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
           ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -66,27 +66,33 @@
 
         <Label Grid.Row="3" Grid.Column="0"
                Text="Threshold for predictions certainty:"/>
-        <Slider Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="0.1"
-                Value="{Binding ScoreThreshold}"/>
-        <Label Grid.Row="3" Grid.Column="4"
-               Text="{Binding ScoreThreshold}"/>
+        <HorizontalStackLayout Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="0.1"
+                    Value="{Binding ScoreThreshold}"
+                    MinimumWidthRequest="600"/>
+            <Label Text="{Binding ScoreThreshold}"
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
 
         <Label Grid.Row="4" Grid.Column="0"
                Text="Threshold for Intersection over Union (IoU):"/>
-        <Slider Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="0.1"
-                Value="{Binding IouThreshold}"/>
-        <Label Grid.Row="4" Grid.Column="4"
-               Text="{Binding IouThreshold}"/>
-        
+        <HorizontalStackLayout Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="0.1"
+                    Value="{Binding IouThreshold}"
+                    MinimumWidthRequest="600"/>
+            <Label Text="{Binding IouThreshold}"
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
+
         <Label Grid.Row="5" Grid.Column="0"
                Text="Bounding Box expansion in percentage:"/>
-        <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="0.1"
-                Value="{Binding ExpansionPercentage}"/>
-        <Label Grid.Row="5" Grid.Column="4"
-               Text="{Binding ExpansionPercentageString}"/>
+        <HorizontalStackLayout Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="0.1"
+                    Value="{Binding ExpansionPercentage}"
+                    MinimumWidthRequest="600"/>
+            <Label Text="{Binding ExpansionPercentageString}"
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
 
         <Label Grid.Row="6" Grid.Column="0"
                Text="Select the maximum Dimension Size:"/>
@@ -98,12 +104,15 @@
 
         <Label Grid.Row="7" Grid.Column="0"
                Text="Lanczos sampler Radius:"/>
-        <Slider Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="1"
-                Maximum="25"
-                Value="{Binding LanczosRadius}"/>
-        <Label Grid.Row="7" Grid.Column="4"
-               Text="{Binding LanczosRadius}"/>
+        <HorizontalStackLayout Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="1"
+                    Maximum="25"
+                    Value="{Binding LanczosRadius}"
+                    MinimumWidthRequest="600"/>
+            <Label Grid.Row="7" Grid.Column="4"
+                   Text="{Binding LanczosRadius}"
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
 
         <Grid Grid.Row="8" Grid.Column="0">
             <Grid.ColumnDefinitions>
@@ -114,12 +123,14 @@
             <Label Grid.Column="2"
                Text="Sharpen Sigma?"/>
         </Grid>
-        <Slider Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="0.5"
-                Maximum="5"
-                Value="{Binding SharpenSigma}"/>
-        <Label Grid.Row="8" Grid.Column="4"
-               Text="{Binding SharpenSigma}"/>
+        <HorizontalStackLayout Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="0.5"
+                    Maximum="5"
+                    Value="{Binding SharpenSigma}"
+                    MinimumWidthRequest="600"/>
+            <Label Text="{Binding SharpenSigma}"
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
 
         <Label Grid.Row="9" Grid.Column="0"
                 Text="Minimum image resolution for Sigma (256 min):"/>

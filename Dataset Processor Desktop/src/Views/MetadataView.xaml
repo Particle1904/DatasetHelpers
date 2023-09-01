@@ -200,11 +200,13 @@
 
                 <Label Grid.Column="0"
                        Text="Threshold for predictions:"/>
-                <Slider Grid.Column="1" Grid.ColumnSpan="3"
-                        Minimum="0.1"
-                        Value="{Binding Threshold}"/>
-                <Label Grid.Column="4"
-                       Text="{Binding Threshold}"/>
+                <HorizontalStackLayout Grid.Column="1" Grid.ColumnSpan="3" Spacing="10">
+                    <Slider Minimum="0.1"
+                            Value="{Binding Threshold}"
+                            MinimumWidthRequest="600"/>
+                    <Label Text="{Binding Threshold}"
+                           HorizontalOptions="End"/>
+                </HorizontalStackLayout>
             </Grid>
 
             <Grid Grid.Row="1">

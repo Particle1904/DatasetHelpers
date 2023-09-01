@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.DatasetSortView">
-    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
           ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>

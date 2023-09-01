@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              x:Class="Dataset_Processor_Desktop.src.Views.ResizeImagesView">
-    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" 
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
           ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -71,12 +71,15 @@
 
         <Label Grid.Row="4" Grid.Column="0"
                Text="Lanczos sampler Radius:"/>
-        <Slider Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="1"
-                Maximum="25"
-                Value="{Binding LanczosRadius}"/>
-        <Label Grid.Row="4" Grid.Column="4"
-               Text="{Binding LanczosRadius}"/>
+        <HorizontalStackLayout Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+            <Slider Minimum="1"
+                    Maximum="25"
+                    Value="{Binding LanczosRadius}"
+                    MinimumWidthRequest="600"/>
+            <Label Text="{Binding LanczosRadius}" 
+                   HorizontalOptions="End"/>
+        </HorizontalStackLayout>
+        
 
         <Grid Grid.Row="5" Grid.Column="0">
             <Grid.ColumnDefinitions>
@@ -86,14 +89,17 @@
             <CheckBox IsChecked="{Binding ApplySharpen}"/>
             <Label Grid.Column="2"
                Text="Sharpen Sigma?"/>
-        </Grid>        
-        <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"
-                Minimum="0.5"
-                Maximum="5"
-                Value="{Binding SharpenSigma}"/>
-        <Label Grid.Row="5" Grid.Column="4"
-               Text="{Binding SharpenSigma}"/>
+        </Grid>
 
+        <HorizontalStackLayout Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="4" Spacing="10">
+        <Slider Minimum="0.5"
+                Maximum="5"
+                Value="{Binding SharpenSigma}"
+                MinimumWidthRequest="600"/>
+        <Label Text="{Binding SharpenSigma}"
+               HorizontalOptions="End"/>
+        </HorizontalStackLayout>
+        
         <Label Grid.Row="6" Grid.Column="0"
                 Text="Minimum image resolution for Sigma (256 min):"/>
         <ScrollView Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4"

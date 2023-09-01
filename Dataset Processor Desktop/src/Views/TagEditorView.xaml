@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Dataset_Processor_Desktop.src.Views"
              x:Class="Dataset_Processor_Desktop.src.Views.TagEditorView">
-    <Grid VerticalOptions="Center" HorizontalOptions="Center" 
-                  ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
+          ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>

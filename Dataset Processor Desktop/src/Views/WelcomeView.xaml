@@ -2,7 +2,8 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Dataset_Processor_Desktop.src.Views.WelcomeView">
-    <VerticalStackLayout Spacing="50" Padding="20" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" WidthRequest="1024">
+    <VerticalStackLayout Spacing="50" Padding="20" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" 
+                         WidthRequest="1024">
         <Label Text="Welcome to the Dataset All-in-one tools"
                VerticalOptions="Center" 
                HorizontalOptions="Center"
