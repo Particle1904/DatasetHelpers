@@ -50,7 +50,7 @@
 
         <Button Grid.Row="2" Grid.Column="0"
                 Command="{Binding SelectOutputFolderCommand}"
-                Text="Select Output Folder:"/>
+                Text="Select Output folder:"/>
         <StackLayout Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
             <Label Text="{Binding OutputFolderPath}"/>
             <ImageButton Source="folder_opened.png"
