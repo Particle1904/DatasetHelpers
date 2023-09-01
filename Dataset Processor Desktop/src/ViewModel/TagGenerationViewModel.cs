@@ -54,17 +54,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _threshold;
             set
             {
-                try
+                if (Math.Round(value, 2) != _threshold)
                 {
-                    if (Math.Round(value, 2) != _threshold)
-                    {
-                        _threshold = Math.Round(value, 2);
-                        OnPropertyChanged(nameof(Threshold));
-                    }
-                }
-                catch (Exception exception)
-                {
-                    _loggerService.LatestLogMessage = $"{exception.Message}";
+                    _threshold = Math.Round(value, 2);
+                    OnPropertyChanged(nameof(Threshold));
                 }
             }
         }
