@@ -25,7 +25,7 @@ To build clone this repository and open the project in Visual Studio 2022 or lat
 Use these commands to build it as a self-contained .exe application (only windows supported at this time):
 Right-click the Solution and click "Open in Terminal" then use the command:
 
-Remember to download the model files: https://github.com/LeonardoFer/DatasetHelpers/releases/tag/v0.0.0
+Remember to download the model files: https://github.com/Particle1904/DatasetHelpers/releases/tag/v0.0.0
 Follow the instructions in the release page to install them!
 
 ```dotnet build /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None -p:BuildWindowsOnly=true```
