@@ -7,7 +7,7 @@ One standout feature is the automatic tag generation using the WD 1.4 SwinV2 Tag
 
 The toolkit also offers advanced content-aware smart cropping. Leveraging the YoloV4 model for object detection, it intelligently identifies images with people and performs automatic cropping. Custom implementation ensures precise cropping, resulting in optimized images ready for further processing. Output dimensions are 512x512, 640x640, or 768x768, compatible with popular machine learning frameworks.
 
-![Alt Text](https://github.com/LeonardoFer/DatasetHelpers/blob/master/showcase_gif.gif?raw=true)
+![Alt Text](https://github.com/Particle1904/DatasetHelpers/blob/master/showcase_gif.gif?raw=true)
 
 ## Features
 - Discard images with low resolution
