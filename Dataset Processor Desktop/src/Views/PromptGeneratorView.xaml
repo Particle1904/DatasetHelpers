@@ -16,6 +16,8 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -190,8 +192,19 @@
                     IsEnabled="{Binding GenerateButtonEnabled}"
                     Text="Generate captions!"/>
         </Grid>
+
+        <ProgressBar Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3"
+             Progress="{Binding GenerationProgress.PercentFloat}"
+             ProgressColor="{StaticResource DarkPrimary}"/>
+
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="5"
+               HorizontalOptions="Center"
+               VerticalTextAlignment="Center"
+               FontSize="Medium"
+               TextColor="{StaticResource DarkSecondary}"
+               Text="{Binding TaskStatusString}"/>
         
-        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+        <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="5"
            TextColor="{StaticResource DarkSecondary}"
            Margin="0,0,0,0"
            VerticalTextAlignment="Center"

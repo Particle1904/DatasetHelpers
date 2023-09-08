@@ -1,5 +1,7 @@
-﻿using Dataset_Processor_Desktop.src.Utilities;
+﻿using Dataset_Processor_Desktop.src.Enums;
+using Dataset_Processor_Desktop.src.Utilities;
 
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
 namespace Dataset_Processor_Desktop.src.ViewModel
@@ -28,6 +30,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _outputFolderPath = value;
                 OnPropertyChanged(nameof(OutputFolderPath));
+            }
+        }
+
+        private Progress _generationProgress;
+        public Progress GenerationProgress
+        {
+            get => _generationProgress;
+            set
+            {
+                _generationProgress = value;
+                OnPropertyChanged(nameof(GenerationProgress));
             }
         }
 
@@ -142,6 +155,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             CopyPredictedPromptCommand = new RelayCommand(async () => await CopyToClipboard(GeneratedPrompt));
             GeneratePromptCommand = new RelayCommand(async () => await GeneratePromptAsync());
             GeneratePromptsCommand = new RelayCommand(async () => await GeneratePromptsAsync());
+
+            TaskStatus = ProcessingStatus.Idle;
         }
 
         public async Task SelectInputFolderAsync()
@@ -196,6 +211,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task GeneratePromptsAsync()
         {
+            if (GenerationProgress == null)
+            {
+                GenerationProgress = new Progress();
+            }
+            if (GenerationProgress.PercentFloat != 0f)
+            {
+                GenerationProgress.Reset();
+            }
+
+            TaskStatus = ProcessingStatus.Running;
+
             try
             {
                 GenerateButtonEnabled = false;
@@ -209,7 +235,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 string outputPath = Path.Combine(OutputFolderPath, "generatedPrompts.txt");
 
                 await Task.Run(() => _promptGeneratorService.GeneratePromptsAndSaveToFile(outputPath, _datasetTags, TagsToPrepend,
-                    TagsToAppend, _amountOfTags, _amountOfGeneratedPrompts));
+                    TagsToAppend, _amountOfTags, _amountOfGeneratedPrompts, GenerationProgress));
             }
             catch (Exception exception)
             {
@@ -229,6 +255,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             finally
             {
+                TaskStatus = ProcessingStatus.Finished;
                 GenerateButtonEnabled = true;
             }
         }

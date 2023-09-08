@@ -1,4 +1,5 @@
-﻿using SmartData.Lib.Interfaces;
+﻿using SmartData.Lib.Helpers;
+using SmartData.Lib.Interfaces;
 
 using System.Text;
 
@@ -86,6 +87,29 @@ namespace SmartData.Lib.Services
                 string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
                 string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
                 prompts[i] = cleanedPrompt;
+            }
+
+            await File.AppendAllLinesAsync(outputFile, prompts);
+        }
+
+        public async Task GeneratePromptsAndSaveToFile(string outputFile, string[] tags, string prependTags,
+            string appendTags, int amountOfTags, int amountOfPrompts, Progress progress)
+        {
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+
+            progress.TotalFiles = amountOfPrompts;
+
+            string[] prompts = new string[amountOfPrompts];
+
+            for (int i = 0; i < amountOfPrompts; i++)
+            {
+                string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
+                string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
+                prompts[i] = cleanedPrompt;
+                progress.UpdateProgress();
             }
 
             await File.AppendAllLinesAsync(outputFile, prompts);
