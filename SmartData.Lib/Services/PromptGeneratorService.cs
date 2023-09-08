@@ -92,6 +92,17 @@ namespace SmartData.Lib.Services
             await File.AppendAllLinesAsync(outputFile, prompts);
         }
 
+        /// <summary>
+        /// Generates multiple prompts based on provided tags and saves them to a specified file.
+        /// </summary>
+        /// <param name="outputFile">The path to the output file where prompts will be saved.</param>
+        /// <param name="tags">An array of tags from which the prompts are generated.</param>
+        /// <param name="prependTags">Optional tags to prepend to the generated prompts (can be empty).</param>
+        /// <param name="appendTags">Optional tags to append to the generated prompts (can be empty).</param>
+        /// <param name="amountOfTags">The number of tags to include in each generated prompt.</param>
+        /// <param name="amountOfPrompts">The total number of prompts to generate and save.</param>
+        /// <param name="progress">An object used to report progress during the generation process.</param>
+        /// <returns>A Task representing the asynchronous operation of generating and saving prompts.</returns>
         public async Task GeneratePromptsAndSaveToFile(string outputFile, string[] tags, string prependTags,
             string appendTags, int amountOfTags, int amountOfPrompts, Progress progress)
         {
