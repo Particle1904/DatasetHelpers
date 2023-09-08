@@ -222,28 +222,8 @@ namespace SmartData.Lib.Services
         /// <returns>Returns a formatted string with the processed tags by each line.</returns>
         public string CalculateListOfMostFrequentTags(string inputFolderPath)
         {
-            Dictionary<string, uint> tags = new Dictionary<string, uint>();
-
-            foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt").Where(x => !x.Contains("sample_prompt_custom.txt")))
-            {
-                string fileTags = File.ReadAllText(file);
-                string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "", RegexOptions.None, TimeSpan.FromSeconds(10)).Replace(", ", ",").Split(",");
-
-                foreach (string splittedTag in split)
-                {
-                    string match = tags.Keys.FirstOrDefault(x => x.Equals(splittedTag));
-                    if (match == null)
-                    {
-                        tags.Add(splittedTag, 1);
-                    }
-                    else
-                    {
-                        tags[match]++;
-                    }
-                }
-            }
-
-            var sorted = tags.OrderByDescending(x => x.Value).ToList();
+            Dictionary<string, uint> tagsWithFrequency = GetTagsWithFrequency(inputFolderPath);
+            List<KeyValuePair<string, uint>> sorted = tagsWithFrequency.OrderByDescending(x => x.Value).ToList();
 
             StringBuilder stringBuilder = new StringBuilder();
             foreach (KeyValuePair<string, uint> tag in sorted)
@@ -253,6 +233,18 @@ namespace SmartData.Lib.Services
                 stringBuilder.Append($"{formatted}{Environment.NewLine}");
             }
             return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Retrieves an array of unique tags extracted from text files in the specified folder.
+        /// </summary>
+        /// <param name="inputFolderPath">The path to the folder containing text files.</param>
+        /// <returns>An array of strings representing unique tags found in the text files.</returns>
+        public string[] GetTagsFromDataset(string inputFolderPath)
+        {
+            Dictionary<string, uint> tagsWithFrequency = GetTagsWithFrequency(inputFolderPath);
+
+            return tagsWithFrequency.Keys.ToArray();
         }
 
         /// <summary>
@@ -680,6 +672,40 @@ namespace SmartData.Lib.Services
                 }
             }
             return stringBuilder.ToString();
+        }
+
+        /// <summary>
+        /// Retrieves a dictionary of tags and their frequencies from text files in the specified folder.
+        /// </summary>
+        /// <param name="inputFolderPath">The path to the folder containing text files.</param>
+        /// <returns>
+        /// A dictionary where keys represent tags and values represent their corresponding frequencies,
+        /// sorted in descending order of frequency.
+        /// </returns>
+        private static Dictionary<string, uint> GetTagsWithFrequency(string inputFolderPath)
+        {
+            Dictionary<string, uint> tagsWithFrequency = new Dictionary<string, uint>();
+
+            foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt").Where(x => !x.Contains("sample_prompt_custom.txt")))
+            {
+                string fileTags = File.ReadAllText(file);
+                string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "", RegexOptions.None, TimeSpan.FromSeconds(10)).Replace(", ", ",").Split(",");
+
+                foreach (string splittedTag in split)
+                {
+                    string match = tagsWithFrequency.Keys.FirstOrDefault(x => x.Equals(splittedTag));
+                    if (match == null)
+                    {
+                        tagsWithFrequency.Add(splittedTag, 1);
+                    }
+                    else
+                    {
+                        tagsWithFrequency[match]++;
+                    }
+                }
+            }
+
+            return tagsWithFrequency;
         }
     }
 }

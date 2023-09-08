@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dataset_Processor_Desktop.src.Views.PromptGeneratorView">
+    <Grid VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand"
+      ColumnSpacing="10" RowSpacing="10" Padding="10" WidthRequest="1024">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5"
+           HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+           FontSize="Title"
+           Text="Dataset Prompt Generator"/>
+
+        <Button Grid.Row="1" Grid.Column="0"
+            Command="{Binding SelectInputFolderCommand}"
+            Text="Select Input folder:"/>
+        <StackLayout Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+            <Label Text="{Binding InputFolderPath}"/>
+            <ImageButton Source="folder_opened.png"
+                     Command="{Binding OpenInputFolderCommand}"
+                     WidthRequest="30"
+                     HeightRequest="30"
+                     Padding="2"
+                     HorizontalOptions="End"/>
+        </StackLayout>
+
+        <Label Grid.Row="2" Grid.Column="0"
+               Text="Tags to prepend:"/>
+        <ScrollView Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    HeightRequest="50">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="False"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter the tags you want to prepend to the start of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+                    Text="{Binding TagsToPrepend}"/>
+        </ScrollView>
+
+        <Label Grid.Row="3" Grid.Column="0"
+               Text="Tags to append:"/>
+        <ScrollView Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="4"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    HeightRequest="50">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"                
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="False"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter the tags you want to append to the end of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+                    Text="{Binding TagsToAppend}"/>
+        </ScrollView>
+
+        <Label Grid.Row="4" Grid.Column="0"
+               Text="Amount of tags (if tag is a repeated one, it will be automatically removed):"/>
+        <ScrollView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="4"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand">
+            <Editor VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="False"
+                    AutoSize="TextChanges"
+                    Placeholder="Enter here the number of random tags to use for the generation. Note: value will be clamped to be between 5 and 50; your append and prepend tags aren't taken into consideration."
+                    Text="{Binding AmountOfTags}"
+                    Keyboard="Numeric"/>
+        </ScrollView>
+
+        <BoxView HeightRequest="1" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="5"
+             Background="{StaticResource Gray600}"/>
+
+        <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0"
+                   HorizontalTextAlignment="Start"
+                   Text="Generated prompt:"/>
+            <ImageButton Grid.Column="1"
+                         Source="content_copy.png"
+                         HorizontalOptions="End"
+                         Command="{Binding CopyPredictedPromptCommand}"
+                         WidthRequest="30"
+                         HeightRequest="30"
+                         Padding="2"/>
+        </Grid>
+
+        <ScrollView Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5"
+                    HorizontalOptions="FillAndExpand"
+                    VerticalOptions="FillAndExpand"
+                    HeightRequest="100"
+                    MaximumHeightRequest="120">
+            <Editor VerticalOptions="FillAndExpand"
+                    IsEnabled="{Binding GenerateButtonEnabled}"
+                    HorizontalOptions="FillAndExpand"
+                    AutoSize="TextChanges"
+                    VerticalTextAlignment="Start"
+                    HorizontalTextAlignment="Start"
+                    IsTextPredictionEnabled="False"
+                    Text="{Binding GeneratedPrompt}"
+                    IsSpellCheckEnabled="False"
+                    FontSize="Default"
+                    FontFamily="OpenSansRegular"
+                    Placeholder="This is where you can view and edit your generated prompt. Click the button on the far right to copy the contents to your system clipboard.">
+            </Editor>
+        </ScrollView>
+
+        <Button Grid.Row="8" Grid.Column="2"
+            Command="{Binding GeneratePromptCommand}"
+            Text="Generate caption!"/>        
+
+        <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5"
+           TextColor="{StaticResource DarkSecondary}"
+           Margin="0,0,0,0"
+           VerticalTextAlignment="Center"
+           HorizontalOptions="Center"
+           Text="Note: This functionality will generate a unique prompt from your input folder data, append and prepend any number of tags you want.&#10;It will also clean up the generate prompt and apply redundancy removal to it.&#10;You can also save a file with as many unique generated prompts as you want."/>
+    </Grid>
+</ContentView>

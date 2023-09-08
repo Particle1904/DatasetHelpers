@@ -17,7 +17,6 @@ public partial class ExtractSubsetView : ContentView
         _fileManipulatorService = fileManipulatorService;
 
         _viewModel = new ExtractSubsetViewModel(_fileManipulatorService);
-
         BindingContext = _viewModel;
     }
 }

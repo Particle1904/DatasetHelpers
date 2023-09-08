@@ -18,6 +18,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         private readonly ITagProcessorService _tagProcessorService;
         private readonly IContentAwareCropService _contentAwareCropService;
         private readonly IInputHooksService _inputHooksService;
+        private readonly IPromptGeneratorService _promptGeneratorService;
 
         #region Definition of App Views.
         private View _dynamicContentView;
@@ -50,6 +51,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToTagProcessingCommand { get; private set; }
         public RelayCommand NavigateToTagEditorCommand { get; private set; }
         public RelayCommand NavigateToExtractSubsetCommand { get; private set; }
+        public RelayCommand NavigateToPromptGeneratorCommand { get; private set; }
         public RelayCommand NavigateToMetadataCommand { get; private set; }
         public RelayCommand NavigateToSettingsCommand { get; private set; }
 
@@ -61,6 +63,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _tagProcessorService = Application.Current.Handler.MauiContext.Services.GetService<ITagProcessorService>();
             _contentAwareCropService = Application.Current.Handler.MauiContext.Services.GetService<IContentAwareCropService>();
             _inputHooksService = Application.Current.Handler.MauiContext.Services.GetService<IInputHooksService>();
+            _promptGeneratorService = Application.Current.Handler.MauiContext.Services.GetService<IPromptGeneratorService>();
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -75,6 +78,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 { AppViews.TagProcessing, new TagProcessingView(_tagProcessorService, _fileManipulatorService) },
                 { AppViews.TagEditor, new TagEditorView(_fileManipulatorService, _imageProcessorService, _inputHooksService) },
                 { AppViews.ExtractSubset, new ExtractSubsetView(_fileManipulatorService) },
+                { AppViews.PromptGenerator, new PromptGeneratorView(_promptGeneratorService, _tagProcessorService) },
                 { AppViews.Metadata, new MetadataView(_imageProcessorService, _autoTaggerService) },
                 { AppViews.Settings, new SettingsView() }
             };
@@ -90,6 +94,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToTagProcessingCommand = new RelayCommand(() => NavigateToPage(AppViews.TagProcessing));
             NavigateToTagEditorCommand = new RelayCommand(NavigateToTagEditorView);
             NavigateToExtractSubsetCommand = new RelayCommand(() => NavigateToPage(AppViews.ExtractSubset));
+            NavigateToPromptGeneratorCommand = new RelayCommand(() => NavigateToPage(AppViews.PromptGenerator));
             NavigateToMetadataCommand = new RelayCommand(() => NavigateToPage(AppViews.Metadata));
             NavigateToSettingsCommand = new RelayCommand(() => NavigateToPage(AppViews.Settings));
 

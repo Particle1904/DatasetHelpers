@@ -106,6 +106,9 @@
 	  <MauiXaml Update="src\Views\MetadataView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="src\Views\PromptGeneratorView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="src\Views\SortView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

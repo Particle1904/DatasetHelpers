@@ -27,6 +27,8 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="0"
@@ -65,10 +67,13 @@
                     Text="Extract Subset"
                     Command="{Binding NavigateToExtractSubsetCommand}"/>
             <Button Grid.Row="9"
+                    Text="Dataset Prompt Gen"
+                    Command="{Binding NavigateToPromptGeneratorCommand}"/>
+            <Button Grid.Row="10"
                     Text="Metadata Viewer"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToMetadataCommand}"/>
-            <Button Grid.Row="10"
+            <Button Grid.Row="11"
                     Text="Settings"
                     VerticalOptions="Center"
                     Command="{Binding NavigateToSettingsCommand}"/>

@@ -17,5 +17,6 @@ namespace SmartData.Lib.Interfaces
         public string CalculateListOfMostFrequentTags(string inputFolderPath);
         public string ApplyRedundancyRemoval(string tags);
         public string GetCommaSeparatedString(List<string> predictedTags);
+        public string[] GetTagsFromDataset(string inputFolderPath);
     }
 }

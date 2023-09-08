@@ -46,6 +46,9 @@ namespace Dataset_Processor_Desktop
                     Path.Combine(_modelsPath, _csvFilename)
             ));
             builder.Services.AddSingleton<IInputHooksService, InputHooksService>();
+            builder.Services.AddSingleton<IPromptGeneratorService>(service => new
+                PromptGeneratorService(service.GetRequiredService<ITagProcessorService>(),
+                    service.GetRequiredService<IFileManipulatorService>()));
 
             return builder.Build();
         }

@@ -11,6 +11,7 @@
         TagProcessing,
         TagEditor,
         ExtractSubset,
+        PromptGenerator,
         Metadata,
         Settings
     }
