@@ -66,7 +66,25 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 catch
                 {
-                    _loggerService.LatestLogMessage = $"Needs to be a number between 5 and 50.";
+                    _loggerService.LatestLogMessage = $"Amount of tags needs to be a number between 5 and 50.";
+                }
+            }
+        }
+
+        private int _amountOfGeneratedPrompts;
+        public string AmountOfGeneratedPrompts
+        {
+            get => _amountOfGeneratedPrompts.ToString();
+            set
+            {
+                try
+                {
+                    _amountOfGeneratedPrompts = Math.Clamp(int.Parse(value), 10, ushort.MaxValue);
+                    OnPropertyChanged(nameof(AmountOfTags));
+                }
+                catch
+                {
+                    _loggerService.LatestLogMessage = $"Amount of Prompts to Generate needs to be a number between 10 and 65535.";
                 }
             }
         }
@@ -101,6 +119,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand OpenOutputFolderCommand { get; private set; }
         public RelayCommand CopyPredictedPromptCommand { get; private set; }
         public RelayCommand GeneratePromptCommand { get; private set; }
+        public RelayCommand GeneratePromptsCommand { get; private set; }
 
         public PromptGeneratorViewModel(IPromptGeneratorService promptGeneratorService, ITagProcessorService tagProcessorService)
         {
@@ -113,6 +132,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             TagsToAppend = "masterpiece, best quality, absurdres";
             GeneratedPrompt = string.Empty;
             _amountOfTags = 20;
+            _amountOfGeneratedPrompts = 1000;
             GenerateButtonEnabled = true;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
@@ -121,6 +141,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             OpenOutputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(OutputFolderPath));
             CopyPredictedPromptCommand = new RelayCommand(async () => await CopyToClipboard(GeneratedPrompt));
             GeneratePromptCommand = new RelayCommand(async () => await GeneratePromptAsync());
+            GeneratePromptsCommand = new RelayCommand(async () => await GeneratePromptsAsync());
         }
 
         public async Task SelectInputFolderAsync()
@@ -148,11 +169,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 if (_datasetTags == null || _datasetTags.Length == 0)
                 {
                     GenerateButtonEnabled = false;
-                    _datasetTags = Task.Run(() => _tagProcessorService.GetTagsFromDataset(InputFolderPath)).Result;
+                    _datasetTags = await Task.Run(() => _tagProcessorService.GetTagsFromDataset(InputFolderPath));
                     GenerateButtonEnabled = true;
                 }
 
-                GeneratedPrompt = _promptGeneratorService.GeneratePromptFromDataset(_datasetTags, TagsToPrepend, TagsToAppend, _amountOfTags);
+                string generatedPrompt = await Task.Run(() => _promptGeneratorService.GeneratePromptFromDataset(_datasetTags, TagsToPrepend, TagsToAppend, _amountOfTags));
+                GeneratedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
             }
             catch (Exception exception)
             {
@@ -169,6 +191,45 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
                     await _loggerService.SaveExceptionStackTrace(exception);
                 }
+            }
+        }
+
+        public async Task GeneratePromptsAsync()
+        {
+            try
+            {
+                GenerateButtonEnabled = false;
+                if (_datasetTags == null || _datasetTags.Length == 0)
+                {
+
+                    _datasetTags = Task.Run(() => _tagProcessorService.GetTagsFromDataset(InputFolderPath)).Result;
+
+                }
+
+                string outputPath = Path.Combine(OutputFolderPath, "generatedPrompts.txt");
+
+                await Task.Run(() => _promptGeneratorService.GeneratePromptsAndSaveToFile(outputPath, _datasetTags, TagsToPrepend,
+                    TagsToAppend, _amountOfTags, _amountOfGeneratedPrompts));
+            }
+            catch (Exception exception)
+            {
+                if (exception.GetType() == typeof(FileNotFoundException))
+                {
+                    _loggerService.LatestLogMessage = $"{exception.Message}";
+                }
+                else if (exception.GetType() == typeof(ArgumentNullException))
+                {
+                    _loggerService.LatestLogMessage = exception.Message;
+                }
+                else
+                {
+                    _loggerService.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    await _loggerService.SaveExceptionStackTrace(exception);
+                }
+            }
+            finally
+            {
+                GenerateButtonEnabled = true;
             }
         }
     }

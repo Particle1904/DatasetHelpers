@@ -15,7 +15,7 @@ namespace SmartData.Lib.Interfaces
         public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, bool exactMatchesOnly);
         public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, Progress progress);
         public string GetTextFromFile(string imageFilePath, string txtFileExtension);
-        public void SaveTextForImage(string filePath, string textToSave);
+        public void SaveTextToFile(string filePath, string textToSave);
         public Task CreateSubsetAsync(List<string> files, string outputPath);
         public Task CreateSubsetAsync(List<string> files, string outputPath, Progress progress);
     }

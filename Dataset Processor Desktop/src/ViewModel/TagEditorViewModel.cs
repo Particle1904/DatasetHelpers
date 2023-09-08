@@ -193,7 +193,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 OnPropertyChanged(nameof(CurrentImageTags));
                 OnPropertyChanged(nameof(CurrentAndTotal));
                 string txtFile = Path.ChangeExtension(_imageFiles[_selectedItemIndex], CurrentType);
-                _fileManipulatorService.SaveTextForImage(txtFile, _currentImageTags);
+                _fileManipulatorService.SaveTextToFile(txtFile, _currentImageTags);
             }
         }
 

@@ -20,6 +20,17 @@ namespace SmartData.Lib.Services
             _random = new Random();
         }
 
+        /// <summary>
+        /// Generates a prompt based on provided tags, with optional prefix and suffix tags.
+        /// </summary>
+        /// <param name="tags">An array of tags from which the prompt is generated.</param>
+        /// <param name="prependTags">Optional tags to prepend to the generated prompt (can be empty).</param>
+        /// <param name="appendTags">Optional tags to append to the generated prompt (can be empty).</param>
+        /// <param name="amountOfTags">The number of tags to include in the generated prompt.</param>
+        /// <returns>
+        /// A string representing the generated prompt, constructed from the provided tags
+        /// with optional prefix and suffix tags.
+        /// </returns>
         public string GeneratePromptFromDataset(string[] tags, string prependTags, string appendTags, int amountOfTags)
         {
             _stringBuilder.Clear();
@@ -47,7 +58,37 @@ namespace SmartData.Lib.Services
             }
 
             string prompt = _stringBuilder.ToString().Replace(", , ", ", ").Replace(", ,", ", ").Replace("  ", " ");
-            return _tagProcessorService.ApplyRedundancyRemoval(prompt);
+            return prompt;
+        }
+
+        /// <summary>
+        /// Generates multiple prompts based on provided tags and saves them to a specified file.
+        /// </summary>
+        /// <param name="outputFile">The path to the output file where prompts will be saved.</param>
+        /// <param name="tags">An array of tags from which the prompts are generated.</param>
+        /// <param name="prependTags">Optional tags to prepend to the generated prompts (can be empty).</param>
+        /// <param name="appendTags">Optional tags to append to the generated prompts (can be empty).</param>
+        /// <param name="amountOfTags">The number of tags to include in each generated prompt.</param>
+        /// <param name="amountOfPrompts">The total number of prompts to generate and save.</param>
+        /// <returns>A Task representing the asynchronous operation of generating and saving prompts.</returns>
+        public async Task GeneratePromptsAndSaveToFile(string outputFile, string[] tags, string prependTags,
+            string appendTags, int amountOfTags, int amountOfPrompts)
+        {
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+
+            string[] prompts = new string[amountOfPrompts];
+
+            for (int i = 0; i < amountOfPrompts; i++)
+            {
+                string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
+                string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
+                prompts[i] = cleanedPrompt;
+            }
+
+            await File.AppendAllLinesAsync(outputFile, prompts);
         }
     }
 }

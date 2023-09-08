@@ -410,7 +410,7 @@ namespace SmartData.Lib.Services
         /// <param name="filePath">The file path where the text will be saved.</param>
         /// <param name="textToSave">The text to save to the file.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public void SaveTextForImage(string filePath, string textToSave)
+        public void SaveTextToFile(string filePath, string textToSave)
         {
             File.WriteAllText(filePath, textToSave);
         }
