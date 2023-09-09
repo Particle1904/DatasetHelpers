@@ -164,6 +164,7 @@
 
         <Button Grid.Row="13" Grid.Column="2"
                 Command="{Binding CropImagesCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Auto Crop Images!"/>
 
         <ProgressBar Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="3"

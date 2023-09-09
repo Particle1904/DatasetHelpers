@@ -321,7 +321,7 @@ namespace SmartData.Lib.Services
                         else
                         {
                             string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
-                            if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                            if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase, Utilities.RegexTimeout))
                             {
                                 filteredImageFiles.Add(image);
                                 break;
@@ -369,7 +369,7 @@ namespace SmartData.Lib.Services
                     foreach (string tag in wordsSplit)
                     {
                         string wordBoundaryPattern = $@"\b{Regex.Escape(tag)}\b";
-                        if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase))
+                        if (Regex.IsMatch(caption, wordBoundaryPattern, RegexOptions.IgnoreCase, Utilities.RegexTimeout))
                         {
                             filteredImageFiles.Add(image);
                             break;

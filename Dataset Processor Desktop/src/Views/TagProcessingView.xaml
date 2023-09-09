@@ -129,6 +129,7 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="40"/>
@@ -153,6 +154,12 @@
                    HorizontalOptions="Start"
                    VerticalOptions="Center"
                    Text="Would you like to apply redundancy removal to the tags? For example: if the processed tags have &quot;shirt&quot; and &quot;black shirt&quot;;&#x0a;it will strip &quot;shirt&quot; and keep &quot;black shirt&quot; since its more descriptive."/>
+            <CheckBox Grid.Row="3" Grid.Column="0"
+                      IsChecked="{Binding ApplyConsolidateTags}"/>
+            <Label Grid.Row="3" Grid.Column="1"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   Text="[EXPERIMENTAL!] Would you like to consolidate similar tags into a single one? For example: if the processed tags have &quot;white shirt&quot; and &quot;collared shirt&quot;&#x0a;it will combine them into &quot;white collared shirt&quot;."/>
         </Grid>
 
         <Label Grid.Row="7" Grid.Column="0"
@@ -181,6 +188,7 @@
 
         <Button Grid.Row="10" Grid.Column="2"
                 Command="{Binding ProcessTagsCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Process tags!"/>
 
         <ProgressBar Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="3"

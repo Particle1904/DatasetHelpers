@@ -139,6 +139,7 @@
 
         <Button Grid.Row="11" Grid.Column="2"
                 Command="{Binding MakePredictionsCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Generate tags!"/>
 
         <ProgressBar Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="3"

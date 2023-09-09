@@ -54,6 +54,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _isUiEnabled;
+        public bool IsUiEnabled
+        {
+            get => _isUiEnabled;
+            set
+            {
+                _isUiEnabled = value;
+                OnPropertyChanged(nameof(IsUiEnabled));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand ProcessCaptionsCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -69,6 +80,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             ProcessCaptionsCommand = new RelayCommand(async () => await ProcessCaptionsAsync());
             OpenInputFolderCommand = new RelayCommand(async () => await OpenFolderAsync(InputFolderPath));
+
+            IsUiEnabled = true;
         }
 
         public async Task SelectInputFolderAsync()
@@ -82,6 +95,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task ProcessCaptionsAsync()
         {
+            IsUiEnabled = false;
+
             if (CaptionProcessingProgress == null)
             {
                 CaptionProcessingProgress = new Progress();
@@ -106,6 +121,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             finally
             {
+                IsUiEnabled = true;
                 TaskStatus = Enums.ProcessingStatus.Finished;
             }
         }

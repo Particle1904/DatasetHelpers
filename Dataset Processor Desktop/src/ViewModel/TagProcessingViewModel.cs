@@ -121,6 +121,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _applyConsolidateTags;
+        public bool ApplyConsolidateTags
+        {
+            get => _applyConsolidateTags;
+            set
+            {
+                _applyConsolidateTags = value;
+                OnPropertyChanged(nameof(ApplyConsolidateTags));
+            }
+        }
+
         private string _sortedByFrequency;
         public string SortedByFrequency
         {
@@ -129,6 +140,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 _sortedByFrequency = value;
                 OnPropertyChanged(nameof(SortedByFrequency));
+            }
+        }
+
+        private bool _isUiEnabled;
+        public bool IsUiEnabled
+        {
+            get => _isUiEnabled;
+            set
+            {
+                _isUiEnabled = value;
+                OnPropertyChanged(nameof(IsUiEnabled));
             }
         }
 
@@ -153,8 +175,10 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             SortedByFrequency = "Click the button in the right to process tags by frequency.\nThis will use the .txt files in the input folder.";
 
             RandomizeTags = false;
-            RenameFilesToCrescent = true;
+            RenameFilesToCrescent = false;
             ApplyRedundancyRemoval = false;
+
+            IsUiEnabled = true;
         }
 
         public async Task SelectInputFolderAsync()
@@ -168,6 +192,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task ProcessTagsAsync()
         {
+            IsUiEnabled = false;
+
             if (TagProcessingProgress == null)
             {
                 TagProcessingProgress = new Progress();
@@ -191,6 +217,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     TagProcessingProgress.Reset();
                     await _fileManipulatorService.RenameAllToCrescentAsync(InputFolderPath, TagProcessingProgress);
                 }
+                if (ApplyConsolidateTags)
+                {
+                    TagProcessingProgress.Reset();
+                    //await _tagProcessorService.ConsolidateTags(InputFolderPath);
+                    await _tagProcessorService.ConsolidateTagsAndLogEdgeCases(InputFolderPath, _loggerService, TagProcessingProgress);
+                }
                 if (ApplyRedundancyRemoval)
                 {
                     TagProcessingProgress.Reset();
@@ -211,6 +243,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             finally
             {
+                IsUiEnabled = true;
                 TaskStatus = Enums.ProcessingStatus.Finished;
             }
 
@@ -233,6 +266,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 }
                 finally
                 {
+                    IsUiEnabled = true;
                     TaskStatus = Enums.ProcessingStatus.Finished;
                 }
             }

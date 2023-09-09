@@ -88,6 +88,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _isUiEnabled;
+        public bool IsUiEnabled
+        {
+            get => _isUiEnabled;
+            set
+            {
+                _isUiEnabled = value;
+                OnPropertyChanged(nameof(IsUiEnabled));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand SelectDiscardedFolderCommand { get; private set; }
@@ -122,9 +133,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             OpenBackupFolderCommand = new RelayCommand(async () => await OpenFolderAsync(BackupFolderPath));
 
             Dimension = SupportedDimensions.Resolution512x512;
+            IsUiEnabled = true;
 
             TaskStatus = ProcessingStatus.Idle;
-            IsUiLocked = false;
         }
 
         public async Task SelectInputFolderAsync()
@@ -162,6 +173,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task SortImagesAsync()
         {
+            IsUiEnabled = false;
 
             if (SortProgress == null)
             {
@@ -191,6 +203,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             finally
             {
+                IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
             }
         }

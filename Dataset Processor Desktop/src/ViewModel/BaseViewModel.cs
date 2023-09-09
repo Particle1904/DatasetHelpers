@@ -20,17 +20,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             get => _configsService;
         }
 
-        private bool _isUiLocked = false;
-        public bool IsUiLocked
-        {
-            get => _isUiLocked;
-            set
-            {
-                _isUiLocked = value;
-                OnPropertyChanged(nameof(IsUiLocked));
-            }
-        }
-
         public string TaskStatusString
         {
             get

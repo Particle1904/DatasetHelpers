@@ -1,6 +1,7 @@
 ﻿using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,6 +11,90 @@ namespace SmartData.Lib.Services
     {
         private readonly string _txtSearchPattern = "*.txt";
         private readonly string _captionSearchPattern = "*.caption";
+
+        private static HashSet<string> _edgeCasesContains = new HashSet<string>()
+        {
+            "tattoo", "piercing", "headwear", "on", "up", "(", ")", "looking", "viewer", "grabbing", "pubic",
+            "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread"
+        };
+
+        private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
+        {
+            "facial hair", "navel hair", "armpit hair", "chest hair", "pubic hair", "ass visible through thighs",
+            "feet out of frame", "head out of frame", "leg lift", "thigh high", "closed eyes", "glowing eyes",
+            "half closed eyes", "rolling eyes",
+        };
+
+        private static HashSet<string> _breastsSizeKeywords = new HashSet<string>()
+        {
+            "small b", "medium b", "large b", "huge b", "flat chest"
+        };
+
+        private static HashSet<string> _hairLengthKeywords = new HashSet<string>()
+        {
+            "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "long hair"
+        };
+
+        private static HashSet<string> _hairColorKeywords = new HashSet<string>()
+        {
+            "blonde hair", "blond hair", "brown hair", "black hair", "blue hair", "pink hair", "purple hair",
+            "white hair", "grey hair", "gray hair", "red hair", "green hair", "orange hair", "aqua hair"
+        };
+
+        private static HashSet<string> _eyeColorsKeywords = new HashSet<string>()
+        {
+            "brown eyes", "black eyes", "blue eyes", "pink eyes", "purple eyes", "white eyes",
+            "grey eyes", "gray eyes", "red eyes", "green eyes", "orange eyes", "aqua eyes", "yellow eyes"
+        };
+
+        private static HashSet<string> _lipsColorKeywords = new HashSet<string>()
+        {
+            "aqua lips", "black lips", "blue lips", "brown lips", "gold lips", "green lips", "grey lips",
+            "purple lips", "blue lips", "orange lips", "pink lips", "purple lips", "red lips", "silver lips",
+            "white lips", "yellow lips"
+        };
+
+        private static HashSet<string> _pSizeKeywords = new HashSet<string>()
+        {
+            "small pe", "medium pe", "large pe", "huge pe" , "gigantic pe"
+        };
+
+        private static HashSet<string> _pStateKeywords = new HashSet<string>()
+        {
+            "flaccid", "erection"
+        };
+
+        private static HashSet<string> _skinColorsKeywords = new HashSet<string>()
+        {
+            "black skin", "blue skin", "pink skin", "purple skin", "white skin", "grey skin",
+            "gray skin", "red skin", "green skin", "orange skin", "yellow skin"
+        };
+
+        private static HashSet<string> _clothingKeywords = new HashSet<string>()
+        {
+            "clothing aside", "panties aside", "bikini bottom aside", "leotard aside", "swimsuit aside",
+            "buruma aside", "thong aside", "shorts aside", "fundoshi aside", "pelvic curtain aside",
+            "dress aside", "skirt aside", "apron aside", "bodysuit aside"
+        };
+
+        private static HashSet<string> _clothesPullKeywords = new HashSet<string>()
+        {
+            "clothes pull", "shirt pull", "dress pull", "skirt pull", "shorts pull", "pants pull",
+            "one-piece swimsuit pull", "bikini pull", "bra pull", "pantyhose pull", "sports bra pull"
+        };
+
+        private static HashSet<string> _clothesLiftKeywords = new HashSet<string>()
+        {
+            "clothes lift", "bikini top lift", "dress lift", "hakama lift", "hoodie lift", "kimono lift",
+            "pelvic curtain lift", "sarong lift", "shirt lift", "skirt lift", "sports bra lift",
+            "sweater lift", "swimsuit lift", "towel lift", "bikini lift"
+        };
+
+        private static HashSet<string> _tagsToRemove = new HashSet<string>()
+        {
+            "questionable", "explicit", "sensitive", "censored", "uncensored", "solo", "general", "meme",
+            "meme attire", "mosaic censoring"
+        };
 
         /// <summary>
         /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags.
@@ -55,6 +140,79 @@ namespace SmartData.Lib.Services
                 await File.WriteAllTextAsync(file, processedTags);
                 progress.UpdateProgress();
             }
+        }
+
+        /// <summary>
+        /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
+        /// The consolidated tags are then saved back to the respective files.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ConsolidateTags(string inputFolderPath)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string consolidatedTags = ProcessConsolidateTags(readTags);
+                await File.WriteAllTextAsync(file, consolidatedTags);
+            }
+        }
+
+        /// <summary>
+        /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
+        /// The consolidated tags are then saved back to the respective files, and progress is updated.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
+        /// <param name="progress">The progress object to update with the status of the consolidation operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ConsolidateTags(string inputFolderPath, Progress progress)
+        {
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string consolidatedTags = ProcessConsolidateTags(readTags);
+                await File.WriteAllTextAsync(file, consolidatedTags);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
+        /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
+        /// The consolidated tags are then saved back to the respective files, and progress is updated.
+        /// Additionally, edge cases encountered during consolidation are logged using a StringBuilder.
+        /// After consolidation, the total time taken for the operation is appended to the log.
+        /// </summary>
+        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
+        /// <param name="loggerService">The logger service responsible for handling log storage.</param>
+        /// <param name="progress">The progress object to update with the status of the consolidation operation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService loggerService, Progress progress)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+
+            progress.TotalFiles = files.Length;
+
+            foreach (string file in files)
+            {
+                string readTags = await File.ReadAllTextAsync(file);
+                string consolidatedTags = ProcessConsolidateTags(readTags, file, stringBuilder);
+                await File.WriteAllTextAsync(file, consolidatedTags);
+                progress.UpdateProgress();
+            }
+
+            stopwatch.Stop();
+            stringBuilder.AppendLine($"{Environment.NewLine}{Environment.NewLine}TIME TAKEN: {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
+            await loggerService.SaveStringBuilderToLogFile(stringBuilder);
         }
 
         /// <summary>
@@ -256,8 +414,8 @@ namespace SmartData.Lib.Services
         /// <returns>The string with redundant tags removed.</returns>
         public string ApplyRedundancyRemoval(string tags)
         {
-            List<string> cleanedTags = new List<string>();
-            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
+            HashSet<string> cleanedTags = new HashSet<string>(50);
+            string[] tagsSplit = Utilities.ParseAndCleanTags(tags);
 
             bool hasBreastSizeTag = false;
             bool hasMaleGenitaliaSizeTag = false;
@@ -267,6 +425,9 @@ namespace SmartData.Lib.Services
             bool hasEyesColorTag = false;
             bool hasSkinColorTag = false;
             bool hasClothingAsideTag = false;
+            bool hasLipsColorTag = false;
+            bool hasClothingLiftTag = false;
+            bool hasClothingPullTag = false;
 
             foreach (string tag in tagsSplit)
             {
@@ -278,6 +439,9 @@ namespace SmartData.Lib.Services
                 bool isEyesColor = IsEyesColor(tag);
                 bool isSkinColor = IsSkinColor(tag);
                 bool isClothingAsideTag = IsClothingAside(tag);
+                bool isLipsColorTag = IsLipsColor(tag);
+                bool isClothingLiftTag = IsClothingLift(tag);
+                bool isClothingPullTag = IsClothingPull(tag);
                 bool isRedundant = false;
 
                 foreach (string processedTag in cleanedTags)
@@ -342,27 +506,48 @@ namespace SmartData.Lib.Services
                     cleanedTags.Add(tag);
                     hasSkinColorTag = true;
                 }
+                else if (isLipsColorTag && !hasLipsColorTag)
+                {
+                    if (tagsSplit.Any(x => x.Equals("multicolored lips", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        cleanedTags.Add(tag);
+                    }
+                    else
+                    {
+                        cleanedTags.Add(tag);
+                        hasLipsColorTag = true;
+                    }
+                }
                 else if (isClothingAsideTag && !hasClothingAsideTag)
                 {
                     cleanedTags.Add(tag);
                     hasClothingAsideTag = true;
                 }
-                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isMaleGenitaliaStateTag && !isHairLengthTag &&
-                         !isHairColor && !isEyesColor && !isSkinColor && !isClothingAsideTag && !isRedundant)
+                else if (isClothingLiftTag && !hasClothingLiftTag)
                 {
-                    cleanedTags.RemoveAll(x => IsRedundantWith(x, tag));
+                    cleanedTags.Add(tag);
+                    hasClothingLiftTag = true;
+                }
+                else if (isClothingPullTag && !hasClothingPullTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasClothingPullTag = true;
+                }
+                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isMaleGenitaliaStateTag && !isHairLengthTag &&
+                         !isHairColor && !isEyesColor && !isSkinColor && !isClothingAsideTag && !isClothingLiftTag
+                         && !isClothingPullTag && !isLipsColorTag && !isRedundant)
+                {
+                    cleanedTags.RemoveWhere(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
                 }
             }
 
-            string[] tagsToRemove = { "questionable", "explicit", "sensitive", "censored", "uncensored", "solo",
-                "general", "meme", "meme attire" };
-            foreach (string tagToRemove in tagsToRemove)
+            foreach (string tagToRemove in _tagsToRemove)
             {
-                cleanedTags.RemoveAll(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
+                cleanedTags.RemoveWhere(x => x.Equals(tagToRemove, StringComparison.OrdinalIgnoreCase));
             }
 
-            return GetCommaSeparatedString(cleanedTags);
+            return GetCommaSeparatedString(cleanedTags.ToList());
         }
 
         /// <summary>
@@ -396,8 +581,8 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tags are redundant, false otherwise.</returns>
         private static bool IsRedundantWith(string tag, string otherTag)
         {
-            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10)) ||
-                    Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase, TimeSpan.FromSeconds(10)));
+            return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase, Utilities.RegexTimeout) ||
+                    Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase, Utilities.RegexTimeout));
         }
 
         /// <summary>
@@ -407,9 +592,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a breast size, false otherwise.</returns>
         private static bool IsBreastSize(string tag)
         {
-            string[] sizeKeywords = { "small b", "medium b", "large b", "huge b", "flat chest" };
-
-            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _breastsSizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -419,9 +602,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a hair length, false otherwise.</returns>
         private static bool IsHairLength(string tag)
         {
-            string[] lengthKeyword = { "short hair", "very long hair", "medium hair", "absurdly long hair", "very short hair", "long hair" };
-
-            return Array.Exists(lengthKeyword, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _hairLengthKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -431,9 +612,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a male genitalia size, false otherwise.</returns>
         private static bool IsMaleGenitaliaSize(string tag)
         {
-            string[] sizeKeywords = { "small p", "medium p", "large p", "huge p" };
-
-            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _pSizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -443,9 +622,9 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a male genitalia state, false otherwise.</returns>
         private static bool IsMaleGenitaliaState(string tag)
         {
-            string[] sizeKeywords = { "flaccid", "erection" };
 
-            return Array.Exists(sizeKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+
+            return _pStateKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -460,10 +639,27 @@ namespace SmartData.Lib.Services
                 return false;
             }
 
-            string[] colorKeywords = { "blonde hair", "brown hair", "black hair", "blue hair", "pink hair", "purple hair",
-                "white hair", "grey hair", "gray hair", "red hair", "green hair", "orange hair", "aqua hair" };
+            return _hairColorKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
 
-            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        /// <summary>
+        /// Determines if the given tag represents a piece of clothing being lifted.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a piece of clothing being lifted, false otherwise.</returns>
+        private static bool IsClothingLift(string tag)
+        {
+            return _clothesLiftKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a piece of clothing being pulled.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a piece of clothing being pulled, false otherwise.</returns>
+        private static bool IsClothingPull(string tag)
+        {
+            return _clothesPullKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -478,10 +674,7 @@ namespace SmartData.Lib.Services
                 return false;
             }
 
-            string[] colorKeywords = { "brown eyes", "black eyes", "blue eyes", "pink eyes", "purple eyes", "white eyes",
-                "grey eyes", "gray eyes", "red eyes", "green eyes", "orange eyes", "aqua eyes", "yellow eyes" };
-
-            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _eyeColorsKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -489,12 +682,19 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents skin color, false otherwise.</returns>
+        private static bool IsLipsColor(string tag)
+        {
+            return _lipsColorKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents lipstick color.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents lipstick color, false otherwise.</returns>
         private static bool IsSkinColor(string tag)
         {
-            string[] colorKeywords = { "black skin", "blue skin", "pink skin", "purple skin", "white skin", "grey skin",
-                "gray skin", "red skin", "green skin", "orange skin", "yellow skin" };
-
-            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _skinColorsKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -504,11 +704,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag represents a piece of clothing to the side, false otherwise.</returns>
         private static bool IsClothingAside(string tag)
         {
-            string[] colorKeywords = { "clothing aside", "panties aside", "bikini bottom aside", "leotard aside",
-                "swimsuit aside", "buruma aside", "thong aside", "shorts aside", "fundoshi aside", "pelvic curtain aside",
-                "dress aside", "skirt aside", "apron aside", "bodysuit aside" };
-
-            return Array.Exists(colorKeywords, x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+            return _clothingKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -520,15 +716,15 @@ namespace SmartData.Lib.Services
         /// <returns>The caption content after search and replace operations.</returns>
         private static string ProcessSearchAndReplace(string captions, string wordsToBeReplaced, string wordsToReplace)
         {
-            string[] wordsToBeReplacedSplit = wordsToBeReplaced.Replace(", ", ",").Split(",");
-            string[] wordsToReplaceSplit = wordsToReplace.Replace(", ", ",").Split(",");
+            string[] wordsToBeReplacedSplit = Utilities.ParseAndCleanTags(wordsToBeReplaced);
+            string[] wordsToReplaceSplit = Utilities.ParseAndCleanTags(wordsToReplace);
 
             if (wordsToReplaceSplit.Length != wordsToBeReplacedSplit.Length)
             {
                 throw new ArgumentException("Amount must be the same!");
             }
 
-            string[] captionsSplit = captions.Replace(", ", ",").Split(",");
+            string[] captionsSplit = Utilities.ParseAndCleanTags(captions);
 
             for (int i = 0; i < captionsSplit.Length; i++)
             {
@@ -536,7 +732,8 @@ namespace SmartData.Lib.Services
                 {
                     if (!captionsSplit[i].Contains(wordsToReplaceSplit[j]))
                     {
-                        captionsSplit[i] = Regex.Replace(captionsSplit[i], $@"\b{Regex.Escape(wordsToBeReplacedSplit[j])}\b", wordsToReplaceSplit[j]);
+                        captionsSplit[i] = Regex.Replace(captionsSplit[i], $@"\b{Regex.Escape(wordsToBeReplacedSplit[j])}\b",
+                            wordsToReplaceSplit[j], RegexOptions.IgnoreCase, Utilities.RegexTimeout);
                     }
                 }
             }
@@ -559,7 +756,7 @@ namespace SmartData.Lib.Services
             // Add user input tags.
             if (!string.IsNullOrEmpty(tagsToAdd))
             {
-                string[] tagsToAddSplit = tagsToAdd.Replace(", ", ",").Split(",");
+                string[] tagsToAddSplit = Utilities.ParseAndCleanTags(tagsToAdd);
 
                 foreach (string tag in tagsToAddSplit)
                 {
@@ -567,12 +764,12 @@ namespace SmartData.Lib.Services
                 }
             }
 
-            string[] predictedTagsSplit = predictedTags.Replace(", ", ",").Split(",");
+            string[] predictedTagsSplit = Utilities.ParseAndCleanTags(predictedTags);
 
             // Add tags that should be Emphasized(bring to the front of the list).
             if (!string.IsNullOrEmpty(tagsToEmphasize))
             {
-                string[] tagsToEmphasizeSplit = tagsToEmphasize.Replace(", ", ",").Split(",");
+                string[] tagsToEmphasizeSplit = Utilities.ParseAndCleanTags(tagsToEmphasize);
 
                 foreach (string tag in tagsToEmphasizeSplit)
                 {
@@ -597,7 +794,7 @@ namespace SmartData.Lib.Services
             // Remove unwanted tags.
             if (!string.IsNullOrEmpty(tagsToRemove))
             {
-                string[] tagsToRemoveSplit = tagsToRemove.Replace(", ", ",").Split(",");
+                string[] tagsToRemoveSplit = Utilities.ParseAndCleanTags(tagsToRemove);
 
                 foreach (string tag in tagsToRemoveSplit)
                 {
@@ -620,15 +817,15 @@ namespace SmartData.Lib.Services
         {
             List<string> tagsResult = new List<string>();
 
-            string[] tagsToBeReplacedSplit = tagsToBeReplaced.Replace(", ", ",").Split(",");
-            string[] tagsToReplaceSplit = tagsToReplace.Replace(", ", ",").Split(",");
+            string[] tagsToBeReplacedSplit = Utilities.ParseAndCleanTags(tagsToBeReplaced);
+            string[] tagsToReplaceSplit = Utilities.ParseAndCleanTags(tagsToReplace);
 
             if (tagsToReplaceSplit.Length != tagsToBeReplacedSplit.Length)
             {
                 throw new ArgumentException("Amount of tags must be the same!");
             }
 
-            string[] tagsSplit = tags.Replace(", ", ",").Split(",");
+            string[] tagsSplit = Utilities.ParseAndCleanTags(tags);
 
             foreach (string tag in tagsSplit)
             {
@@ -653,7 +850,7 @@ namespace SmartData.Lib.Services
         /// <returns>A string with the same tags as the input, but in a random order.</returns>
         private static string RandomizeTags(string tags)
         {
-            List<string> tagsSplit = tags.Replace(", ", ",").Split(",").ToList();
+            List<string> tagsSplit = Utilities.ParseAndCleanTags(tags).ToList();
 
             Random random = new Random();
 
@@ -685,11 +882,12 @@ namespace SmartData.Lib.Services
         private static Dictionary<string, uint> GetTagsWithFrequency(string inputFolderPath)
         {
             Dictionary<string, uint> tagsWithFrequency = new Dictionary<string, uint>();
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, "*.txt");
 
-            foreach (string file in Directory.GetFiles(inputFolderPath, "*.txt").Where(x => !x.Contains("sample_prompt_custom.txt")))
+            foreach (string file in files)
             {
                 string fileTags = File.ReadAllText(file);
-                string[] split = Regex.Replace(fileTags, @"\r\n?|\n", "", RegexOptions.None, TimeSpan.FromSeconds(10)).Replace(", ", ",").Split(",");
+                string[] split = Utilities.ParseAndCleanTags(Regex.Replace(fileTags, @"\r\n?|\n", "", RegexOptions.IgnoreCase, Utilities.RegexTimeout));
 
                 foreach (string splittedTag in split)
                 {
@@ -706,6 +904,134 @@ namespace SmartData.Lib.Services
             }
 
             return tagsWithFrequency;
+        }
+
+        /// <summary>
+        /// Processes and consolidates similar tags within the provided input tags based on shared words in multi-word tags.
+        /// </summary>
+        /// <param name="tags">The input tags to be consolidated.</param>
+        /// <param name="filePath">The path to the file associated with the tags being processed.</param>
+        /// <param name="logStringBuilder">A StringBuilder to record logs for tags consolidation.</param>
+        /// <returns>The consolidated tags as a single string.</returns>
+        private static string ProcessConsolidateTags(string tags, string filePath, StringBuilder logStringBuilder)
+        {
+            List<string> tagsResult = new List<string>();
+
+            string[] splitTags = Utilities.ParseAndCleanTags(tags);
+
+            Dictionary<string, List<string>> tagsWithSimilarity = GetDictionaryOfSimilarTags(tagsResult, splitTags);
+
+            StringBuilder tagStringBuilder = new StringBuilder();
+            foreach (KeyValuePair<string, List<string>> keyValuePairs in tagsWithSimilarity)
+            {
+                tagStringBuilder.Clear();
+                foreach (string value in keyValuePairs.Value.Distinct())
+                {
+                    tagStringBuilder.Append(value);
+                    tagStringBuilder.Append(" ");
+                }
+                tagStringBuilder.Append(keyValuePairs.Key);
+                tagsResult.Add(tagStringBuilder.ToString());
+
+                if (keyValuePairs.Value.Count >= 3)
+                {
+                    logStringBuilder.AppendLine($"FILE: {filePath} | CONSOLIDATED TAG: {tagStringBuilder.ToString()}");
+                }
+            }
+
+            return string.Join(", ", tagsResult.Distinct());
+        }
+
+        /// <summary>
+        /// Processes and consolidates similar tags within the provided input tags.
+        /// Tags are consolidated based on shared words in multi-word tags.
+        /// </summary>
+        /// <param name="tags">The input tags to be consolidated.</param>
+        /// <returns>The consolidated tags as a single string.</returns>
+        private static string ProcessConsolidateTags(string tags)
+        {
+            List<string> tagsResult = new List<string>();
+
+            string[] splitTags = Utilities.ParseAndCleanTags(tags);
+
+            Dictionary<string, List<string>> tagsWithSimilarity = GetDictionaryOfSimilarTags(tagsResult, splitTags);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (KeyValuePair<string, List<string>> keyValuePairs in tagsWithSimilarity)
+            {
+                stringBuilder.Clear();
+                foreach (string value in keyValuePairs.Value)
+                {
+                    stringBuilder.Append(value);
+                    stringBuilder.Append(" ");
+                }
+                stringBuilder.Append(keyValuePairs.Key);
+                tagsResult.Add(stringBuilder.ToString());
+            }
+
+            return string.Join(", ", tagsResult.Distinct());
+        }
+
+        /// <summary>
+        /// Creates a dictionary of similar tags based on shared words in multi-word tags.
+        /// </summary>
+        /// <param name="tagsResult">A list to store consolidated tags.</param>
+        /// <param name="splitTags">An array of input tags to process.</param>
+        /// <returns>A dictionary where keys are last words in multi-word tags, and values are lists of related tags.</returns>
+        private static Dictionary<string, List<string>> GetDictionaryOfSimilarTags(List<string> tagsResult, string[] splitTags)
+        {
+            Dictionary<string, List<string>> tagsWithSimilarity = new Dictionary<string, List<string>>();
+
+            foreach (string tag in splitTags)
+            {
+                if (tag.Contains(' ') && !IsEdgeCase(tag))
+                {
+                    string[] tagSplit = tag.Split(' ');
+                    string lastTag = tagSplit.Last();
+
+                    if (!tagsWithSimilarity.ContainsKey(lastTag))
+                    {
+                        tagsWithSimilarity.Add(lastTag, new List<string>());
+                    }
+
+                    foreach (string currentTag in tagSplit)
+                    {
+                        if (!currentTag.Equals(lastTag))
+                        {
+                            tagsWithSimilarity[lastTag].Add(currentTag);
+                        }
+                    }
+                }
+                else
+                {
+                    tagsResult.Add(tag);
+                }
+            }
+
+            return tagsWithSimilarity;
+        }
+
+        /// <summary>
+        /// Determines whether a given tag is an edge case, which may require special handling or consideration.
+        /// </summary>
+        /// <param name="tag">The tag to evaluate.</param>
+        /// <returns>True if the tag is an edge case; otherwise, false.</returns>
+        private static bool IsEdgeCase(string tag)
+        {
+            if (_edgeCasesContains.Any(hashTags => tag.Contains(hashTags)))
+            {
+                return true;
+            }
+            if (_edgeCasesEquals.Any(hashTags => tag.Equals(hashTags)))
+            {
+                return true;
+            }
+            if (_eyeColorsKeywords.Any(hashTags => tag.Equals(hashTags)))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

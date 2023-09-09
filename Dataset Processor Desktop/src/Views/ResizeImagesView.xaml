@@ -128,6 +128,7 @@
 
         <Button Grid.Row="9" Grid.Column="2"
                 Command="{Binding ResizeImagesCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Resize images!"/>
 
         <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"

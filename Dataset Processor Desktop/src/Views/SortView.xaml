@@ -121,6 +121,7 @@
 
         <Button Grid.Row="9" Grid.Column="2"
                 Command="{Binding SortImagesCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Sort images!"/>
 
         <ProgressBar Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="3"

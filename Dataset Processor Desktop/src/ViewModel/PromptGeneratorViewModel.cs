@@ -1,4 +1,6 @@
-﻿using Dataset_Processor_Desktop.src.Enums;
+﻿// Ignore Spelling: Prepend
+
+using Dataset_Processor_Desktop.src.Enums;
 using Dataset_Processor_Desktop.src.Utilities;
 
 using SmartData.Lib.Helpers;
@@ -113,18 +115,18 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
-        private bool _generateButtonEnabled;
-        public bool GenerateButtonEnabled
+        private string[] _datasetTags;
+
+        private bool _isUiEnabled;
+        public bool IsUiEnabled
         {
-            get => _generateButtonEnabled;
+            get => _isUiEnabled;
             set
             {
-                _generateButtonEnabled = value;
-                OnPropertyChanged(nameof(GenerateButtonEnabled));
+                _isUiEnabled = value;
+                OnPropertyChanged(nameof(IsUiEnabled));
             }
         }
-
-        private string[] _datasetTags;
 
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
@@ -146,7 +148,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             GeneratedPrompt = string.Empty;
             _amountOfTags = 20;
             _amountOfGeneratedPrompts = 1000;
-            GenerateButtonEnabled = true;
+            IsUiEnabled = true;
 
             SelectInputFolderCommand = new RelayCommand(async () => await SelectInputFolderAsync());
             SelectOutputFolderCommand = new RelayCommand(async () => await SelectOutputFolderAsync());
@@ -183,9 +185,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 if (_datasetTags == null || _datasetTags.Length == 0)
                 {
-                    GenerateButtonEnabled = false;
+                    IsUiEnabled = false;
                     _datasetTags = await Task.Run(() => _tagProcessorService.GetTagsFromDataset(InputFolderPath));
-                    GenerateButtonEnabled = true;
+                    IsUiEnabled = true;
                 }
 
                 string generatedPrompt = await Task.Run(() => _promptGeneratorService.GeneratePromptFromDataset(_datasetTags, TagsToPrepend, TagsToAppend, _amountOfTags));
@@ -211,6 +213,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         public async Task GeneratePromptsAsync()
         {
+            IsUiEnabled = false;
+
             if (GenerationProgress == null)
             {
                 GenerationProgress = new Progress();
@@ -224,7 +228,6 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             try
             {
-                GenerateButtonEnabled = false;
                 if (_datasetTags == null || _datasetTags.Length == 0)
                 {
 
@@ -255,8 +258,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
             finally
             {
+                IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
-                GenerateButtonEnabled = true;
             }
         }
     }

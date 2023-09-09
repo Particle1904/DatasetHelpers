@@ -81,6 +81,7 @@
 
         <Button Grid.Row="5" Grid.Column="2"
                 Command="{Binding ProcessCaptionsCommand}"
+                IsEnabled="{Binding IsUiEnabled}"
                 Text="Process captions!"/>
 
         <ProgressBar Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3"

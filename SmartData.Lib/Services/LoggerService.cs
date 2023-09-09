@@ -9,6 +9,7 @@ namespace SmartData.Lib.Services
     public class LoggerService : ILoggerService, INotifyPropertyChanged
     {
         private string _latestLogMessage = string.Empty;
+
         public string LatestLogMessage
         {
             get => _latestLogMessage;
@@ -25,27 +26,6 @@ namespace SmartData.Lib.Services
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        /// Cleans the latest log message after a specified time span.
-        /// </summary>
-        /// <param name="timeSpan">The time span after which the latest log message should be cleaned.</param>
-        /// <remarks>
-        /// This method is invoked to clean the latest log message after a specified time span has elapsed.
-        /// It starts by restarting the internal stopwatch to measure the time elapsed.
-        /// The method then asynchronously delays for the specified time span using the <see cref="Task.Delay"/> method.
-        /// After the delay, it sets the value of the latest log message to an empty string, effectively cleaning it.
-        /// It raises the <see cref="PropertyChanged"/> event for the "LatestLogMessage" property to notify any subscribers of the change.
-        /// Finally, it stops the stopwatch and the method execution completes.
-        /// </remarks>
-        private async Task CleanLogMessageAsync(TimeSpan timeSpan)
-        {
-            _stopwatch.Restart();
-            await Task.Delay(timeSpan);
-            _latestLogMessage = string.Empty;
-            OnPropertyChanged(nameof(LatestLogMessage));
-            _stopwatch.Stop();
-        }
-
-        /// <summary>
         /// Saves the details of an exception and its stack trace to a text file.
         /// </summary>
         /// <param name="exception">The exception to save.</param>
@@ -59,18 +39,18 @@ namespace SmartData.Lib.Services
         /// </remarks>
         public async Task SaveExceptionStackTrace(Exception exception)
         {
-            string outputFolder = Path.Combine(Environment.CurrentDirectory, "logs");
+            string outputFolder = GetLogsFolder();
             if (!Directory.Exists(outputFolder))
             {
                 Directory.CreateDirectory(outputFolder);
             }
 
-            string filePath = Path.Combine(outputFolder, $"{DateTime.Now.ToString("error_yyyy-MM-dd_HH-mm-ss")}.txt");
+            string filePath = Path.Combine(outputFolder, $"error_{GetTimeNowString(true)}.txt");
 
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("Exception Details");
             stringBuilder.AppendLine("=================");
-            stringBuilder.AppendLine($"Date and Time: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+            stringBuilder.AppendLine($"Date and Time: {GetTimeNowString(false)}");
             stringBuilder.AppendLine($"Source: {exception.Source}");
             stringBuilder.AppendLine($"Message: {exception.Message}");
             stringBuilder.AppendLine($"Help Link: {exception.HelpLink}");
@@ -107,6 +87,67 @@ namespace SmartData.Lib.Services
             }
 
             await File.AppendAllTextAsync(filePath, stringBuilder.ToString());
+        }
+
+        /// <summary>
+        /// Saves the contents of a StringBuilder to a log file named "consolidated_tags_log.txt"
+        /// in the logs folder within the current application's directory.
+        /// </summary>
+        /// <param name="stringBuilder">The StringBuilder containing log content to be saved.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task SaveStringBuilderToLogFile(StringBuilder stringBuilder)
+        {
+            string outputFolder = GetLogsFolder();
+            if (!Directory.Exists(outputFolder))
+            {
+                Directory.CreateDirectory(outputFolder);
+            }
+            string filePath = Path.Combine(outputFolder, $"consolidated_tags_log-{GetTimeNowString(true)}.txt");
+
+            await File.WriteAllTextAsync(filePath, stringBuilder.ToString());
+            LatestLogMessage = $"Saved a Log File with consolidated tags that looks like possible outliers. Please check the file: {filePath}";
+        }
+
+        /// <summary>
+        /// Cleans the latest log message after a specified time span.
+        /// </summary>
+        /// <param name="timeSpan">The time span after which the latest log message should be cleaned.</param>
+        /// <remarks>
+        /// This method is invoked to clean the latest log message after a specified time span has elapsed.
+        /// It starts by restarting the internal stopwatch to measure the time elapsed.
+        /// The method then asynchronously delays for the specified time span using the <see cref="Task.Delay"/> method.
+        /// After the delay, it sets the value of the latest log message to an empty string, effectively cleaning it.
+        /// It raises the <see cref="PropertyChanged"/> event for the "LatestLogMessage" property to notify any subscribers of the change.
+        /// Finally, it stops the stopwatch and the method execution completes.
+        /// </remarks>
+        private async Task CleanLogMessageAsync(TimeSpan timeSpan)
+        {
+            _stopwatch.Restart();
+            await Task.Delay(timeSpan);
+            _latestLogMessage = string.Empty;
+            OnPropertyChanged(nameof(LatestLogMessage));
+            _stopwatch.Stop();
+        }
+
+        /// <summary>
+        /// Gets the folder path for storing log files within the current application's directory.
+        /// </summary>
+        /// <returns>The folder path for log storage.</returns>
+        private static string GetLogsFolder() => Path.Combine(Environment.CurrentDirectory, "logs");
+
+        /// <summary>
+        /// Gets the current date and time formatted as a string in the specified format.
+        /// </summary>
+        /// <param name="isForFileName">A flag indicating whether the formatted string is intended for use in a file name.</param>
+        /// <returns>A string representing the current date and time formatted as specified.</returns>
+        private static string GetTimeNowString(bool IsForFileName)
+        {
+            if (IsForFileName)
+            {
+                return DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            }
+
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         protected virtual void OnPropertyChanged(string propertyName)
