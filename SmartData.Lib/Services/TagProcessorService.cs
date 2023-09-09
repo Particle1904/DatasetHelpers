@@ -15,7 +15,8 @@ namespace SmartData.Lib.Services
         private static HashSet<string> _edgeCasesContains = new HashSet<string>()
         {
             "tattoo", "piercing", "headwear", "on", "up", "(", ")", "looking", "viewer", "grabbing", "pubic",
-            "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread"
+            "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread", "milking machine",
+            "clothed"
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -23,7 +24,7 @@ namespace SmartData.Lib.Services
             "facial hair", "navel hair", "armpit hair", "chest hair", "pubic hair", "ass visible through thighs",
             "feet out of frame", "head out of frame", "leg lift", "thigh high", "closed eyes", "glowing eyes",
             "half-closed eyes", "rolling eyes", "tail ornament", "open mouth", "closed mouth", "thighhighs under boots",
-            "high heel"
+            "high heel", "ball bra", "huge ass"
         };
 
         private static HashSet<string> _breastsSizeKeywords = new HashSet<string>()
@@ -429,6 +430,7 @@ namespace SmartData.Lib.Services
             bool hasLipsColorTag = false;
             bool hasClothingLiftTag = false;
             bool hasClothingPullTag = false;
+            bool hasEyewearTag = false;
 
             foreach (string tag in tagsSplit)
             {
@@ -443,6 +445,7 @@ namespace SmartData.Lib.Services
                 bool isLipsColorTag = IsLipsColor(tag);
                 bool isClothingLiftTag = IsClothingLift(tag);
                 bool isClothingPullTag = IsClothingPull(tag);
+                bool isEyewearTag = IsEyewear(tag);
                 bool isRedundant = false;
 
                 foreach (string processedTag in cleanedTags)
@@ -534,9 +537,14 @@ namespace SmartData.Lib.Services
                     cleanedTags.Add(tag);
                     hasClothingPullTag = true;
                 }
+                else if (isEyewearTag && !hasEyewearTag)
+                {
+                    cleanedTags.Add(tag);
+                    hasEyewearTag = true;
+                }
                 else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isMaleGenitaliaStateTag && !isHairLengthTag &&
                          !isHairColor && !isEyesColor && !isSkinColor && !isClothingAsideTag && !isClothingLiftTag
-                         && !isClothingPullTag && !isLipsColorTag && !isRedundant)
+                         && !isClothingPullTag && !isLipsColorTag && !isEyewearTag && !isRedundant)
                 {
                     cleanedTags.RemoveWhere(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
@@ -594,6 +602,16 @@ namespace SmartData.Lib.Services
         private static bool IsBreastSize(string tag)
         {
             return _breastsSizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents an eyewear.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents an eyewear, false otherwise.</returns>
+        private static bool IsEyewear(string tag)
+        {
+            return tag.Contains("eyewear");
         }
 
         /// <summary>
