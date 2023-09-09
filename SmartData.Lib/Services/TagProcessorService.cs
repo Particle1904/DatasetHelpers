@@ -22,12 +22,13 @@ namespace SmartData.Lib.Services
         {
             "facial hair", "navel hair", "armpit hair", "chest hair", "pubic hair", "ass visible through thighs",
             "feet out of frame", "head out of frame", "leg lift", "thigh high", "closed eyes", "glowing eyes",
-            "half closed eyes", "rolling eyes",
+            "half-closed eyes", "rolling eyes", "tail ornament", "open mouth", "closed mouth", "thighhighs under boots",
+            "high heel"
         };
 
         private static HashSet<string> _breastsSizeKeywords = new HashSet<string>()
         {
-            "small b", "medium b", "large b", "huge b", "flat chest"
+            "small breasts", "medium breasts", "large breasts", "huge breasts", "gigantic breasts", "flat chest"
         };
 
         private static HashSet<string> _hairLengthKeywords = new HashSet<string>()
@@ -1027,6 +1028,10 @@ namespace SmartData.Lib.Services
                 return true;
             }
             if (_eyeColorsKeywords.Any(hashTags => tag.Equals(hashTags)))
+            {
+                return true;
+            }
+            if (_breastsSizeKeywords.Any(hashTags => tag.Equals(hashTags)))
             {
                 return true;
             }
