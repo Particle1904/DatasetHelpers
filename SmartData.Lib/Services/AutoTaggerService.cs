@@ -157,46 +157,84 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Interrogates an image from a stream and returns a string representation of the predicted tags.
+        /// Asynchronously generates tags for images in the specified input path using a pre-trained model
+        /// and appends the results to existing tag files in the specified output path or creates new ones.
         /// </summary>
-        /// <param name="imageStream">The stream containing the image data.</param>
-        /// <returns>A string representation of the predicted tags.</returns>
-        public async Task<string> InterrogateImageFromStream(Stream imageStream)
+        /// <param name="inputPath">The path to the folder containing the input images.</param>
+        /// <param name="outputPath">The path to the folder where the output tag files will be saved.</param>
+        /// <param name="appendToFile">Flag indicating whether to append tags to existing tag files (if available).</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task GenerateTagsAndKeepRedundant(string inputPath, string outputPath, bool appendToFile, bool weightedCaptions = false)
         {
             if (!_isModelLoaded)
             {
                 await LoadModel();
             }
 
-            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
-
-            VBuffer<float> predictions = await GetPredictionAsync(imageStream).ConfigureAwait(false);
-            float[] values = predictions.GetValues().ToArray();
-
-            for (int i = 0; i < values.Length; i++)
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            foreach (string file in files)
             {
-                if (values[i] > _threshold)
-                {
-                    predictionsDict.Add(_tags[i], values[i]);
-                }
+                await GenerateTagsWithRedundant(outputPath, appendToFile, weightedCaptions, file);
+            }
+        }
+
+        /// <summary>
+        /// Generates tags for the image files in the specified input folder, appends the results to text files
+        /// in the specified output folder, and updates the progress object with the status of the operation.
+        /// </summary>
+        /// <param name="inputPath">The path to the input folder containing image files.</param>
+        /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
+        /// <param name="progress">The progress object to update with the status of the operation.</param>
+        /// <param name="appendToFile">Flag indicating whether to append tags to existing tag files (if available).</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task GenerateTagsAndKeepRedundant(string inputPath, string outputPath, bool appendToFile, Progress progress, bool weightedCaptions = false)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
             }
 
-            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
-
-            List<string> listOrdered = new List<string>();
-
-            foreach (KeyValuePair<string, float> item in sortedDict)
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            progress.TotalFiles = files.Length;
+            foreach (string file in files)
             {
-                listOrdered.Add(item.Key);
+                await GenerateTagsWithRedundant(outputPath, appendToFile, weightedCaptions, file);
+                progress.UpdateProgress();
+            }
+        }
+
+        /// <summary>
+        /// Generates tags for an image file, appends the results to a text file, and renames the image file.
+        /// </summary>
+        /// <param name="outputPath">The path to the folder where the text files will be written.</param>
+        /// <param name="appendToFile">Flag indicating whether to append tags to an existing tag file (if available).</param>
+        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
+        /// <param name="file">The path to the image file to process.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task GenerateTagsWithRedundant(string outputPath, bool appendToFile, bool weightedCaptions, string file)
+        {
+            List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
+            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
+
+            string txtFile = Path.ChangeExtension(file, ".txt");
+
+            if (File.Exists(txtFile) && appendToFile)
+            {
+                string existingCaption = await File.ReadAllTextAsync(txtFile);
+                commaSeparated = $"{existingCaption.Replace("_", " ")}, {commaSeparated}";
             }
 
-            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
+            string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
 
-            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+            string tempFile = Path.Combine(outputPath, $"temp_{Path.GetFileName(file)}");
+            File.Move(file, tempFile);
 
-            UnloadModel();
+            string finalFile = tempFile.Replace("temp_", "");
+            File.Move(tempFile, finalFile);
 
-            return redundantRemoved;
+            await File.WriteAllTextAsync(resultPath, commaSeparated);
         }
 
         /// <summary>
@@ -262,6 +300,49 @@ namespace SmartData.Lib.Services
             {
                 await PostProcessTags(outputPath, weightedCaptions, file);
             }
+        }
+
+        /// <summary>
+        /// Interrogates an image from a stream and returns a string representation of the predicted tags.
+        /// </summary>
+        /// <param name="imageStream">The stream containing the image data.</param>
+        /// <returns>A string representation of the predicted tags.</returns>
+        public async Task<string> InterrogateImageFromStream(Stream imageStream)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
+            }
+
+            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
+
+            VBuffer<float> predictions = await GetPredictionAsync(imageStream).ConfigureAwait(false);
+            float[] values = predictions.GetValues().ToArray();
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] > _threshold)
+                {
+                    predictionsDict.Add(_tags[i], values[i]);
+                }
+            }
+
+            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
+
+            List<string> listOrdered = new List<string>();
+
+            foreach (KeyValuePair<string, float> item in sortedDict)
+            {
+                listOrdered.Add(item.Key);
+            }
+
+            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
+
+            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+
+            UnloadModel();
+
+            return redundantRemoved;
         }
 
         /// <summary>

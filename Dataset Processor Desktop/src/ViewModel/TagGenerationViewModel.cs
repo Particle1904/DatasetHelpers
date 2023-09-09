@@ -90,6 +90,17 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             }
         }
 
+        private bool _applyRedundancyRemoval;
+        public bool ApplyRedundancyRemoval
+        {
+            get => _applyRedundancyRemoval;
+            set
+            {
+                _applyRedundancyRemoval = value;
+                OnPropertyChanged(nameof(ApplyRedundancyRemoval));
+            }
+        }
+
         public RelayCommand SelectInputFolderCommand { get; private set; }
         public RelayCommand SelectOutputFolderCommand { get; private set; }
         public RelayCommand OpenInputFolderCommand { get; private set; }
@@ -116,6 +127,8 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             MakePredictionsCommand = new RelayCommand(async () => await MakePredictionsAsync());
 
             WeightedCaptions = false;
+            AppendCaptionsToFile = false;
+            ApplyRedundancyRemoval = true;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
@@ -164,13 +177,20 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
                 timer.Start();
 
-                if (AppendCaptionsToFile)
+                if (ApplyRedundancyRemoval)
                 {
-                    await _autoTaggerService.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                    if (AppendCaptionsToFile)
+                    {
+                        await _autoTaggerService.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                    }
+                    else
+                    {
+                        await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                    }
                 }
                 else
                 {
-                    await _autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                    await _autoTaggerService.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile, PredictionProgress, WeightedCaptions);
                 }
             }
             catch (Exception exception)
