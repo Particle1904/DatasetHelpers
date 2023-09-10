@@ -20,6 +20,7 @@ namespace SmartData.Lib.Services
                 _ = CleanLogMessageAsync(TimeSpan.FromSeconds(60));
             }
         }
+        public string LogsFolder { get => GetLogsFolder(); }
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
 

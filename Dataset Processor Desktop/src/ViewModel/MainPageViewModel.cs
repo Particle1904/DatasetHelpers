@@ -54,6 +54,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         public RelayCommand NavigateToPromptGeneratorCommand { get; private set; }
         public RelayCommand NavigateToMetadataCommand { get; private set; }
         public RelayCommand NavigateToSettingsCommand { get; private set; }
+        public RelayCommand OpenLogsFolderCommand { get; private set; }
 
         public MainPageViewModel()
         {
@@ -97,6 +98,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             NavigateToPromptGeneratorCommand = new RelayCommand(() => NavigateToPage(AppViews.PromptGenerator));
             NavigateToMetadataCommand = new RelayCommand(() => NavigateToPage(AppViews.Metadata));
             NavigateToSettingsCommand = new RelayCommand(() => NavigateToPage(AppViews.Settings));
+            OpenLogsFolderCommand = new RelayCommand(async () => await OpenFolderAsync(_loggerService.LogsFolder));
 
             try
             {

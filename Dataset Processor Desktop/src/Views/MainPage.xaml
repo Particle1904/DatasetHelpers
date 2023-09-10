@@ -91,7 +91,7 @@
                              Content="{Binding DynamicContentView}"                         
                              Padding="10"/>
             </ScrollView>
-        
+
             <Frame Grid.Row="1"
                    VerticalOptions="FillAndExpand"
                    HorizontalOptions="FillAndExpand"
@@ -101,12 +101,21 @@
                    CornerRadius="0"
                    BorderColor="{StaticResource DarkPrimary}">
                 <VerticalStackLayout>
-                    <Label Text="Log messages:"
-                           FontSize="Caption"/>
+                    <HorizontalStackLayout Spacing="6">
+                        <ImageButton Source="folder_opened.png"
+                                     Command="{Binding OpenLogsFolderCommand}"
+                                     WidthRequest="20"
+                                     HeightRequest="20"
+                                     Padding="2"
+                                     HorizontalOptions="End"/>
+                        <Label Text="Log messages:"
+                               FontSize="Caption"
+                               HorizontalOptions="EndAndExpand"/>                        
+                    </HorizontalStackLayout>                    
                     <ScrollView>
                         <Label Text="{Binding LatestLogMessage}"/>
                     </ScrollView>
-                </VerticalStackLayout>                
+                </VerticalStackLayout>
             </Frame>
         </Grid>
     </Grid>
