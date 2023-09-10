@@ -16,7 +16,8 @@ namespace SmartData.Lib.Services
         {
             "tattoo", "piercing", "headwear", "on", "up", "(", ")", "looking", "viewer", "grabbing", "pubic",
             "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread", "milking machine",
-            "clothed"
+            "clothed", "hands in", "hand in", "hands between", "hand between", "removed", "adjusting",
+            "tentacle around pen", "head wings", "veiny"
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -24,12 +25,21 @@ namespace SmartData.Lib.Services
             "facial hair", "navel hair", "armpit hair", "chest hair", "pubic hair", "ass visible through thighs",
             "feet out of frame", "head out of frame", "leg lift", "thigh high", "closed eyes", "glowing eyes",
             "half-closed eyes", "rolling eyes", "tail ornament", "open mouth", "closed mouth", "thighhighs under boots",
-            "high heel", "ball bra", "huge ass"
+            "high heel", "ball bra", "huge ass", "perky breasts", "playing with own hair", "crying with eyes open",
+            "hair bow", "dress shirt", "hair scrunchie", "hair over shoulder", "off shoulder", "thighband pantyhose",
+            "clothes around waist", "short shorts", "open jacket", "short sleeves", "wide sleeves", "low wings",
+            "detached wings"
         };
 
         private static HashSet<string> _breastsSizeKeywords = new HashSet<string>()
         {
             "small breasts", "medium breasts", "large breasts", "huge breasts", "gigantic breasts", "flat chest"
+        };
+
+        private static HashSet<string> _scleraColorsKeywords = new HashSet<string>()
+        {
+            "aqua sclera", "black sclera", "blue sclera", "brown sclera", "green sclera", "grey sclera",
+            "orange sclera", "black sclera", "pink sclera", "purple sclera", "red sclera", "yellow sclera"
         };
 
         private static HashSet<string> _hairLengthKeywords = new HashSet<string>()
@@ -58,7 +68,7 @@ namespace SmartData.Lib.Services
 
         private static HashSet<string> _pSizeKeywords = new HashSet<string>()
         {
-            "small pe", "medium pe", "large pe", "huge pe" , "gigantic pe"
+            "small pen", "medium pen", "large pen", "huge pen" , "gigantic pen"
         };
 
         private static HashSet<string> _pStateKeywords = new HashSet<string>()
@@ -419,33 +429,35 @@ namespace SmartData.Lib.Services
             HashSet<string> cleanedTags = new HashSet<string>(50);
             string[] tagsSplit = Utilities.ParseAndCleanTags(tags);
 
-            bool hasBreastSizeTag = false;
-            bool hasMaleGenitaliaSizeTag = false;
-            bool hasMaleGenitaliaStateTag = false;
-            bool hasHairLengthTag = false;
-            bool hasHairColorTag = false;
-            bool hasEyesColorTag = false;
-            bool hasSkinColorTag = false;
-            bool hasClothingAsideTag = false;
-            bool hasLipsColorTag = false;
-            bool hasClothingLiftTag = false;
-            bool hasClothingPullTag = false;
-            bool hasEyewearTag = false;
+            bool hasBreastSize = false;
+            bool hasMaleGenitaliaSize = false;
+            bool hasMaleGenitaliaState = false;
+            bool hasHairLength = false;
+            bool hasHairColor = false;
+            bool hasEyesColor = false;
+            bool hasSkinColor = false;
+            bool hasClothingAside = false;
+            bool hasLipsColor = false;
+            bool hasClothingLift = false;
+            bool hasClothingPull = false;
+            bool hasEyewear = false;
+            bool hasScleraColor = false;
 
             foreach (string tag in tagsSplit)
             {
-                bool isBreastSizeTag = IsBreastSize(tag);
-                bool isMaleGenitaliaTag = IsMaleGenitaliaSize(tag);
-                bool isMaleGenitaliaStateTag = IsMaleGenitaliaState(tag);
-                bool isHairLengthTag = IsHairLength(tag);
+                bool isBreastSize = IsBreastSize(tag);
+                bool isMaleGenitalia = IsMaleGenitaliaSize(tag);
+                bool isMaleGenitaliaState = IsMaleGenitaliaState(tag);
+                bool isHairLength = IsHairLength(tag);
                 bool isHairColor = IsHairColor(tag);
                 bool isEyesColor = IsEyesColor(tag);
                 bool isSkinColor = IsSkinColor(tag);
-                bool isClothingAsideTag = IsClothingAside(tag);
-                bool isLipsColorTag = IsLipsColor(tag);
-                bool isClothingLiftTag = IsClothingLift(tag);
-                bool isClothingPullTag = IsClothingPull(tag);
-                bool isEyewearTag = IsEyewear(tag);
+                bool isClothingAside = IsClothingAside(tag);
+                bool isLipsColor = IsLipsColor(tag);
+                bool isClothingLift = IsClothingLift(tag);
+                bool isClothingPull = IsClothingPull(tag);
+                bool isEyewear = IsEyewear(tag);
+                bool isScleraColor = IsScleraColor(tag);
                 bool isRedundant = false;
 
                 foreach (string processedTag in cleanedTags)
@@ -464,27 +476,27 @@ namespace SmartData.Lib.Services
                     }
                 }
 
-                if (isBreastSizeTag && !hasBreastSizeTag)
+                if (isBreastSize && !hasBreastSize)
                 {
                     cleanedTags.Add(tag);
-                    hasBreastSizeTag = true;
+                    hasBreastSize = true;
                 }
-                else if (isMaleGenitaliaTag && !hasMaleGenitaliaSizeTag)
+                else if (isMaleGenitalia && !hasMaleGenitaliaSize)
                 {
                     cleanedTags.Add(tag);
-                    hasMaleGenitaliaSizeTag = true;
+                    hasMaleGenitaliaSize = true;
                 }
-                else if (isMaleGenitaliaStateTag && !hasMaleGenitaliaStateTag)
+                else if (isMaleGenitaliaState && !hasMaleGenitaliaState)
                 {
                     cleanedTags.Add(tag);
-                    hasMaleGenitaliaStateTag = true;
+                    hasMaleGenitaliaState = true;
                 }
-                else if (isHairLengthTag && !hasHairLengthTag)
+                else if (isHairLength && !hasHairLength)
                 {
                     cleanedTags.Add(tag);
-                    hasHairLengthTag = true;
+                    hasHairLength = true;
                 }
-                else if (isHairColor && !hasHairColorTag)
+                else if (isHairColor && !hasHairColor)
                 {
                     if (tagsSplit.Any(x => x.Equals("two-tone hair", StringComparison.OrdinalIgnoreCase)))
                     {
@@ -497,20 +509,20 @@ namespace SmartData.Lib.Services
                     else
                     {
                         cleanedTags.Add(tag);
-                        hasHairColorTag = true;
+                        hasHairColor = true;
                     }
                 }
-                else if (isEyesColor && !hasEyesColorTag)
+                else if (isEyesColor && !hasEyesColor)
                 {
                     cleanedTags.Add(tag);
-                    hasEyesColorTag = true;
+                    hasEyesColor = true;
                 }
-                else if (isSkinColor && !hasSkinColorTag)
+                else if (isSkinColor && !hasSkinColor)
                 {
                     cleanedTags.Add(tag);
-                    hasSkinColorTag = true;
+                    hasSkinColor = true;
                 }
-                else if (isLipsColorTag && !hasLipsColorTag)
+                else if (isLipsColor && !hasLipsColor)
                 {
                     if (tagsSplit.Any(x => x.Equals("multicolored lips", StringComparison.OrdinalIgnoreCase)))
                     {
@@ -519,32 +531,44 @@ namespace SmartData.Lib.Services
                     else
                     {
                         cleanedTags.Add(tag);
-                        hasLipsColorTag = true;
+                        hasLipsColor = true;
                     }
                 }
-                else if (isClothingAsideTag && !hasClothingAsideTag)
+                else if (isScleraColor && !hasScleraColor)
+                {
+                    if (tagsSplit.Any(x => x.Equals("mismatched sclera", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        cleanedTags.Add(tag);
+                    }
+                    else
+                    {
+                        cleanedTags.Add(tag);
+                        hasScleraColor = true;
+                    }
+                }
+                else if (isClothingAside && !hasClothingAside)
                 {
                     cleanedTags.Add(tag);
-                    hasClothingAsideTag = true;
+                    hasClothingAside = true;
                 }
-                else if (isClothingLiftTag && !hasClothingLiftTag)
+                else if (isClothingLift && !hasClothingLift)
                 {
                     cleanedTags.Add(tag);
-                    hasClothingLiftTag = true;
+                    hasClothingLift = true;
                 }
-                else if (isClothingPullTag && !hasClothingPullTag)
+                else if (isClothingPull && !hasClothingPull)
                 {
                     cleanedTags.Add(tag);
-                    hasClothingPullTag = true;
+                    hasClothingPull = true;
                 }
-                else if (isEyewearTag && !hasEyewearTag)
+                else if (isEyewear && !hasEyewear)
                 {
                     cleanedTags.Add(tag);
-                    hasEyewearTag = true;
+                    hasEyewear = true;
                 }
-                else if (!isBreastSizeTag && !isMaleGenitaliaTag && !isMaleGenitaliaStateTag && !isHairLengthTag &&
-                         !isHairColor && !isEyesColor && !isSkinColor && !isClothingAsideTag && !isClothingLiftTag
-                         && !isClothingPullTag && !isLipsColorTag && !isEyewearTag && !isRedundant)
+                else if (!isBreastSize && !isMaleGenitalia && !isMaleGenitaliaState && !isHairLength &&
+                         !isHairColor && !isEyesColor && !isSkinColor && !isClothingAside && !isClothingLift &&
+                         !isClothingPull && !isLipsColor && !isEyewear && !isScleraColor && !isRedundant)
                 {
                     cleanedTags.RemoveWhere(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
@@ -592,6 +616,16 @@ namespace SmartData.Lib.Services
         {
             return (Regex.IsMatch(otherTag, $@"\b{Regex.Escape(tag)}\b", RegexOptions.IgnoreCase, Utilities.RegexTimeout) ||
                     Regex.IsMatch(tag, $@"\b{Regex.Escape(otherTag)}\b", RegexOptions.IgnoreCase, Utilities.RegexTimeout));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents a sclera color.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents a sclera color, false otherwise.</returns>
+        private static bool IsScleraColor(string tag)
+        {
+            return _scleraColorsKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -1037,19 +1071,23 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag is an edge case; otherwise, false.</returns>
         private static bool IsEdgeCase(string tag)
         {
-            if (_edgeCasesContains.Any(hashTags => tag.Contains(hashTags)))
+            if (_edgeCasesContains.Any(hashedTag => tag.Contains(hashedTag)))
             {
                 return true;
             }
-            if (_edgeCasesEquals.Any(hashTags => tag.Equals(hashTags)))
+            if (_edgeCasesEquals.Any(hashedTag => tag.Equals(hashedTag)))
             {
                 return true;
             }
-            if (_eyeColorsKeywords.Any(hashTags => tag.Equals(hashTags)))
+            if (_eyeColorsKeywords.Any(hashedTag => tag.Equals(hashedTag)))
             {
                 return true;
             }
-            if (_breastsSizeKeywords.Any(hashTags => tag.Equals(hashTags)))
+            if (_breastsSizeKeywords.Any(hashedTag => tag.Equals(hashedTag)))
+            {
+                return true;
+            }
+            if (_pSizeKeywords.Any(hashedTag => tag.Contains(hashedTag)))
             {
                 return true;
             }
