@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Helpers;
+﻿// Ignore Spelling: prepend
+
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
 using System.Text;

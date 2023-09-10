@@ -17,7 +17,7 @@ namespace SmartData.Lib.Services
             "tattoo", "piercing", "headwear", "on", "up", "(", ")", "looking", "viewer", "grabbing", "pubic",
             "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread", "milking machine",
             "clothed", "hands in", "hand in", "hands between", "hand between", "removed", "adjusting",
-            "tentacle around pen", "head wings", "veiny"
+            "tentacle around pen", "head wings", "veiny", "cutout"
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -28,7 +28,17 @@ namespace SmartData.Lib.Services
             "high heel", "ball bra", "huge ass", "perky breasts", "playing with own hair", "crying with eyes open",
             "hair bow", "dress shirt", "hair scrunchie", "hair over shoulder", "off shoulder", "thighband pantyhose",
             "clothes around waist", "short shorts", "open jacket", "short sleeves", "wide sleeves", "low wings",
-            "detached wings"
+            "detached wings", "covered eyes", "doughnut hair bun"
+        };
+
+        private static HashSet<string> _animalEars = new HashSet<string>()
+        {
+            "alpaca ears", "bat ears", "bear ears", "beaver ears", "bird ears", "boar ears", "cat ears", "cow ears",
+            "deer ears", "dog ears", "fake animal ears", "ferret ears", "fox ears", "gazelle ears", "giraffe ears",
+            "goat ears", "hamster ears", "hippopotamus ears", "horse ears", "jackal ears", "jaguar ears", "leopard ears",
+            "lion ears", "monkey ears", "moose ears", "mouse ears", "otter ears", "panda ears", "pig ears",
+            "rabbit ears", "raccoon ears", "rhinoceros ears", "sheep ears", "squirrel ears", "tamandua ears",
+            "tapir ears", "tiger ears", "weasel ears", "wolf ears", "zebra ears", "animal ears"
         };
 
         private static HashSet<string> _breastsSizeKeywords = new HashSet<string>()
@@ -442,9 +452,12 @@ namespace SmartData.Lib.Services
             bool hasClothingPull = false;
             bool hasEyewear = false;
             bool hasScleraColor = false;
+            bool hasAnimalEars = false;
 
             foreach (string tag in tagsSplit)
             {
+                bool isRedundant = false;
+
                 bool isBreastSize = IsBreastSize(tag);
                 bool isMaleGenitalia = IsMaleGenitaliaSize(tag);
                 bool isMaleGenitaliaState = IsMaleGenitaliaState(tag);
@@ -458,7 +471,7 @@ namespace SmartData.Lib.Services
                 bool isClothingPull = IsClothingPull(tag);
                 bool isEyewear = IsEyewear(tag);
                 bool isScleraColor = IsScleraColor(tag);
-                bool isRedundant = false;
+                bool isAnimalEars = IsAnimalEars(tag);
 
                 foreach (string processedTag in cleanedTags)
                 {
@@ -546,6 +559,11 @@ namespace SmartData.Lib.Services
                         hasScleraColor = true;
                     }
                 }
+                else if (isAnimalEars && !hasAnimalEars)
+                {
+                    cleanedTags.Add(tag);
+                    hasAnimalEars = true;
+                }
                 else if (isClothingAside && !hasClothingAside)
                 {
                     cleanedTags.Add(tag);
@@ -568,7 +586,8 @@ namespace SmartData.Lib.Services
                 }
                 else if (!isBreastSize && !isMaleGenitalia && !isMaleGenitaliaState && !isHairLength &&
                          !isHairColor && !isEyesColor && !isSkinColor && !isClothingAside && !isClothingLift &&
-                         !isClothingPull && !isLipsColor && !isEyewear && !isScleraColor && !isRedundant)
+                         !isClothingPull && !isLipsColor && !isEyewear && !isScleraColor && !isAnimalEars &&
+                         !isRedundant)
                 {
                     cleanedTags.RemoveWhere(x => IsRedundantWith(x, tag));
                     cleanedTags.Add(tag);
@@ -693,6 +712,16 @@ namespace SmartData.Lib.Services
             }
 
             return _hairColorKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Determines if the given tag represents animal ears.
+        /// </summary>
+        /// <param name="tag">The tag to check.</param>
+        /// <returns>True if the tag represents animal ears, false otherwise.</returns>
+        private static bool IsAnimalEars(string tag)
+        {
+            return _animalEars.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
