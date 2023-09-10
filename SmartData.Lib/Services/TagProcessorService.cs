@@ -14,10 +14,11 @@ namespace SmartData.Lib.Services
 
         private static HashSet<string> _edgeCasesContains = new HashSet<string>()
         {
-            "tattoo", "piercing", "headwear", "on", "up", "(", ")", "looking", "viewer", "grabbing", "pubic",
+            "tattoo", "piercing", "headwear", "on", "up", "in", "(", ")", "looking", "viewer", "grabbing", "pubic",
             "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread", "milking machine",
             "clothed", "hands in", "hand in", "hands between", "hand between", "removed", "adjusting",
-            "tentacle around pen", "head wings", "veiny", "cutout"
+            "tentacle around pen", "head wings", "veiny", "cutout", "torn", "in another's mouth", "back",
+            "tor in thighhighs", "under clothes", "from behind", "shibari", "uniform", "around_waist"
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -28,7 +29,11 @@ namespace SmartData.Lib.Services
             "high heel", "ball bra", "huge ass", "perky breasts", "playing with own hair", "crying with eyes open",
             "hair bow", "dress shirt", "hair scrunchie", "hair over shoulder", "off shoulder", "thighband pantyhose",
             "clothes around waist", "short shorts", "open jacket", "short sleeves", "wide sleeves", "low wings",
-            "detached wings", "covered eyes", "doughnut hair bun"
+            "detached wings", "covered eyes", "doughnut hair bun", "holding own tail", "covered nipples", "covered mouth",
+            "torn clothes", "revealing clothes", "clothes in mouth", "shirt in mouth", "m legs", "arm grab",
+            "arms behind head", "legs up", "legs behind head", "licking lips", "puckered lips", "footwear bow",
+            "platform footwear", "single hair bun", "double bun", "strap slip", "bags under eyes", "hair over eyes",
+            "hair flower"
         };
 
         private static HashSet<string> _animalEars = new HashSet<string>()
