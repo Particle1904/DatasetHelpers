@@ -76,12 +76,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             {
                 try
                 {
-                    _amountOfTags = Math.Clamp(int.Parse(value), 5, 50);
+                    _amountOfTags = Math.Clamp(int.Parse(value), 1, ushort.MaxValue);
                     OnPropertyChanged(nameof(AmountOfTags));
                 }
                 catch
                 {
-                    _loggerService.LatestLogMessage = $"Amount of tags needs to be a number between 5 and 50.";
+                    _loggerService.LatestLogMessage = $"Amount of tags needs to be a number between 1 and 50.";
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                     IsUiEnabled = true;
                 }
 
-                string generatedPrompt = await Task.Run(() => _promptGeneratorService.GeneratePromptFromDataset(_datasetTags, TagsToPrepend, TagsToAppend, _amountOfTags));
+                string generatedPrompt = await Task.Run(() => _promptGeneratorService.GeneratePromptFromDataset(_datasetTags, TagsToPrepend, TagsToAppend, Math.Clamp(_amountOfTags, 5, 100)));
                 GeneratedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
             }
             catch (Exception exception)
