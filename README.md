@@ -1,4 +1,7 @@
 # Dataset Processor - All-in-one Tools
+### [You don't need to Clone the repository or build to use it! Download in the releases page](https://github.com/Particle1904/DatasetHelpers/releases)
+### [Please, check the Wiki for how to install and use the software!](https://github.com/Particle1904/DatasetHelpers/wiki)
+
 Dataset Processor Tools is a versatile toolkit designed to streamline the processing of image-text datasets for machine learning applications. It empowers users with a range of powerful functionalities to enhance their datasets effortlessly.
 
 Efficiently manage image datasets with Dataset Processor Tools. It supports editing both .txt and .caption files, allowing users to customize and fine-tune dataset annotations easily. Update tags, refine descriptions, and add contextual information with simplicity and seamless organization.
