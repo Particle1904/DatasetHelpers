@@ -2,6 +2,7 @@
 using SmartData.Lib.Interfaces;
 
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,11 +15,11 @@ namespace SmartData.Lib.Services
 
         private static HashSet<string> _edgeCasesContains = new HashSet<string>()
         {
-            "tattoo", "piercing", "headwear", "on", "up", "in", "(", ")", "looking", "viewer", "grabbing", "pubic",
+            "tattoo", "piercing", "headwear", "on", "up", "in", "of", "looking", "viewer", "grabbing", "pubic",
             "apart", "by self", "by another", "own mouth", "grab", "object insertion", "spread", "milking machine",
             "clothed", "hands in", "hand in", "hands between", "hand between", "removed", "adjusting",
             "tentacle around pen", "head wings", "veiny", "cutout", "torn", "in another's mouth", "back",
-            "tor in thighhighs", "under clothes", "from behind", "shibari", "uniform", "around_waist"
+            "tor in thighhighs", "under clothes", "from behind", "shibari", "uniform", "around waist", "very long",
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -33,7 +34,8 @@ namespace SmartData.Lib.Services
             "torn clothes", "revealing clothes", "clothes in mouth", "shirt in mouth", "m legs", "arm grab",
             "arms behind head", "legs up", "legs behind head", "licking lips", "puckered lips", "footwear bow",
             "platform footwear", "single hair bun", "double bun", "strap slip", "bags under eyes", "hair over eyes",
-            "hair flower"
+            "hair flower", "hair between eyes", "furry female", "furry male", "faceless male", "faceless female",
+            "muscular female", "muscular male", "rei no himo", "cone hair bun", "crop top", "big hair"
         };
 
         private static HashSet<string> _animalEars = new HashSet<string>()
@@ -179,11 +181,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            foreach (string file in files)
+            using (SHA256 sha256 = SHA256.Create())
             {
-                string readTags = await File.ReadAllTextAsync(file);
-                string consolidatedTags = ProcessConsolidateTags(readTags);
-                await File.WriteAllTextAsync(file, consolidatedTags);
+                foreach (string file in files)
+                {
+                    string readTags = await File.ReadAllTextAsync(file);
+                    string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
+                    await File.WriteAllTextAsync(file, consolidatedTags);
+                }
             }
         }
 
@@ -200,28 +205,35 @@ namespace SmartData.Lib.Services
 
             progress.TotalFiles = files.Length;
 
-            foreach (string file in files)
+            using (SHA256 sha256 = SHA256.Create())
             {
-                string readTags = await File.ReadAllTextAsync(file);
-                string consolidatedTags = ProcessConsolidateTags(readTags);
-                await File.WriteAllTextAsync(file, consolidatedTags);
-                progress.UpdateProgress();
+                foreach (string file in files)
+                {
+                    string readTags = await File.ReadAllTextAsync(file);
+                    string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
+                    await File.WriteAllTextAsync(file, consolidatedTags);
+                    progress.UpdateProgress();
+                }
             }
         }
 
         /// <summary>
-        /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
+        /// Consolidates similar tags in text files within the specified input folder and logs edge cases.
         /// The consolidated tags are then saved back to the respective files, and progress is updated.
-        /// Additionally, edge cases encountered during consolidation are logged using a StringBuilder.
-        /// After consolidation, the total time taken for the operation is appended to the log.
+        /// Additionally, the total time taken for the operation is logged.
         /// </summary>
         /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
         /// <param name="loggerService">The logger service responsible for handling log storage.</param>
         /// <param name="progress">The progress object to update with the status of the consolidation operation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method reads text files from the specified folder, consolidates similar tags in each file,
+        /// and saves the consolidated tags back to the respective files. Progress is tracked using the provided
+        /// progress object. Edge cases encountered during consolidation are logged within this method, and
+        /// the total time taken for the operation is also logged.
+        /// </remarks>
         public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService loggerService, Progress progress)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            StringBuilder logStringBuilder = new StringBuilder();
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -229,17 +241,30 @@ namespace SmartData.Lib.Services
 
             progress.TotalFiles = files.Length;
 
-            foreach (string file in files)
+            using (SHA256 sha256 = SHA256.Create())
             {
-                string readTags = await File.ReadAllTextAsync(file);
-                string consolidatedTags = ProcessConsolidateTags(readTags, file, stringBuilder);
-                await File.WriteAllTextAsync(file, consolidatedTags);
-                progress.UpdateProgress();
+                foreach (string file in files)
+                {
+                    string readTags = await File.ReadAllTextAsync(file);
+                    string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
+
+                    string[] splitTags = consolidatedTags.Split(", ");
+                    foreach (string item in splitTags)
+                    {
+                        if (item.Split(' ').Length >= 3)
+                        {
+                            logStringBuilder.AppendLine($"FILE: {file} | CONSOLIDATED TAG: {item}");
+                        }
+                    }
+
+                    await File.WriteAllTextAsync(file, consolidatedTags);
+                    progress.UpdateProgress();
+                }
             }
 
             stopwatch.Stop();
-            stringBuilder.AppendLine($"{Environment.NewLine}{Environment.NewLine}TIME TAKEN: {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
-            await loggerService.SaveStringBuilderToLogFile(stringBuilder);
+            logStringBuilder.AppendLine($"{Environment.NewLine}TIME TAKEN: {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
+            await loggerService.SaveStringBuilderToLogFile(logStringBuilder);
         }
 
         /// <summary>
@@ -630,6 +655,7 @@ namespace SmartData.Lib.Services
             return stringBuilder.ToString();
         }
 
+        #region Tag Category check methods.
         /// <summary>
         /// Determines if the given tag is redundant with another tag.
         /// </summary>
@@ -793,6 +819,7 @@ namespace SmartData.Lib.Services
         {
             return _clothingKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
+        #endregion
 
         /// <summary>
         /// Processes search and replace operations on the provided captions.
@@ -996,20 +1023,34 @@ namespace SmartData.Lib.Services
         /// <summary>
         /// Processes and consolidates similar tags within the provided input tags based on shared words in multi-word tags.
         /// </summary>
+        /// <param name="sha256">The SHA-256 instance used for computing hash codes.</param>
         /// <param name="tags">The input tags to be consolidated.</param>
-        /// <param name="filePath">The path to the file associated with the tags being processed.</param>
-        /// <param name="logStringBuilder">A StringBuilder to record logs for tags consolidation.</param>
         /// <returns>The consolidated tags as a single string.</returns>
-        private static string ProcessConsolidateTags(string tags, string filePath, StringBuilder logStringBuilder)
+        /// <remarks>
+        /// This method processes the input tags, identifies and consolidates similar tags based on shared words
+        /// in multi-word tags, and returns the consolidated tags as a single string.
+        /// </remarks>
+        private static string ProcessConsolidateTags(SHA256 sha256, string tags)
         {
             List<string> tagsResult = new List<string>();
 
             string[] splitTags = Utilities.ParseAndCleanTags(tags);
 
             Dictionary<string, List<string>> tagsWithSimilarity = GetDictionaryOfSimilarTags(tagsResult, splitTags);
+            if (tagsWithSimilarity.Count == 0)
+            {
+                return tags;
+            }
+
+            List<string> hashSortedTags = HashAndSortTags(sha256, tagsWithSimilarity.FirstOrDefault().Value);
+
+            Dictionary<string, List<string>> tagsWithSimilaritySorted = new Dictionary<string, List<string>>
+            {
+                { tagsWithSimilarity.Keys.FirstOrDefault(), hashSortedTags }
+            };
 
             StringBuilder tagStringBuilder = new StringBuilder();
-            foreach (KeyValuePair<string, List<string>> keyValuePairs in tagsWithSimilarity)
+            foreach (var keyValuePairs in tagsWithSimilaritySorted)
             {
                 tagStringBuilder.Clear();
                 foreach (string value in keyValuePairs.Value.Distinct())
@@ -1019,41 +1060,6 @@ namespace SmartData.Lib.Services
                 }
                 tagStringBuilder.Append(keyValuePairs.Key);
                 tagsResult.Add(tagStringBuilder.ToString());
-
-                if (keyValuePairs.Value.Count >= 3)
-                {
-                    logStringBuilder.AppendLine($"FILE: {filePath} | CONSOLIDATED TAG: {tagStringBuilder.ToString()}");
-                }
-            }
-
-            return string.Join(", ", tagsResult.Distinct());
-        }
-
-        /// <summary>
-        /// Processes and consolidates similar tags within the provided input tags.
-        /// Tags are consolidated based on shared words in multi-word tags.
-        /// </summary>
-        /// <param name="tags">The input tags to be consolidated.</param>
-        /// <returns>The consolidated tags as a single string.</returns>
-        private static string ProcessConsolidateTags(string tags)
-        {
-            List<string> tagsResult = new List<string>();
-
-            string[] splitTags = Utilities.ParseAndCleanTags(tags);
-
-            Dictionary<string, List<string>> tagsWithSimilarity = GetDictionaryOfSimilarTags(tagsResult, splitTags);
-
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (KeyValuePair<string, List<string>> keyValuePairs in tagsWithSimilarity)
-            {
-                stringBuilder.Clear();
-                foreach (string value in keyValuePairs.Value)
-                {
-                    stringBuilder.Append(value);
-                    stringBuilder.Append(" ");
-                }
-                stringBuilder.Append(keyValuePairs.Key);
-                tagsResult.Add(stringBuilder.ToString());
             }
 
             return string.Join(", ", tagsResult.Distinct());
@@ -1105,10 +1111,15 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag is an edge case; otherwise, false.</returns>
         private static bool IsEdgeCase(string tag)
         {
-            if (_edgeCasesContains.Any(hashedTag => tag.Contains(hashedTag)))
+            foreach (var edgeCase in _edgeCasesContains)
             {
-                return true;
+                string pattern = @$"\b{Regex.Escape(edgeCase)}\b";
+                if (Regex.IsMatch(tag, pattern, RegexOptions.IgnoreCase, Utilities.RegexTimeout))
+                {
+                    return true;
+                }
             }
+
             if (_edgeCasesEquals.Any(hashedTag => tag.Equals(hashedTag)))
             {
                 return true;
@@ -1127,6 +1138,46 @@ namespace SmartData.Lib.Services
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Computes hash codes for the input tags using the provided SHA-256 instance
+        /// and returns a sorted list of tags in ascending order based on their hash codes.
+        /// </summary>
+        /// <param name="sha256">The SHA-256 instance used for computing hash codes.</param>
+        /// <param name="tags">A list of tags to be processed and sorted.</param>
+        /// <returns>
+        /// A sorted list of tags where the tags are ordered in ascending order based on their hash codes.
+        /// </returns>
+        /// <exception cref="ArgumentException">Thrown if the input list of tags is empty.</exception>
+        /// <remarks>
+        /// This method computes hash codes for each tag using the provided SHA-256 instance
+        /// and orders the tags by their hash codes. The resulting list provides a consistent
+        /// and predictable order for the input tags.
+        /// </remarks>
+        private static List<string> HashAndSortTags(SHA256 sha256, List<string> tags)
+        {
+            if (tags.Count <= 1)
+            {
+                return tags;
+            }
+
+            Dictionary<string, int> hashedTags = new Dictionary<string, int>(tags.Count);
+
+            foreach (var item in tags)
+            {
+                byte[] data = Encoding.UTF8.GetBytes(item);
+                byte[] hash = sha256.ComputeHash(data);
+                int hashCode = BitConverter.ToInt32(hash, 0);
+
+                if (!hashedTags.ContainsKey(item))
+                {
+                    hashedTags.Add(item, hashCode);
+                }
+            }
+
+            IOrderedEnumerable<KeyValuePair<string, int>> orderedTags = hashedTags.OrderBy(x => x.Value);
+            return orderedTags.Select(x => x.Key).ToList();
         }
     }
 }
