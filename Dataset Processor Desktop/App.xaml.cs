@@ -32,7 +32,7 @@ namespace Dataset_Processor_Desktop
             CultureInfo.CurrentUICulture = culture;
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
-            Preferences.Set("Language", cultureCode);
+            //Preferences.Set("Language", cultureCode);
         }
     }
 }

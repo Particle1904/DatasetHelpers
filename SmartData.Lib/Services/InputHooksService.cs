@@ -29,6 +29,7 @@ namespace SmartData.Lib.Services
 
         public InputHooksService()
         {
+#if !DEBUG
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
@@ -36,6 +37,7 @@ namespace SmartData.Lib.Services
             _keyboardHook.KeyPressed += OnKeyDown;
             _keyboardHook.MousePressed += OnMouseButtonDown;
             _keyboardHook.RunAsync();
+#endif
         }
 
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)
@@ -45,33 +47,31 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF1)
+            switch (e.RawEvent.Keyboard.KeyCode)
             {
-                OnF1ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF2)
-            {
-                OnF2ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF3)
-            {
-                OnF3ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF4)
-            {
-                OnF4ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF5)
-            {
-                OnF5ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF6)
-            {
-                OnF6ButtonDown(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcF8)
-            {
-                OnF8ButtonDown(EventArgs.Empty);
+                case KeyCode.VcF1:
+                    ButtonF1?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF2:
+                    ButtonF2?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF3:
+                    ButtonF3?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF4:
+                    ButtonF4?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF5:
+                    ButtonF5?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF6:
+                    ButtonF6?.Invoke(this, e);
+                    break;
+                case KeyCode.VcF8:
+                    ButtonF8?.Invoke(this, e);
+                    break;
+                default:
+                    break;
             }
 
             _keyboardTimer.Restart();
@@ -84,70 +84,22 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            if (e.RawEvent.Mouse.Button == MouseButton.Button4)
+            switch (e.RawEvent.Mouse.Button)
             {
-                OnMouseButton4Down(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Mouse.Button == MouseButton.Button5)
-            {
-                OnMouseButton5Down(EventArgs.Empty);
-            }
-            else if (e.RawEvent.Mouse.Button == MouseButton.Button3)
-            {
-                OnMouseButton3Down(EventArgs.Empty);
+                case MouseButton.Button3:
+                    MouseButton3?.Invoke(this, e);
+                    break;
+                case MouseButton.Button4:
+                    MouseButton4?.Invoke(this, e);
+                    break;
+                case MouseButton.Button5:
+                    MouseButton5?.Invoke(this, e);
+                    break;
+                default:
+                    break;
             }
 
             _keyboardTimer.Restart();
-        }
-
-        private void OnF1ButtonDown(EventArgs e)
-        {
-            ButtonF1?.Invoke(this, e);
-        }
-
-        private void OnF2ButtonDown(EventArgs e)
-        {
-            ButtonF2?.Invoke(this, e);
-        }
-
-        private void OnF3ButtonDown(EventArgs e)
-        {
-            ButtonF3?.Invoke(this, e);
-        }
-
-        private void OnF4ButtonDown(EventArgs e)
-        {
-            ButtonF4?.Invoke(this, e);
-        }
-
-        private void OnF5ButtonDown(EventArgs e)
-        {
-            ButtonF5?.Invoke(this, e);
-        }
-
-        private void OnF6ButtonDown(EventArgs e)
-        {
-            ButtonF6?.Invoke(this, e);
-        }
-
-        private void OnF8ButtonDown(EventArgs e)
-        {
-            ButtonF8?.Invoke(this, e);
-        }
-
-        private void OnMouseButton4Down(EventArgs e)
-        {
-            MouseButton4?.Invoke(this, e);
-        }
-
-        private void OnMouseButton5Down(EventArgs e)
-        {
-            MouseButton5?.Invoke(this, e);
-        }
-
-        private void OnMouseButton3Down(EventArgs e)
-        {
-            MouseButton3?.Invoke(this, e);
         }
 
         private bool CanProcessHook()
