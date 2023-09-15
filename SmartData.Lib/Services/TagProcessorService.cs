@@ -17,11 +17,16 @@ namespace SmartData.Lib.Services
         {
             "tattoo", "piercing", "headwear", "on", "up", "in", "of", "at", "looking", "viewer", "grabbing", "pubic",
             "apart", "by", "own mouth", "grab", "object insertion", "spread", "milking machine", "clothed", "together",
-            "between", "removed", "adjusting", "around", "head wings", "thong", "lift", "while", "caressing",
-            "veiny", "cutout", "torn", "back", "under", "behind", "shibari", "uniform", "tentacle around",
+            "between", "removed", "adjusting", "around", "head wings", "thong", "lift", "while", "caressing", "cutout",
+            "torn", "back", "under", "behind", "shibari", "uniform", "tentacle around", "holster", "reverse",
             "pull", "with", "very", "over", "tying", "arm hair", "pulled back", "holding", "drying hair",
             "hair ribbon", "through", "ring", "no", "top", "extra", "platform heels", "out", "peek", "disembodied",
-            "ale mast", "ari mast", "reverse", "one", "across", "hold", "hitachi", "slip", "holster", "reverse"
+            "reverse", "one", "across", "hold", "hitachi", "slip", "licking"
+        };
+
+        private static HashSet<string> _edgeCasesSubString = new HashSet<string>()
+        {
+            "ale mast", "ari mast",
         };
 
         private static HashSet<string> _edgeCasesEquals = new HashSet<string>()
@@ -33,12 +38,11 @@ namespace SmartData.Lib.Services
             "hair bow", "dress shirt", "hair scrunchie", "off shoulder", "thighband pantyhose", "short shorts",
             "open jacket", "short sleeves", "wide sleeves", "low wings", "detached wings", "covered eyes",
             "doughnut hair bun", "covered nipples", "covered mouth", "torn clothes", "revealing clothes",
-            "clothes in mouth", "shirt in mouth", "m legs", "arm grab", "legs up", "licking lips", "puckered lips",
-            "footwear bow", "platform footwear", "hand paper fan", "stuffed toy",
+            "clothes in mouth", "shirt in mouth", "m legs", "arm grab", "legs up", "puckered lips",
+            "footwear bow", "platform footwear", "hand paper fan", "stuffed toy", "colored inner hair", "thigh boots",
             "single hair bun", "double bun", "strap slip", "bags under eyes", "hair flower", "hair between eyes",
             "furry female", "furry male", "faceless male", "faceless female", "muscular female", "muscular male",
             "rei no himo", "cone hair bun", "crop top", "big hair", "upper teeth only", "lower teeth only",
-            "colored inner hair", "thigh boots"
         };
 
         private static HashSet<string> _animalEars = new HashSet<string>()
@@ -254,7 +258,7 @@ namespace SmartData.Lib.Services
                     string[] splitTags = consolidatedTags.Split(", ");
                     foreach (string item in splitTags)
                     {
-                        if (item.Split(' ').Length >= 3)
+                        if (item.Split(' ').Length >= 4)
                         {
                             logStringBuilder.AppendLine($"FILE: {file} | CONSOLIDATED TAG: {item}");
                         }
@@ -1131,11 +1135,7 @@ namespace SmartData.Lib.Services
             {
                 return true;
             }
-            if (_breastsSizeKeywords.Any(hashedTag => tag.Equals(hashedTag)))
-            {
-                return true;
-            }
-            if (_pSizeKeywords.Any(hashedTag => tag.Contains(hashedTag)))
+            if (_edgeCasesSubString.Any(hashedTag => tag.Contains(hashedTag)))
             {
                 return true;
             }
