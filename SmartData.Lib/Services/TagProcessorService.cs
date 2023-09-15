@@ -19,7 +19,7 @@ namespace SmartData.Lib.Services
             "apart", "by", "own mouth", "grab", "object insertion", "spread", "milking machine", "clothed", "together",
             "between", "removed", "adjusting", "around", "head wings", "thong", "lift", "while", "caressing",
             "veiny", "cutout", "torn", "back", "under", "behind", "shibari", "uniform", "tentacle around",
-            "pull", "very long", "with", "very", "over", "tying", "arm hair", "pulled back", "holding", "drying hair",
+            "pull", "with", "very", "over", "tying", "arm hair", "pulled back", "holding", "drying hair",
             "hair ribbon", "through", "ring", "no", "top", "extra", "platform heels", "out", "peek", "disembodied",
             "ale mast", "ari mast", "reverse", "one", "across", "hold", "hitachi", "slip", "holster", "reverse"
         };
@@ -1045,15 +1045,15 @@ namespace SmartData.Lib.Services
                 return tags;
             }
 
-            List<string> hashSortedTags = HashAndSortTags(sha256, tagsWithSimilarity.FirstOrDefault().Value);
-
-            Dictionary<string, List<string>> tagsWithSimilaritySorted = new Dictionary<string, List<string>>
+            Dictionary<string, List<string>> tagsWithSimilaritySorted = new Dictionary<string, List<string>>();
+            foreach (KeyValuePair<string, List<string>> tagWithSimilarity in tagsWithSimilarity)
             {
-                { tagsWithSimilarity.Keys.FirstOrDefault(), hashSortedTags }
-            };
+                List<string> hashSortedTags = HashAndSortTags(sha256, tagWithSimilarity.Value);
+                tagsWithSimilaritySorted.Add(tagWithSimilarity.Key, hashSortedTags);
+            }
 
             StringBuilder tagStringBuilder = new StringBuilder();
-            foreach (var keyValuePairs in tagsWithSimilaritySorted)
+            foreach (KeyValuePair<string, List<string>> keyValuePairs in tagsWithSimilaritySorted)
             {
                 tagStringBuilder.Clear();
                 foreach (string value in keyValuePairs.Value.Distinct())
@@ -1124,10 +1124,6 @@ namespace SmartData.Lib.Services
             }
 
             if (_edgeCasesEquals.Any(hashedTag => tag.Equals(hashedTag)))
-            {
-                return true;
-            }
-            if (_hairLengthKeywords.Any(hashedTag => tag.Equals(hashedTag)))
             {
                 return true;
             }
