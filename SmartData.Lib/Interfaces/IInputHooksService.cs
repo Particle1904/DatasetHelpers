@@ -14,6 +14,8 @@
         public event EventHandler MouseButton4;
         public event EventHandler MouseButton5;
 
+        public event EventHandler ControlLeftArrowCombo;
+        public event EventHandler ControlRightArrowCombo;
         public bool IsActive { get; set; }
     }
 }

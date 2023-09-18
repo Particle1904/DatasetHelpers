@@ -25,19 +25,36 @@ namespace SmartData.Lib.Services
         public event EventHandler MouseButton4;
         public event EventHandler MouseButton5;
 
+        private bool _isControlActive = false;
+        public event EventHandler ControlLeftArrowCombo;
+        public event EventHandler ControlRightArrowCombo;
+
         public bool IsActive { get; set; } = false;
 
         public InputHooksService()
         {
-#if !DEBUG
+
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
             _keyboardHook = new SimpleGlobalHook(true);
             _keyboardHook.KeyPressed += OnKeyDown;
+            _keyboardHook.KeyPressed += (sender, e) =>
+            {
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftControl)
+                {
+                    _isControlActive = true;
+                }
+            };
+            _keyboardHook.KeyReleased += (sender, e) =>
+            {
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftControl)
+                {
+                    _isControlActive = false;
+                }
+            };
             _keyboardHook.MousePressed += OnMouseButtonDown;
             _keyboardHook.RunAsync();
-#endif
         }
 
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)
@@ -69,6 +86,18 @@ namespace SmartData.Lib.Services
                     break;
                 case KeyCode.VcF8:
                     ButtonF8?.Invoke(this, e);
+                    break;
+                case KeyCode.VcLeft:
+                    if (_isControlActive)
+                    {
+                        ControlLeftArrowCombo?.Invoke(this, e);
+                    }
+                    break;
+                case KeyCode.VcRight:
+                    if (_isControlActive)
+                    {
+                        ControlRightArrowCombo?.Invoke(this, e);
+                    }
                     break;
                 default:
                     break;

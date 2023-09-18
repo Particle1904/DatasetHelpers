@@ -241,6 +241,9 @@ namespace Dataset_Processor_Desktop.src.ViewModel
             _inputHooksService.MouseButton3 += OnMouseButton3Down;
             _inputHooksService.MouseButton4 += OnMouseButton4Down;
             _inputHooksService.MouseButton5 += OnMouseButton5Down;
+
+            _inputHooksService.ControlLeftArrowCombo += OnF1ButtonDown;
+            _inputHooksService.ControlRightArrowCombo += OnF2ButtonDown;
         }
 
         public void UpdateCurrentSelectedTags()
