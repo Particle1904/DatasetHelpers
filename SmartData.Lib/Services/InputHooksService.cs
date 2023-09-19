@@ -25,9 +25,9 @@ namespace SmartData.Lib.Services
         public event EventHandler MouseButton4;
         public event EventHandler MouseButton5;
 
-        private bool _isControlActive = false;
-        public event EventHandler ControlLeftArrowCombo;
-        public event EventHandler ControlRightArrowCombo;
+        private bool _isAltActive = false;
+        public event EventHandler AltLeftArrowCombo;
+        public event EventHandler AltRightArrowCombo;
 
         public bool IsActive { get; set; } = false;
 
@@ -41,16 +41,16 @@ namespace SmartData.Lib.Services
             _keyboardHook.KeyPressed += OnKeyDown;
             _keyboardHook.KeyPressed += (sender, e) =>
             {
-                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftControl)
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
                 {
-                    _isControlActive = true;
+                    _isAltActive = true;
                 }
             };
             _keyboardHook.KeyReleased += (sender, e) =>
             {
-                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftControl)
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
                 {
-                    _isControlActive = false;
+                    _isAltActive = false;
                 }
             };
             _keyboardHook.MousePressed += OnMouseButtonDown;
@@ -88,15 +88,15 @@ namespace SmartData.Lib.Services
                     ButtonF8?.Invoke(this, e);
                     break;
                 case KeyCode.VcLeft:
-                    if (_isControlActive)
+                    if (_isAltActive)
                     {
-                        ControlLeftArrowCombo?.Invoke(this, e);
+                        AltLeftArrowCombo?.Invoke(this, e);
                     }
                     break;
                 case KeyCode.VcRight:
-                    if (_isControlActive)
+                    if (_isAltActive)
                     {
-                        ControlRightArrowCombo?.Invoke(this, e);
+                        AltRightArrowCombo?.Invoke(this, e);
                     }
                     break;
                 default:
