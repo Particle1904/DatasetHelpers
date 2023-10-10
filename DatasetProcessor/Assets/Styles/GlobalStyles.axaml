@@ -1,0 +1,81 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="Black">
+			<!-- Add Controls for Previewer Here -->
+			<CheckBox Content="100"/>
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- BUTTON -->
+	<Style Selector="Button">
+		<Setter Property="Background" Value="{DynamicResource Primary}"/>
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="CornerRadius" Value="0"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+	
+	<!-- SLIDER -->
+	<Style Selector="Slider">
+		<Setter Property="Minimum" Value="0"/>
+		<Setter Property="Maximum" Value="100"/>
+		<Setter	Property="Background" Value="{DynamicResource Gray800}"/>
+		<Setter	Property="Foreground" Value="{DynamicResource PrimaryDark}"/>
+		
+		<Style Selector="^:horizontal /template/ Thumb#thumb">
+			<Setter Property="Background" Value="{DynamicResource Primary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ Thumb#thumb">
+			<Setter Property="Background" Value="{DynamicResource PrimaryLight}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ RepeatButton#PART_DecreaseButton">
+			<Setter	Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ RepeatButton#PART_IncreaseButton">
+			<Setter	Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+
+	<!-- LABEL -->
+	<Style Selector="Label">
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- CHECK BOX -->
+	<Style Selector="CheckBox">
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		</Style>
+		<Style Selector="^:checked">
+			<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		</Style>
+		<Style Selector="^:checked /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
+			<Setter Property="Background" Value="{DynamicResource Primary}"/>		
+		</Style>
+		<Style Selector="^:unchecked /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		</Style>
+	</Style>
+
+	<!-- GRID -->
+	<Style Selector="Grid">
+		<Setter Property="Background" Value="{DynamicResource Gray800}"/>
+	</Style>
+</Styles>
