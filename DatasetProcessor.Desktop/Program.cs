@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Avalonia;
+using Avalonia.Svg.Skia;
 
-using Avalonia;
+using System;
 
 namespace DatasetProcessor.Desktop;
 
@@ -15,9 +16,13 @@ class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        GC.KeepAlive(typeof(SvgImageExtension).Assembly);
+        GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
+
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
-
+    }
 }

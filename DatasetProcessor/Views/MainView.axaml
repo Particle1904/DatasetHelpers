@@ -3,13 +3,78 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.MainView"
              x:DataType="vm:MainViewModel"
 			 Background="{DynamicResource SurfaceDark}">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+  <Design.DataContext>  
     <vm:MainViewModel />
   </Design.DataContext>
+	
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	
+	<SplitView Background="{DynamicResource SecondarySurfaceDark}" 
+			   IsPaneOpen="True"
+			   OpenPaneLength="180"
+			   DisplayMode="CompactInline"
+			   PaneBackground="{DynamicResource SurfaceDark}">
+		<SplitView.Pane>
+			<StackPanel>
+				<Button Content="Welcome Page"/>
+				<Button Content="Sort Images"/>
+				<Button Content="Content Aware Crop"/>
+				<Button Content="Resize Images"/>
+				<Button Content="Generate Tags"/>
+				<Button Content="Process Captions"/>
+				<Button Content="Process Tags"/>				
+				<Button Content="Tag/Caption Editor"/>
+				<Button Content="Extract Subset"/>
+				<Button Content="Dataset Prompt Gen"/>
+				<Button Content="Metadata Viewer"/>
+				<Button Content="Settings"/>
+			</StackPanel>
+		</SplitView.Pane>
+		<Grid RowDefinitions="50, *, 100">
+			<!-- TITTLE BAR -->
+			<Label Grid.Row="0" Content="Page Title"/>
+
+			<!-- MAIN PAG-->
+			<ScrollViewer Grid.Row="1" Background="{DynamicResource SecondarySurfaceDark}">
+				<Label Content="Main Page"/>
+			</ScrollViewer>
+
+			<!-- LOGS PANEL -->
+			<Border Grid.Row="2"
+					BorderBrush="{DynamicResource Primary}" BorderThickness="1">
+				<StackPanel Spacing="5" Margin="10"
+							Background="{DynamicResource SurfaceSecondaryDarK}">
+				
+					<StackPanel Orientation="Horizontal" Spacing="6">
+						<Button Width="20" Height="20">
+							<Panel>
+								<Image Width="16" Height="16" 
+									   VerticalAlignment="Center" HorizontalAlignment="Center"
+									   Source="{SvgImage /Assets/Icons/folder_opened.svg}"/>
+							</Panel>
+						</Button>
+						<Label Content="Log messages:"
+							   FontSize="12"/>					
+					</StackPanel>
+					<ScrollViewer Height="60"
+								  MaxHeight="60"
+								  HorizontalScrollBarVisibility="Disabled"
+								  VerticalScrollBarVisibility="Visible">
+						<TextBlock VerticalAlignment="Stretch"
+								   FontSize="11"
+								   HorizontalAlignment="Left"
+								   Text="{Binding LatestLogMessage}">
+						</TextBlock>
+					</ScrollViewer>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</SplitView>		
 </UserControl>
+

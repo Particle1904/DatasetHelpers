@@ -3,7 +3,7 @@
 	<Design.PreviewWith>
 		<Border Padding="20" Background="Black">
 			<!-- Add Controls for Previewer Here -->
-			<CheckBox Content="100"/>
+			<Button Content="Content Tags"/>
 		</Border>
 	</Design.PreviewWith>
 
@@ -19,6 +19,7 @@
 		<Setter Property="Margin" Value="0"/>
 		<Setter Property="FontSize" Value="16"/>
 		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Height" Value="40"/>
 
 		<Style Selector="^:pointerover /template/ ContentPresenter">
 			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
@@ -54,6 +55,12 @@
 		<Setter Property="HorizontalAlignment" Value="Center"/>
 	</Style>
 
+	<!-- TEXT BLOCK -->
+	<Style Selector="TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+	</Style>
+	
 	<!-- CHECK BOX -->
 	<Style Selector="CheckBox">
 		<Setter Property="HorizontalAlignment" Value="Center"/>
@@ -76,6 +83,6 @@
 
 	<!-- GRID -->
 	<Style Selector="Grid">
-		<Setter Property="Background" Value="{DynamicResource Gray800}"/>
+		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
 	</Style>
 </Styles>
