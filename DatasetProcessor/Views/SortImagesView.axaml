@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
-             x:Class="DatasetProcessor.Views.WelcomeView"
-			 x:DataType="vm:WelcomeViewModel"
+			 x:Class="DatasetProcessor.Views.SortImagesView"
+             x:DataType="vm:SortImagesViewModel"
 			 Background="{DynamicResource SurfaceDark}">
 	<Design.DesignStyle>
-		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE WELCOME PAGE"/>
+	<Label Content="THIS IS THE SORT IMAGES PAGE"/>
 </UserControl>

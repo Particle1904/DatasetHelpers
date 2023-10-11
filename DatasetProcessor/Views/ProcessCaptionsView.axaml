@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
-             x:Class="DatasetProcessor.Views.WelcomeView"
-			 x:DataType="vm:WelcomeViewModel"
+			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+             x:Class="DatasetProcessor.Views.ProcessCaptionsView"
+			 x:DataType="vm:SortImagesViewModel"
 			 Background="{DynamicResource SurfaceDark}">
 	<Design.DesignStyle>
-		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE WELCOME PAGE"/>
+	<Label Content="THIS IS THE PROCESS CAPTIONS PAGE"/>
 </UserControl>

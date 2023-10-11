@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:local="clr-namespace:DatasetProcessor.src.Enums"
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.MainView"
              x:DataType="vm:MainViewModel"			
@@ -18,18 +19,42 @@
 			   PaneBackground="{DynamicResource SurfaceDark}">
 		<SplitView.Pane>
 			<StackPanel>
-				<Button Content="Welcome Page"/>
-				<Button Content="Sort Images"/>
-				<Button Content="Content Aware Crop"/>
-				<Button Content="Resize Images"/>
-				<Button Content="Generate Tags"/>
-				<Button Content="Process Captions"/>
-				<Button Content="Process Tags"/>				
-				<Button Content="Tag/Caption Editor"/>
-				<Button Content="Extract Subset"/>
-				<Button Content="Dataset Prompt Gen"/>
-				<Button Content="Metadata Viewer"/>
-				<Button Content="Settings"/>
+				<Button Content="Welcome Page"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Welcome}"/>
+				<Button Content="Sort Images"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.SortImages}"/>
+				<Button Content="Content Aware Crop"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.ContentAwareCrop}"/>
+				<Button Content="Resize Images"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.ResizeImages}"/>
+				<Button Content="Generate Tags"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.TagGeneration}"/>
+				<Button Content="Process Captions"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.ProcessCaptions}"/>
+				<Button Content="Process Tags"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.ProcessTags}"/>				
+				<Button Content="Tag/Caption Editor"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.TagEditor}"/>
+				<Button Content="Extract Subset"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.ExtractSubset}"/>
+				<Button Content="Dataset Prompt Gen"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.PromptGenerator}"/>
+				<Button Content="Metadata Viewer"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Metadata}"/>
+				<Button Content="Settings"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Settings}"/>
 			</StackPanel>
 		</SplitView.Pane>
 		<Grid RowDefinitions="50, *, 100">
@@ -38,7 +63,7 @@
 
 			<!-- MAIN PAGE -->
 			<ScrollViewer Grid.Row="1" Background="{DynamicResource SecondarySurfaceDark}">
-				<Label Content="Main Page"/>
+				<UserControl Content="{Binding DynamicView}"/>
 			</ScrollViewer>
 
 			<!-- LOGS PANEL -->
