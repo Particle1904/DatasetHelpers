@@ -33,7 +33,7 @@ namespace SmartData.Lib.Services
 
         public InputHooksService()
         {
-
+#if !DEBUG
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
@@ -55,6 +55,7 @@ namespace SmartData.Lib.Services
             };
             _keyboardHook.MousePressed += OnMouseButtonDown;
             _keyboardHook.RunAsync();
+#endif
         }
 
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)

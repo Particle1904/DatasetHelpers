@@ -5,12 +5,8 @@
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.MainView"
-             x:DataType="vm:MainViewModel"
-			 Background="{DynamicResource SurfaceDark}">
-  <Design.DataContext>  
-    <vm:MainViewModel />
-  </Design.DataContext>
-	
+             x:DataType="vm:MainViewModel"			
+			 Background="{DynamicResource SurfaceDark}">	
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
@@ -40,7 +36,7 @@
 			<!-- TITTLE BAR -->
 			<Label Grid.Row="0" Content="Page Title"/>
 
-			<!-- MAIN PAG-->
+			<!-- MAIN PAGE -->
 			<ScrollViewer Grid.Row="1" Background="{DynamicResource SecondarySurfaceDark}">
 				<Label Content="Main Page"/>
 			</ScrollViewer>
@@ -52,7 +48,8 @@
 							Background="{DynamicResource SurfaceSecondaryDarK}">
 				
 					<StackPanel Orientation="Horizontal" Spacing="6">
-						<Button Width="20" Height="20">
+						<Button Width="20" Height="20"
+								Command="{Binding OpenLogsFolderCommand}">
 							<Panel>
 								<Image Width="16" Height="16" 
 									   VerticalAlignment="Center" HorizontalAlignment="Center"

@@ -26,18 +26,33 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.0.4" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.2" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.3" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartData.Lib\SmartData.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <AvaloniaXaml Update="Assets\Styles\GlobalStyles.axaml">
       <SubType>Designer</SubType>
     </AvaloniaXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\MainView.axaml.cs">
+      <DependentUpon>MainView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Utilities\" />
   </ItemGroup>
 </Project>
