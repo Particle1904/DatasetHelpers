@@ -6,7 +6,7 @@
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
 			 x:Class="DatasetProcessor.Views.MetadataView"
              x:DataType="vm:MetadataViewModel"
-			 Background="{DynamicResource SurfaceDark}">
+			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>

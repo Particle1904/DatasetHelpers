@@ -1,7 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 
 using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
@@ -60,6 +62,10 @@ public partial class App : Application
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, autoTagger, tagProcessor, contentAwareCrop,
                     inputHooks, promptGenerator, logger, configs)
             };
+
+            IClipboard clipboard = desktop.MainWindow.Clipboard;
+            IStorageProvider storageProvider = desktop.MainWindow.StorageProvider;
+            (desktop.MainWindow.DataContext as MainViewModel).InitializeClipboardAndStorageProvider(clipboard, storageProvider);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {

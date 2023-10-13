@@ -60,6 +60,14 @@
 		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
 		<Setter Property="TextWrapping" Value="Wrap"/>
 	</Style>
+
+	<!-- TEXT BOX -->
+	<Style Selector="TextBox">
+		<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		<Style Selector="^:focus">
+			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
 	
 	<!-- CHECK BOX -->
 	<Style Selector="CheckBox">
@@ -79,10 +87,26 @@
 		<Style Selector="^:unchecked /template/ Border#NormalRectangle">
 			<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
 		</Style>
+		<Style Selector="^:unchecked /template/ Grid#RootGrid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:checked /template/ Grid#RootGrid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:checked /template/ Grid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:unchecked /template/ Grid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
 	</Style>
 
 	<!-- GRID -->
 	<Style Selector="Grid">
 		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
+	</Style>
+
+	<Style Selector="Grid.gridSecondary">
+		<Setter Property="Background" Value="{DynamicResource SurfaceLighterDark}"/>
 	</Style>
 </Styles>

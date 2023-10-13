@@ -3,15 +3,15 @@
     public enum AppPages : byte
     {
         Welcome,
-        SortImages,
-        ContentAwareCrop,
-        ResizeImages,
-        TagGeneration,
-        ProcessCaptions,
-        ProcessTags,
-        TagEditor,
-        ExtractSubset,
-        PromptGenerator,
+        Sort_Images,
+        Content_Aware_Crop,
+        Resize_Images,
+        Tag_Generation,
+        Process_Captions,
+        Process_Tags,
+        Tag_Editor,
+        Extract_Subset,
+        Prompt_Generator,
         Metadata,
         Settings
     }

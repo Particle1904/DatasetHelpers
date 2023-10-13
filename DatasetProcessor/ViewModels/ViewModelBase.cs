@@ -2,12 +2,15 @@
 using Avalonia.Platform.Storage;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
 using SmartData.Lib.Interfaces;
 
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -15,10 +18,12 @@ namespace DatasetProcessor.ViewModels;
 
 public partial class ViewModelBase : ObservableObject
 {
-    protected readonly ILoggerService _logger;
+    [ObservableProperty]
+    protected ILoggerService _logger;
     protected readonly IConfigsService _configs;
     protected IClipboard _clipboard;
     protected IStorageProvider _storageProvider;
+    private FolderPickerOpenOptions _folderPickerOptions;
 
     public string TaskStatusString
     {
@@ -62,18 +67,34 @@ public partial class ViewModelBase : ObservableObject
     {
         _logger = logger;
         _configs = configs;
+
+        _folderPickerOptions = new FolderPickerOpenOptions()
+        {
+            AllowMultiple = false,
+            Title = "Select folder with Dataset files"
+        };
     }
 
-    public void Initialize(IClipboard clipboard, IStorageProvider storageProvider)
-    {
-        _clipboard = clipboard;
-        _storageProvider = storageProvider;
-    }
-
+    /// <summary>
+    /// Opens a folder in the default file explorer.
+    /// </summary>
+    [RelayCommand]
     protected void OpenFolderInExplorer(string folderPath)
     {
+        if (string.IsNullOrEmpty(folderPath))
+        {
+            Logger.LatestLogMessage = $"A folder needs to be selected before opening it in the explorer.";
+            return;
+        }
+
         try
         {
+            if (!Directory.Exists(folderPath))
+            {
+                Logger.LatestLogMessage = $"Folder does not exist: {folderPath}.";
+                return;
+            }
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 Process.Start("explorer.exe", folderPath);
@@ -89,8 +110,22 @@ public partial class ViewModelBase : ObservableObject
         }
         catch
         {
-            _logger.LatestLogMessage = "Unable to open the folder!";
+            Logger.LatestLogMessage = "Unable to open the folder!";
         }
+    }
+
+    [RelayCommand]
+    protected async Task<string> SelectInputFolder()
+    {
+        string resultFolder = string.Empty;
+
+        IReadOnlyList<IStorageFolder> result = await _storageProvider.OpenFolderPickerAsync(_folderPickerOptions);
+        if (result.Count > 0)
+        {
+            resultFolder = result[0].Path.LocalPath;
+        }
+
+        return resultFolder;
     }
 
     protected async Task CopyToClipboard(string text)
@@ -99,5 +134,11 @@ public partial class ViewModelBase : ObservableObject
         {
             await _clipboard.SetTextAsync(text);
         }
+    }
+
+    public void Initialize(IClipboard clipboard, IStorageProvider storageProvider)
+    {
+        _clipboard = clipboard;
+        _storageProvider = storageProvider;
     }
 }

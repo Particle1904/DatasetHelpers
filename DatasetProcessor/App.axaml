@@ -5,6 +5,7 @@
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
         <FluentTheme />
+		<StyleInclude Source="/UserControls/SelectFolderControl.axaml"/>
     </Application.Styles>
 	
 	<!-- RESOURCES -->
@@ -33,6 +34,7 @@
 		<SolidColorBrush x:Key="SecondarySurfaceLight">#E6E6E6</SolidColorBrush>
 
 		<SolidColorBrush x:Key="SurfaceDark">#1F1F1F</SolidColorBrush>
-		<SolidColorBrush x:Key="SecondarySurfaceDark">#2C2C2C</SolidColorBrush>		
+		<SolidColorBrush x:Key="SecondarySurfaceDark">#2C2C2C</SolidColorBrush>
+		<SolidColorBrush x:Key="SurfaceLighterDark">#393939</SolidColorBrush>
 	</Application.Resources>
 </Application>

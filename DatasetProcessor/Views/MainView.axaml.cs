@@ -25,6 +25,9 @@ public partial class MainView : UserControl
     private readonly ILoggerService _logger;
     private readonly IConfigsService _configs;
 
+    private IClipboard _clipboard;
+    private IStorageProvider _storageProvider;
+
     private MainViewModel? _viewModel;
 
     public MainView(IFileManipulatorService fileManipulator,
@@ -80,11 +83,10 @@ public partial class MainView : UserControl
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        TopLevel? topLevel = TopLevel.GetTopLevel(this);
-        IClipboard clipboard = topLevel.Clipboard;
-        IStorageProvider storageProvider = topLevel.StorageProvider;
-        _viewModel?.Initialize(clipboard, storageProvider);
-
         base.OnAttachedToVisualTree(e);
+
+        TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        _clipboard = topLevel.Clipboard;
+        _storageProvider = topLevel.StorageProvider;
     }
 }

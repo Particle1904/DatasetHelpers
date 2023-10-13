@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 
 using DatasetProcessor.ViewModels;
 
@@ -24,10 +23,5 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-    }
-
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
     }
 }
