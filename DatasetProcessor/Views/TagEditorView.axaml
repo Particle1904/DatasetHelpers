@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
 			 xmlns:controls="clr-namespace:DatasetProcessor.UserControls"
 			 mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="768"
 			 x:Class="DatasetProcessor.Views.TagEditorView"
@@ -163,35 +164,37 @@
 						</Panel>
 					</Button>
 				</Grid>
-				<Grid Grid.Row="4" 
-					  RowDefinitions="1*, 10, 1*, 10, Auto">
-					<TextBox Grid.Row="0"
-							 x:Name="EditorTags"
-							 MaxHeight="200"
-							 Watermark="This is where you can edit the tags/captions."
-							 Text="{Binding CurrentImageTags}"/>
-					<Label Grid.Row="2"
-						   x:Name="LabelFormatted"
-						   HorizontalAlignment="Left"
-						   VerticalAlignment="Top"
-						   MaxHeight="200"/>
+				<Grid Grid.Row="4"
+					  Classes="gridSecondary"
+					  RowDefinitions="2*, 10, 1*, 10, Auto">
+					<!-- TAGS EDITOR -->
+					<AvaloniaEdit:TextEditor Grid.Row="0"
+											 x:Name="EditorTags"
+											 Padding="10"
+											 VerticalScrollBarVisibility="Auto"
+											 HorizontalScrollBarVisibility="Disabled"									
+											 SyntaxHighlighting="True"
+											 BorderBrush="{DynamicResource Primary}"
+											 BorderThickness="1"/>
+					<!-- HIGHLIGHT PANEL -->
+					<Grid Grid.Row="2"
+						  RowDefinitions="Auto, 10, *">
+						<Label Grid.Row="0"
+							   Padding="8"
+							   Content="Highlight words:"
+							   HorizontalAlignment="Left"/>
+						<TextBox Grid.Row="2" 
+								 x:Name="EditorHighlight"
+								 TextWrapping="Wrap"
+								 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+								 Text="{Binding WordsToHighlight}"/>
+					</Grid>
 					<Label Grid.Row="4"
 						   FontSize="12"
 						   Foreground="{DynamicResource SecondaryLight}"
 						   Content="Note: text changes are automatically saved whenever you type anything in the text box"/>
 				</Grid>
 			</Grid>
-		</Grid>
-		<!-- HIGHLIGHT PANEL -->
-		<Grid Grid.Row="8" ColumnDefinitions="1*, 10, 6*"
-			  Height="60">
-			<Label Grid.Column="0"
-				   Content="Highlight words:"/>
-			<TextBox Grid.Column="2"
-					 x:Name="EditorHighlight"
-					 TextWrapping="Wrap"
-					 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
-					 Text="{Binding WordsToHighlight}"/>		
 		</Grid>
 	</Grid>
 </UserControl>
