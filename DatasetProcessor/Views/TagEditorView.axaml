@@ -11,7 +11,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 20"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Grid.Row="0" Classes="gridSecondary" ColumnDefinitions="Auto, 10, *, 10, Auto">
@@ -45,9 +45,9 @@
 			<Label Grid.Column="0"
 				   Content="{Binding SelectedImageFilename}"/>
 			<Label Grid.Column="2"
-				   Content="{Binding TotalImageFiles}"/>
-			<Label Grid.Column="4"
 				   Content="{Binding CurrentAndTotal}"/>
+			<Label Grid.Column="4"
+				   Content="{Binding TotalImageFiles}"/>
 			<CheckBox Grid.Column="6" Grid.ColumnSpan="2"
 					  IsChecked="{Binding IsExactFilter}"
 					  Content="Perform only exact matches when filtering?"
@@ -57,18 +57,16 @@
 		<Grid Grid.Row="4" Classes="gridSecondary" 
 			  ColumnDefinitions="4*, 10, 1*, 10, 1*, 10, Auto"
 			  Height="60">
-			<TextBox Height="60"
-					 ScrollViewer.VerticalScrollBarVisibility="Hidden"
-					 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-					 Grid.Column="0"
+			<TextBox Grid.Column="0"
+					 Height="60"
 					 AcceptsReturn="True"
-					 TextWrapping="WrapWithOverflow"
 					 Watermark="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."/>
 			<Button Grid.Column="2" Height="60"
 					Content="Filter images"/>
 			<Button  Grid.Column="4" Height="60"
 					Content="Clear filter"/>
-			<Button Grid.Column="6" Height="60" Width="60">
+			<Button Grid.Column="6" Height="60" Width="60"
+					Command="{Binding GoToRandomItemCommand}">
 				<Panel>
 					<Image Source="{SvgImage /Assets/Icons/dice.svg}"/>
 				</Panel>
@@ -84,21 +82,27 @@
 				<Button Grid.Row="0"
 						Content="&lt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-1"/>
 				<Button Grid.Row="2"
 						Content="&lt;&lt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-10"/>
 				<Button Grid.Row="4"
 						Content="&lt;&lt;&lt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-100"/>
 			</Grid>
 
 			<!-- IMAGE DISPLAY -->
 			<Grid Grid.Column="2"
-				  MaxHeight="768" MinHeight="256"
-				  MaxWidth="768" MinWidth="256"
+				  MaxHeight="512" MinHeight="512"
+				  MaxWidth="512" MinWidth="512"
 				  Background="{DynamicResource SurfaceDark}">
 				<Image HorizontalAlignment="Center"
 					   VerticalAlignment="Center"
@@ -113,15 +117,21 @@
 				<Button Grid.Row="0"
 						Content="&gt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="1"/>
 				<Button Grid.Row="2"
 						Content="&gt;&gt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="10"/>
 				<Button Grid.Row="4"
 						Content="&gt;&gt;&gt;"
 						Height="50"
-						Width="50"/>
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="100"/>
 			</Grid>
 
 			<!-- EDITOR PANEL -->
@@ -137,13 +147,14 @@
 						   Padding="10"/>
 					<Button Grid.Column="2"
 							MinWidth="80"
-							Content="Switch" />
+							Content="Switch"
+							Command="{Binding SwitchEditorTypeCommand}"/>
 				</Grid>
 				<Grid Grid.Row="2"
 					  Classes="gridSecondary"
 					  ColumnDefinitions="*, 10, 40">
 					<Label Grid.Column="0"
-						   Content="{Binding CurrentlyEditingType}"
+						   Content="{Binding CurrentType, StringFormat='Currently editing: {0}.'}"
 						   HorizontalAlignment="Left"
 						   Padding="10"/>
 					<Button Grid.Column="2">
@@ -153,28 +164,34 @@
 					</Button>
 				</Grid>
 				<Grid Grid.Row="4" 
-					  RowDefinitions="1*, 10, 1*">
-					<TextBox Grid.Row="0" 
-							 ScrollViewer.VerticalScrollBarVisibility="Hidden"
-							 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-							 TextWrapping="WrapWithOverflow"
-							 Watermark="This is where you can edit the tags/captions."/>
+					  RowDefinitions="1*, 10, 1*, 10, Auto">
+					<TextBox Grid.Row="0"
+							 x:Name="EditorTags"
+							 MaxHeight="200"
+							 Watermark="This is where you can edit the tags/captions."
+							 Text="{Binding CurrentImageTags}"/>
 					<Label Grid.Row="2"
+						   x:Name="LabelFormatted"
 						   HorizontalAlignment="Left"
-						   VerticalAlignment="Top"/>
+						   VerticalAlignment="Top"
+						   MaxHeight="200"/>
+					<Label Grid.Row="4"
+						   FontSize="12"
+						   Foreground="{DynamicResource SecondaryLight}"
+						   Content="Note: text changes are automatically saved whenever you type anything in the text box"/>
 				</Grid>
 			</Grid>
 		</Grid>
 		<!-- HIGHLIGHT PANEL -->
-		<Grid Grid.Row="8" ColumnDefinitions="1*, 10, 6*">
-			<Label Grid.Column="0" Content="Highlight words:"/>
+		<Grid Grid.Row="8" ColumnDefinitions="1*, 10, 6*"
+			  Height="60">
+			<Label Grid.Column="0"
+				   Content="Highlight words:"/>
 			<TextBox Grid.Column="2"
-					 Height="60"
-					 ScrollViewer.VerticalScrollBarVisibility="Hidden"
-					 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-					 Grid.Row="0"
-					 TextWrapping="WrapWithOverflow"
-					 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."/>
+					 x:Name="EditorHighlight"
+					 TextWrapping="Wrap"
+					 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 Text="{Binding WordsToHighlight}"/>		
 		</Grid>
 	</Grid>
 </UserControl>

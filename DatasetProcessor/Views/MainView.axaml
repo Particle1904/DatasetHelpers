@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.MainView"
              x:DataType="vm:MainViewModel"			
-			 Background="{DynamicResource SurfaceDark}">	
+			 Background="{DynamicResource SecondarySurfaceDark}">	
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
@@ -57,26 +57,31 @@
 						CommandParameter="{x:Static local:AppPages.Settings}"/>
 			</StackPanel>
 		</SplitView.Pane>
-		<Grid RowDefinitions="50, *, 100">
+		<Grid RowDefinitions="40, *, Auto">
 			<!-- TITTLE BAR -->
 			<Label Grid.Row="0"
 				   Content="{Binding PageName}"
-				   FontSize="30"
+				   FontSize="26"
 				   FontWeight="UltraLight"/>
 
 			<!-- MAIN PAGE -->
 			<ScrollViewer Grid.Row="1" 
+						  Padding="8"
 						  Background="{DynamicResource SecondarySurfaceDark}"
-						  Padding="8">
-					<UserControl Grid.Row="0" Content="{Binding DynamicView}"/>
+						  HorizontalScrollBarVisibility="Disabled"
+						  VerticalScrollBarVisibility="Visible">
+					<UserControl Grid.Row="0" 
+								 Content="{Binding DynamicView}"
+								 Margin="0, 0, 16, 16"/>
 			</ScrollViewer>
 
 			<!-- LOGS PANEL -->
 			<Border Grid.Row="2"
+					Margin="1"
 					BorderBrush="{DynamicResource Primary}" BorderThickness="1">
-				<StackPanel Spacing="5" Margin="10"
-							Background="{DynamicResource SurfaceSecondaryDarK}">
-				
+				<StackPanel Spacing="5"
+							Margin="8"
+							Background="{DynamicResource SurfaceSecondaryDarK}">				
 					<StackPanel Orientation="Horizontal" Spacing="6">
 						<Button Width="20" Height="20"
 								Command="{Binding OpenFolderInExplorerCommand}"
@@ -90,8 +95,8 @@
 						<Label Content="Log messages:"
 							   FontSize="12"/>					
 					</StackPanel>
-					<ScrollViewer Height="60"
-								  MaxHeight="60"
+					<ScrollViewer Height="40"
+								  MaxHeight="40"
 								  HorizontalScrollBarVisibility="Disabled"
 								  VerticalScrollBarVisibility="Visible">
 						<TextBlock VerticalAlignment="Stretch"

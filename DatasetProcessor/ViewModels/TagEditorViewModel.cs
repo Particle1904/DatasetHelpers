@@ -6,7 +6,10 @@ using CommunityToolkit.Mvvm.Input;
 using SmartData.Lib.Interfaces;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
@@ -20,7 +23,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private string _inputFolderPath;
         [ObservableProperty]
-        private string[] _imageFiles;
+        private List<string> _imageFiles;
         [ObservableProperty]
         private string _totalImageFiles;
         [ObservableProperty]
@@ -42,13 +45,14 @@ namespace DatasetProcessor.ViewModels
 
         private bool _showBlurredImage;
         private MemoryStream _currentImageMemoryStream = null;
+        [ObservableProperty]
         private bool _editingTxt;
 
         public string CurrentType
         {
             get
             {
-                if (_editingTxt)
+                if (EditingTxt)
                 {
                     return ".txt";
                 }
@@ -97,16 +101,21 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
-        partial void OnImageFilesChanged(string[] value)
+        partial void OnEditingTxtChanged(bool value)
         {
-            TotalImageFiles = $"Total files found: {ImageFiles.Length.ToString()}";
+            UpdateCurrentSelectedTags();
+        }
+
+        partial void OnImageFilesChanged(List<string> value)
+        {
+            TotalImageFiles = $"Total files found: {ImageFiles.Count.ToString()}.";
         }
 
         partial void OnSelectedItemIndexChanged(int value)
         {
-            if (ImageFiles?.Length > 0)
+            if (ImageFiles?.Count > 0)
             {
-                SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Length - 1);
+                SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
                 SelectedImage = new Bitmap((ImageFiles[SelectedItemIndex]));
             }
             else
@@ -128,32 +137,77 @@ namespace DatasetProcessor.ViewModels
             }
             finally
             {
-                //SelectedImage = newValue;
-                SelectedImageFilename = Path.GetFileName(ImageFiles[SelectedItemIndex]);
+                CurrentAndTotal = $"Currently viewing: {SelectedItemIndex + 1}/{ImageFiles?.Count}.";
+                SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles[SelectedItemIndex])}.";
             }
-        }
-
-        partial void OnTotalImageFilesChanged(string value)
-        {
-            TotalImageFiles = $"Total files found: {value}";
-        }
-
-        partial void OnCurrentAndTotalChanged(string value)
-        {
-            CurrentAndTotal = $"Current viewing: {SelectedItemIndex + 1}/{ImageFiles?.Length}.";
         }
 
         partial void OnCurrentImageTagsChanged(string value)
         {
-            OnPropertyChanged(nameof(CurrentAndTotal));
             string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
             _fileManipulator.SaveTextToFile(txtFile, CurrentImageTags);
         }
 
         [RelayCommand]
-        public void GoToItem(int parameter)
+        public async Task SelectInputFolder()
         {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                InputFolderPath = result;
+                LoadImagesFromInputFolder();
+            }
+        }
 
+        [RelayCommand]
+        public void GoToItem(string parameter)
+        {
+            int.TryParse(parameter, out int parameterInt);
+
+            if (ImageFiles?.Count != 0)
+            {
+                SelectedItemIndex += parameterInt;
+            }
+        }
+
+        [RelayCommand]
+        public void GoToRandomItem()
+        {
+            if (ImageFiles?.Count != 0 && ImageFiles != null)
+            {
+                SelectedItemIndex = _random.Next(0, ImageFiles.Count);
+            }
+        }
+
+        [RelayCommand]
+        public void SwitchEditorType()
+        {
+            EditingTxt = !EditingTxt;
+            OnPropertyChanged(nameof(CurrentType));
+        }
+
+        private void LoadImagesFromInputFolder()
+        {
+            try
+            {
+                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
+                if (ImageFiles.Count != 0)
+                {
+                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    SelectedItemIndex = 0;
+                }
+            }
+            catch
+            {
+                Logger.LatestLogMessage = "No image files were found in the directory.";
+            }
+            finally
+            {
+                if (ImageFiles.Count != 0)
+                {
+                    SelectedImage = new Bitmap(ImageFiles[SelectedItemIndex]);
+                }
+            }
         }
     }
 }

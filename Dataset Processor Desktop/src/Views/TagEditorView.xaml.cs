@@ -122,6 +122,4 @@ public partial class TagEditorView : ContentView
 
         return formattedString;
     }
-
-
 }

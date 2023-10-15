@@ -67,6 +67,10 @@
 		<Style Selector="^:focus">
 			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
 		</Style>
+		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+		<Setter Property="AcceptsReturn" Value="True"/>
 	</Style>
 	
 	<!-- CHECK BOX -->

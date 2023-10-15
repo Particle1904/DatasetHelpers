@@ -101,7 +101,25 @@ public partial class ViewModelBase : ObservableObject
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                Process.Start("xdg-open", folderPath);
+                using var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "sh",
+                        Arguments = $"-c 'xdg-open {folderPath}'",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+                int exitCode = process.ExitCode;
+                if (exitCode != 0)
+                {
+                    Logger.LatestLogMessage = "Unable to open the folder!";
+                }
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -114,8 +132,7 @@ public partial class ViewModelBase : ObservableObject
         }
     }
 
-    [RelayCommand]
-    protected async Task<string> SelectInputFolder()
+    protected async Task<string> SelectFolderPath()
     {
         string resultFolder = string.Empty;
 
