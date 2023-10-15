@@ -61,11 +61,16 @@
 			<TextBox Grid.Column="0"
 					 Height="60"
 					 AcceptsReturn="True"
+					 Text="{Binding WordsToFilter}"
 					 Watermark="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."/>
 			<Button Grid.Column="2" Height="60"
-					Content="Filter images"/>
-			<Button  Grid.Column="4" Height="60"
-					Content="Clear filter"/>
+					Content="Filter images" 
+					IsEnabled="{Binding ButtonEnabled}"
+					Command="{Binding FilterFilesCommand}"/>
+			<Button Grid.Column="4" Height="60"
+					Content="Clear filter"
+					IsEnabled="{Binding ButtonEnabled}"
+					Command="{Binding ClearFilterCommand}"/>
 			<Button Grid.Column="6" Height="60" Width="60"
 					Command="{Binding GoToRandomItemCommand}">
 				<Panel>
@@ -105,10 +110,16 @@
 				  MaxHeight="512" MinHeight="512"
 				  MaxWidth="512" MinWidth="512"
 				  Background="{DynamicResource SurfaceDark}">
-				<Image HorizontalAlignment="Center"
-					   VerticalAlignment="Center"
-					   Source="{Binding SelectedImage, Mode=TwoWay}">
-				</Image>
+				<Button Classes="transparentButton"						
+						MaxHeight="512" MinHeight="512"
+						MaxWidth="512" MinWidth="512"
+						Command="{Binding BlurImageCommand}">
+					<Panel Margin="0">
+						<Image HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   Source="{Binding SelectedImage, Mode=TwoWay}"/>
+						</Panel>
+				</Button>
 			</Grid>
 
 			<!-- FORWARD BUTTONS -->
@@ -143,7 +154,7 @@
 					  Classes="gridSecondary"
 					  ColumnDefinitions="3*, 10, 1*">
 					<Label Grid.Column="0"
-						   Content="Switch between .caption and .txt"
+						   Content="Switch between .caption and .txt:"
 						   HorizontalAlignment="Left"
 						   Padding="10"/>
 					<Button Grid.Column="2"
@@ -192,7 +203,7 @@
 					<Label Grid.Row="4"
 						   FontSize="12"
 						   Foreground="{DynamicResource SecondaryLight}"
-						   Content="Note: text changes are automatically saved whenever you type anything in the text box"/>
+						   Content="Note: text changes are automatically saved whenever you type anything in the text box."/>
 				</Grid>
 			</Grid>
 		</Grid>

@@ -118,6 +118,17 @@ public partial class MainViewModel : ViewModelBase
         NavigateToPage(AppPages.Tag_Editor);
     }
 
+    /// <summary>
+    /// Initializes the clipboard and storage provider for the application and its views.
+    /// </summary>
+    /// <param name="clipboard">An implementation of the IClipboard interface for managing clipboard operations.</param>
+    /// <param name="storageProvider">An implementation of the IStorageProvider interface for handling storage-related operations.</param>
+    /// <remarks>
+    /// This method sets the clipboard and storage provider for the application and ensures that each view's associated view model
+    /// is also initialized with the provided clipboard and storage provider.
+    /// </remarks>
+    /// <param name="clipboard">The clipboard provider to use for the application.</param>
+    /// <param name="storageProvider">The storage provider to use for the application.</param>
     public void InitializeClipboardAndStorageProvider(IClipboard clipboard, IStorageProvider storageProvider)
     {
         Initialize(clipboard, storageProvider);

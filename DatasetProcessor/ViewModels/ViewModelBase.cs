@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels;
 
+/// <summary>
+/// The base view model class that provides common functionality for view models.
+/// </summary>
 public partial class ViewModelBase : ObservableObject
 {
     [ObservableProperty]
@@ -60,8 +63,16 @@ public partial class ViewModelBase : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the view model is active.
+    /// </summary>
     public bool IsActive { get; set; } = false;
 
+    /// <summary>
+    /// Initializes a new instance of the ViewModelBase class with the provided logger and configuration service.
+    /// </summary>
+    /// <param name="logger">The logger service for logging messages.</param>
+    /// <param name="configs">The configuration service for application settings.</param>
     public ViewModelBase(ILoggerService logger,
                          IConfigsService configs)
     {
@@ -132,6 +143,10 @@ public partial class ViewModelBase : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Selects a folder path using the folder picker dialog and returns the selected folder's path.
+    /// </summary>
+    /// <returns>The path of the selected folder, or an empty string if no folder was selected.</returns>
     protected async Task<string> SelectFolderPath()
     {
         string resultFolder = string.Empty;
@@ -145,6 +160,10 @@ public partial class ViewModelBase : ObservableObject
         return resultFolder;
     }
 
+    /// <summary>
+    /// Copies the provided text to the clipboard asynchronously.
+    /// </summary>
+    /// <param name="text">The text to be copied to the clipboard.</param>
     protected async Task CopyToClipboard(string text)
     {
         if (!string.IsNullOrWhiteSpace(text))
@@ -153,6 +172,11 @@ public partial class ViewModelBase : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Initializes the view model with the clipboard and storage provider.
+    /// </summary>
+    /// <param name="clipboard">The clipboard provider for managing clipboard operations.</param>
+    /// <param name="storageProvider">The storage provider for handling storage-related operations.</param>
     public void Initialize(IClipboard clipboard, IStorageProvider storageProvider)
     {
         _clipboard = clipboard;

@@ -105,5 +105,13 @@ namespace DatasetProcessor.Views
                 EditorTags.Text = _viewModel.CurrentImageTags;
             }
         }
+
+        private void BlurImageCommand(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+        {
+        }
+
+        private void Binding_1(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+        {
+        }
     }
 }
