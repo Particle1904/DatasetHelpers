@@ -169,7 +169,8 @@
 						   Content="{Binding CurrentType, StringFormat='Currently editing: {0}.'}"
 						   HorizontalAlignment="Left"
 						   Padding="10"/>
-					<Button Grid.Column="2">
+					<Button Grid.Column="2"
+							Command="{Binding CopyCurrentImageTagsToClipboardCommand}">
 						<Panel>
 							<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
 						</Panel>

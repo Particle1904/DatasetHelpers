@@ -46,11 +46,11 @@ namespace DatasetProcessor.ViewModels
         private bool _buttonEnabled;
         [ObservableProperty]
         private string _currentAndTotal;
+        [ObservableProperty]
+        private bool _editingTxt;
 
         private bool _showBlurredImage;
         private MemoryStream _currentImageMemoryStream = null;
-        [ObservableProperty]
-        private bool _editingTxt;
 
         /// <summary>
         /// Gets the current type of file being edited, either .txt or .caption.
@@ -250,6 +250,12 @@ namespace DatasetProcessor.ViewModels
                 InputFolderPath = result;
                 LoadImagesFromInputFolder();
             }
+        }
+
+        [RelayCommand]
+        private async Task CopyCurrentImageTagsToClipboard()
+        {
+            await CopyToClipboard(CurrentImageTags);
         }
 
         [RelayCommand]

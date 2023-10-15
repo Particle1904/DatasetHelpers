@@ -40,6 +40,12 @@ namespace DatasetProcessor.Views
         /// </summary>
         private void OnEditorHighlightTextChanged(object sender, TextChangedEventArgs e)
         {
+            if (string.IsNullOrEmpty(EditorHighlight.Text))
+            {
+                EditorTags.SyntaxHighlighting = null;
+                return;
+            }
+
             if (_viewModel != null)
             {
                 string[] tagsToHighlight = EditorHighlight.Text.Replace(", ", ",").Split(",");
@@ -104,14 +110,6 @@ namespace DatasetProcessor.Views
             {
                 EditorTags.Text = _viewModel.CurrentImageTags;
             }
-        }
-
-        private void BlurImageCommand(object? sender, Avalonia.Input.PointerPressedEventArgs e)
-        {
-        }
-
-        private void Binding_1(object? sender, Avalonia.Input.PointerPressedEventArgs e)
-        {
         }
     }
 }
