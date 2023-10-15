@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 
-using AvaloniaEdit.Document;
-
 using DatasetProcessor.src.Classes;
 using DatasetProcessor.ViewModels;
 
@@ -14,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.Views
 {
+    /// <summary>
+    /// A view for editing tags, with the ability to highlight specific tags by changing their text color.
+    /// </summary>
     public partial class TagEditorView : UserControl
     {
         private Color _highlightTextColor = Color.FromArgb(255, 255, 179, 71);
@@ -23,21 +24,20 @@ namespace DatasetProcessor.Views
 
         private TagEditorViewModel _viewModel;
 
-        private TextDocument _textDocument;
-
-        SolidColorBrush _transparentForeground;
-        SolidColorBrush _highlightForeground;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagEditorView"/> class.
+        /// </summary>
         public TagEditorView()
         {
             InitializeComponent();
 
             EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged(sender, args));
             EditorTags.TextChanged += OnTextChanged;
-            _textDocument = new TextDocument();
-            EditorTags.Document = _textDocument;
         }
 
+        /// <summary>
+        /// Handles the TextChanged event of the EditorHighlight control to update tag highlighting.
+        /// </summary>
         private void OnEditorHighlightTextChanged(object sender, TextChangedEventArgs e)
         {
             if (_viewModel != null)
@@ -48,6 +48,9 @@ namespace DatasetProcessor.Views
             }
         }
 
+        /// <summary>
+        /// Handles the TextChanged event of the EditorTags control to process changes in tags.
+        /// </summary>
         private void OnTextChanged(object sender, EventArgs args)
         {
             if (_viewModel != null)
@@ -58,6 +61,9 @@ namespace DatasetProcessor.Views
             }
         }
 
+        /// <summary>
+        /// Overrides the DataContextChanged method to update the associated view model.
+        /// </summary>
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = (TagEditorViewModel)DataContext;
@@ -66,6 +72,9 @@ namespace DatasetProcessor.Views
             base.OnDataContextChanged(e);
         }
 
+        /// <summary>
+        /// Asynchronously debounces an action to execute after a specified delay.
+        /// </summary>
         private async Task DebounceOnTextChangedAsync(Action action)
         {
             _cancellationTokenSource.Cancel();
@@ -86,6 +95,9 @@ namespace DatasetProcessor.Views
             }
         }
 
+        /// <summary>
+        /// Handles property changes in the associated view model to update tag text.
+        /// </summary>
         private void OnTagsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_viewModel.CurrentImageTags))
