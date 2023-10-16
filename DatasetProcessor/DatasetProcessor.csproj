@@ -22,6 +22,7 @@
     <None Remove="Assets\Icons\dice.svg" />
     <None Remove="Assets\Icons\folder_opened.svg" />
     <None Remove="Assets\Icons\icon.png" />
+    <None Remove="Assets\Images\drag_and_drop.png" />
   </ItemGroup>
 
   <ItemGroup>

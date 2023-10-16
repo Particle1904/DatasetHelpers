@@ -86,7 +86,7 @@ public partial class MainViewModel : ViewModelBase
             { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},
             { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(logger, configs) }},
             { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(logger, configs) }},
-            { AppPages.Metadata, new MetadataView() { DataContext = new MetadataViewModel(logger, configs) }},
+            { AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, autoTagger, logger, configs) }},
             { AppPages.Settings, new SettingsView() { DataContext = new SettingsViewModel(logger, configs) }}
         };
 

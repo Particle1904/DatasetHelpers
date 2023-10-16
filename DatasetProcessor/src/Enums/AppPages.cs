@@ -12,7 +12,7 @@
         Tag_Editor,
         Extract_Subset,
         Prompt_Generator,
-        Metadata,
+        Metadata_Viewer,
         Settings
     }
 }

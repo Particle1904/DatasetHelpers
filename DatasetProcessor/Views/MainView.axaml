@@ -51,13 +51,14 @@
 						CommandParameter="{x:Static local:AppPages.Prompt_Generator}"/>
 				<Button Content="Metadata Viewer"
 						Command="{Binding NavigateToPageCommand}"
-						CommandParameter="{x:Static local:AppPages.Metadata}"/>
+						CommandParameter="{x:Static local:AppPages.Metadata_Viewer}"/>
 				<Button Content="Settings"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Settings}"/>
 			</StackPanel>
 		</SplitView.Pane>
-		<Grid RowDefinitions="40, *, Auto">
+		<Grid Classes="gridPrimary"
+			  RowDefinitions="40, *, Auto">
 			<!-- TITTLE BAR -->
 			<Label Grid.Row="0"
 				   Content="{Binding PageName}"

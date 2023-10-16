@@ -48,6 +48,8 @@ namespace DatasetProcessor.ViewModels
         private string _currentAndTotal;
         [ObservableProperty]
         private bool _editingTxt;
+        [ObservableProperty]
+        private string _currentImageTags;
 
         private bool _showBlurredImage;
         private MemoryStream _currentImageMemoryStream = null;
@@ -69,9 +71,6 @@ namespace DatasetProcessor.ViewModels
                 }
             }
         }
-
-        [ObservableProperty]
-        private string _currentImageTags;
 
         /// <summary>
         /// Initializes a new instance of the TagEditorViewModel class.
@@ -99,20 +98,20 @@ namespace DatasetProcessor.ViewModels
 
             SelectedItemIndex = 0;
 
-            _inputHooks.ButtonF1 += (sender, args) => OnButtonDown(sender, args, "-1");
-            _inputHooks.ButtonF2 += (sender, args) => OnButtonDown(sender, args, "1");
-            _inputHooks.ButtonF3 += (sender, args) => OnButtonDown(sender, args, "-10");
-            _inputHooks.ButtonF4 += (sender, args) => OnButtonDown(sender, args, "10");
-            _inputHooks.ButtonF5 += (sender, args) => OnButtonDown(sender, args, "-100");
-            _inputHooks.ButtonF6 += (sender, args) => OnButtonDown(sender, args, "100");
+            _inputHooks.ButtonF1 += (sender, args) => OnNavigationButtonDown("-1");
+            _inputHooks.ButtonF2 += (sender, args) => OnNavigationButtonDown("1");
+            _inputHooks.ButtonF3 += (sender, args) => OnNavigationButtonDown("-10");
+            _inputHooks.ButtonF4 += (sender, args) => OnNavigationButtonDown("10");
+            _inputHooks.ButtonF5 += (sender, args) => OnNavigationButtonDown("-100");
+            _inputHooks.ButtonF6 += (sender, args) => OnNavigationButtonDown("100");
             _inputHooks.ButtonF8 += async (sender, args) => await BlurImageAsync();
 
             _inputHooks.MouseButton3 += async (sender, args) => await BlurImageAsync();
-            _inputHooks.MouseButton4 += (sender, args) => OnButtonDown(sender, args, "-1");
-            _inputHooks.MouseButton5 += (sender, args) => OnButtonDown(sender, args, "1");
+            _inputHooks.MouseButton4 += (sender, args) => OnNavigationButtonDown("-1");
+            _inputHooks.MouseButton5 += (sender, args) => OnNavigationButtonDown("1");
 
-            _inputHooks.AltLeftArrowCombo += (sender, args) => OnButtonDown(sender, args, "-1");
-            _inputHooks.AltRightArrowCombo += (sender, args) => OnButtonDown(sender, args, "1");
+            _inputHooks.AltLeftArrowCombo += (sender, args) => OnNavigationButtonDown("-1");
+            _inputHooks.AltRightArrowCombo += (sender, args) => OnNavigationButtonDown("1");
         }
 
         /// <summary>
@@ -171,6 +170,9 @@ namespace DatasetProcessor.ViewModels
             OnPropertyChanged(nameof(CurrentType));
         }
 
+        /// <summary>
+        /// Toggles the display of a blurred image for the currently selected image asynchronously.
+        /// </summary>
         [RelayCommand]
         private async Task BlurImageAsync()
         {
@@ -203,6 +205,9 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Asynchronously filters and loads image files based on specified filter criteria.
+        /// </summary>
         [RelayCommand]
         private async Task FilterFilesAsync()
         {
@@ -239,6 +244,18 @@ namespace DatasetProcessor.ViewModels
         }
 
         /// <summary>
+        /// Clears the applied filter and reloads all images from the original input folder.
+        /// </summary>
+        [RelayCommand]
+        private void ClearFilter()
+        {
+            if (!string.IsNullOrEmpty(InputFolderPath))
+            {
+                LoadImagesFromInputFolder();
+            }
+        }
+
+        /// <summary>
         /// Selects an input folder and loads images from it.
         /// </summary>
         [RelayCommand]
@@ -252,19 +269,13 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Copies the current image tags to the clipboard asynchronously.
+        /// </summary>
         [RelayCommand]
         private async Task CopyCurrentImageTagsToClipboard()
         {
             await CopyToClipboard(CurrentImageTags);
-        }
-
-        [RelayCommand]
-        private void ClearFilter()
-        {
-            if (!string.IsNullOrEmpty(InputFolderPath))
-            {
-                LoadImagesFromInputFolder();
-            }
         }
 
         /// <summary>
@@ -294,7 +305,13 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
-        private void OnButtonDown(object sender, EventArgs e, string index)
+        /// <summary>
+        /// Handles a button down event and navigates to the item with the specified index.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        /// <param name="index">The index of the item to navigate to.</param>
+        private void OnNavigationButtonDown(string index)
         {
             if (IsActive)
             {

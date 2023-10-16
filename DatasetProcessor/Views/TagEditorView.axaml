@@ -15,7 +15,7 @@
 	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 20"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Grid.Row="0" Classes="gridSecondary" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 			</Button>
 		</Grid>
 		<!-- CURRENT FILE INFORMATION PANEL -->
-		<Grid Grid.Row="2" Classes="gridSecondary" 
+		<Grid Classes="gridSecondary" Grid.Row="2"
 			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, 1*, 1*"
 			  Height="40">
 			<Label Grid.Column="0"
@@ -55,7 +55,7 @@
 					  VerticalAlignment="Center"/>
 		</Grid>
 		<!-- FILTER BUTTONS BAR -->
-		<Grid Grid.Row="4" Classes="gridSecondary" 
+		<Grid Classes="gridSecondary" Grid.Row="4"
 			  ColumnDefinitions="4*, 10, 1*, 10, 1*, 10, Auto"
 			  Height="60">
 			<TextBox Grid.Column="0"
@@ -106,10 +106,9 @@
 			</Grid>
 
 			<!-- IMAGE DISPLAY -->
-			<Grid Grid.Column="2"
+			<Grid Classes="gridPrimary" Grid.Column="2"
 				  MaxHeight="512" MinHeight="512"
-				  MaxWidth="512" MinWidth="512"
-				  Background="{DynamicResource SurfaceDark}">
+				  MaxWidth="512" MinWidth="512">
 				<Button Classes="transparentButton"						
 						MaxHeight="512" MinHeight="512"
 						MaxWidth="512" MinWidth="512"
@@ -186,10 +185,14 @@
 											 VerticalScrollBarVisibility="Auto"
 											 HorizontalScrollBarVisibility="Disabled"									
 											 SyntaxHighlighting="True"
+											 Background="{DynamicResource SurfaceDark}"
 											 BorderBrush="{DynamicResource Primary}"
-											 BorderThickness="1"/>
+											 BorderThickness="1"
+											 FontSize="17"
+											 FontWeight="Light"/>
 					<!-- HIGHLIGHT PANEL -->
 					<Grid Grid.Row="2"
+						  Classes="gridPrimary"
 						  RowDefinitions="Auto, 10, *">
 						<Label Grid.Row="0"
 							   Padding="8"
@@ -198,6 +201,7 @@
 						<TextBox Grid.Row="2" 
 								 x:Name="EditorHighlight"
 								 TextWrapping="Wrap"
+								 Background="Transparent"
 								 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 								 Text="{Binding WordsToHighlight}"/>
 					</Grid>

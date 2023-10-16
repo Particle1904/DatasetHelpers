@@ -3,10 +3,10 @@
 	<Design.PreviewWith>
 		<Border Padding="20" Background="Black">
 			<!-- Add Controls for Previewer Here -->
-			<Button Content="Content Tags"/>
+			<Slider Width="100"/>
 		</Border>
 	</Design.PreviewWith>
-
+	
 	<!-- BUTTON -->
 	<Style Selector="Button">
 		<Setter Property="Background" Value="{DynamicResource Primary}"/>
@@ -79,6 +79,8 @@
 
 	<!-- TEXT BOX -->
 	<Style Selector="TextBox">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Padding" Value="12, 12, 46, 12"/>
 		<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
 		<Style Selector="^:focus">
 			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
@@ -123,9 +125,13 @@
 
 	<!-- GRID -->
 	<Style Selector="Grid">
-		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
+		<Setter Property="Background" Value="Transparent"/>
 	</Style>
 
+	<Style Selector="Grid.gridPrimary">
+		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
+	</Style>
+	
 	<Style Selector="Grid.gridSecondary">
 		<Setter Property="Background" Value="{DynamicResource SurfaceLighterDark}"/>
 	</Style>
