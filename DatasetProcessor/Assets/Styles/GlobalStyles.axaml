@@ -3,7 +3,8 @@
 	<Design.PreviewWith>
 		<Border Padding="20" Background="Black">
 			<!-- Add Controls for Previewer Here -->
-			<Slider Width="100"/>
+			<ProgressBar Width="500"
+						 Value="50"/>
 		</Border>
 	</Design.PreviewWith>
 	
@@ -25,7 +26,6 @@
 			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
 		</Style>
 	</Style>
-
 	<Style Selector="Button.transparentButton">
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="Foreground" Value="Transparent"/>
@@ -127,12 +127,17 @@
 	<Style Selector="Grid">
 		<Setter Property="Background" Value="Transparent"/>
 	</Style>
-
 	<Style Selector="Grid.gridPrimary">
 		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
-	</Style>
-	
+	</Style>	
 	<Style Selector="Grid.gridSecondary">
 		<Setter Property="Background" Value="{DynamicResource SurfaceLighterDark}"/>
+	</Style>
+
+	<!-- PROGRES BAR -->
+	<Style Selector="ProgressBar">
+		<Setter Property="ShowProgressText" Value="True"/>
+		<Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+		<Setter Property="MaxWidth" Value="500"/>
 	</Style>
 </Styles>

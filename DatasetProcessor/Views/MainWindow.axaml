@@ -11,7 +11,7 @@
         Title="Dataset Processor All-in-one Tools - v2.0.0"
 		Background="{DynamicResource SurfaceDark}"
 		MinWidth="1320"
-		MinHeight="768"
+		MinHeight="600"
 		WindowState="Maximized">
         <views:MainView />
 	<Window.Styles>

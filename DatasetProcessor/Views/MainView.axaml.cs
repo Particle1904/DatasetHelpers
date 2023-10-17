@@ -10,6 +10,7 @@ using SmartData.Lib.Services;
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace DatasetProcessor.Views;
 
@@ -88,5 +89,11 @@ public partial class MainView : UserControl
         TopLevel? topLevel = TopLevel.GetTopLevel(this);
         _clipboard = topLevel.Clipboard;
         _storageProvider = topLevel.StorageProvider;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            MetadataViewerButton.IsEnabled = false;
+            MetadataViewerButton.IsVisible = false;
+        }
     }
 }

@@ -42,22 +42,27 @@ namespace DatasetProcessor.Views
                 return;
             }
 
+            string fileOrigin = string.Empty;
             try
             {
-                await HandleFilesFromExplorer(e);
-            }
-            catch
-            {
-                _viewModel.Logger.LatestLogMessage = "Couldn't load the image from the File Explorer.";
-            }
+                if (e.Data.Contains(DataFormats.Text))
+                {
+                    fileOrigin = "browser";
 
-            try
-            {
-                await HandleFilesFromBrowser(e);
+                    string text = e.Data.GetText();
+                    await HandleFilesFromBrowser(text);
+                }
+                else
+                {
+                    fileOrigin = "file explorer";
+
+                    IEnumerable<IStorageItem> files = e.Data.GetFiles();
+                    await HandleFilesFromExplorer(files);
+                }
             }
             catch
             {
-                _viewModel.Logger.LatestLogMessage = "Couldn't load the image from the Browser.";
+                _viewModel.Logger.LatestLogMessage = $"An error occured while trying to read the image file from the {fileOrigin}.";
             }
         }
 
@@ -65,21 +70,17 @@ namespace DatasetProcessor.Views
         /// Handles files dragged from the browser, if they are valid images.
         /// </summary>
         /// <param name="e">The DragEventArgs containing the dropped data.</param>
-        private async Task HandleFilesFromBrowser(DragEventArgs e)
+        private async Task HandleFilesFromBrowser(string text)
         {
-            if (e.Data.Contains(DataFormats.Text))
+            if (IsUrl(text))
             {
-                string text = e.Data.GetText();
-                if (IsUrl(text))
+                using (HttpClient client = new HttpClient())
                 {
-                    using (HttpClient client = new HttpClient())
+                    HttpResponseMessage response = await client.GetAsync(text);
+                    if (response.IsSuccessStatusCode && response.Content.Headers.ContentType.MediaType.StartsWith("image"))
                     {
-                        HttpResponseMessage response = await client.GetAsync(text);
-                        if (response.IsSuccessStatusCode && response.Content.Headers.ContentType.MediaType.StartsWith("image"))
-                        {
-                            Stream fileStream = await response.Content.ReadAsStreamAsync();
-                            await _viewModel.OpenFileAsync(fileStream);
-                        }
+                        Stream fileStream = await response.Content.ReadAsStreamAsync();
+                        await _viewModel.OpenFileAsync(fileStream);
                     }
                 }
             }
@@ -89,10 +90,8 @@ namespace DatasetProcessor.Views
         /// Handles files dragged from the file explorer, if they are valid images.
         /// </summary>
         /// <param name="e">The DragEventArgs containing the dropped data.</param>
-        private async Task HandleFilesFromExplorer(DragEventArgs e)
+        private async Task HandleFilesFromExplorer(IEnumerable<IStorageItem> files)
         {
-            IEnumerable<IStorageItem> files = e.Data.GetFiles();
-
             if (files != null && files.Any())
             {
                 IStorageItem firstItem = files.FirstOrDefault();

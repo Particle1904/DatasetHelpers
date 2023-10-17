@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
 using System.Collections.Generic;
@@ -170,6 +171,23 @@ public partial class ViewModelBase : ObservableObject
         {
             await _clipboard.SetTextAsync(text);
         }
+    }
+
+    /// <summary>
+    /// Updates the progress tracker to reflect the completion of one file.
+    /// </summary>
+    protected static Progress ResetProgress(Progress progress)
+    {
+        if (progress == null)
+        {
+            return new Progress();
+        }
+        if (progress.PercentFloat != 0f)
+        {
+            progress.Reset();
+        }
+
+        return progress;
     }
 
     /// <summary>

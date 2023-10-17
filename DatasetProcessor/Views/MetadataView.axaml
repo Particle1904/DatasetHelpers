@@ -91,6 +91,7 @@
 					   HorizontalAlignment="Right"
 					   Content="{Binding Threshold}"/>
 			</Grid>
+			<!-- GENERATED TAGS PANEL -->
 			<Grid Classes="gridSecondary"
 				  Grid.Row="2"
 				  RowDefinitions="Auto, 10, *"

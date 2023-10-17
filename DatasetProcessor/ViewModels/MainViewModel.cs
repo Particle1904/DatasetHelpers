@@ -12,6 +12,7 @@ using SmartData.Lib.Interfaces;
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace DatasetProcessor.ViewModels;
 
@@ -80,15 +81,19 @@ public partial class MainViewModel : ViewModelBase
             { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(logger, configs) }},
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext =  new ContentAwareCropViewModel(logger, configs) }},
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(logger, configs) }},
-            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(logger, configs) }},
+            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, autoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(logger, configs) }},
             { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(logger, configs) }},
             { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},
             { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(logger, configs) }},
             { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(logger, configs) }},
-            { AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, autoTagger, logger, configs) }},
             { AppPages.Settings, new SettingsView() { DataContext = new SettingsViewModel(logger, configs) }}
         };
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            _views.Add(AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, autoTagger, logger, configs) });
+        }
 
         _dynamicView = _views[AppPages.Welcome];
         SetPageName(AppPages.Welcome);
