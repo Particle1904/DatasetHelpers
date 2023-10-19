@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 
-using DatasetProcessor.ViewModels;
-
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Services;
 
@@ -28,8 +26,6 @@ public partial class MainView : UserControl
 
     private IClipboard _clipboard;
     private IStorageProvider _storageProvider;
-
-    private MainViewModel? _viewModel;
 
     public MainView(IFileManipulatorService fileManipulator,
                     IImageProcessorService imageProcessor,
@@ -86,7 +82,7 @@ public partial class MainView : UserControl
     {
         base.OnAttachedToVisualTree(e);
 
-        TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        TopLevel topLevel = TopLevel.GetTopLevel(this);
         _clipboard = topLevel.Clipboard;
         _storageProvider = topLevel.StorageProvider;
 

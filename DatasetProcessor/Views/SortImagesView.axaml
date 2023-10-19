@@ -3,6 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
 			 x:Class="DatasetProcessor.Views.SortImagesView"
              x:DataType="vm:SortImagesViewModel"
@@ -10,5 +12,157 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE SORT IMAGES PAGE"/>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- OUTPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select output folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectOutputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding OutputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding OutputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- DISCARDED FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="4" ColumnDefinitions="Auto, 10, *, 10, Auto"
+			  RowDefinitions="Auto, 10, Auto">
+			<Button Grid.Column="0"
+					Grid.Row="0"
+					Content="Select discarded folder"
+					Width="180"
+					Height="40"
+					FontSize="14"
+					Command="{Binding SelectDiscardedFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Grid.Row="0"
+				   Content="{Binding DiscardedFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					Grid.Row="0"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding DiscardedFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Label Grid.Column="0" Grid.ColumnSpan="3"
+				   Grid.Row="2"
+				   Content="Select the dimension size for discarding images:"
+				   HorizontalAlignment="Left"/>
+			<ComboBox Grid.Column="2" Grid.ColumnSpan="3"
+					  Grid.Row="2"
+					  HorizontalAlignment="Right"
+					  MinWidth="200"
+					  MaxWidth="200"
+					  SelectedItem="{Binding Dimension}"
+					  ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}">				
+			</ComboBox>
+		</Grid>
+		<!-- BACKUP FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="6" ColumnDefinitions="Auto, 10, *, 10, Auto"
+			  RowDefinitions="Auto, 10, Auto">
+			<Button Grid.Column="0"
+					Grid.Row="0"
+					Content="Select backup folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectBackupFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Grid.Row="0"
+				   Content="{Binding BackupFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					Grid.Row="0"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding BackupFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<CheckBox Grid.Column="0" Grid.ColumnSpan="5"
+					  Grid.Row="2"
+					  HorizontalAlignment="Left"
+					  Margin="10"
+					  IsChecked="{Binding WeightedCaptions}"
+					  Content="Would you like to backup images before processing?">
+			</CheckBox>
+		</Grid>
+		
+		<Separator Grid.Row="8"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="10"
+			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="12"
+			   Content="{Binding ElapsedTime, StringFormat='Sorting elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- SORT BUTTON -->
+		<Button Grid.Row="14"
+				Width="200"
+				Content="Sort images"
+				IsEnabled="{Binding IsUiEnabled}"
+				Command="{Binding SortImagesCommand}"/>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="16"
+					 Value="{Binding PredictionProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="18"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
+	</Grid>
 </UserControl>

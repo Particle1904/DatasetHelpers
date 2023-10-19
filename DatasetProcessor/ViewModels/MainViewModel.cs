@@ -78,7 +78,7 @@ public partial class MainViewModel : ViewModelBase
         _views = new Dictionary<AppPages, UserControl>()
         {
             { AppPages.Welcome, new WelcomeView() { DataContext = new WelcomeViewModel(logger, configs) }},
-            { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(logger, configs) }},
+            { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext =  new ContentAwareCropViewModel(logger, configs) }},
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(logger, configs) }},
             { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, autoTagger, logger, configs) }},

@@ -27,7 +27,8 @@
 			<!-- POSITIVE PROMPT -->
 			<Grid Classes="gridSecondary" Grid.Row="0" 
 				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto">
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Positive prompt:"
 					   HorizontalAlignment="Left"/>
@@ -43,7 +44,8 @@
 			<!-- NEGATIVE PROMPT -->
 			<Grid Classes="gridSecondary" Grid.Row="2" 
 				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto">
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Negative prompt:"
 					   HorizontalAlignment="Left"/>
@@ -59,7 +61,8 @@
 			<!-- GENERATION PARAMETERS -->
 			<Grid Classes="gridSecondary" Grid.Row="4" 
 				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto">
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Generation parameters:"
 					   HorizontalAlignment="Left"/>
@@ -95,7 +98,8 @@
 			<Grid Classes="gridSecondary"
 				  Grid.Row="2"
 				  RowDefinitions="Auto, 10, *"
-				  ColumnDefinitions="*, 10, 40">
+				  ColumnDefinitions="*, 10, 40"
+				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 				   Content="WD 1.4 interrogated tags:"
 				   HorizontalAlignment="Left"/>

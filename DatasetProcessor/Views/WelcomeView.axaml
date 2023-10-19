@@ -10,5 +10,57 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE WELCOME PAGE"/>
+	<Grid RowDefinitions="Auto, 60, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+		  Margin="0, 60, 0, 0">
+		<Label Grid.Column="0" Grid.ColumnSpan="5"
+			   Grid.Row="0"
+			   Content="Use the Buttons on the left to navigate through the app."
+			   FontSize="30"/>
+		<!-- WIKI PAGE -->
+		<Panel Grid.Row="2"
+			   Background="{DynamicResource SurfaceLighterDark}">
+			<Grid ColumnDefinitions="3*, 10, 2*"
+			  MaxWidth="600">
+				<Label Grid.Column="0"
+					   Content="Open the Wiki Page to read the documentation"
+					   HorizontalAlignment="Left"/>
+				<Button Grid.Column="2"
+						Content="Open Wiki page"/>
+			</Grid>
+		</Panel>
+		<!-- ISSUES PAGE -->
+		<Panel Grid.Row="4"
+			   Background="{DynamicResource SurfaceLighterDark}">
+			<Grid ColumnDefinitions="3*, 10, 2*"
+				  MaxWidth="600">
+				<Label Grid.Column="0"
+					   Content="Open the Issues page to post or search for an issue"
+					   HorizontalAlignment="Left"/>
+				<Button Grid.Column="2"
+						Content="Open Issues page"/>
+			</Grid>
+		</Panel>
+		<!-- REPOSITORY -->
+		<Panel Grid.Row="6"
+			   Background="{DynamicResource SurfaceLighterDark}">
+			<Button MaxWidth="600"
+					Content="Open GitHub repository page">				
+			</Button>
+		</Panel>
+		<!-- RELEASES -->
+		<Panel Grid.Row="8"
+			   Background="{DynamicResource SurfaceLighterDark}">
+			<Button MaxWidth="600"
+					Content="Open Releases page">
+			</Button>
+		</Panel>
+		<!-- INFO LABEL -->
+		<Panel Grid.Row="10"
+			   Background="{DynamicResource SurfaceDark}"
+			   Height="40">
+			<Label Content="Feature requests are welcome, feel free to post it as an issue in the GitHub repository!"
+				   Foreground="{DynamicResource Secondary}"
+				   FontSize="16"/>
+		</Panel>
+	</Grid>
 </UserControl>
