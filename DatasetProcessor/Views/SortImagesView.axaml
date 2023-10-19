@@ -146,7 +146,7 @@
 		<Separator Grid.Row="8"/>
 		<!-- CURRENTLY PROCESSING -->
 		<Label Grid.Row="10"
-			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+			   Content="{Binding SortProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 		<!-- ELAPSED TIME -->
 		<Label Grid.Row="12"
 			   Content="{Binding ElapsedTime, StringFormat='Sorting elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
@@ -158,7 +158,7 @@
 				Command="{Binding SortImagesCommand}"/>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="16"
-					 Value="{Binding PredictionProgress.PercentComplete}"/>
+					 Value="{Binding SortProgress.PercentComplete}"/>
 		<!-- TASK STATUS -->
 		<Label Grid.Row="18"
 			   FontSize="22"

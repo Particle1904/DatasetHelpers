@@ -3,12 +3,199 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+             xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.ContentAwareCropView"
 			 x:DataType="vm:SortImagesViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE CONTENT AWARE CROP PAGE"/>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 10, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- OUTPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select output folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectOutputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding OutputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding OutputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- THRESHOLD SLIDER -->
+		<Grid Classes="gridSecondary"
+				  Grid.Row="4"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Width="300"
+				   Content="Threshold for predictions certainty:"/>
+			<Slider Grid.Column="2"
+					Minimum="0.1"
+					Maximum="1"
+					Value="{Binding ScoreThreshold}"/>
+			<Label Grid.Column="4"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding ScoreThreshold}"/>
+		</Grid>
+		<!-- IoU THRESHOLD SLIDER -->
+		<Grid Classes="gridSecondary"
+				  Grid.Row="5"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Width="300"
+				   Content="Threshold for Intersection over Union (IoU):"/>
+			<Slider Grid.Column="2"
+					Minimum="0.1"
+					Maximum="1"
+					Value="{Binding IouThreshold}"/>
+			<Label Grid.Column="4"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding IouThreshold}"/>
+		</Grid>
+		<!-- EXPANSION SLIDER -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="6"
+			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Width="300"
+				   Content="Bounding Box expansion in percentage:"/>
+			<Slider Grid.Column="2"
+					Minimum="0.1"
+					Maximum="1"
+					Value="{Binding ExpansionPercentage}"/>
+			<Label Grid.Column="4"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding ExpansionPercentageString}"/>
+		</Grid>
+		<!-- DIMENSION CONFIGS-->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="8"
+			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Content="Select the output dimension size:"
+				   HorizontalAlignment="Left"/>
+			<ComboBox Grid.Column="2" Grid.ColumnSpan="3"
+					  HorizontalAlignment="Right"
+					  MinWidth="200"
+					  MaxWidth="200"
+					  SelectedItem="{Binding Dimension}"
+					  ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}">
+			</ComboBox>
+		</Grid>
+		<!-- LANCOZS SAMPLER SLIDER -->
+		<Grid Classes="gridSecondary"
+				  Grid.Row="9"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Width="300"
+				   Content="Lanczos sampler radius:"/>
+			<Slider Grid.Column="2"
+					Minimum="1"
+					Maximum="25"
+					Value="{Binding LanczosRadius}"/>
+			<Label Grid.Column="4"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding LanczosRadius}"/>
+		</Grid>
+		<!-- SHARPEN SIGMA SLIDER -->
+		<Grid Classes="gridSecondary"
+				  Grid.Row="10"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto, 10, Auto">
+			<CheckBox Grid.Column="0"
+					  Width="282"
+					  Margin="10"
+					  Content="Apply Sharpen Sigma?:"
+					  VerticalAlignment="Center"/>
+			<Slider Grid.Column="2"
+					Minimum="0.5"
+					Maximum="5"
+					Value="{Binding SharpenSigma}"
+					VerticalAlignment="Center"/>
+			<Label Grid.Column="4"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding SharpenSigma}"
+				   VerticalAlignment="Center"/>
+			<Grid Grid.Column="6" ColumnDefinitions="Auto, 10, Auto">
+				<TextBlock Grid.Column="0" 
+						   Text="Minimum resolution for Sigman (256x min):"
+						   MaxWidth="200"
+						   VerticalAlignment="Center"/>
+				<TextBox Grid.Column="2"
+						 Padding="10"
+						 MaxWidth="240"
+						 MinWidth="240"
+						 MaxHeight="70"
+						 Text="{Binding MinimumResolutionForSigma}"
+						 Watermark="Enter here a minimum resolution size for Sigma to be applied. For example: setting this value to be 2048 will make it so sharpen is only applied to images bigger or equal to 2048px in either Width or Height. Input 256 to apply it to all images."/>
+			</Grid>
+		</Grid>
+		<Separator Grid.Row="11"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="12"
+			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="14"
+			   Content="{Binding ElapsedTime, StringFormat='Content aware crop elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- SORT BUTTON -->
+		<Button Grid.Row="16"
+				Width="200"
+				Content="Auto crop images"
+				IsEnabled="{Binding IsUiEnabled}"
+				Command="{Binding SortImagesCommand}"/>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="18"
+					 Value="{Binding PredictionProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="20"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
+	</Grid>
 </UserControl>

@@ -79,7 +79,7 @@ public partial class MainViewModel : ViewModelBase
         {
             { AppPages.Welcome, new WelcomeView() { DataContext = new WelcomeViewModel(logger, configs) }},
             { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
-            { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext =  new ContentAwareCropViewModel(logger, configs) }},
+            { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext =  new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(logger, configs) }},
             { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, autoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(logger, configs) }},
