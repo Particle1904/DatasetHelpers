@@ -83,10 +83,10 @@ public partial class MainViewModel : ViewModelBase
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs) }},
             { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, autoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(logger, configs) }},
+            { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},
-            { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(logger, configs) }},
-            { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(logger, configs) }},
+            { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(fileManipulator, logger, configs) }},
+            { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, logger, configs) }},
             { AppPages.Settings, new SettingsView() { DataContext = new SettingsViewModel(logger, configs) }}
         };
 

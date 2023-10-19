@@ -45,10 +45,10 @@
 			<Label Grid.Column="0" 
 				   Content="Words to replace:"/>
 			<TextBox Grid.Column="2"
-					 Watermark="Enter the words you want to search to be replaced, separated by commas. For example: 'word1, word2'. Leave blank if not applicable."
+					 Watermark="Enter the words you want to search to be replaced, separated by commas.&#10;For example: 'word1, word2'.&#10;Leave blank if not applicable."
                      Text="{Binding WordsToBeReplaced}"/>
 			<TextBox Grid.Column="4"
-					 Watermark="Enter the words you want to replace with, separated by commas. For example: 'newword1, newword2'. Leave blank if not applicable."
+					 Watermark="Enter the words you want to replace with, separated by commas.&#10;For example: 'newword1, newword2'.&#10;Leave blank if not applicable."
                      Text="{Binding WordsToReplace}"/>
 		</Grid>
 		<!-- NOTE TEXT BOX -->
@@ -59,7 +59,7 @@
 					   TextAlignment="Center"
 					   FontWeight="Light"
 					   Foreground="{DynamicResource Secondary}"
-				   Text="Note: This functionality will replace exact words and ignore cases where the input words are part of larger words. For example: if you input 'fox' to be replaced with 'cat', occurrences like 'foxy' remain untouched due to their integration within bigger words."/>
+				   Text="Note: This functionality will replace exact words and ignore cases where the input words are part of larger words.&#10;For example: if you input 'fox' to be replaced with 'cat', occurrences like 'foxy' remain untouched due to their integration within bigger words."/>
 		</Panel>
 		<Separator Grid.Row="5"/>
 		<!-- CURRENTLY PROCESSING -->

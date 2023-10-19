@@ -10,5 +10,125 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE SETTINGS PAGE"/>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0"
+			  RowDefinitions="1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 4*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="3"
+				   Content="{Binding Configs.SelectedFolderDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="2"
+					Grid.Column="0"
+					Command="{Binding SelectSortedFolderCommand}"
+					Content="Select 'sorted' folder"/>
+			<TextBlock Grid.Row="2"
+					   Grid.Column="2"
+					   Text="{Binding SelectedFolderPath}"/>
+		</Grid>
+		
+		<Grid Classes="gridSecondary" Grid.Row="2"
+			  RowDefinitions="1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 4*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="3"
+				   Content="{Binding Configs.DiscardedFolderDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="2"
+					Grid.Column="0"
+					Content="Select 'discarded' folder"
+					Command="{Binding SelectDiscardedFolderCommand}"
+					FontSize="14"/>
+			<TextBlock Grid.Row="2"
+					   Grid.Column="2"
+					   Text="{Binding DiscardedFolderPath}"/>
+		</Grid>
+		
+		<Grid Classes="gridSecondary" Grid.Row="4"
+			  RowDefinitions="1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 4*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="3"
+				   Content="{Binding Configs.BackupFolderDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="2"
+					Grid.Column="0"
+					Content="Select 'backup' folder"
+					Command="{Binding SelectBackupFolderCommand}"/>
+			<TextBlock Grid.Row="2"
+					   Grid.Column="2"
+					   Text="{Binding BackupFolderPath}"/>
+		</Grid>
+		
+		<Grid Classes="gridSecondary" Grid.Row="6"
+			  RowDefinitions="1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 4*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="3"
+				   Content="{Binding Configs.ResizedFolderDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="2"
+					Grid.Column="0"
+					Content="Select 'resized' folder"
+					Command="{Binding SelectResizedFolderCommand}"/>
+			<TextBlock Grid.Row="2"
+					   Grid.Column="2"
+					   Text="{Binding ResizedFolderPath}"/>
+		</Grid>
+		
+		<Grid Classes="gridSecondary" Grid.Row="8"
+			  RowDefinitions="1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 4*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="3"
+				   Content="{Binding Configs.CombinedFolderDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="2"
+					Grid.Column="0"
+					Content="Select 'combined' folder"
+					FontSize="14"
+					Command="{Binding SelectCombinedOutputFolderCommand}"/>
+			<TextBlock Grid.Row="2"
+					   Grid.Column="2"
+					   Text="{Binding CombinedOutputFolderPath}"/>
+		</Grid>
+		<Grid Classes="gridSecondary"
+				  Grid.Row="10"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto"
+				  RowDefinitions="Auto, 10, Auto">
+			<Label Grid.Column="0"
+				   Grid.ColumnSpan="5"
+				   Content="{Binding Configs.TaggerThresholdDescription}"
+				   Foreground="{DynamicResource Secondary}"
+				   HorizontalAlignment="Left"/>
+			<Label Grid.Column="0"
+				   Grid.Row="2"
+				   Content="Threshold for predictions:"/>
+			<Slider Grid.Column="2"
+					Grid.Row="2"
+					Minimum="0.1"
+					Maximum="1"
+					Value="{Binding TaggerThreshold}"/>
+			<Label Grid.Column="4"
+				   Grid.Row="2"
+				   Width="50"
+				   HorizontalAlignment="Right"
+				   Content="{Binding TaggerThreshold}"/>
+		</Grid>
+		<Separator Grid.Row="11"/>
+		<Button Grid.Row="12"
+				MaxWidth="200"
+			    Content="Save settings"
+				Command="{Binding SaveSettingsCommand}"/>
+	</Grid>
 </UserControl>

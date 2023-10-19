@@ -24,7 +24,8 @@ public partial class ViewModelBase : ObservableObject
 {
     [ObservableProperty]
     protected ILoggerService _logger;
-    protected readonly IConfigsService _configs;
+    [ObservableProperty]
+    protected IConfigsService _configs;
     protected IClipboard _clipboard;
     protected IStorageProvider _storageProvider;
     private FolderPickerOpenOptions _folderPickerOptions;

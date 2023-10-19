@@ -67,14 +67,12 @@
 				   FontWeight="UltraLight"/>
 
 			<!-- MAIN PAGE -->
-			<ScrollViewer Grid.Row="1" 
-						  Padding="8"
+			<ScrollViewer Grid.Row="1"
 						  Background="{DynamicResource SecondarySurfaceDark}"
 						  HorizontalScrollBarVisibility="Disabled"
-						  VerticalScrollBarVisibility="Visible">
-					<UserControl Grid.Row="0" 
-								 Content="{Binding DynamicView}"
-								 Margin="0, 0, 16, 16"/>
+						  VerticalScrollBarVisibility="Auto">
+					<UserControl Margin="16"
+								 Content="{Binding DynamicView}"/>
 			</ScrollViewer>
 
 			<!-- LOGS PANEL -->

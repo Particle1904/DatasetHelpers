@@ -3,12 +3,160 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="1024"
              x:Class="DatasetProcessor.Views.ProcessTagsView"
 			 x:DataType="vm:ProcessTagsViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Label Content="THIS IS THE PROCESS TAGS PAGE"/>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 16"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- INPUT FIELDS -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="2"
+			  RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto"
+			  ColumnDefinitions="1*, 10, 2*, 10, 2*">
+			<!-- TAGS TO ADD -->
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Content="Tags to add:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="0"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter tags you want to add, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 Text="{Binding TagsToAdd}"/>
+			<!-- TAGS TO EMPHASIZE -->
+			<Label Grid.Row="2"
+				   Grid.Column="0"
+				   Content="Tags to emphasize:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="2"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter tags you want to emphasize by bringing them to the beginning, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 Text="{Binding TagsToEmphasize}"/>
+			<!-- TAGS TO REMOVE -->
+			<Label Grid.Row="4"
+				   Grid.Column="0"
+				   Content="Tags to remove:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="4"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter tags you want to remove, separated by commas. For example: 'obsolete, redundant'. Leave blank if not applicable."
+					 Text="{Binding TagsToRemove}"/>
+			<!-- TAGS TO REPLACE -->
+			<Label Grid.Row="6"
+				   Grid.Column="0"
+				   Content="Tags to replace:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="6"
+					 Grid.Column="2"
+					 Watermark="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+				     Text="{Binding TagsToBeReplaced}"/>
+			<TextBox Grid.Row="6"
+					 Grid.Column="4"
+					 Watermark="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
+					 Text="{Binding TagsToReplace}"/>
+		</Grid>
+		<!-- CHECK BOXES -->
+		<Grid Classes="gridSecondary" Grid.Row="4" 
+			  RowDefinitions="Auto, Auto, Auto, Auto">
+			<CheckBox Grid.Row="0"
+					  HorizontalAlignment="Left"
+					  Margin="10"
+					  IsChecked="{Binding RandomizeTags}"
+					  Content="Would you like to randomize Tags after processing?">
+			</CheckBox>			
+			<CheckBox Grid.Row="1"
+					  HorizontalAlignment="Left"
+					  Margin="10"
+					  IsChecked="{Binding RenameFilesToCrescent}"
+					  Content="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg + 1.txt, 2.jpeg + 2.txt and etc.?">
+			</CheckBox>		
+			<CheckBox Grid.Row="2" 
+					  HorizontalAlignment="Left"
+					  Margin="10"
+					  IsChecked="{Binding ApplyRedundancyRemoval}"
+					  Content="Would you like to apply redundancy removal to the tags? For example: if the processed tags have &quot;shirt&quot; and &quot;black shirt&quot;;&#x0a;it will strip &quot;shirt&quot; and keep &quot;black shirt&quot; since its more descriptive.">
+			</CheckBox>
+			<CheckBox Grid.Row="3"
+					  HorizontalAlignment="Left"
+					  Margin="10"
+					  IsChecked="{Binding ApplyConsolidateTags}"
+					  Content="[VERY EXPERIMENTAL] Would you like to consolidate similar tags into a single one? For example: if the processed tags have &quot;white shirt&quot; and &quot;collared shirt&quot;&#x0a;it will combine them into &quot;white collared shirt&quot;.">
+			</CheckBox>
+		</Grid>
+		<Grid Classes="gridSecondary" Grid.Row="6"
+			  ColumnDefinitions="1*, 10, 3*, 10, 1*">
+			<Label Grid.Column="0" 
+				   Content="Sumary of tags by frequency:"/>
+			<TextBox Grid.Column="2"
+					 MinHeight="100"
+					 MaxHeight="100"
+					 Watermark="Click the button to process tags by frequency.&#xa;This will use the .txt files in the input folder."
+					 Text="{Binding SortedByFrequency}"/>
+			<Button Grid.Column="4"
+					Content="Calculate frequency"
+					Command="{Binding CalculateByFrequencyCommand}"/>
+		</Grid>
+		<!-- NOTE TEXT BOX -->
+		<Panel Grid.Row="8"
+			   Background="{DynamicResource SurfaceDark}">
+			<TextBlock HorizontalAlignment="Center"
+					   Margin="10"
+					   TextAlignment="Center"
+					   FontWeight="Light"
+					   Foreground="{DynamicResource Secondary}"
+					   Text="Note: You can leave any of the text fields empty and still use the Randomize, Rename, Redundancy Removal and Tag Consolidation features." />
+		</Panel>
+		<Separator Grid.Row="9"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="10"
+			   Content="{Binding TagProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="12"
+			   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- PROCESS BUTTON -->
+		<Button Grid.Row="14"
+				Width="200"
+				Content="Process tags"
+				IsEnabled="{Binding IsUiEnabled}"
+				Command="{Binding ProcessTagsCommand}"/>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="16"
+					 Value="{Binding TagProcessingProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="18"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
+	</Grid>
 </UserControl>

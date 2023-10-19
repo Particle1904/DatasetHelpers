@@ -201,7 +201,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = $"Something went wrong while loading blurred image! Error log will be saved inside the logs folder.";
+                Logger.LatestLogMessage = $"Something went wrong while loading blurred image!";
             }
         }
 

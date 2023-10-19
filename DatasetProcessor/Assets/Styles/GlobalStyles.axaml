@@ -80,7 +80,7 @@
 	<!-- TEXT BOX -->
 	<Style Selector="TextBox">
 		<Setter Property="FontSize" Value="14"/>
-		<Setter Property="Padding" Value="12, 12, 46, 12"/>
+		<Setter Property="Padding" Value="12, 12, 12, 12"/>
 		<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
 		<Style Selector="^:focus">
 			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
