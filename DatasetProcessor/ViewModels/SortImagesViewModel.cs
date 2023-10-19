@@ -126,6 +126,7 @@ namespace DatasetProcessor.ViewModels
                 timer.Start();
 
                 await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, SortProgress, Dimension);
+                timer.Stop();
             }
             catch (Exception exception)
             {
@@ -136,6 +137,7 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
+                _timer.Stop();
             }
         }
     }

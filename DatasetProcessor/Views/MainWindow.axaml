@@ -12,7 +12,8 @@
 		Background="{DynamicResource SurfaceDark}"
 		MinWidth="1320"
 		MinHeight="600"
-		WindowState="Maximized">
+		WindowState="Normal"
+		CanResize="True">
         <views:MainView />
 	<Window.Styles>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>

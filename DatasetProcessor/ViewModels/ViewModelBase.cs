@@ -119,7 +119,7 @@ public partial class ViewModelBase : ObservableObject
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "sh",
-                        Arguments = $"-c 'xdg-open {folderPath}'",
+                        Arguments = $"open {folderPath}",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true
