@@ -31,7 +31,7 @@ namespace Dataset_Processor_Desktop
             builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
             builder.Services.AddSingleton<IFileManipulatorService, FileManipulatorService>();
             builder.Services.AddSingleton<IImageProcessorService, ImageProcessorService>();
-            builder.Services.AddSingleton<ITagProcessorService, TagProcessor>();
+            builder.Services.AddSingleton<ITagProcessorService, TagProcessorService>();
             builder.Services.AddSingleton<ILoggerService, LoggerService>();
             builder.Services.AddSingleton<IConfigsService, ConfigsService>();
             builder.Services.AddSingleton<IContentAwareCropService>(service =>

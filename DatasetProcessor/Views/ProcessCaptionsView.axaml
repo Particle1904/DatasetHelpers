@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+             x:Class="DatasetProcessor.Views.ProcessCaptionsView"
+			 x:DataType="vm:SortImagesViewModel"
+			 Background="{DynamicResource SecondarySurfaceDark}">
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- REPLACE PANEL -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="2"
+			  ColumnDefinitions="1*, 10, 2*, 10, 2*"
+			  Height="100">
+			<Label Grid.Column="0" 
+				   Content="Words to replace:"/>
+			<TextBox Grid.Column="2"
+					 Watermark="Enter the words you want to search to be replaced, separated by commas.&#10;For example: 'word1, word2'.&#10;Leave blank if not applicable."
+                     Text="{Binding WordsToBeReplaced}"/>
+			<TextBox Grid.Column="4"
+					 Watermark="Enter the words you want to replace with, separated by commas.&#10;For example: 'newword1, newword2'.&#10;Leave blank if not applicable."
+                     Text="{Binding WordsToReplace}"/>
+		</Grid>
+		<!-- NOTE TEXT BOX -->
+		<Panel Grid.Row="4"
+			   Background="{DynamicResource SurfaceDark}">
+			<TextBlock HorizontalAlignment="Center"
+					   Margin="10"
+					   TextAlignment="Center"
+					   FontWeight="Light"
+					   Foreground="{DynamicResource Secondary}"
+				   Text="Note: This functionality will replace exact words and ignore cases where the input words are part of larger words.&#10;For example: if you input 'fox' to be replaced with 'cat', occurrences like 'foxy' remain untouched due to their integration within bigger words."/>
+		</Panel>
+		<Separator Grid.Row="5"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="6"
+			   Content="{Binding CaptionProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="8"
+			   Content="{Binding ElapsedTime, StringFormat='Resize images elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- SORT BUTTON -->
+		<Button Grid.Row="10"
+				Width="200"
+				Content="Resize images"
+				IsEnabled="{Binding IsUiEnabled}"
+				Command="{Binding ProcessCaptionsCommand}"/>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="12"
+					 Value="{Binding CaptionProcessingProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="14"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
+	</Grid>
+</UserControl>

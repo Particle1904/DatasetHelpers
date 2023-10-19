@@ -5,9 +5,16 @@ using System.ComponentModel;
 
 namespace SmartData.Lib.Services
 {
+    /// <summary>
+    /// Service for managing configurations and handling configuration file operations.
+    /// Implements the <see cref="IConfigsService"/> and <see cref="INotifyPropertyChanged"/> interfaces.
+    /// </summary>
     public class ConfigsService : IConfigsService, INotifyPropertyChanged
     {
-        public Config Configurations { get; set; }
+        /// <summary>
+        /// Gets or sets the configuration object.
+        /// </summary>
+        public Config Configurations { get; private set; }
 
         private readonly string _cfgFilePath = Path.Combine(AppContext.BaseDirectory, "config.cfg");
 
@@ -29,27 +36,34 @@ namespace SmartData.Lib.Services
         private readonly string _combinedFolderDescription = "#Folder for Generated Tags and their corresponding Images. This is also the folder the Processor and Tag Editor pages will use as Input.";
         public string CombinedFolderDescription { get => _combinedFolderDescription.Replace("#", ""); }
 
+        /// <summary>
+        /// Event raised when a property value changes.
+        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigsService"/> class.
+        /// Creates a new <see cref="Config"/> object and asynchronously loads configuration values from the configuration file.
+        /// </summary>
         public ConfigsService()
         {
             Configurations = new Config();
+            Task.Run(() => LoadConfigurationsAsync());
         }
 
         /// <summary>
-        /// Loads the configuration values from the configuration file.
+        /// Asynchronously loads configuration values from the configuration file.
         /// </summary>
         /// <remarks>
-        /// This method first ensures that the configuration file exists by calling the <see cref="CreateConfigFileIfNotExist"/> method.
+        /// This method first ensures that the configuration file exists by calling the <see cref="CreateConfigFileIfNotExistAsync"/> method.
         /// It then reads all lines from the configuration file and filters out any lines starting with '#' (comments).
         /// Each remaining line represents a configuration option in the format "ConfigurationDescription=ConfigurationValue".
         /// The method parses each line and assigns the corresponding configuration value to the appropriate property in the <see cref="Configurations"/> object.
         /// If a folder path is specified in the configuration file, the method checks if the folder exists, and if not, assigns a default folder path.
         /// </remarks>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task LoadConfigurations()
+        public async Task LoadConfigurationsAsync()
         {
-            await CreateConfigFileIfNotExist();
+            await CreateConfigFileIfNotExistAsync();
 
             string[] file = await File.ReadAllLinesAsync(_cfgFilePath);
 
@@ -85,7 +99,7 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Saves the current configuration values to the configuration file.
+        /// Asynchronously saves the current configuration values to the configuration file.
         /// </summary>
         /// <remarks>
         /// This method writes the current configuration values, including the tagger threshold, discarded folder, selected folder,
@@ -94,7 +108,7 @@ namespace SmartData.Lib.Services
         /// with the new configuration values.
         /// </remarks>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SaveConfigurations()
+        public async Task SaveConfigurationsAsync()
         {
             List<string> configsList = new List<string>
             {
@@ -122,7 +136,7 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Creates the configuration file if it doesn't already exist. Writes the default configuration values to the file.
+        /// Asynchronously creates the configuration file if it doesn't already exist and writes the default configuration values to the file.
         /// </summary>
         /// <remarks>
         /// This method checks if the configuration file exists. If it doesn't, it creates the file and writes the default
@@ -130,7 +144,7 @@ namespace SmartData.Lib.Services
         /// such as the tagger threshold, discarded folder, selected folder, backup folder, resized folder, and combined folder.
         /// </remarks>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task CreateConfigFileIfNotExist()
+        private async Task CreateConfigFileIfNotExistAsync()
         {
             if (!File.Exists(_cfgFilePath))
             {
@@ -207,6 +221,10 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Raises the PropertyChanged event for a specific property.
+        /// </summary>
+        /// <param name="propertyName">The name of the property that has changed (optional).</param>
         public virtual void OnPropertyChanged(string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

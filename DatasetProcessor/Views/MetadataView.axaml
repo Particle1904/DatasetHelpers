@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		     xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+			 x:Class="DatasetProcessor.Views.MetadataView"
+             x:DataType="vm:MetadataViewModel"
+			 Background="{DynamicResource SecondarySurfaceDark}">
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	<Grid RowDefinitions="Auto, 10, *" ColumnDefinitions="Auto, 10, *"
+		  Background="Transparent">
+		<!-- IMAGE DISPLAY -->
+		<Grid Classes="gridPrimary"
+			  Grid.Column="0"
+			  MaxHeight="512" MinHeight="512"
+			  MaxWidth="512" MinWidth="512">
+			<Image HorizontalAlignment="Center"
+				   VerticalAlignment="Center"
+				   Source="{Binding SelectedImage}"
+				   DragDrop.AllowDrop="True"/>
+		</Grid>
+		<Grid Classes="gridPrimary" 
+			  Grid.Column="2" RowDefinitions="1*, 10, 1*, 10, 1*">
+			<!-- POSITIVE PROMPT -->
+			<Grid Classes="gridSecondary" Grid.Row="0" 
+				  RowDefinitions="Auto, 10, *" 
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
+				<Label Grid.Row="0" Grid.Column="0"
+					   Content="Positive prompt:"
+					   HorizontalAlignment="Left"/>
+				<Button Grid.Row="0" Grid.Column="2"
+						Command="{Binding CopyPositivePromptToClipboardCommand}">
+					<Panel>
+						<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+					</Panel>
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+						 Text="{Binding PositivePrompt}"/>
+			</Grid>
+			<!-- NEGATIVE PROMPT -->
+			<Grid Classes="gridSecondary" Grid.Row="2" 
+				  RowDefinitions="Auto, 10, *" 
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
+				<Label Grid.Row="0" Grid.Column="0"
+					   Content="Negative prompt:"
+					   HorizontalAlignment="Left"/>
+				<Button Grid.Row="0" Grid.Column="2"
+						Command="{Binding CopyNegativePromptToClipboardCommand}">
+					<Panel>
+						<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+					</Panel>
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+						 Text="{Binding NegativePrompt}"/>
+			</Grid>
+			<!-- GENERATION PARAMETERS -->
+			<Grid Classes="gridSecondary" Grid.Row="4" 
+				  RowDefinitions="Auto, 10, *" 
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
+				<Label Grid.Row="0" Grid.Column="0"
+					   Content="Generation parameters:"
+					   HorizontalAlignment="Left"/>
+				<Button Grid.Row="0" Grid.Column="2"
+						Command="{Binding CopySeedFromParametersToClipboardCommand}">
+					<Panel>
+						<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+					</Panel>
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+						 Text="{Binding Parameters}"/>
+			</Grid>
+		</Grid>
+
+		<Grid Classes="gridPrimary" Grid.Row="2" Grid.ColumnSpan="3"
+			  RowDefinitions="Auto, 10, *, 16">
+			<!-- THRESHOLD SLIDER -->
+			<Grid Classes="gridSecondary"
+				  Grid.Row="0"
+				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+				<Label Grid.Column="0"
+					   Content="Threshold for predictions:"/>
+				<Slider Grid.Column="2"
+						Minimum="0.1"
+						Maximum="1"
+						Value="{Binding Threshold}"/>
+				<Label Grid.Column="4"
+					   Width="50"
+					   HorizontalAlignment="Right"
+					   Content="{Binding Threshold}"/>
+			</Grid>
+			<!-- GENERATED TAGS PANEL -->
+			<Grid Classes="gridSecondary"
+				  Grid.Row="2"
+				  RowDefinitions="Auto, 10, *"
+				  ColumnDefinitions="*, 10, 40"
+				  MaxHeight="160">
+				<Label Grid.Row="0" Grid.Column="0"
+				   Content="WD 1.4 interrogated tags:"
+				   HorizontalAlignment="Left"/>
+				<Button Grid.Row="0" Grid.Column="2"
+						Command="{Binding CopyPredictedTagsToClipboardCommand}">
+					<Panel>
+						<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+					</Panel>
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+						 Text="{Binding PredictedTags}"
+						 Height="60"/>
+			</Grid>			
+		</Grid>
+	</Grid>
+</UserControl>

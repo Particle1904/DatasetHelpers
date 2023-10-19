@@ -120,6 +120,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 OnPropertyChanged(nameof(WordsToFilter));
             }
         }
+
         private bool _isExactFilter;
         public bool IsExactFilter
         {

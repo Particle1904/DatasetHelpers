@@ -23,7 +23,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         #region Definition of App Views.
         private View _dynamicContentView;
 
-        private Dictionary<AppViews, View> views;
+        private Dictionary<AppViews, View> _views;
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             ((INotifyPropertyChanged)_loggerService).PropertyChanged += OnLoggerServicePropertyChanged;
 
-            views = new Dictionary<AppViews, View>()
+            _views = new Dictionary<AppViews, View>()
             {
                 { AppViews.Welcome, new WelcomeView() },
                 { AppViews.DatasetSort, new DatasetSortView(_fileManipulatorService) },
@@ -84,7 +84,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 { AppViews.Settings, new SettingsView() }
             };
 
-            _dynamicContentView = views[AppViews.Welcome];
+            _dynamicContentView = _views[AppViews.Welcome];
 
             NavigateToWelcomePageCommand = new RelayCommand(() => NavigateToPage(AppViews.Welcome));
             NavigateToDatasetSortCommand = new RelayCommand(() => NavigateToPage(AppViews.DatasetSort));
@@ -102,7 +102,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             try
             {
-                _configsService.LoadConfigurations();
+                _configsService.LoadConfigurationsAsync();
             }
             catch (Exception exception)
             {
@@ -117,12 +117,12 @@ namespace Dataset_Processor_Desktop.src.ViewModel
         {
             SetAllViewsAsInactive();
             SetViewAsActive(view);
-            DynamicContentView = views[view];
+            DynamicContentView = _views[view];
         }
 
         public void NavigateToTagEditorView()
         {
-            TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)views[AppViews.TagEditor].BindingContext;
+            TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_views[AppViews.TagEditor].BindingContext;
             tagEditorViewModel.UpdateCurrentSelectedTags();
             NavigateToPage(AppViews.TagEditor);
         }
@@ -137,7 +137,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private void SetAllViewsAsInactive()
         {
-            foreach (var item in views)
+            foreach (var item in _views)
             {
                 BaseViewModel bindingContext = (BaseViewModel)item.Value.BindingContext;
                 if (bindingContext != null)
@@ -149,7 +149,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
         private void SetViewAsActive(AppViews view)
         {
-            BaseViewModel bindingContext = (BaseViewModel)views[view].BindingContext;
+            BaseViewModel bindingContext = (BaseViewModel)_views[view].BindingContext;
             if (bindingContext != null)
             {
                 bindingContext.IsActive = true;

@@ -1,0 +1,41 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+			 x:Class="DatasetProcessor.App"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <Application.Styles>
+        <FluentTheme />
+		<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    </Application.Styles>
+	
+	<!-- RESOURCES -->
+	<Application.Resources>
+		<SolidColorBrush x:Key="Gray50">#FAFAFA</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray100">#F5F5F5</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray200">#EEEEEE</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray300">#E0E0E0</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray400">#BDBDBD</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray500">#9E9E9E</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray600">#757575</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray700">#616161</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray800">#424242</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray900">#212121</SolidColorBrush>
+		<SolidColorBrush x:Key="Gray950">#262626</SolidColorBrush>
+		
+		<!-- Light Mode Colors -->
+		<SolidColorBrush x:Key="Primary">#2D8C7F</SolidColorBrush>
+		<SolidColorBrush x:Key="PrimaryLight">#5FAEA0</SolidColorBrush>
+		<SolidColorBrush x:Key="PrimaryDark">#1E6055</SolidColorBrush>
+		<SolidColorBrush x:Key="Secondary">#FFB347</SolidColorBrush>
+		<SolidColorBrush x:Key="SecondaryLight">#FFD18F</SolidColorBrush>
+		<SolidColorBrush x:Key="SecondaryDark">#E58C27</SolidColorBrush>
+		
+		<SolidColorBrush x:Key="SurfaceLight">#F7F7F7</SolidColorBrush>		
+		<SolidColorBrush x:Key="SecondarySurfaceLight">#E6E6E6</SolidColorBrush>
+
+		<SolidColorBrush x:Key="SurfaceDark">#1F1F1F</SolidColorBrush>
+		<SolidColorBrush x:Key="SecondarySurfaceDark">#2C2C2C</SolidColorBrush>
+		<SolidColorBrush x:Key="SurfaceLighterDark">#393939</SolidColorBrush>
+	</Application.Resources>
+</Application>

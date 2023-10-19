@@ -2,14 +2,23 @@
 
 namespace SmartData.Lib.Helpers
 {
+    /// <summary>
+    /// Represents a progress tracker for tracking the completion of a set of tasks.
+    /// </summary>
     public class Progress : INotifyPropertyChanged
     {
         private int _totalFiles;
         private int _filesProcessed;
         private int _percentComplete;
 
+        /// <summary>
+        /// Event raised when a property of the Progress object changes.
+        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Gets or sets the total number of files to process.
+        /// </summary>
         public int TotalFiles
         {
             get => _totalFiles;
@@ -20,9 +29,12 @@ namespace SmartData.Lib.Helpers
             }
         }
 
+        /// <summary>
+        /// Gets or sets the percentage of completion as an integer (0-100).
+        /// </summary>
         public int PercentComplete
         {
-            get => _percentComplete / 100;
+            get => _percentComplete;
             set
             {
                 _percentComplete = value;
@@ -31,11 +43,17 @@ namespace SmartData.Lib.Helpers
             }
         }
 
+        /// <summary>
+        /// Gets the percentage of completion as a floating-point number (0.0-1.0).
+        /// </summary>
         public float PercentFloat
         {
             get => (float)_percentComplete / 100;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the Progress class with default values.
+        /// </summary>
         public Progress()
         {
             _filesProcessed = 0;
@@ -53,6 +71,9 @@ namespace SmartData.Lib.Helpers
             OnPropertyChanged(nameof(PercentFloat));
         }
 
+        /// <summary>
+        /// Resets the progress tracker to its initial state.
+        /// </summary>
         public void Reset()
         {
             TotalFiles = 0;

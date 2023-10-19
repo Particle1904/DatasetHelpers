@@ -166,7 +166,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
                 _configsService.Configurations.CombinedOutputFolder = CombinedOutputFolderPath;
             }
 
-            await _configsService.SaveConfigurations();
+            await _configsService.SaveConfigurationsAsync();
         }
     }
 }

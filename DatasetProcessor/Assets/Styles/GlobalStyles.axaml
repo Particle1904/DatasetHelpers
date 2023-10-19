@@ -1,0 +1,143 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Design.PreviewWith>
+		<Border Padding="20" Background="Black">
+			<!-- Add Controls for Previewer Here -->
+			<ProgressBar Width="500"
+						 Value="50"/>
+		</Border>
+	</Design.PreviewWith>
+	
+	<!-- BUTTON -->
+	<Style Selector="Button">
+		<Setter Property="Background" Value="{DynamicResource Primary}"/>
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="CornerRadius" Value="0"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="FontSize" Value="16"/>
+		<Setter Property="FontWeight" Value="Medium"/>
+		<Setter Property="Height" Value="40"/>
+		
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+	<Style Selector="Button.transparentButton">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="Transparent"/>
+		<Setter Property="CornerRadius" Value="0"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="VerticalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+	
+	<!-- SLIDER -->
+	<Style Selector="Slider">
+		<Setter Property="Minimum" Value="0"/>
+		<Setter Property="Maximum" Value="100"/>
+		<Setter	Property="Background" Value="{DynamicResource Gray800}"/>
+		<Setter	Property="Foreground" Value="{DynamicResource PrimaryDark}"/>
+		
+		<Style Selector="^:horizontal /template/ Thumb#thumb">
+			<Setter Property="Background" Value="{DynamicResource Primary}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ Thumb#thumb">
+			<Setter Property="Background" Value="{DynamicResource PrimaryLight}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ RepeatButton#PART_DecreaseButton">
+			<Setter	Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ RepeatButton#PART_IncreaseButton">
+			<Setter	Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+
+	<!-- LABEL -->
+	<Style Selector="Label">
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+	</Style>
+
+	<!-- TEXT BLOCK -->
+	<Style Selector="TextBlock">
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+	</Style>
+
+	<!-- TEXT BOX -->
+	<Style Selector="TextBox">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Padding" Value="12, 12, 12, 12"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		<Style Selector="^:focus">
+			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+		<Setter Property="AcceptsReturn" Value="True"/>
+	</Style>
+	
+	<!-- CHECK BOX -->
+	<Style Selector="CheckBox">
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		</Style>
+		<Style Selector="^:checked">
+			<Setter Property="Foreground" Value="{DynamicResource Gray50}"/>
+		</Style>
+		<Style Selector="^:checked /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryDark}"/>
+			<Setter Property="Background" Value="{DynamicResource Primary}"/>		
+		</Style>
+		<Style Selector="^:unchecked /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush" Value="{DynamicResource Primary}"/>
+		</Style>
+		<Style Selector="^:unchecked /template/ Grid#RootGrid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:checked /template/ Grid#RootGrid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:checked /template/ Grid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:unchecked /template/ Grid">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+	</Style>
+
+	<!-- GRID -->
+	<Style Selector="Grid">
+		<Setter Property="Background" Value="Transparent"/>
+	</Style>
+	<Style Selector="Grid.gridPrimary">
+		<Setter Property="Background" Value="{DynamicResource SurfaceDark}"/>
+	</Style>	
+	<Style Selector="Grid.gridSecondary">
+		<Setter Property="Background" Value="{DynamicResource SurfaceLighterDark}"/>
+	</Style>
+
+	<!-- PROGRES BAR -->
+	<Style Selector="ProgressBar">
+		<Setter Property="ShowProgressText" Value="True"/>
+		<Setter Property="Foreground" Value="{DynamicResource Primary}"/>
+		<Setter Property="MaxWidth" Value="500"/>
+	</Style>
+</Styles>

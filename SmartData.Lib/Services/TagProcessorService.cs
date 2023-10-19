@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
-    public class TagProcessor : ITagProcessorService
+    public class TagProcessorService : ITagProcessorService
     {
         private readonly string _txtSearchPattern = "*.txt";
         private readonly string _captionSearchPattern = "*.caption";

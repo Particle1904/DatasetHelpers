@@ -1,0 +1,169 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+			 x:Class="DatasetProcessor.Views.DatasetPromptGeneratorView"
+             x:DataType="vm:DatasetPromptGeneratorViewModel"
+			 Background="{DynamicResource SecondarySurfaceDark}">
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- INPUT FIELDS -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="2"
+			  RowDefinitions="Auto, 10, Auto, 10, Auto"
+			  ColumnDefinitions="1*, 10, 2*, 10, 2*">
+			<!-- TAGS TO ADD -->
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Content="Tags to prepend:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="0"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter the tags you want to prepend to the start of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+                     Text="{Binding TagsToPrepend}"/>
+			<!-- TAGS TO EMPHASIZE -->
+			<Label Grid.Row="2"
+				   Grid.Column="0"
+				   Content="Tags to append:"
+				   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="2"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter the tags you want to append to the end of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+					 Text="{Binding TagsToAppend}"/>
+			<!-- TAGS TO REMOVE -->
+			<TextBlock Grid.Row="4"
+					   Grid.Column="0"
+					   Text="Amount of tags (if tag is a repeated one, it will be automatically removed):"
+					   HorizontalAlignment="Left"/>
+			<TextBox Grid.Row="4"
+					 Grid.Column="2"
+					 Grid.ColumnSpan="3"
+					 Watermark="Enter here the number of random tags to use for the generation. Note: value will be clamped to be between 5 and 50; your append and prepend tags aren't taken into consideration."
+					 Text="{Binding AmountOfTags}"/>
+		</Grid>
+		<Separator Grid.Row="5"/>
+		<Grid Classes="gridSecondary" Grid.Row="6"
+				  RowDefinitions="Auto, 10, *"
+				  ColumnDefinitions="*, 10, Auto"
+				  MaxHeight="160">
+			<Label Grid.Row="0" Grid.Column="0"
+				   Content="Generated prompt:"
+				   HorizontalAlignment="Left"/>
+			<Button Grid.Row="0" Grid.Column="2"
+					Command="{Binding CopyGeneratedPromptToClipboardCommand}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+				</Panel>
+			</Button>
+			<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+					 Text="{Binding GeneratedPrompt}"
+					 Height="60"
+					 Watermark="This is where you can view and edit your generated prompt. Click the button on the far right to copy the contents to your system clipboard."/>
+		</Grid>
+		<!-- OUTPUT PANEL -->
+		<Grid Classes="gridSecondary" Grid.Row="8" 
+			  ColumnDefinitions="1*, 10, 4*"
+			  RowDefinitions="Auto, 10, Auto, 10, Auto">
+			<Button Grid.Column="0"
+					Grid.Row="2"
+					IsEnabled="{Binding IsUiEnabled}"
+					Content="Generate prompt"
+					Command="{Binding GeneratePromptCommand}"/>
+			<Panel Grid.Column="1"
+				   Grid.Row="0"
+				   Grid.RowSpan="5"
+				   Width="1"
+				   Background="#808080"
+				   Margin="10"/>
+			<Grid Grid.Column="2"
+				  Grid.Row="0"
+				  ColumnDefinitions="1*, 10, 4*, 10, 40">
+				<Button Grid.Column="0"
+						Content="Select output folder"
+						FontSize="14"
+						Command="{Binding SelectOutputFolderCommand}"/>
+				<Label Grid.Column="2"
+					   HorizontalAlignment="Left"
+					   Content="{Binding OutputFolderPath}"/>
+				<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding OutputFolderPath}">
+					<Panel>
+						<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+							   HorizontalAlignment="Stretch"
+							   VerticalAlignment="Stretch"
+							   Margin="1"/>
+					</Panel>
+				</Button>
+			</Grid>
+			<Grid Grid.Column="2"
+				  Grid.Row="2"
+				  ColumnDefinitions="1*, 10, 4*, 10, 40">
+				<Label Grid.Column="0"
+					   Content="Amount of prompts:"/>
+				<TextBox Grid.Column="2" Grid.ColumnSpan="3"
+						 Text="{Binding AmountOfGeneratedPrompts}"/>
+			</Grid>
+			<Grid Grid.Column="2"
+				  Grid.Row="4"
+				  ColumnDefinitions="1*,1*,1*">
+				<Button Grid.Column="1"
+						Content="Generate prompts"
+						Command="{Binding GeneratePromptsCommand}"/>
+			</Grid>			
+		</Grid>
+		<!-- NOTE TEXT BOX -->
+		<Panel Grid.Row="10"
+			   Background="{DynamicResource SurfaceDark}">
+			<TextBlock HorizontalAlignment="Center"
+					   Margin="10"
+					   TextAlignment="Center"
+					   FontWeight="Light"
+					   Foreground="{DynamicResource Secondary}"
+					   Text="Note: This functionality will generate a unique prompt from your input folder data, append and prepend any number of tags you want.&#10;It will also clean up the generate prompt and apply redundancy removal to it.&#10;You can also save a file with 10 to 65535 unique generated prompts in the selected output folder.&#10;The configurations for append, prepend and number of tags also apply to prompts saved on file."/>
+		</Panel>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="12"
+					 Value="{Binding GenerationProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="14"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
+	</Grid>
+</UserControl>

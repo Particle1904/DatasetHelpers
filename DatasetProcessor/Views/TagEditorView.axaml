@@ -1,0 +1,216 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+			 xmlns:controls="clr-namespace:DatasetProcessor.UserControls"
+			 mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="768"
+			 x:Class="DatasetProcessor.Views.TagEditorView"
+             x:DataType="vm:TagEditorViewModel"			
+			 Background="{DynamicResource SecondarySurfaceDark}">
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 20"
+		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- CURRENT FILE INFORMATION PANEL -->
+		<Grid Classes="gridSecondary" Grid.Row="2"
+			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, 1*, 1*"
+			  Height="40">
+			<Label Grid.Column="0"
+				   Content="{Binding SelectedImageFilename}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding CurrentAndTotal}"/>
+			<Label Grid.Column="4"
+				   Content="{Binding TotalImageFiles}"/>
+			<CheckBox Grid.Column="6" Grid.ColumnSpan="2"
+					  IsChecked="{Binding IsExactFilter}"
+					  Content="Perform only exact matches when filtering?"
+					  VerticalAlignment="Center"/>
+		</Grid>
+		<!-- FILTER BUTTONS BAR -->
+		<Grid Classes="gridSecondary" Grid.Row="4"
+			  ColumnDefinitions="4*, 10, 1*, 10, 1*, 10, Auto"
+			  Height="60">
+			<TextBox Grid.Column="0"
+					 Height="60"
+					 AcceptsReturn="True"
+					 Text="{Binding WordsToFilter}"
+					 Watermark="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."/>
+			<Button Grid.Column="2" Height="60"
+					Content="Filter images" 
+					IsEnabled="{Binding ButtonEnabled}"
+					Command="{Binding FilterFilesCommand}"/>
+			<Button Grid.Column="4" Height="60"
+					Content="Clear filter"
+					IsEnabled="{Binding ButtonEnabled}"
+					Command="{Binding ClearFilterCommand}"/>
+			<Button Grid.Column="6" Height="60" Width="60"
+					Command="{Binding GoToRandomItemCommand}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/dice.svg}"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- IMAGE PANEL -->
+		<Grid Grid.Row="6" Background="Transparent"
+			  ColumnDefinitions="50, 10, 1*, 10, 50, 10, 1*">
+			<!-- BACKWARDS BUTTONS -->
+			<Grid Grid.Column="0" RowDefinitions="Auto, 10, Auto, 10, Auto"
+				  VerticalAlignment="Center"
+				  Background="Transparent">
+				<Button Grid.Row="0"
+						Content="&lt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-1"/>
+				<Button Grid.Row="2"
+						Content="&lt;&lt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-10"/>
+				<Button Grid.Row="4"
+						Content="&lt;&lt;&lt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-100"/>
+			</Grid>
+
+			<!-- IMAGE DISPLAY -->
+			<Grid Classes="gridPrimary" Grid.Column="2"
+				  MaxHeight="512" MinHeight="512"
+				  MaxWidth="512" MinWidth="512">
+				<Button Classes="transparentButton"						
+						MaxHeight="512" MinHeight="512"
+						MaxWidth="512" MinWidth="512"
+						Command="{Binding BlurImageCommand}">
+					<Panel Margin="0">
+						<Image HorizontalAlignment="Center"
+							   VerticalAlignment="Center"
+							   Source="{Binding SelectedImage, Mode=TwoWay}"/>
+						</Panel>
+				</Button>
+			</Grid>
+
+			<!-- FORWARD BUTTONS -->
+			<Grid Grid.Column="4" RowDefinitions="Auto, 10, Auto, 10, Auto"
+				  VerticalAlignment="Center"
+				  Background="Transparent">
+				<Button Grid.Row="0"
+						Content="&gt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="1"/>
+				<Button Grid.Row="2"
+						Content="&gt;&gt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="10"/>
+				<Button Grid.Row="4"
+						Content="&gt;&gt;&gt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="100"/>
+			</Grid>
+
+			<!-- EDITOR PANEL -->
+			<Grid Grid.Column="6"
+				  Background="{DynamicResource SurfaceDark}"
+				  RowDefinitions="Auto, 10, Auto, 10, *">
+				<Grid Grid.Row="0"
+					  Classes="gridSecondary"
+					  ColumnDefinitions="3*, 10, 1*">
+					<Label Grid.Column="0"
+						   Content="Switch between .caption and .txt:"
+						   HorizontalAlignment="Left"
+						   Padding="10"/>
+					<Button Grid.Column="2"
+							MinWidth="80"
+							Content="Switch"
+							Command="{Binding SwitchEditorTypeCommand}"/>
+				</Grid>
+				<Grid Grid.Row="2"
+					  Classes="gridSecondary"
+					  ColumnDefinitions="*, 10, 40">
+					<Label Grid.Column="0"
+						   Content="{Binding CurrentType, StringFormat='Currently editing: {0}.'}"
+						   HorizontalAlignment="Left"
+						   Padding="10"/>
+					<Button Grid.Column="2"
+							Command="{Binding CopyCurrentImageTagsToClipboardCommand}">
+						<Panel>
+							<Image Source="{SvgImage /Assets/Icons/content_copy.svg}"/>
+						</Panel>
+					</Button>
+				</Grid>
+				<Grid Grid.Row="4"
+					  Classes="gridSecondary"
+					  RowDefinitions="2*, 10, 1*, 10, Auto">
+					<!-- TAGS EDITOR -->
+					<AvaloniaEdit:TextEditor Grid.Row="0"
+											 x:Name="EditorTags"
+											 Padding="10"
+											 VerticalScrollBarVisibility="Auto"
+											 HorizontalScrollBarVisibility="Disabled"									
+											 SyntaxHighlighting="True"
+											 Background="{DynamicResource SurfaceDark}"
+											 BorderBrush="{DynamicResource Primary}"
+											 BorderThickness="1"
+											 FontSize="17"
+											 FontWeight="Light"/>
+					<!-- HIGHLIGHT PANEL -->
+					<Grid Grid.Row="2"
+						  Classes="gridPrimary"
+						  RowDefinitions="Auto, 10, *">
+						<Label Grid.Row="0"
+							   Padding="8"
+							   Content="Highlight words:"
+							   HorizontalAlignment="Left"/>
+						<TextBox Grid.Row="2" 
+								 x:Name="EditorHighlight"
+								 TextWrapping="Wrap"
+								 Background="Transparent"
+								 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+								 Text="{Binding WordsToHighlight}"/>
+					</Grid>
+					<Label Grid.Row="4"
+						   FontSize="12"
+						   Foreground="{DynamicResource SecondaryLight}"
+						   Content="Note: text changes are automatically saved whenever you type anything in the text box."/>
+				</Grid>
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>

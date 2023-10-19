@@ -1,0 +1,20 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DatasetProcessor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:DatasetProcessor.Views"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+        x:Class="DatasetProcessor.Views.MainWindow"
+        Icon="/Assets/Icons/icon.png"
+		WindowStartupLocation="CenterScreen"
+        Title="Dataset Processor All-in-one Tools - v2.0.0"
+		Background="{DynamicResource SurfaceDark}"
+		MinWidth="1320"
+		MinHeight="600"
+		WindowState="Maximized">
+        <views:MainView />
+	<Window.Styles>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
+	</Window.Styles>
+</Window>
