@@ -150,7 +150,8 @@
 			<CheckBox Grid.Column="0"
 					  Width="282"
 					  Margin="10"
-					  Content="Apply Sharpen Sigma?:"
+					  Content="Apply Sharpen Sigma?"
+					  IsChecked="{Binding ApplySharpen}"
 					  VerticalAlignment="Center"/>
 			<Slider Grid.Column="2"
 					Minimum="0.5"
@@ -188,7 +189,7 @@
 				Width="200"
 				Content="Auto crop images"
 				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding SortImagesCommand}"/>
+				Command="{Binding CropImagesCommand}"/>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="18"
 					 Value="{Binding PredictionProgress.PercentComplete}"/>

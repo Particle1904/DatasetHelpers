@@ -4,7 +4,7 @@ namespace SmartData.Lib.Interfaces
 {
     public interface IConfigsService
     {
-        public Config Configurations { get; set; }
+        public Config Configurations { get; }
 
         public string TaggerThresholdDescription { get; }
         public string DiscardedFolderDescription { get; }
@@ -13,8 +13,7 @@ namespace SmartData.Lib.Interfaces
         public string ResizedFolderDescription { get; }
         public string CombinedFolderDescription { get; }
 
-        public Task LoadConfigurations();
-        public Task SaveConfigurations();
-        public Task CreateConfigFileIfNotExist();
+        public Task LoadConfigurationsAsync();
+        public Task SaveConfigurationsAsync();
     }
 }

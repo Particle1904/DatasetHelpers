@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
@@ -61,6 +62,10 @@ namespace DatasetProcessor.ViewModels
                     {
                         Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!";
                     }
+                    else
+                    {
+                        Logger.LatestLogMessage = string.Empty;
+                    }
 
                     _minimumResolutionForSigma = parsedValue;
                     OnPropertyChanged(nameof(MinimumResolutionForSigma));
@@ -101,6 +106,27 @@ namespace DatasetProcessor.ViewModels
             IsUiEnabled = true;
         }
 
+        [RelayCommand]
+        private async Task SelectInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                InputFolderPath = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                OutputFolderPath = result;
+            }
+        }
+
+        [RelayCommand]
         public async Task CropImagesAsync()
         {
             IsUiEnabled = false;
@@ -126,6 +152,10 @@ namespace DatasetProcessor.ViewModels
                 _contentAwareCrop.LanczosRadius = (int)LanczosRadius;
                 _contentAwareCrop.ApplySharpen = ApplySharpen;
                 _contentAwareCrop.SharpenSigma = (float)SharpenSigma;
+                if (_minimumResolutionForSigma == null)
+                {
+                    _minimumResolutionForSigma = 0;
+                }
                 _contentAwareCrop.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1, ushort.MaxValue);
                 await _contentAwareCrop.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
             }

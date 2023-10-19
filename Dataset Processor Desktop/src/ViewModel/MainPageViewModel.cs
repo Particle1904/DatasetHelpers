@@ -102,7 +102,7 @@ namespace Dataset_Processor_Desktop.src.ViewModel
 
             try
             {
-                _configsService.LoadConfigurations();
+                _configsService.LoadConfigurationsAsync();
             }
             catch (Exception exception)
             {
