@@ -3,6 +3,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
+    <ApplicationIcon>Assets\Icons\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   
@@ -23,6 +24,11 @@
     <None Remove="Assets\Icons\folder_opened.svg" />
     <None Remove="Assets\Icons\icon.png" />
     <None Remove="Assets\Images\drag_and_drop.png" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <Content Include="Assets\Icons\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

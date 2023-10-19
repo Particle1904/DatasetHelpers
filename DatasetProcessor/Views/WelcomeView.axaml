@@ -25,7 +25,9 @@
 					   Content="Open the Wiki Page to read the documentation"
 					   HorizontalAlignment="Left"/>
 				<Button Grid.Column="2"
-						Content="Open Wiki page"/>
+						Content="Open Wiki page"
+						Command="{Binding OpenWebPageCommand}"
+						CommandParameter="{Binding WikiWebAddress}"/>
 			</Grid>
 		</Panel>
 		<!-- ISSUES PAGE -->
@@ -37,22 +39,26 @@
 					   Content="Open the Issues page to post or search for an issue"
 					   HorizontalAlignment="Left"/>
 				<Button Grid.Column="2"
-						Content="Open Issues page"/>
+						Content="Open Issues page"
+						Command="{Binding OpenWebPageCommand}"
+						CommandParameter="{Binding IssuesWebAddress}"/>
 			</Grid>
 		</Panel>
 		<!-- REPOSITORY -->
 		<Panel Grid.Row="6"
 			   Background="{DynamicResource SurfaceLighterDark}">
 			<Button MaxWidth="600"
-					Content="Open GitHub repository page">				
-			</Button>
+					Content="Open GitHub repository page"
+					Command="{Binding OpenWebPageCommand}"
+					CommandParameter="{Binding RepoWebAddress}"/>
 		</Panel>
 		<!-- RELEASES -->
 		<Panel Grid.Row="8"
 			   Background="{DynamicResource SurfaceLighterDark}">
 			<Button MaxWidth="600"
-					Content="Open Releases page">
-			</Button>
+					Content="Open Releases page"
+					Command="{Binding OpenWebPageCommand}"
+					CommandParameter="{Binding ReleasesWebAddress}"/>
 		</Panel>
 		<!-- INFO LABEL -->
 		<Panel Grid.Row="10"
