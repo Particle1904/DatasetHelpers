@@ -31,7 +31,11 @@ Right-click the Solution and click "Open in Terminal" then use the command:
 Remember to download the model files: https://github.com/Particle1904/DatasetHelpers/releases/tag/v0.0.0
 Follow the instructions in the release page to install them!
 
-```dotnet build /restore /t:build /p:TargetFramework=net7.0-windows10.0.19041.0 /p:configuration=release /p:WindowsAppSDKSelfContained=true /p:Platform=x64 /p:WindowsPackageType=None -p:BuildWindowsOnly=true```
+FOR WINDOWS:
+```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=win-x64```
+
+FOR LINUX:
+```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=linux-x64```
 
 ## Requirements
 This software requires two runtimes:
