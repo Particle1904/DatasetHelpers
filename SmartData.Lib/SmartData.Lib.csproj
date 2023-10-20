@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML" Version="3.0.0-preview.23266.6" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.16.1" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.16.1" />
     <PackageReference Include="Microsoft.ML.OnnxTransformer" Version="3.0.0-preview.23266.6" />
     <PackageReference Include="SharpHook" Version="5.1.1" />
