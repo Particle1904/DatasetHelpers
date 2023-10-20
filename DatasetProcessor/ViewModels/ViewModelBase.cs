@@ -114,25 +114,7 @@ public partial class ViewModelBase : ObservableObject
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                using var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = "sh",
-                        Arguments = $"-c 'xdg-open {folderPath}'",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-                process.WaitForExit();
-                int exitCode = process.ExitCode;
-                if (exitCode != 0)
-                {
-                    Logger.LatestLogMessage = "Unable to open the folder!";
-                }
+                Process.Start("open", folderPath);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
