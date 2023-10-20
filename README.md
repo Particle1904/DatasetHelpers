@@ -23,13 +23,13 @@ The toolkit also offers advanced content-aware smart cropping. Leveraging the Yo
 
 ## Getting Started
 To get started with the Dataset Processor Tools, download the provided release or build yourself.
-To build clone this repository and open the project in Visual Studio 2022 or later. You can then build and run the project.
-
-Use these commands to build it as a self-contained .exe application (only windows supported at this time):
-Right-click the Solution and click "Open in Terminal" then use the command:
+To build clone this repository and open the project in Visual Studio 2022, Visual Studio Code with C# extensions or the terminal. You can then build and run the project.
 
 Remember to download the model files: https://github.com/Particle1904/DatasetHelpers/releases/tag/v0.0.0
 Follow the instructions in the release page to install them!
+
+Use these commands to build it as a self-contained application:
+In Visual Studio Community 2022; Right-click the DatasetProcessor.Desktop and click "Open in Terminal" then use the command:
 
 FOR WINDOWS:
 ```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=win-x64```
