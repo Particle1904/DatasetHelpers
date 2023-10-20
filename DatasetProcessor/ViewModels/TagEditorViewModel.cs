@@ -140,11 +140,18 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void GoToItem(string parameter)
         {
-            int.TryParse(parameter, out int parameterInt);
-
-            if (ImageFiles?.Count != 0)
+            try
             {
-                SelectedItemIndex += parameterInt;
+                int.TryParse(parameter, out int parameterInt);
+
+                if (ImageFiles?.Count != 0)
+                {
+                    SelectedItemIndex += parameterInt;
+                }
+            }
+            catch
+            {
+                Logger.LatestLogMessage = "Couldn't load the image.";
             }
         }
 
