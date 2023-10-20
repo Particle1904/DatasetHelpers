@@ -60,7 +60,15 @@ namespace SmartData.Lib.Services
             string[] inputColumns = GetInputColumns();
             string[] outputColumns = GetOutputColumns();
 
-            _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath);
+            // Try to load in GPU but fall back to CPU.
+            try
+            {
+                _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath, 1, true);
+            }
+            catch
+            {
+                _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath);
+            }
 
             IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());
 
