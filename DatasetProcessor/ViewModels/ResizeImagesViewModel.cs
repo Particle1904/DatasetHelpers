@@ -124,18 +124,18 @@ namespace DatasetProcessor.ViewModels
             ResizeProgress = ResetProgress(ResizeProgress);
 
             _timer.Reset();
+            _timer.Start();
+            DispatcherTimer timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
+            timer.Start();
+
             TaskStatus = ProcessingStatus.Running;
 
             try
             {
-                _timer.Start();
-                DispatcherTimer timer = new DispatcherTimer()
-                {
-                    Interval = TimeSpan.FromMilliseconds(100)
-                };
-                timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
-                timer.Start();
-
                 _imageProcessor.LanczosSamplerRadius = (int)LanczosRadius;
                 _imageProcessor.ApplySharpen = ApplySharpen;
                 _imageProcessor.SharpenSigma = (float)SharpenSigma;
@@ -156,6 +156,9 @@ namespace DatasetProcessor.ViewModels
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
             }
+
+            _timer.Stop();
+            timer.Stop();
         }
     }
 }

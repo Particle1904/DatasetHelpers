@@ -90,18 +90,20 @@ namespace DatasetProcessor.ViewModels
             PredictionProgress = ResetProgress(PredictionProgress);
 
             _timer.Reset();
+            _timer.Start();
+            DispatcherTimer timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            timer.Start();
+
             TaskStatus = ProcessingStatus.Running;
             _autoTagger.Threshold = (float)Threshold;
 
             try
             {
-                _timer.Start();
-                DispatcherTimer timer = new DispatcherTimer()
-                {
-                    Interval = TimeSpan.FromMilliseconds(100)
-                };
-                timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-                timer.Start();
+
 
                 if (ApplyRedundancyRemoval)
                 {
@@ -130,8 +132,10 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
-                _timer.Stop();
             }
+
+            _timer.Stop();
+            timer.Stop();
         }
 
         partial void OnThresholdChanged(double value)

@@ -89,8 +89,6 @@ namespace DatasetProcessor.ViewModels
             TagProcessingProgress = ResetProgress(TagProcessingProgress);
 
             _timer.Reset();
-            TaskStatus = ProcessingStatus.Running;
-
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
             {
@@ -98,6 +96,8 @@ namespace DatasetProcessor.ViewModels
             };
             timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
             timer.Start();
+
+            TaskStatus = ProcessingStatus.Running;
 
             try
             {

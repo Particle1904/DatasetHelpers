@@ -106,6 +106,13 @@ namespace DatasetProcessor.ViewModels
             SortProgress = ResetProgress(SortProgress);
 
             _timer.Reset();
+            _timer.Start();
+            DispatcherTimer timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            timer.Start();
 
             if (BackupImages)
             {
@@ -117,16 +124,7 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                _timer.Start();
-                DispatcherTimer timer = new DispatcherTimer()
-                {
-                    Interval = TimeSpan.FromMilliseconds(100)
-                };
-                timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-                timer.Start();
-
                 await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, SortProgress, Dimension);
-                timer.Stop();
             }
             catch (Exception exception)
             {
@@ -137,8 +135,10 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
-                _timer.Stop();
             }
+
+            timer.Stop();
+            _timer.Stop();
         }
     }
 }

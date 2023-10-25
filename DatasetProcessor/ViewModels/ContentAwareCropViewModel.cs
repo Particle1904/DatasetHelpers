@@ -134,18 +134,17 @@ namespace DatasetProcessor.ViewModels
             CropProgress = ResetProgress(CropProgress);
 
             _timer.Reset();
-            TaskStatus = ProcessingStatus.Running;
+            _timer.Start();
+            DispatcherTimer timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
+            timer.Start();
 
+            TaskStatus = ProcessingStatus.Running;
             try
             {
-                _timer.Start();
-                DispatcherTimer timer = new DispatcherTimer()
-                {
-                    Interval = TimeSpan.FromMilliseconds(100)
-                };
-                timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
-                timer.Start();
-
                 _contentAwareCrop.ScoreThreshold = (float)ScoreThreshold;
                 _contentAwareCrop.IouThreshold = (float)IouThreshold;
                 _contentAwareCrop.ExpansionPercentage = (float)ExpansionPercentage + 1.0f;
@@ -168,8 +167,10 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
-                _timer.Stop();
             }
+
+            _timer.Stop();
+            timer.Stop();
         }
 
         partial void OnScoreThresholdChanged(double value)
