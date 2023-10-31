@@ -21,7 +21,7 @@ namespace SmartData.Lib.Services
         /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
         /// 2. The files are then renamed with a number in ascending order starting from 1.
         /// </remarks>
-        public async Task RenameAllToCrescentAsync(string inputPath)
+        public async Task RenameAllToCrescentAsync(string inputPath, int startingNumberForFileNames = 1)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
@@ -36,7 +36,7 @@ namespace SmartData.Lib.Services
 
                 for (int i = 0; i < imageFiles.Length; i++)
                 {
-                    await RenameFileToCrescentName(inputPath, imageFiles, i);
+                    await RenameFileToCrescentName(inputPath, imageFiles, i, startingNumberForFileNames);
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace SmartData.Lib.Services
         /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
         /// 2. The files are then renamed with a number in ascending order starting from 1.
         /// </remarks>
-        public async Task RenameAllToCrescentAsync(string inputPath, Progress progress)
+        public async Task RenameAllToCrescentAsync(string inputPath, Progress progress, int startingNumberForFileNames = 1)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
@@ -73,7 +73,7 @@ namespace SmartData.Lib.Services
 
                 for (int i = 0; i < imageFiles.Length; i++)
                 {
-                    await RenameFileToCrescentName(inputPath, imageFiles, i);
+                    await RenameFileToCrescentName(inputPath, imageFiles, i, startingNumberForFileNames);
 
                     progress.UpdateProgress();
                 }
@@ -488,7 +488,7 @@ namespace SmartData.Lib.Services
         /// <param name="imageFiles">An array of image file paths.</param>
         /// <param name="i">The index of the current file in the imageFiles array.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous renaming operation.</returns>
-        private static async Task RenameFileToCrescentName(string inputPath, string[] imageFiles, int i)
+        private static async Task RenameFileToCrescentName(string inputPath, string[] imageFiles, int i, int startingNumberForFileNames)
         {
             string imageFileName = Path.GetFileNameWithoutExtension(imageFiles[i]);
 
@@ -500,13 +500,13 @@ namespace SmartData.Lib.Services
                 if (File.Exists(filePath))
                 {
                     string txtExtension = Path.GetExtension(filePath);
-                    string newTxtName = Path.Combine(inputPath, $"{i + 1}{txtExtension}");
+                    string newTxtName = Path.Combine(inputPath, $"{i + startingNumberForFileNames}{txtExtension}");
                     await Task.Run(() => File.Move(filePath, newTxtName));
                 }
             }
 
             string imageExtension = Path.GetExtension(imageFiles[i]);
-            string newImageName = Path.Combine(inputPath, $"{i + 1}{imageExtension}");
+            string newImageName = Path.Combine(inputPath, $"{i + startingNumberForFileNames}{imageExtension}");
             await Task.Run(() => File.Move(imageFiles[i], newImageName));
         }
 

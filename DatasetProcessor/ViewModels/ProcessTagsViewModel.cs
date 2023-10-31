@@ -20,6 +20,8 @@ namespace DatasetProcessor.ViewModels
         private readonly ITagProcessorService _tagProcessor;
         private readonly IFileManipulatorService _fileManipulator;
 
+        private const string _invalidMinSharpenNumberMessage = "File names must be a number between 1 and 2147483647.";
+
         [ObservableProperty]
         private string _inputFolderPath;
         [ObservableProperty]
@@ -44,6 +46,35 @@ namespace DatasetProcessor.ViewModels
         private bool _applyConsolidateTags;
         [ObservableProperty]
         private string _sortedByFrequency;
+
+        private int? _startingNumberForFileNames;
+        public string StartingNumberForFileNames
+        {
+            get => _startingNumberForFileNames.ToString();
+            set
+            {
+                try
+                {
+                    int parsedValue = int.Parse(value);
+                    if (parsedValue <= 0 || parsedValue > int.MaxValue)
+                    {
+                        Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!";
+                    }
+                    else
+                    {
+                        Logger.LatestLogMessage = string.Empty;
+                    }
+
+                    _startingNumberForFileNames = parsedValue;
+                    OnPropertyChanged(nameof(StartingNumberForFileNames));
+                }
+                catch
+                {
+                    _startingNumberForFileNames = null;
+                    Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 1 as its minimum valid number.";
+                }
+            }
+        }
 
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
@@ -110,7 +141,11 @@ namespace DatasetProcessor.ViewModels
                 if (RenameFilesToCrescent)
                 {
                     TagProcessingProgress.Reset();
-                    await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, TagProcessingProgress);
+                    if (_startingNumberForFileNames == null)
+                    {
+                        _startingNumberForFileNames = 1;
+                    }
+                    await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, TagProcessingProgress, (int)_startingNumberForFileNames);
                 }
                 if (ApplyConsolidateTags)
                 {

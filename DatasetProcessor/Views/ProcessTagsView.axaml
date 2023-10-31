@@ -94,13 +94,26 @@
 					  Margin="10"
 					  IsChecked="{Binding RandomizeTags}"
 					  Content="Would you like to randomize Tags after processing?">
-			</CheckBox>			
-			<CheckBox Grid.Row="1"
-					  HorizontalAlignment="Left"
-					  Margin="10"
-					  IsChecked="{Binding RenameFilesToCrescent}"
-					  Content="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg + 1.txt, 2.jpeg + 2.txt and etc.?">
-			</CheckBox>		
+			</CheckBox>
+			<Grid ColumnDefinitions="3*, 10, 1*, 10, 1*" Grid.Row="1">
+				<CheckBox Grid.Column="0" 
+						  HorizontalAlignment="Left"
+						  Margin="10"
+					      IsChecked="{Binding RenameFilesToCrescent}"
+					      Content="Would you like to rename Images and their .txt files to crescent order? For example: 1.jpeg + 1.txt, 2.jpeg + 2.txt and etc.?">
+				</CheckBox>
+				<TextBlock Grid.Column="2"
+						   Text="Starting number for names (if no value is provided, '1' will be used):"
+						   MaxWidth="200"
+						   VerticalAlignment="Center"/>
+				<TextBox Grid.Column="4"
+						 Padding="10"
+						 MaxWidth="240"
+						 MinWidth="240"
+						 MaxHeight="70"
+						 Text="{Binding StartingNumberForFileNames}"
+						 Watermark="Enter here a number for file names, it will be incremented for each file. For example: 10.jpeg, 11.jpeg, etc."/>
+			</Grid>
 			<CheckBox Grid.Row="2" 
 					  HorizontalAlignment="Left"
 					  Margin="10"

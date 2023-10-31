@@ -5,8 +5,8 @@ namespace SmartData.Lib.Interfaces
 {
     public interface IFileManipulatorService
     {
-        public Task RenameAllToCrescentAsync(string inputPath);
-        public Task RenameAllToCrescentAsync(string inputPath, Progress progress);
+        public Task RenameAllToCrescentAsync(string inputPath, int startingNumberForFileNames = 1);
+        public Task RenameAllToCrescentAsync(string inputPath, Progress progress, int startingNumberForFileNames = 1);
         public Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512);
         public Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512);
         public void CreateFolderIfNotExist(string folderName);
