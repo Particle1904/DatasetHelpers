@@ -71,7 +71,7 @@
 		<!-- SORT BUTTON -->
 		<Button Grid.Row="10"
 				Width="200"
-				Content="Resize images"
+				Content="Process captions"
 				IsEnabled="{Binding IsUiEnabled}"
 				Command="{Binding ProcessCaptionsCommand}"/>
 		<!-- PROGRESS BAR -->
