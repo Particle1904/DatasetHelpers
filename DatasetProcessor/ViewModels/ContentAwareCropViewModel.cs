@@ -87,6 +87,13 @@ namespace DatasetProcessor.ViewModels
             _fileManipulator = fileManipulator;
             _contentAwareCrop = contentAwareCrop;
 
+            (_contentAwareCrop as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                CropProgress = ResetProgress(CropProgress);
+                CropProgress.TotalFiles = args;
+            };
+            (_contentAwareCrop as INotifyProgress).ProgressUpdated += (sender, args) => CropProgress.UpdateProgress();
+
             InputFolderPath = _configs.Configurations.SelectedFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.ResizedFolder;
@@ -131,8 +138,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            CropProgress = ResetProgress(CropProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -156,7 +161,7 @@ namespace DatasetProcessor.ViewModels
                     _minimumResolutionForSigma = 0;
                 }
                 _contentAwareCrop.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1, ushort.MaxValue);
-                await _contentAwareCrop.ProcessCroppedImage(InputFolderPath, OutputFolderPath, CropProgress, Dimension);
+                await _contentAwareCrop.ProcessCroppedImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
             }
             catch (Exception exception)
             {

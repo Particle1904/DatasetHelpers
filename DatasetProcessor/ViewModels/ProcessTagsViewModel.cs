@@ -88,6 +88,13 @@ namespace DatasetProcessor.ViewModels
             _tagProcessor = tagProcessor;
             _fileManipulator = fileManipulator;
 
+            (_tagProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                TagProcessingProgress = ResetProgress(TagProcessingProgress);
+                TagProcessingProgress.TotalFiles = args;
+            };
+            (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => TagProcessingProgress.UpdateProgress();
+
             InputFolderPath = _configs.Configurations.CombinedOutputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
 
@@ -117,8 +124,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            TagProcessingProgress = ResetProgress(TagProcessingProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -132,11 +137,11 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                await _tagProcessor.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove, TagProcessingProgress);
+                await _tagProcessor.ProcessAllTagFiles(InputFolderPath, TagsToAdd, TagsToEmphasize, TagsToRemove);
                 if (RandomizeTags)
                 {
                     TagProcessingProgress.Reset();
-                    await _tagProcessor.RandomizeTagsOfFiles(InputFolderPath, TagProcessingProgress);
+                    await _tagProcessor.RandomizeTagsOfFiles(InputFolderPath);
                 }
                 if (RenameFilesToCrescent)
                 {
@@ -145,18 +150,18 @@ namespace DatasetProcessor.ViewModels
                     {
                         _startingNumberForFileNames = 1;
                     }
-                    await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, TagProcessingProgress, (int)_startingNumberForFileNames);
+                    await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, (int)_startingNumberForFileNames);
                 }
                 if (ApplyConsolidateTags)
                 {
                     TagProcessingProgress.Reset();
                     //await _tagProcessorService.ConsolidateTags(InputFolderPath);
-                    await _tagProcessor.ConsolidateTagsAndLogEdgeCases(InputFolderPath, Logger, TagProcessingProgress);
+                    await _tagProcessor.ConsolidateTagsAndLogEdgeCases(InputFolderPath, Logger);
                 }
                 if (ApplyRedundancyRemoval)
                 {
                     TagProcessingProgress.Reset();
-                    await _tagProcessor.ApplyRedundancyRemovalToFiles(InputFolderPath, TagProcessingProgress);
+                    await _tagProcessor.ApplyRedundancyRemovalToFiles(InputFolderPath);
                 }
             }
             catch (Exception exception)
@@ -184,7 +189,7 @@ namespace DatasetProcessor.ViewModels
 
                 try
                 {
-                    await _tagProcessor.ProcessTagsReplacement(InputFolderPath, TagsToBeReplaced, TagsToReplace, TagProcessingProgress);
+                    await _tagProcessor.ProcessTagsReplacement(InputFolderPath, TagsToBeReplaced, TagsToReplace);
                 }
                 catch (Exception exception)
                 {

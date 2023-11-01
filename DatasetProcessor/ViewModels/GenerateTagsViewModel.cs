@@ -46,6 +46,13 @@ namespace DatasetProcessor.ViewModels
             _fileManipulator = fileManipulator;
             _autoTagger = autoTagger;
 
+            (_autoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                PredictionProgress = ResetProgress(PredictionProgress);
+                PredictionProgress.TotalFiles = args;
+            };
+            (_autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+
             InputFolderPath = _configs.Configurations.ResizedFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.CombinedOutputFolder;
@@ -87,8 +94,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            PredictionProgress = ResetProgress(PredictionProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -103,22 +108,20 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-
-
                 if (ApplyRedundancyRemoval)
                 {
                     if (AppendCaptionsToFile)
                     {
-                        await _autoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                        await _autoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
                     }
                     else
                     {
-                        await _autoTagger.GenerateTags(InputFolderPath, OutputFolderPath, PredictionProgress, WeightedCaptions);
+                        await _autoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
                     }
                 }
                 else
                 {
-                    await _autoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile, PredictionProgress);
+                    await _autoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
                 }
 
                 timer.Stop();

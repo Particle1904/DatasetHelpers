@@ -33,6 +33,13 @@ namespace DatasetProcessor.ViewModels
             _tagProcessor = tagProcessor;
             _fileManipulator = fileManipulator;
 
+            (_tagProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                CaptionProcessingProgress = ResetProgress(CaptionProcessingProgress);
+                CaptionProcessingProgress.TotalFiles = args;
+            };
+            (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => CaptionProcessingProgress.UpdateProgress();
+
             InputFolderPath = _configs.Configurations.CombinedOutputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
 
@@ -60,7 +67,7 @@ namespace DatasetProcessor.ViewModels
             TaskStatus = ProcessingStatus.Running;
             try
             {
-                await _tagProcessor.FindAndReplace(InputFolderPath, WordsToBeReplaced, WordsToReplace, CaptionProcessingProgress);
+                await _tagProcessor.FindAndReplace(InputFolderPath, WordsToBeReplaced, WordsToReplace);
             }
             catch (Exception exception)
             {

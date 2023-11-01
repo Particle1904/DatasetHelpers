@@ -124,7 +124,7 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, SortProgress, Dimension);
+                await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, Dimension);
             }
             catch (Exception exception)
             {

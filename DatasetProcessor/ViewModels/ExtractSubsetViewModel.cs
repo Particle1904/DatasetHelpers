@@ -40,6 +40,13 @@ namespace DatasetProcessor.ViewModels
         {
             _fileManipulator = fileManipulator;
 
+            (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                FilterProgress = ResetProgress(FilterProgress);
+                FilterProgress.TotalFiles = args;
+            };
+            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => FilterProgress.UpdateProgress();
+
             InputFolderPath = string.Empty;
             OutputFolderPath = string.Empty;
 
@@ -96,13 +103,13 @@ namespace DatasetProcessor.ViewModels
                 if (SearchCaptions)
                 {
                     FilterProgress.Reset();
-                    captionsResult = await Task.Run(() => _fileManipulator.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter, FilterProgress));
+                    captionsResult = await Task.Run(() => _fileManipulator.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter));
                 }
 
                 List<string> result = captionsResult.Union(tagsResult).ToList();
 
                 FilterProgress.Reset();
-                await _fileManipulator.CreateSubsetAsync(result, OutputFolderPath, FilterProgress);
+                await _fileManipulator.CreateSubsetAsync(result, OutputFolderPath);
             }
             catch (Exception exception)
             {

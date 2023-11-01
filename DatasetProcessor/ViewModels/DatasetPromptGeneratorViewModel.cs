@@ -101,6 +101,13 @@ namespace DatasetProcessor.ViewModels
             _promptGenerator = promptGenerator;
             _tagProcessor = tagProcessor;
 
+            (_promptGenerator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                GenerationProgress = ResetProgress(GenerationProgress);
+                GenerationProgress.TotalFiles = args;
+            };
+            (_promptGenerator as INotifyProgress).ProgressUpdated += (sender, args) => GenerationProgress.UpdateProgress();
+
             InputFolderPath = string.Empty;
             OutputFolderPath = string.Empty;
             TagsToPrepend = string.Empty;
@@ -176,24 +183,13 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            if (GenerationProgress == null)
-            {
-                GenerationProgress = new Progress();
-            }
-            if (GenerationProgress.PercentFloat != 0f)
-            {
-                GenerationProgress.Reset();
-            }
-
             TaskStatus = ProcessingStatus.Running;
 
             try
             {
                 if (_datasetTags == null || _datasetTags.Length == 0)
                 {
-
                     _datasetTags = Task.Run(() => _tagProcessor.GetTagsFromDataset(InputFolderPath)).Result;
-
                 }
 
                 string outputPath = Path.Combine(OutputFolderPath, "generatedPrompts.txt");
@@ -209,8 +205,7 @@ namespace DatasetProcessor.ViewModels
 
                 await Task.Run(() => _promptGenerator.GeneratePromptsAndSaveToFile(outputPath, _datasetTags, TagsToPrepend, TagsToAppend,
                     Math.Clamp((int)_amountOfTags, 1, 50),
-                    Math.Clamp((int)_amountOfGeneratedPrompts, 10, ushort.MaxValue),
-                    GenerationProgress)); ;
+                    Math.Clamp((int)_amountOfGeneratedPrompts, 10, ushort.MaxValue)));
             }
             catch (Exception exception)
             {

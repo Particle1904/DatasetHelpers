@@ -80,6 +80,13 @@ namespace DatasetProcessor.ViewModels
             _imageProcessor = imageProcessor;
             _fileManipulator = fileManipulator;
 
+            (_imageProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                ResizeProgress = ResetProgress(ResizeProgress);
+                ResizeProgress.TotalFiles = args;
+            };
+            (_imageProcessor as INotifyProgress).ProgressUpdated += (sender, args) => ResizeProgress.UpdateProgress();
+
             Dimension = SupportedDimensions.Resolution512x512;
 
             InputFolderPath = _configs.Configurations.SelectedFolder;
@@ -121,8 +128,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            ResizeProgress = ResetProgress(ResizeProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -144,7 +149,7 @@ namespace DatasetProcessor.ViewModels
                     _minimumResolutionForSigma = 0;
                 }
                 _imageProcessor.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1, ushort.MaxValue);
-                await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, ResizeProgress, Dimension);
+                await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
             }
             catch (Exception exception)
             {

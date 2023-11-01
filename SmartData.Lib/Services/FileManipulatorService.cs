@@ -7,16 +7,19 @@ using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
-    public class FileManipulatorService : IFileManipulatorService
+    public class FileManipulatorService : IFileManipulatorService, INotifyProgress
     {
         private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
 
         /// <summary>
         /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
         /// Only files with extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp" are considered to be image files.
         /// </summary>
         /// <param name="path">The path to the directory containing the files to rename.</param>
-        /// <remarks>
+        /// /// <remarks>
         /// This method scans the specified directory for image files with the extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp". It renames each image file and its corresponding caption and text files by appending a number in ascending order to their names. The renaming process is performed in two steps:
         /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
         /// 2. The files are then renamed with a number in ascending order starting from 1.
@@ -27,55 +30,22 @@ namespace SmartData.Lib.Services
 
             if (imageFiles.Length > 0)
             {
+                TotalFilesChanged?.Invoke(this, imageFiles.Length);
+
                 foreach (string file in imageFiles)
                 {
                     await RenameFileToTemporaryName(inputPath, file);
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                 }
+
+                TotalFilesChanged?.Invoke(this, imageFiles.Length);
 
                 imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
                 for (int i = 0; i < imageFiles.Length; i++)
                 {
                     await RenameFileToCrescentName(inputPath, imageFiles, i, startingNumberForFileNames);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
-        /// Only files with extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp" are considered to be image files.
-        /// </summary>
-        /// <param name="path">The path to the directory containing the files to rename.</param>
-        /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
-        /// /// <remarks>
-        /// This method scans the specified directory for image files with the extensions ".jpg", ".jpeg", ".png", ".gif", and ".webp". It renames each image file and its corresponding caption and text files by appending a number in ascending order to their names. The renaming process is performed in two steps:
-        /// 1. Each file is temporarily renamed by adding the suffix "_temp" before the extension.
-        /// 2. The files are then renamed with a number in ascending order starting from 1.
-        /// </remarks>
-        public async Task RenameAllToCrescentAsync(string inputPath, Progress progress, int startingNumberForFileNames = 1)
-        {
-            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
-            if (imageFiles.Length > 0)
-            {
-                progress.TotalFiles = imageFiles.Length;
-
-                foreach (string file in imageFiles)
-                {
-                    await RenameFileToTemporaryName(inputPath, file);
-
-                    progress.UpdateProgress();
-                }
-
-                progress.Reset();
-
-                imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
-                for (int i = 0; i < imageFiles.Length; i++)
-                {
-                    await RenameFileToCrescentName(inputPath, imageFiles, i, startingNumberForFileNames);
-
-                    progress.UpdateProgress();
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -92,32 +62,13 @@ namespace SmartData.Lib.Services
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            foreach (string file in files)
-            {
-                await SortImageAsync(discardedOutputPath, selectedOutputPath, dimension, file);
-            }
-        }
 
-        /// <summary>
-        /// Sorts images from a specified input directory into separate output directories based on their size.
-        /// Images with a width or height less than or equal to the specified minimum size are moved to the discarded output directory,
-        /// while larger images are moved to the selected output directory.
-        /// </summary>
-        /// <param name="inputPath">The path of the directory containing the input images.</param>
-        /// <param name="discardedOutputPath">The path of the directory where images that are smaller than or equal to the minimum size will be moved.</param>
-        /// <param name="selectedOutputPath">The path of the directory where images that are larger than the minimum size will be moved.</param>
-        /// <param name="progress">An instance of the Progress class to track the progress of the image sorting operation.</param>
-        /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
-        public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, Progress progress, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
                 await SortImageAsync(discardedOutputPath, selectedOutputPath, dimension, file);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -157,35 +108,12 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateSubsetAsync(List<string> files, string outputPath)
         {
-            foreach (string file in files)
-            {
-                string folderPath = Path.GetDirectoryName(file);
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
-
-                string outputImageFile = Path.Combine(outputPath, $"{Path.GetFileName(file)}");
-                await Task.Run(() => File.Copy(file, outputImageFile, true));
-
-                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.txt", outputPath);
-                await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.caption", outputPath);
-            }
-        }
-
-        /// <summary>
-        /// Creates a subset of files based on the provided list by copying them to the specified output path. 
-        /// If accompanying '.txt' and '.caption' files exist, they are also copied.
-        /// </summary>
-        /// <param name="files">A list of file paths to create a subset from.</param>
-        /// <param name="outputPath">The path to the output folder where the subset files will be copied.</param>
-        /// <param name="progress">An instance of the Progress class to track the progress of the image sorting operation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task CreateSubsetAsync(List<string> files, string outputPath, Progress progress)
-        {
             if (string.IsNullOrWhiteSpace(outputPath))
             {
                 throw new ArgumentNullException($"Please select an output folder!");
             }
 
-            progress.TotalFiles = files.Count;
+            TotalFilesChanged?.Invoke(this, files.Count);
 
             foreach (string file in files)
             {
@@ -198,7 +126,7 @@ namespace SmartData.Lib.Services
                 await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.txt", outputPath);
                 await CopyOptionalFileAsync(folderPath, $"{fileNameWithoutExtension}.caption", outputPath);
 
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -344,10 +272,9 @@ namespace SmartData.Lib.Services
         /// <param name="inputPath">The directory path to search for image files.</param>
         /// <param name="txtFileExtension">The file extension for text files containing captions (must be either ".txt" or ".caption").</param>
         /// <param name="wordsToFilter">A comma-separated string of words to filter the image files by.</param>
-        /// <param name="progress">An instance of the Progress class to track the progress of the renaming operation.</param>
         /// <returns>A sorted list of image files whose captions contain any of the specified words.</returns>
         /// <exception cref="ArgumentException">Thrown when the provided txtFileExtension is not ".txt" or ".caption".</exception>
-        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter, Progress progress)
+        public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter)
         {
             if (!txtFileExtension.Equals(".txt") && !txtFileExtension.Equals(".caption"))
             {
@@ -356,7 +283,7 @@ namespace SmartData.Lib.Services
 
             List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
 
-            progress.TotalFiles = imageFiles.Count;
+            TotalFilesChanged?.Invoke(this, imageFiles.Count);
 
             List<string> filteredImageFiles = new List<string>();
             string[] wordsSplit = wordsToFilter.Replace(", ", ",").Split(",");
@@ -382,7 +309,7 @@ namespace SmartData.Lib.Services
                 }
                 finally
                 {
-                    progress.UpdateProgress();
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                 }
             }
 

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
-    public class TagProcessorService : ITagProcessorService
+    public class TagProcessorService : ITagProcessorService, INotifyProgress
     {
         private readonly string _txtSearchPattern = "*.txt";
         private readonly string _captionSearchPattern = "*.caption";
@@ -132,8 +132,11 @@ namespace SmartData.Lib.Services
             "meme attire", "mosaic censoring"
         };
 
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
+
         /// <summary>
-        /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags.
+        /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags asynchronously.
         /// </summary>
         /// <param name="inputFolderPath">The folder path where the tag files are located.</param>
         /// <param name="tagsToAdd">The tags to add to the tag files.</param>
@@ -144,58 +147,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            foreach (string file in files)
-            {
-                string readTags = await File.ReadAllTextAsync(file);
-
-                string processedTags = ProcessListOfTags(readTags, tagsToAdd, tagsToEmphasize, tagsToRemove);
-
-                await File.WriteAllTextAsync(file, processedTags);
-            }
-        }
-
-        /// <summary>
-        /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags asynchronously.
-        /// </summary>
-        /// <param name="inputFolderPath">The folder path where the tag files are located.</param>
-        /// <param name="tagsToAdd">The tags to add to the tag files.</param>
-        /// <param name="tagsToEmphasize">The tags to emphasize in the tag files.</param>
-        /// <param name="tagsToRemove">The tags to remove from the tag files.</param>
-        /// <param name="progress">The progress object to update progress of processing.</param>
-        /// <returns>A task that represents the asynchronous processing of all tag files in the folder.</returns>
-        public async Task ProcessAllTagFiles(string inputFolderPath, string tagsToAdd, string tagsToEmphasize, string tagsToRemove, Progress progress)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ProcessListOfTags(readTags, tagsToAdd, tagsToEmphasize, tagsToRemove);
                 await File.WriteAllTextAsync(file, processedTags);
-                progress.UpdateProgress();
-            }
-        }
-
-        /// <summary>
-        /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
-        /// The consolidated tags are then saved back to the respective files.
-        /// </summary>
-        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ConsolidateTags(string inputFolderPath)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
-
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                foreach (string file in files)
-                {
-                    string readTags = await File.ReadAllTextAsync(file);
-                    string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
-                    await File.WriteAllTextAsync(file, consolidatedTags);
-                }
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -203,14 +162,13 @@ namespace SmartData.Lib.Services
         /// Consolidates tags in text files within the specified input folder by grouping similar tags together.
         /// The consolidated tags are then saved back to the respective files, and progress is updated.
         /// </summary>
-        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
-        /// <param name="progress">The progress object to update with the status of the consolidation operation.</param>
+        /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>       
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ConsolidateTags(string inputFolderPath, Progress progress)
+        public async Task ConsolidateTags(string inputFolderPath)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -219,7 +177,7 @@ namespace SmartData.Lib.Services
                     string readTags = await File.ReadAllTextAsync(file);
                     string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
                     await File.WriteAllTextAsync(file, consolidatedTags);
-                    progress.UpdateProgress();
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -231,14 +189,13 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
         /// <param name="loggerService">The logger service responsible for handling log storage.</param>
-        /// <param name="progress">The progress object to update with the status of the consolidation operation.</param>
         /// <remarks>
         /// This method reads text files from the specified folder, consolidates similar tags in each file,
         /// and saves the consolidated tags back to the respective files. Progress is tracked using the provided
         /// progress object. Edge cases encountered during consolidation are logged within this method, and
         /// the total time taken for the operation is also logged.
         /// </remarks>
-        public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService loggerService, Progress progress)
+        public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService loggerService)
         {
             StringBuilder logStringBuilder = new StringBuilder();
             Stopwatch stopwatch = new Stopwatch();
@@ -246,7 +203,7 @@ namespace SmartData.Lib.Services
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -265,7 +222,7 @@ namespace SmartData.Lib.Services
                     }
 
                     await File.WriteAllTextAsync(file, consolidatedTags);
-                    progress.UpdateProgress();
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                 }
             }
 
@@ -275,7 +232,7 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Performs search and replace operations on captions within files asynchronously.
+        /// Performs search and replace operations on captions within files asynchronously, with progress tracking.
         /// </summary>
         /// <param name="inputFolderPath">The folder path where the caption files are located.</param>
         /// <param name="wordsToBeReplaced">The words to be replaced in the captions.</param>
@@ -284,33 +241,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _captionSearchPattern);
 
-            foreach (string file in files)
-            {
-                string readCaption = await File.ReadAllTextAsync(file);
-                string processedCaption = ProcessSearchAndReplace(readCaption, wordsToBeReplaced, wordsToReplace);
-                await File.WriteAllTextAsync(file, processedCaption);
-            }
-        }
-
-        /// <summary>
-        /// Performs search and replace operations on captions within files asynchronously, with progress tracking.
-        /// </summary>
-        /// <param name="inputFolderPath">The folder path where the caption files are located.</param>
-        /// <param name="wordsToBeReplaced">The words to be replaced in the captions.</param>
-        /// <param name="wordsToReplace">The replacement words for the search operation.</param>
-        /// <param name="progress">The progress object to update progress of processing.</param>
-        public async Task FindAndReplace(string inputFolderPath, string wordsToBeReplaced, string wordsToReplace, Progress progress)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _captionSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
                 string readCaption = await File.ReadAllTextAsync(file);
                 string processedCaption = ProcessSearchAndReplace(readCaption, wordsToBeReplaced, wordsToReplace);
                 await File.WriteAllTextAsync(file, processedCaption);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -325,34 +263,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            foreach (var file in files)
-            {
-                string readTags = await File.ReadAllTextAsync(file);
-                string processedTags = ReplaceListOfTags(readTags, tagsToBeReplaced, tagsToReplace);
-                await File.WriteAllTextAsync(file, processedTags);
-            }
-        }
-
-        /// <summary>
-        /// Processes the replacement of tags in all text files within the specified input folder path with the specified tags to replace and tags to be replaced.
-        /// </summary>
-        /// <param name="inputFolderPath">The input folder path containing the text files to be processed.</param>
-        /// <param name="tagsToReplace">The comma-separated list of tags to replace.</param>
-        /// <param name="tagsToBeReplaced">The comma-separated list of tags to be replaced.</param>
-        /// <param name="progress">The Progress object used to track the progress of the operation.</param>
-        /// <returns>A Task representing the asynchronous operation.</returns>
-        public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToBeReplaced, string tagsToReplace, Progress progress)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (var file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ReplaceListOfTags(readTags, tagsToBeReplaced, tagsToReplace);
                 await File.WriteAllTextAsync(file, processedTags);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -365,32 +283,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            foreach (string file in files)
-            {
-                string readTags = await File.ReadAllTextAsync(file);
-                string processedTags = RandomizeTags(readTags);
-                await File.WriteAllTextAsync(file, processedTags);
-            }
-        }
-
-        /// <summary>
-        /// Randomizes the tags of all the text files in the specified input folder path.
-        /// </summary>
-        /// <param name="inputFolderPath">The path of the input folder.</param>
-        /// <param name="progress">The progress tracker for updating the progress of the operation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task RandomizeTagsOfFiles(string inputFolderPath, Progress progress)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = RandomizeTags(readTags);
                 await File.WriteAllTextAsync(file, processedTags);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -403,32 +303,14 @@ namespace SmartData.Lib.Services
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
 
-            foreach (string file in files)
-            {
-                string readTags = await File.ReadAllTextAsync(file);
-                string processedTags = ApplyRedundancyRemoval(readTags);
-                await File.WriteAllTextAsync(file, processedTags);
-            }
-        }
-
-        /// <summary>
-        /// Apply redundancy removal for tags for all .txt files in the specified input folder path.
-        /// </summary>
-        /// <param name="inputFolderPath">The path of the input folder.</param>
-        /// /// <param name="progress">The progress tracker for updating the progress of the operation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ApplyRedundancyRemovalToFiles(string inputFolderPath, Progress progress)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ApplyRedundancyRemoval(readTags);
                 await File.WriteAllTextAsync(file, processedTags);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 

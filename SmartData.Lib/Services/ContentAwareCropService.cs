@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace SmartData.Lib.Services
 {
-    public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService
+    public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService, INotifyProgress
     {
 
         private float _scoreThreshold = 0.5f;
@@ -115,6 +115,10 @@ namespace SmartData.Lib.Services
         }
 
         private int _minimumResolutionForSigma;
+
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
+
         public int MinimumResolutionForSigma
         {
             get => _minimumResolutionForSigma;
@@ -147,11 +151,12 @@ namespace SmartData.Lib.Services
         /// - Obtains the person bounding box results based on the predictions and image size.
         /// - Constructs the result path for the cropped image.
         /// - Crops the image and saves it using the image processor service.
+        /// - raise events to signal the progress status of the operation.
         /// </summary>
         /// <param name="inputPath">The input path containing the images to process.</param>
         /// <param name="outputPath">The output path to store the cropped images.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath, SupportedDimensions dimension)
+        public async Task ProcessCroppedImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             if (!_isModelLoaded)
             {
@@ -169,51 +174,7 @@ namespace SmartData.Lib.Services
                 filesList = files.ToList();
             }
 
-            _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
-            _imageProcessorService.ApplySharpen = ApplySharpen;
-            _imageProcessorService.SharpenSigma = (float)SharpenSigma;
-            _imageProcessorService.MinimumResolutionForSigma = MinimumResolutionForSigma;
-            foreach (string file in filesList)
-            {
-                await ProcessingRoutine(outputPath, dimension, file);
-            }
-        }
-
-        /// <summary>
-        /// Processes cropped images by performing the following steps:
-        /// - Loads the model if it's not already loaded.
-        /// - Retrieves files from the specified input path that match the image search pattern.
-        /// - Updates the progress with the total number of files.
-        /// - For each file, retrieves the bounding box predictions using YOLOv4.
-        /// - Retrieves the size of the image.
-        /// - Obtains the person bounding box results based on the predictions and image size.
-        /// - Constructs the result path for the cropped image.
-        /// - Crops the image and saves it using the image processor service.
-        /// - Updates the progress to reflect the completion of processing for the current file.
-        /// </summary>
-        /// <param name="inputPath">The input path containing the images to process.</param>
-        /// <param name="outputPath">The output path to store the cropped images.</param>
-        /// <param name="progress">The progress object to track the processing progress.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ProcessCroppedImage(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension)
-        {
-            if (!_isModelLoaded)
-            {
-                await LoadModel();
-            }
-
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            List<string> filesList = new List<string>();
-            try
-            {
-                filesList = files.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
-            }
-            catch (Exception)
-            {
-                filesList = files.ToList();
-            }
-
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
             _imageProcessorService.ApplySharpen = ApplySharpen;
@@ -222,7 +183,7 @@ namespace SmartData.Lib.Services
             foreach (string file in filesList)
             {
                 await ProcessingRoutine(outputPath, dimension, file);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 

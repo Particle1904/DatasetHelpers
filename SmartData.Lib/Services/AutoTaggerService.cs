@@ -6,21 +6,28 @@ using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
-    public class AutoTaggerService : BaseAIConsumer<WDInputData, WDOutputData>, IAutoTaggerService
+    /// <summary>
+    /// Service for generating tags for image files using a machine learning model and managing tag-related operations.
+    /// </summary>
+    public class AutoTaggerService : BaseAIConsumer<WDInputData, WDOutputData>, IAutoTaggerService, INotifyProgress
     {
         protected readonly ITagProcessorService _tagProcessorService;
 
         private string[] _tags;
 
         private float _threshold = 0.2f;
+
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
+
         /// <summary>
         /// Gets or sets the threshold value for this object. The threshold value determines the cutoff point for certain calculations.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Single"/> value between 0.0 and 1.0, inclusive.
+        /// A floating-point value between 0.0 and 1.0, inclusive.
         /// </value>
         /// <remarks>
-        /// The <see cref="Threshold"/> value must be a floating-point value between 0.0 and 1.0. Values outside this range will be clamped to the nearest valid value. 
+        /// The <see cref="Threshold"/> value must be a floating-point value between 0.0 and 1.0. Values outside this range will be clamped to the nearest valid value.
         /// </remarks>
         public float Threshold
         {
@@ -31,8 +38,18 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Path to the directory where tag files are stored.
+        /// </summary>
         public string TagsPath { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the AutoTaggerService class.
+        /// </summary>
+        /// <param name="imageProcessorService">The service responsible for image processing.</param>
+        /// <param name="tagProcessorService">The service responsible for processing tags.</param>
+        /// <param name="modelPath">The path to the machine learning model.</param>
+        /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
         public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
         {
             _tagProcessorService = tagProcessorService;
@@ -65,10 +82,11 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Asynchronously generates tags for images in the specified input path using a pre-trained model and saves the results to the specified output path.
+        /// Generates tags for the image files in the specified input folder, writes the results to text files in the specified output folder,
+        /// and raise events to signal the progress status of the operation.
         /// </summary>
-        /// <param name="inputPath">The path to the folder containing the input images.</param>
-        /// <param name="outputPath">The path to the folder where the output files will be saved.</param>
+        /// <param name="inputPath">The path to the input folder containing image files.</param>
+        /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
         /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task GenerateTags(string inputPath, string outputPath, bool weightedCaptions = false)
@@ -79,42 +97,21 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            TotalFilesChanged?.Invoke(this, files.Length);
+
             foreach (string file in files)
             {
                 await PostProcessTags(outputPath, weightedCaptions, file);
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Generates tags for the image files in the specified input folder, writes the results to text files in the specified output folder,
-        /// and updates the progress object with the status of the operation.
+        /// Generates tags for the image files in the specified input folder, appends the results to text files in the specified output folder,
+        /// and raise events to signal the progress status of the operation.
         /// </summary>
         /// <param name="inputPath">The path to the input folder containing image files.</param>
         /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
-        /// <param name="progress">The progress object to update with the status of the operation.</param>
-        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GenerateTags(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false)
-        {
-            if (!_isModelLoaded)
-            {
-                await LoadModel();
-            }
-
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            progress.TotalFiles = files.Length;
-            foreach (string file in files)
-            {
-                await PostProcessTags(outputPath, weightedCaptions, file);
-                progress.UpdateProgress();
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously generates tags for images in the specified input path using a pre-trained model and appends the results to existing tag files in the specified output path.
-        /// </summary>
-        /// <param name="inputPath">The path to the folder containing the input images.</param>
-        /// <param name="outputPath">The path to the folder where the output tag files will be saved.</param>
         /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, bool weightedCaptions = false)
@@ -125,43 +122,21 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            TotalFilesChanged?.Invoke(this, files.Length);
+
             foreach (string file in files)
             {
                 await PostProcessTagsAndAppendToFile(outputPath, weightedCaptions, file);
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
         /// <summary>
-        /// Generates tags for the image files in the specified input folder, appends the results to text files in the specified output folder,
-        /// and updates the progress object with the status of the operation.
+        /// Generates tags for the image files in the specified input folder, appends the results to text files
+        /// in the specified output folder, and raise events to signal the progress status of the operation.
         /// </summary>
         /// <param name="inputPath">The path to the input folder containing image files.</param>
         /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
-        /// <param name="progress">The progress object to update with the status of the operation.</param>
-        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false)
-        {
-            if (!_isModelLoaded)
-            {
-                await LoadModel();
-            }
-
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            progress.TotalFiles = files.Length;
-            foreach (string file in files)
-            {
-                await PostProcessTagsAndAppendToFile(outputPath, weightedCaptions, file);
-                progress.UpdateProgress();
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously generates tags for images in the specified input path using a pre-trained model
-        /// and appends the results to existing tag files in the specified output path or creates new ones.
-        /// </summary>
-        /// <param name="inputPath">The path to the folder containing the input images.</param>
-        /// <param name="outputPath">The path to the folder where the output tag files will be saved.</param>
         /// <param name="appendToFile">Flag indicating whether to append tags to existing tag files (if available).</param>
         /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
@@ -173,35 +148,12 @@ namespace SmartData.Lib.Services
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            TotalFilesChanged?.Invoke(this, files.Length);
+
             foreach (string file in files)
             {
                 await GenerateTagsWithRedundant(outputPath, appendToFile, weightedCaptions, file);
-            }
-        }
-
-        /// <summary>
-        /// Generates tags for the image files in the specified input folder, appends the results to text files
-        /// in the specified output folder, and updates the progress object with the status of the operation.
-        /// </summary>
-        /// <param name="inputPath">The path to the input folder containing image files.</param>
-        /// <param name="outputPath">The path to the output folder where the text files will be written.</param>
-        /// <param name="progress">The progress object to update with the status of the operation.</param>
-        /// <param name="appendToFile">Flag indicating whether to append tags to existing tag files (if available).</param>
-        /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task GenerateTagsAndKeepRedundant(string inputPath, string outputPath, bool appendToFile, Progress progress, bool weightedCaptions = false)
-        {
-            if (!_isModelLoaded)
-            {
-                await LoadModel();
-            }
-
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-            progress.TotalFiles = files.Length;
-            foreach (string file in files)
-            {
-                await GenerateTagsWithRedundant(outputPath, appendToFile, weightedCaptions, file);
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -263,11 +215,9 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Processes a list of tags from a file and appends a summarized version of the tags to an existing caption.
-        /// If the existing caption file doesn't exist, generates the summarized tags from scratch.
-        /// The combined result is then saved to the specified output path.
+        /// Generates tags for an image file and appends the results to an existing tag file or creates a new one.
         /// </summary>
-        /// <param name="outputPath">The output path where the combined result will be saved.</param>
+        /// <param name="outputPath">The path to the directory where the combined result will be saved.</param>
         /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
         /// <param name="file">The input file containing the existing caption and tags to be processed.</param>
         /// <returns>A task representing the asynchronous operation.</returns>

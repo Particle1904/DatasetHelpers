@@ -11,7 +11,7 @@ using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
-    public class ImageProcessorService : IImageProcessorService
+    public class ImageProcessorService : IImageProcessorService, INotifyProgress
     {
         private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
@@ -62,6 +62,9 @@ namespace SmartData.Lib.Services
         public int BlocksPerRow { get; private set; }
         private readonly int _totalBlocks;
         private readonly Dictionary<double, int> _aspectRatioToBlocks;
+
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
 
         public ImageProcessorService()
         {
@@ -189,48 +192,16 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputPath">The path to the directory containing the input images.</param>
         /// <param name="outputPath">The path to the directory where the resized images will be saved.</param>
-        /// <param name="dimension">The target dimensions to resize the images to. Defaults to 512x512 resolution.</param>
-        /// <remarks>
-        /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
-        /// </remarks>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
-        {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
-
-            SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
-
-            foreach (var file in files)
-            {
-                await semaphore.WaitAsync();
-
-                try
-                {
-                    await ResizeImageAsync(file, outputPath, dimension);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Resizes all images in a given input directory and saves the resized images to an output directory.
-        /// </summary>
-        /// <param name="inputPath">The path to the directory containing the input images.</param>
-        /// <param name="outputPath">The path to the directory where the resized images will be saved.</param>
-        /// <param name="progress">An object used to report progress during the image resizing process.</param>
         /// <param name="dimension">The target image dimension to resize the images to.</param>
         /// <remarks>
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
         /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath, outputPath, or progress parameter is null.</exception>
-        public async Task ResizeImagesAsync(string inputPath, string outputPath, Progress progress, SupportedDimensions dimension)
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
 
-            progress.TotalFiles = files.Length;
+            TotalFilesChanged?.Invoke(this, files.Length);
 
             SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
             foreach (var file in files)
@@ -243,7 +214,7 @@ namespace SmartData.Lib.Services
                 }
                 finally
                 {
-                    progress.UpdateProgress();
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                     semaphore.Release();
                 }
             }

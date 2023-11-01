@@ -1,13 +1,12 @@
 ﻿// Ignore Spelling: prepend
 
-using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
 using System.Text;
 
 namespace SmartData.Lib.Services
 {
-    public class PromptGeneratorService : IPromptGeneratorService
+    public class PromptGeneratorService : IPromptGeneratorService, INotifyProgress
     {
         protected readonly ITagProcessorService _tagProcessorService;
         protected readonly IFileManipulatorService _fileManipulatorService;
@@ -22,6 +21,9 @@ namespace SmartData.Lib.Services
             _stringBuilder = new StringBuilder();
             _random = new Random();
         }
+
+        public event EventHandler<int> TotalFilesChanged;
+        public event EventHandler ProgressUpdated;
 
         /// <summary>
         /// Generates a prompt based on provided tags, with optional prefix and suffix tags.
@@ -82,38 +84,7 @@ namespace SmartData.Lib.Services
                 File.Delete(outputFile);
             }
 
-            string[] prompts = new string[amountOfPrompts];
-
-            for (int i = 0; i < amountOfPrompts; i++)
-            {
-                string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
-                string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
-                prompts[i] = cleanedPrompt;
-            }
-
-            await File.AppendAllLinesAsync(outputFile, prompts);
-        }
-
-        /// <summary>
-        /// Generates multiple prompts based on provided tags and saves them to a specified file.
-        /// </summary>
-        /// <param name="outputFile">The path to the output file where prompts will be saved.</param>
-        /// <param name="tags">An array of tags from which the prompts are generated.</param>
-        /// <param name="prependTags">Optional tags to prepend to the generated prompts (can be empty).</param>
-        /// <param name="appendTags">Optional tags to append to the generated prompts (can be empty).</param>
-        /// <param name="amountOfTags">The number of tags to include in each generated prompt.</param>
-        /// <param name="amountOfPrompts">The total number of prompts to generate and save.</param>
-        /// <param name="progress">An object used to report progress during the generation process.</param>
-        /// <returns>A Task representing the asynchronous operation of generating and saving prompts.</returns>
-        public async Task GeneratePromptsAndSaveToFile(string outputFile, string[] tags, string prependTags,
-            string appendTags, int amountOfTags, int amountOfPrompts, Progress progress)
-        {
-            if (File.Exists(outputFile))
-            {
-                File.Delete(outputFile);
-            }
-
-            progress.TotalFiles = amountOfPrompts;
+            TotalFilesChanged?.Invoke(this, amountOfPrompts);
 
             string[] prompts = new string[amountOfPrompts];
 
@@ -122,7 +93,7 @@ namespace SmartData.Lib.Services
                 string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
                 string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
                 prompts[i] = cleanedPrompt;
-                progress.UpdateProgress();
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
 
             await File.AppendAllLinesAsync(outputFile, prompts);

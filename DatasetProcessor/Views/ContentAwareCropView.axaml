@@ -180,7 +180,7 @@
 		<Separator Grid.Row="11"/>
 		<!-- CURRENTLY PROCESSING -->
 		<Label Grid.Row="12"
-			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+			   Content="{Binding CropProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 		<!-- ELAPSED TIME -->
 		<Label Grid.Row="14"
 			   Content="{Binding ElapsedTime, StringFormat='Content aware crop elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
@@ -192,7 +192,7 @@
 				Command="{Binding CropImagesCommand}"/>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="18"
-					 Value="{Binding PredictionProgress.PercentComplete}"/>
+					 Value="{Binding CropProgress.PercentComplete}"/>
 		<!-- TASK STATUS -->
 		<Label Grid.Row="20"
 			   FontSize="22"

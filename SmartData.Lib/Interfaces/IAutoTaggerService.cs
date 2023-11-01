@@ -1,6 +1,4 @@
-﻿using SmartData.Lib.Helpers;
-
-namespace SmartData.Lib.Interfaces
+﻿namespace SmartData.Lib.Interfaces
 {
     public interface IAutoTaggerService
     {
@@ -10,12 +8,8 @@ namespace SmartData.Lib.Interfaces
         public float Threshold { get; set; }
 
         public Task GenerateTags(string inputPath, string outputPath, bool weightedCaptions = false);
-        public Task GenerateTags(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false);
         public Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, bool weightedCaptions = false);
-        public Task GenerateTagsAndAppendToFile(string inputPath, string outputPath, Progress progress, bool weightedCaptions = false);
         public Task GenerateTagsAndKeepRedundant(string inputPath, string outputPath, bool appendToFile, bool weightedCaptions = false);
-        public Task GenerateTagsAndKeepRedundant(string inputPath, string outputPath, bool appendToFile, Progress progress, bool weightedCaptions = false);
-
         public Task<string> InterrogateImageFromStream(Stream imageStream);
     }
 }
