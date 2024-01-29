@@ -109,7 +109,7 @@
 		<!-- PROCESS BUTTON -->
 		<Button Grid.Row="12"
 				Width="200"
-				Content="Extract subsect"
+				Content="Extract subset"
 				IsEnabled="{Binding IsUiEnabled}"
 				Command="{Binding FilterSubsetCommand}"/>
 		<!-- PROGRESS BAR -->
