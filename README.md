@@ -28,7 +28,7 @@ To build clone this repository and open the project in Visual Studio 2022, Visua
 Remember to download the model files: https://github.com/Particle1904/DatasetHelpers/releases/tag/v0.0.0 - follow the instructions in the release page to install them!
 
 Use these commands to build it as a self-contained application:
-In Visual Studio Community 2022; Right-click the DatasetProcessor.Desktop and click "Open in Terminal" then use the command:
+In Visual Studio Community 2022; Right-click the DatasetProcessorDesktop and click "Open in Terminal" then use the command:
 
 FOR WINDOWS:
 ```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=win-x64```
@@ -48,9 +48,10 @@ This software requires two runtimes:
 Dataset Processor Tools can be used to process image datasets for machine learning, allowing you to perform various tasks such as discarding images with low resolution, resizing images while preserving aspect ratio, generating tags using the updated WD 1.4 Tagger model, and mass editing .txt files with tags. The tools also include automatic content-aware cropping, advanced features in the Editor page, and options for mass replacing tags and renaming files.
 
 ## Technologies
-- Dataset Processor Tools is built using .NET MAUI 7.0, an open-source and cross-platform UI framework for building native applications.
+- Dataset Processor Tools is built using Avalonia in its second version, an open-source and cross-platform UI framework for building native cross platform applications.
 - ML.NET to run the WD 1.4 SwinV2 Tagger V2 Model.
 - ML.NET to run the YoloV4 model for content aware automatic crop.
+- Dataset Processor Tools was built using .NET MAUI 7.0 in its first version (but it was abandoned in favor of Avalonia for better cross-platform support), an open-source and cross-platform UI framework for building native applications.
 
 ## Contributing
 Contributions to the Dataset Processor Tools are welcome. If you would like to contribute, fork this repository, make your changes, and create a pull request.
@@ -59,4 +60,4 @@ Contributions to the Dataset Processor Tools are welcome. If you would like to c
 The Dataset Processor Tools is licensed under the MIT License. See the LICENSE file for more information.
 
 ## Acknowledgements
-The Dataset Processor Tools use the pre-trained model [WD 1.4 SwinV2 Tagger V2 by SmilingWolf](https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2), the pre-trained model [YoloV4](https://github.com/AlexeyAB/darknet) and is built with .NET MAUI 7.0, an open-source and cross-platform UI framework for building native applications.
+The Dataset Processor Tools use the pre-trained model [WD 1.4 SwinV2 Tagger V2 by SmilingWolf](https://huggingface.co/SmilingWolf/wd-v1-4-swinv2-tagger-v2), the pre-trained model [YoloV4](https://github.com/AlexeyAB/darknet) and is built with [Avalonia](https://avaloniaui.net), an open-source and cross-platform UI framework for building native applications.
