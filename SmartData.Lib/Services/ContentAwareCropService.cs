@@ -252,8 +252,8 @@ namespace SmartData.Lib.Services
                             var deltaWidth = boundingBoxXYWH[2];
                             var deltaHeight = boundingBoxXYWH[3];
 
-                            float centerX = ((Sigmoid(deltaX) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxX) * _strides[i];
-                            float centerY = ((Sigmoid(deltaY) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxY) * _strides[i];
+                            float centerX = ((Utilities.Sigmoid(deltaX) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxX) * _strides[i];
+                            float centerY = ((Utilities.Sigmoid(deltaY) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxY) * _strides[i];
                             float width = (float)Math.Exp(deltaWidth) * _anchors[i][a][0];
                             float height = (float)Math.Exp(deltaHeight) * _anchors[i][a][1];
 
@@ -298,16 +298,6 @@ namespace SmartData.Lib.Services
 
             List<DetectedPerson> detectedPeople = ApplyNonMaximumSuppresion(detectedPersonObjects);
             return detectedPeople;
-        }
-
-        /// <summary>
-        /// Calculates the sigmoid function value for the given input.
-        /// </summary>
-        /// <param name="x">The input value.</param>
-        /// <returns>The sigmoid value of the input.</returns>
-        private static float Sigmoid(float x)
-        {
-            return 1f / (1f + (float)Math.Exp(-x));
         }
 
         /// <summary>

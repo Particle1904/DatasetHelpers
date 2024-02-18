@@ -2,18 +2,17 @@
 
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models;
 
 namespace SmartData.Lib.Services
 {
-    /// <summary>
-    /// Service for generating tags for image files using a machine learning model and managing tag-related operations.
-    /// </summary>
-    public class AutoTaggerService : BaseAIConsumer<WDInputData, WDOutputData>, IAutoTaggerService, INotifyProgress
+    public abstract class BaseAutoTaggerService<TInput, TOutput> : BaseAIConsumer<TInput, TOutput>, IAutoTaggerService,
+            INotifyProgress
+        where TInput : class
+        where TOutput : class, new()
     {
         protected readonly ITagProcessorService _tagProcessorService;
 
-        private string[] _tags;
+        protected string[] _tags;
 
         private float _threshold = 0.2f;
 
@@ -50,7 +49,7 @@ namespace SmartData.Lib.Services
         /// <param name="tagProcessorService">The service responsible for processing tags.</param>
         /// <param name="modelPath">The path to the machine learning model.</param>
         /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
-        public AutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
+        public BaseAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
         {
             _tagProcessorService = tagProcessorService;
             TagsPath = tagsPath;
@@ -165,7 +164,7 @@ namespace SmartData.Lib.Services
         /// <param name="weightedCaptions">Flag indicating whether to use weighted captions for tag generation.</param>
         /// <param name="file">The path to the image file to process.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task GenerateTagsWithRedundant(string outputPath, bool appendToFile, bool weightedCaptions, string file)
+        protected async Task GenerateTagsWithRedundant(string outputPath, bool appendToFile, bool weightedCaptions, string file)
         {
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
             string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
@@ -196,7 +195,7 @@ namespace SmartData.Lib.Services
         /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
         /// <param name="file">The input file containing the tags to be processed.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task PostProcessTags(string outputPath, bool weightedCaptions, string file)
+        protected async Task PostProcessTags(string outputPath, bool weightedCaptions, string file)
         {
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
             string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
@@ -221,7 +220,7 @@ namespace SmartData.Lib.Services
         /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
         /// <param name="file">The input file containing the existing caption and tags to be processed.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task PostProcessTagsAndAppendToFile(string outputPath, bool weightedCaptions, string file)
+        protected async Task PostProcessTagsAndAppendToFile(string outputPath, bool weightedCaptions, string file)
         {
             string txtFile = Path.ChangeExtension(file, ".txt");
 
@@ -253,11 +252,32 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Returns a list of tags ordered by their score for a given image path.
+        /// </summary>
+        /// <param name="imagePath">The file path of the image to be analyzed.</param>
+        /// <returns>A list of tags ordered by their score in descending order.</returns>
+        public abstract Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath, bool weightedCaptions = false);
+
+        /// <summary>
+        /// Retrieves predictions for the specified image file path using the prediction engine, which is a machine learning model that has been trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
+        /// </summary>
+        /// <param name="imagePath">The path of the image file to make predictions on.</param>
+        /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
+        public abstract Task<VBuffer<float>> GetPredictionAsync(string inputImagePath);
+
+        /// <summary>
+        /// Retrieves predictions for the specified image stream using the prediction engine, which is a machine learning model trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
+        /// </summary>
+        /// <param name="imageStream">The stream containing the image data to make predictions on.</param>
+        /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
+        public abstract Task<VBuffer<float>> GetPredictionAsync(Stream imageStream);
+
+        /// <summary>
         /// Interrogates an image from a stream and returns a string representation of the predicted tags.
         /// </summary>
         /// <param name="imageStream">The stream containing the image data.</param>
         /// <returns>A string representation of the predicted tags.</returns>
-        public async Task<string> InterrogateImageFromStream(Stream imageStream)
+        public virtual async Task<string> InterrogateImageFromStream(Stream imageStream)
         {
             if (!_isModelLoaded)
             {
@@ -296,77 +316,10 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Returns a list of tags ordered by their score for a given image path.
-        /// </summary>
-        /// <param name="imagePath">The file path of the image to be analyzed.</param>
-        /// <returns>A list of tags ordered by their score in descending order.</returns>
-        private async Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath, bool weightedCaptions = false)
-        {
-            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
-
-            VBuffer<float> predictions = await GetPredictionAsync(imagePath).ConfigureAwait(false);
-            float[] values = predictions.GetValues().ToArray();
-
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (values[i] > _threshold)
-                {
-                    predictionsDict.Add(_tags[i], values[i]);
-                }
-            }
-
-            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
-
-            List<string> listOrdered = new List<string>();
-            if (weightedCaptions)
-            {
-                foreach (KeyValuePair<string, float> item in sortedDict)
-                {
-                    listOrdered.Add($"({item.Key}:{item.Value.ToString("F2")})");
-                }
-            }
-            else
-            {
-                foreach (KeyValuePair<string, float> item in sortedDict)
-                {
-                    listOrdered.Add(item.Key);
-                }
-            }
-
-            return listOrdered;
-        }
-
-        /// <summary>
-        /// Retrieves predictions for the specified image file path using the prediction engine, which is a machine learning model that has been trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
-        /// </summary>
-        /// <param name="imagePath">The path of the image file to make predictions on.</param>
-        /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        private async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
-        {
-            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(inputImagePath);
-
-            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
-            return prediction.PredictionsSigmoid;
-        }
-
-        /// <summary>
-        /// Retrieves predictions for the specified image stream using the prediction engine, which is a machine learning model trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
-        /// </summary>
-        /// <param name="imageStream">The stream containing the image data to make predictions on.</param>
-        /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        private async Task<VBuffer<float>> GetPredictionAsync(Stream imageStream)
-        {
-            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(imageStream);
-
-            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
-            return prediction.PredictionsSigmoid;
-        }
-
-        /// <summary>
         /// Loads tags from a CSV file and assigns them to the '_tags' field.
         /// </summary>
         /// <param name="csvPath">The path to the CSV file containing the tags.</param>
-        private void LoadTags(string csvPath)
+        protected void LoadTags(string csvPath)
         {
             if (File.Exists(csvPath))
             {

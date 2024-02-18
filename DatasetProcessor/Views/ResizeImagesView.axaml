@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-              xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
              xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.ResizeImagesView"
@@ -12,7 +12,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="Auto, 30, Auto, 10, Auto, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
@@ -76,7 +76,7 @@
 					  MinWidth="200"
 					  MaxWidth="200"
 					  SelectedItem="{Binding Dimension}"
-					  ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}">
+					  ItemsSource="{Binding Source={x:Static local2:Utilities.ResolutionValues}}">
 			</ComboBox>
 		</Grid>
 		<!-- LANCOZS SAMPLER SLIDER -->

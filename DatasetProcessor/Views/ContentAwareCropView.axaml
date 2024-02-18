@@ -124,7 +124,7 @@
 					  MinWidth="200"
 					  MaxWidth="200"
 					  SelectedItem="{Binding Dimension}"
-					  ItemsSource="{Binding Source={x:Static local2:Utilities.Values}}">
+					  ItemsSource="{Binding Source={x:Static local2:Utilities.ResolutionValues}}">
 			</ComboBox>
 		</Grid>
 		<!-- LANCOZS SAMPLER SLIDER -->

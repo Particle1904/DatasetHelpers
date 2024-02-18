@@ -5,8 +5,10 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Services;
 
 using System;
 using System.Diagnostics;
@@ -17,7 +19,8 @@ namespace DatasetProcessor.ViewModels
     public partial class GenerateTagsViewModel : ViewModelBase
     {
         private readonly IFileManipulatorService _fileManipulator;
-        private readonly IAutoTaggerService _autoTagger;
+        private readonly IAutoTaggerService _wDAutoTagger;
+        private readonly IAutoTaggerService _joyTagAutoTagger;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -25,6 +28,8 @@ namespace DatasetProcessor.ViewModels
         private string _outputFolderPath;
         [ObservableProperty]
         private Progress _predictionProgress;
+        [ObservableProperty]
+        private TagGeneratorModel _generatorModel;
         [ObservableProperty]
         private double _threshold;
 
@@ -40,24 +45,34 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isUiEnabled;
 
-        public GenerateTagsViewModel(IFileManipulatorService fileManipulator, IAutoTaggerService autoTagger,
+        public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDAutoTagger,
+            JoyTagAutoTaggerService joyTagAutoTagger,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
-            _autoTagger = autoTagger;
 
-            (_autoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            _wDAutoTagger = wDAutoTagger;
+            (_wDAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 PredictionProgress = ResetProgress(PredictionProgress);
                 PredictionProgress.TotalFiles = args;
             };
-            (_autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+            (_wDAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+
+            _joyTagAutoTagger = joyTagAutoTagger;
+            (_joyTagAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                PredictionProgress = ResetProgress(PredictionProgress);
+                PredictionProgress.TotalFiles = args;
+            };
+            (_joyTagAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ResizedFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.CombinedOutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
 
+            GeneratorModel = TagGeneratorModel.JoyTag;
             Threshold = _configs.Configurations.TaggerThreshold;
 
             WeightedCaptions = false;
@@ -104,24 +119,51 @@ namespace DatasetProcessor.ViewModels
             timer.Start();
 
             TaskStatus = ProcessingStatus.Running;
-            _autoTagger.Threshold = (float)Threshold;
 
             try
             {
-                if (ApplyRedundancyRemoval)
+                switch (GeneratorModel)
                 {
-                    if (AppendCaptionsToFile)
-                    {
-                        await _autoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                    }
-                    else
-                    {
-                        await _autoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                    }
-                }
-                else
-                {
-                    await _autoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
+                    case TagGeneratorModel.JoyTag:
+                        _joyTagAutoTagger.Threshold = (float)Threshold;
+                        if (ApplyRedundancyRemoval)
+                        {
+                            if (AppendCaptionsToFile)
+                            {
+                                await _joyTagAutoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                            }
+                            else
+                            {
+                                await _joyTagAutoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                            }
+                        }
+                        else
+                        {
+                            await _joyTagAutoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
+                        }
+                        break;
+                    case TagGeneratorModel.WDv1_4:
+                        _wDAutoTagger.Threshold = (float)Threshold;
+
+                        if (ApplyRedundancyRemoval)
+                        {
+                            if (AppendCaptionsToFile)
+                            {
+                                await _wDAutoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                            }
+                            else
+                            {
+                                await _wDAutoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                            }
+                        }
+                        else
+                        {
+                            await _wDAutoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
+                        }
+                        break;
+                    default:
+                        Logger.LatestLogMessage = $"Something went wrong while trying to load one of the auto tagger models!";
+                        break;
                 }
 
                 timer.Stop();

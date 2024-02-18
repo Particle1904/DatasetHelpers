@@ -9,6 +9,7 @@ using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Services;
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,7 +24,8 @@ public partial class MainViewModel : ViewModelBase
 {
     protected readonly IFileManipulatorService _fileManipulator;
     protected readonly IImageProcessorService _imageProcessor;
-    protected readonly IAutoTaggerService _autoTagger;
+    protected readonly IAutoTaggerService _wDAutoTagger;
+    protected readonly IAutoTaggerService _joyTagAutoTagger;
     protected readonly ITagProcessorService _tagProcessor;
     protected readonly IContentAwareCropService _contentAwareCrop;
     protected readonly IInputHooksService _inputHooks;
@@ -56,7 +58,8 @@ public partial class MainViewModel : ViewModelBase
     /// <param name="configs">The configuration service.</param>
     public MainViewModel(IFileManipulatorService fileManipulator,
                          IImageProcessorService imageProcessor,
-                         IAutoTaggerService autoTagger,
+                         WDAutoTaggerService wDAutoTagger,
+                         JoyTagAutoTaggerService joyTagAutoTagger,
                          ITagProcessorService tagProcessor,
                          IContentAwareCropService contentAwareCrop,
                          IInputHooksService inputHooks,
@@ -67,7 +70,8 @@ public partial class MainViewModel : ViewModelBase
     {
         _fileManipulator = fileManipulator;
         _imageProcessor = imageProcessor;
-        _autoTagger = autoTagger;
+        _wDAutoTagger = wDAutoTagger;
+        _joyTagAutoTagger = joyTagAutoTagger;
         _tagProcessor = tagProcessor;
         _contentAwareCrop = contentAwareCrop;
         _inputHooks = inputHooks;
@@ -81,7 +85,7 @@ public partial class MainViewModel : ViewModelBase
             { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext =  new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, autoTagger, logger, configs) }},
+            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, joyTagAutoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},
@@ -92,7 +96,7 @@ public partial class MainViewModel : ViewModelBase
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            _views.Add(AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, autoTagger, logger, configs) });
+            _views.Add(AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, wDAutoTagger, logger, configs) });
         }
 
         _dynamicView = _views[AppPages.Welcome];

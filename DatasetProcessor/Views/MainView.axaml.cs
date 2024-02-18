@@ -60,6 +60,7 @@ public partial class MainView : UserControl
             string modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
             string WDOnnxFilename = "wdModel.onnx";
             string csvFilename = "wdTags.csv";
+
             string YoloV4OnnxFilename = "yolov4.onnx";
 
             _fileManipulator = new FileManipulatorService();
@@ -71,7 +72,7 @@ public partial class MainView : UserControl
             _contentAwareCrop = new ContentAwareCropService(_imageProcessor,
                 Path.Combine(modelsPath, YoloV4OnnxFilename));
             _promptGenerator = new PromptGeneratorService(_tagProcessor, _fileManipulator);
-            _autoTagger = new AutoTaggerService(_imageProcessor, _tagProcessor,
+            _autoTagger = new WDAutoTaggerService(_imageProcessor, _tagProcessor,
                 Path.Combine(modelsPath, WDOnnxFilename), Path.Combine(modelsPath, csvFilename));
         }
 

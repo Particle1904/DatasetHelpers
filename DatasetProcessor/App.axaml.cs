@@ -46,7 +46,8 @@ public partial class App : Application
 
         var fileManipulator = _servicesProvider.GetRequiredService<IFileManipulatorService>();
         var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
-        var autoTagger = _servicesProvider.GetRequiredService<IAutoTaggerService>();
+        var wDAutoTagger = _servicesProvider.GetRequiredService<WDAutoTaggerService>();
+        var joyTagAutoTagger = _servicesProvider.GetRequiredService<JoyTagAutoTaggerService>();
         var tagProcessor = _servicesProvider.GetRequiredService<ITagProcessorService>();
         var contentAwareCrop = _servicesProvider.GetRequiredService<IContentAwareCropService>();
         var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
@@ -59,7 +60,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, autoTagger, tagProcessor, contentAwareCrop,
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, tagProcessor, contentAwareCrop,
                     inputHooks, promptGenerator, logger, configs)
             };
 
@@ -71,7 +72,7 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MainView()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, autoTagger, tagProcessor, contentAwareCrop,
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, tagProcessor, contentAwareCrop,
                     inputHooks, promptGenerator, logger, configs)
             };
         }
@@ -83,7 +84,11 @@ public partial class App : Application
     {
         string _modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
         string _WDOnnxFilename = "wdModel.onnx";
-        string _csvFilename = "wdTags.csv";
+        string _WDCsvFilename = "wdTags.csv";
+
+        string _JoyTagFilename = "joytag.onnx";
+        string _JoyTagCsvFilename = "top_tags.csv";
+
         string _YoloV4OnnxFilename = "yolov4.onnx";
 
         services.AddSingleton<ILoggerService, LoggerService>();
@@ -97,11 +102,17 @@ public partial class App : Application
                 Path.Combine(_modelsPath, _YoloV4OnnxFilename)
 
         ));
-        services.AddSingleton<IAutoTaggerService>(service =>
-            new AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+        services.AddSingleton<WDAutoTaggerService>(service =>
+            new WDAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, _WDOnnxFilename),
-                Path.Combine(_modelsPath, _csvFilename)
+                Path.Combine(_modelsPath, _WDCsvFilename)
+        ));
+        services.AddSingleton<JoyTagAutoTaggerService>(service =>
+            new JoyTagAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<ITagProcessorService>(),
+                Path.Combine(_modelsPath, _JoyTagFilename),
+                Path.Combine(_modelsPath, _JoyTagCsvFilename)
         ));
         services.AddSingleton<IInputHooksService, InputHooksService>();
         services.AddSingleton<IPromptGeneratorService>(service => new

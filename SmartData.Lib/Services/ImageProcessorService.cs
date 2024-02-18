@@ -16,6 +16,7 @@ namespace SmartData.Lib.Services
         private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         private LanczosResampler _lanczosResampler;
+        private BicubicResampler _bicubicResampler;
 
         private const ushort _semaphoreConcurrent = 6;
 
@@ -315,6 +316,69 @@ namespace SmartData.Lib.Services
                     }
                 });
             }
+            return inputData;
+        }
+
+        /// <summary>
+        /// Asynchronously processes an image for tag prediction, using the JoyTag model, by resizing it to 448x448 and converting it to a float array.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>An <see cref="JoyTagInputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        public async Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath)
+        {
+            JoyTagInputData inputData = new JoyTagInputData();
+            inputData.Input1 = new float[1 * 3 * 448 * 448];
+
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _bicubicResampler,
+                    Compand = true,
+                    PadColor = new Rgb24(255, 255, 255),
+                    Size = new Size(448, 448),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                float[,,,] reshapedInput = new float[1, 3, 448, 448];
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            Rgb24 pixel = pixelRow[x];
+
+                            float r = pixel.R / 255.0f;
+                            float g = pixel.G / 255.0f;
+                            float b = pixel.B / 255.0f;
+
+                            r = (r - 0.48145466f) / 0.26862954f;
+                            g = (g - 0.4578275f) / 0.26130258f;
+                            b = (b - 0.40821073f) / 0.27577711f;
+
+                            reshapedInput[0, 0, y, x] = r;
+                            reshapedInput[0, 1, y, x] = g;
+                            reshapedInput[0, 2, y, x] = b;
+                        }
+                    }
+                });
+
+                // Flatten the reshapedInput and assign it to inputData.Input1
+                Buffer.BlockCopy(reshapedInput, 0, inputData.Input1, 0, inputData.Input1.Length * sizeof(float));
+
+                float[] flattenedArray = reshapedInput.Cast<float>().ToArray();
+                // Save the flattened array to a text file
+                File.WriteAllLines(@"C:/Users/Leonardo/Downloads/normalized_csharp.txt", flattenedArray.Select(value => value.ToString()));
+            }
+
             return inputData;
         }
 

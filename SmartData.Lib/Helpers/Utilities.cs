@@ -43,6 +43,21 @@ namespace SmartData.Lib.Helpers
         /// <summary>
         /// Gets an array of supported dimensions.
         /// </summary>
-        public static SupportedDimensions[] Values => (SupportedDimensions[])Enum.GetValues(typeof(SupportedDimensions));
+        public static SupportedDimensions[] ResolutionValues => (SupportedDimensions[])Enum.GetValues(typeof(SupportedDimensions));
+
+        /// <summary>
+        /// Gets an array of supported tag generator models.
+        /// </summary>
+        public static TagGeneratorModel[] ModelValues => (TagGeneratorModel[])Enum.GetValues(typeof(TagGeneratorModel));
+
+        /// <summary>
+        /// Calculates the sigmoid function value for the given input.
+        /// </summary>
+        /// <param name="x">The input value.</param>
+        /// <returns>The sigmoid value of the input.</returns>
+        public static float Sigmoid(float x)
+        {
+            return 1f / (1f + (float)Math.Exp(-x));
+        }
     }
 }

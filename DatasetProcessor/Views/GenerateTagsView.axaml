@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:local="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.GenerateTagsView"
 			 x:DataType="vm:GenerateTagsViewModel"
@@ -10,7 +11,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
@@ -62,9 +63,26 @@
 				</Panel>
 			</Button>
 		</Grid>
+		<!-- MODEL DROPBOX -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="4"
+			  MinHeight="36"
+			  Margin="0,0,0,-1"
+			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Label Grid.Column="0"
+				   Content="Select the auto tagger model:"
+				   HorizontalAlignment="Left"/>
+			<ComboBox Grid.Column="2" Grid.ColumnSpan="3"
+					  HorizontalAlignment="Right"
+					  MinWidth="200"
+					  MaxWidth="200"
+					  SelectedItem="{Binding GeneratorModel}"
+					  ItemsSource="{Binding Source={x:Static local:Utilities.ModelValues}}">
+			</ComboBox>
+		</Grid>
 		<!-- THRESHOLD SLIDER -->
 		<Grid Classes="gridSecondary"
-				  Grid.Row="4"
+				  Grid.Row="6"
 				  ColumnDefinitions="Auto, 10, *, 10, Auto">
 			<Label Grid.Column="0"
 				   Content="Threshold for predictions:"/>
@@ -78,7 +96,7 @@
 				   Content="{Binding Threshold}"/>
 		</Grid>
 		<!-- REDUNDANCY REMOVAL CHECKBOX -->
-		<Panel Grid.Row="6"
+		<Panel Grid.Row="8"
 			   Background="{DynamicResource SurfaceLighterDark}">
 			<CheckBox HorizontalAlignment="Left"
 					  Margin="10"
@@ -87,7 +105,7 @@
 			</CheckBox>
 		</Panel>
 		<!-- APPEND GENERATED CAPTIONS CHECKBOX -->
-		<Panel Grid.Row="8"
+		<Panel Grid.Row="10"
 			   Background="{DynamicResource SurfaceLighterDark}">
 			<CheckBox HorizontalAlignment="Left"
 					  Margin="10"
@@ -96,7 +114,7 @@
 			</CheckBox>
 		</Panel>
 		<!-- WEIGHTED CAPTIONS CHECKBOX -->
-		<Panel Grid.Row="10"
+		<Panel Grid.Row="12"
 			   Background="{DynamicResource SurfaceLighterDark}">
 			<CheckBox HorizontalAlignment="Left"
 					  Margin="10"
@@ -105,7 +123,7 @@
 			</CheckBox>
 		</Panel>
 		<!-- NOTE TEXT BOX -->
-		<Panel Grid.Row="12"
+		<Panel Grid.Row="14"
 			   Background="{DynamicResource SurfaceDark}">
 			<TextBlock HorizontalAlignment="Center"
 					   Margin="10"
@@ -114,24 +132,24 @@
 					   Foreground="{DynamicResource Secondary}"
 					   Text="Note: Low Threshold values can capture false positives. 0.35 is usually a good starting point for anime.&#xa;With photographs you can usually go with lower values like 0.20 or 0.25 since the Auto Tagger wasn't really trained to be used with photos.&#xa;If your dataset is big, like 300+ images, consider using a higher threshold value like 0.5-0.6 to avoid too many false positives." />
 		</Panel>
-		<Separator Grid.Row="14"/>
+		<Separator Grid.Row="16"/>
 		<!-- CURRENTLY PROCESSING -->
-		<Label Grid.Row="16"
+		<Label Grid.Row="18"
 			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 		<!-- ELAPSED TIME -->
-		<Label Grid.Row="18"
+		<Label Grid.Row="20"
 			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- GENERATE BUTTON -->
-		<Button Grid.Row="20"
+		<Button Grid.Row="22"
 				Width="200"
 				Content="Generate tags"
 				IsEnabled="{Binding IsUiEnabled}"
 				Command="{Binding MakePredictionsCommand}"/>
 		<!-- PROGRESS BAR -->
-		<ProgressBar Grid.Row="22"
+		<ProgressBar Grid.Row="24"
 					 Value="{Binding PredictionProgress.PercentComplete}"/>
 		<!-- TASK STATUS -->
-		<Label Grid.Row="24" 
+		<Label Grid.Row="26" 
 			   FontSize="22"
 			   Foreground="{DynamicResource Secondary}"
 			   Content="{Binding TaskStatusString}"/>
