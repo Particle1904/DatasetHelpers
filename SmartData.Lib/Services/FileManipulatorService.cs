@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Enums;
+﻿using SixLabors.ImageSharp;
+
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;

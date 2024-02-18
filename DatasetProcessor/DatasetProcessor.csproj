@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
     <ApplicationIcon>Assets\Icons\icon.ico</ApplicationIcon>
@@ -40,16 +40,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.4" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.1" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.4" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
+    <PackageReference Include="Avalonia" Version="11.0.9" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.6" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.13" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.9" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.9" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.1.24080.9" />
   </ItemGroup>
 
   <ItemGroup>

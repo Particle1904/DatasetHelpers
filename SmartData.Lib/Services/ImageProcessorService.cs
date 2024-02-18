@@ -1,7 +1,11 @@
 ﻿// Ignore Spelling: Metadata Lanczos
 
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Png.Chunks;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 using SmartData.Lib.Enums;
