@@ -13,6 +13,14 @@
 
   
   <ItemGroup>
+    <AvaloniaXaml Remove="src\Utilities\**" />
+    <Compile Remove="src\Utilities\**" />
+    <EmbeddedResource Remove="src\Utilities\**" />
+    <None Remove="src\Utilities\**" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
     <AvaloniaResource Remove="Assets\Icons\folder_opened_old.svg" />
     <AvaloniaResource Remove="Assets\Styles\GlobalStyles.axaml" />
   </ItemGroup>
@@ -58,9 +66,5 @@
     <Compile Update="Views\MainView.axaml.cs">
       <DependentUpon>MainView.axaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="src\Utilities\" />
   </ItemGroup>
 </Project>

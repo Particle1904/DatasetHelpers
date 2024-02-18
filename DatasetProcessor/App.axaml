@@ -30,7 +30,7 @@
 		<SolidColorBrush x:Key="Secondary">#FFB347</SolidColorBrush>
 		<SolidColorBrush x:Key="SecondaryLight">#FFD18F</SolidColorBrush>
 		<SolidColorBrush x:Key="SecondaryDark">#E58C27</SolidColorBrush>
-		
+
 		<SolidColorBrush x:Key="SurfaceLight">#F7F7F7</SolidColorBrush>		
 		<SolidColorBrush x:Key="SecondarySurfaceLight">#E6E6E6</SolidColorBrush>
 

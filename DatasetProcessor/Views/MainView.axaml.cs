@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
+using Avalonia.Media.Immutable;
 using Avalonia.Platform.Storage;
 
 using SmartData.Lib.Interfaces;
@@ -89,8 +90,22 @@ public partial class MainView : UserControl
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            MetadataViewerButton.IsEnabled = false;
-            MetadataViewerButton.IsVisible = false;
+            Metadata_ViewerButton.IsEnabled = false;
+            Metadata_ViewerButton.IsVisible = false;
         }
+    }
+
+    private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var primaryColor = (ImmutableSolidColorBrush)Application.Current.Resources["Primary"];
+        foreach (Control item in LeftMenuStackPanel.Children)
+        {
+            if (item.GetType() == typeof(Button))
+            {
+                (item as Button).Background = primaryColor;
+            }
+        }
+
+        (sender as Button).Background = (ImmutableSolidColorBrush)Application.Current.Resources["SecondaryDark"];
     }
 }
