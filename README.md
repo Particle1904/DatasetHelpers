@@ -36,6 +36,9 @@ FOR WINDOWS:
 FOR LINUX:
 ```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=linux-x64```
 
+FOR MAC:
+[Follow the instructions from this issue](https://github.com/Particle1904/DatasetHelpers/issues/6)
+
 ## Requirements
 This software requires two runtimes:
 - [.NET Desktop Runtime 7.0.4](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
