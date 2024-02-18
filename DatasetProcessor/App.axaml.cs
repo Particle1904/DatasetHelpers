@@ -86,8 +86,8 @@ public partial class App : Application
         string _WDOnnxFilename = "wdModel.onnx";
         string _WDCsvFilename = "wdTags.csv";
 
-        string _JoyTagFilename = "joytag.onnx";
-        string _JoyTagCsvFilename = "top_tags.csv";
+        string _JoyTagFilename = "jtModel.onnx";
+        string _JoyTagCsvFilename = "jtTags.csv";
 
         string _YoloV4OnnxFilename = "yolov4.onnx";
 
