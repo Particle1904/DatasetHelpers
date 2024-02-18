@@ -375,12 +375,9 @@ namespace SmartData.Lib.Services
                     }
                 });
 
-                // Flatten the reshapedInput and assign it to inputData.Input1
                 Buffer.BlockCopy(reshapedInput, 0, inputData.Input1, 0, inputData.Input1.Length * sizeof(float));
 
                 float[] flattenedArray = reshapedInput.Cast<float>().ToArray();
-                // Save the flattened array to a text file
-                File.WriteAllLines(@"C:/Users/Leonardo/Downloads/normalized_csharp.txt", flattenedArray.Select(value => value.ToString()));
             }
 
             return inputData;
