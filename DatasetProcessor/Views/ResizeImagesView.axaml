@@ -12,7 +12,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 30, Auto, 10, Auto, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
