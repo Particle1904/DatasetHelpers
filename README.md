@@ -31,10 +31,10 @@ Use these commands to build it as a self-contained application:
 In Visual Studio Community 2022; Right-click the DatasetProcessorDesktop and click "Open in Terminal" then use the command:
 
 FOR WINDOWS:
-```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=win-x64```
+```dotnet build /restore /t:build /p:TargetFramework=net8.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=win-x64```
 
 FOR LINUX:
-```dotnet build /restore /t:build /p:TargetFramework=net7.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=linux-x64```
+```dotnet build /restore /t:build /p:TargetFramework=net8.0 /p:Configuration=Release /p:Platform=x64 /p:PublishSingleFile=true /p:PublishTrimmed=false /p:RuntimeIdentifier=linux-x64```
 
 FOR MAC:
 [Follow the instructions from this issue](https://github.com/Particle1904/DatasetHelpers/issues/6)
