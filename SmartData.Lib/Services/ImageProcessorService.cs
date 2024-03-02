@@ -76,6 +76,7 @@ namespace SmartData.Lib.Services
             BlocksPerRow = _baseResolution / _divisor;
             _totalBlocks = BlocksPerRow * BlocksPerRow;
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
+            _bicubicResampler = new BicubicResampler();
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
             MinimumResolutionForSigma = 512;
         }
