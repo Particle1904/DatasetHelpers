@@ -179,6 +179,18 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Handles the change event of the ending position of the crop region.
+        /// </summary>
+        /// <param name="value">The new ending position of the crop region.</param>
+        /// <remarks>
+        /// This method is triggered when the ending position of the crop region changes.
+        /// It checks if an image is selected and if an output folder path is specified.
+        /// If both conditions are met, it asynchronously crops the image based on the specified crop region
+        /// (defined by the starting and ending positions) and saves the cropped image to the output folder.
+        /// If no output folder is specified, it logs a message indicating that an output folder needs to be selected.
+        /// If an error occurs during the cropping process, it throws an exception.
+        /// </remarks>
         partial void OnEndingPositionChanged(Point value)
         {
             if (SelectedImage == null)

@@ -459,6 +459,19 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Crops the specified region from an image and saves the cropped portion to the output path.
+        /// </summary>
+        /// <param name="inputPath">The path of the input image file.</param>
+        /// <param name="outputPath">The path where the cropped image will be saved.</param>
+        /// <param name="startingPosition">The starting point of the crop region.</param>
+        /// <param name="endingPosition">The ending point of the crop region.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// The method loads the input image, crops the specified region defined by the starting and ending positions,
+        /// and saves the cropped image to the output path. The crop region is defined by the rectangle formed
+        /// by the starting and ending positions.
+        /// </remarks>
         public async Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition)
         {
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
