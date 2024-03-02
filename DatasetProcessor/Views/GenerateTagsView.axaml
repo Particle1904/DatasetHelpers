@@ -130,7 +130,7 @@
 					   TextAlignment="Center"
 					   FontWeight="Light"
 					   Foreground="{DynamicResource Secondary}"
-					   Text="Note: Low Threshold values can capture false positives. 0.35 is usually a good starting point for anime.&#xa;With photographs you can usually go with lower values like 0.20 or 0.25 since the Auto Tagger wasn't really trained to be used with photos.&#xa;If your dataset is big, like 300+ images, consider using a higher threshold value like 0.5-0.6 to avoid too many false positives." />
+					   Text="Note: Low Threshold values can capture false positives and make it harder for your model to learn.&#xa;If your dataset is big, like 300+ images, consider using a higher threshold value like 0.5-0.6 to avoid too many false positives.&#xa;You can also use 2 or more models to generate tags at a higher threshold value, like 0.6+, and append the generated tags to the .txt files.&#xa;&#xa;&#xa;AVAILABLE MODELS ARE:&#xa;WD 1.4: Great for anime and general style of artwork. Suggested Threshold is 0.40-0.50.&#xa;JoyTag: Great for anime and general type of artwork and can also work quite well with photos. Suggested Threshold: 0.35-0.4.&#xa;Z3D E621: Good for artwork themed around furries. I haven't tested this model extensively yet, but a value of 0.4-0.5 is probably a safe bet." />
 		</Panel>
 		<Separator Grid.Row="16"/>
 		<!-- CURRENTLY PROCESSING -->

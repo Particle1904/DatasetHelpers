@@ -150,6 +150,8 @@ namespace DatasetProcessor.ViewModels
             TaskStatus = ProcessingStatus.Running;
             try
             {
+                await DownloadModelFiles(AvailableModels.Yolo_v4);
+
                 _contentAwareCrop.ScoreThreshold = (float)ScoreThreshold;
                 _contentAwareCrop.IouThreshold = (float)IouThreshold;
                 _contentAwareCrop.ExpansionPercentage = (float)ExpansionPercentage + 1.0f;
@@ -176,6 +178,14 @@ namespace DatasetProcessor.ViewModels
 
             _timer.Stop();
             timer.Stop();
+        }
+
+        private async Task DownloadModelFiles(AvailableModels model)
+        {
+            if (_fileManipulator.FileNeedsToBeDownloaded(model))
+            {
+                await _fileManipulator.DownloadModelFile(model);
+            }
         }
 
         partial void OnScoreThresholdChanged(double value)

@@ -21,6 +21,7 @@ namespace DatasetProcessor.ViewModels
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IAutoTaggerService _wDAutoTagger;
         private readonly IAutoTaggerService _joyTagAutoTagger;
+        private readonly IAutoTaggerService _e621AutoTagger;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -46,10 +47,11 @@ namespace DatasetProcessor.ViewModels
         private bool _isUiEnabled;
 
         public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDAutoTagger,
-            JoyTagAutoTaggerService joyTagAutoTagger,
+            JoyTagAutoTaggerService joyTagAutoTagger, E621AutoTaggerService e621AutoTagger,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
+            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.LatestLogMessage = args;
 
             _wDAutoTagger = wDAutoTagger;
             (_wDAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -66,6 +68,14 @@ namespace DatasetProcessor.ViewModels
                 PredictionProgress.TotalFiles = args;
             };
             (_joyTagAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+
+            _e621AutoTagger = e621AutoTagger;
+            (_e621AutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                PredictionProgress = ResetProgress(PredictionProgress);
+                PredictionProgress.TotalFiles = args;
+            };
+            (_e621AutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ResizedFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
@@ -125,41 +135,16 @@ namespace DatasetProcessor.ViewModels
                 switch (GeneratorModel)
                 {
                     case TagGeneratorModel.JoyTag:
-                        _joyTagAutoTagger.Threshold = (float)Threshold;
-                        if (ApplyRedundancyRemoval)
-                        {
-                            if (AppendCaptionsToFile)
-                            {
-                                await _joyTagAutoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                            }
-                            else
-                            {
-                                await _joyTagAutoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                            }
-                        }
-                        else
-                        {
-                            await _joyTagAutoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
-                        }
+                        await DownloadModelFiles(AvailableModels.JoyTag);
+                        await CallAutoTaggerService(_joyTagAutoTagger);
                         break;
-                    case TagGeneratorModel.WDv1_4:
-                        _wDAutoTagger.Threshold = (float)Threshold;
-
-                        if (ApplyRedundancyRemoval)
-                        {
-                            if (AppendCaptionsToFile)
-                            {
-                                await _wDAutoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                            }
-                            else
-                            {
-                                await _wDAutoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
-                            }
-                        }
-                        else
-                        {
-                            await _wDAutoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
-                        }
+                    case TagGeneratorModel.WDv14:
+                        await DownloadModelFiles(AvailableModels.WD_v1_4);
+                        await CallAutoTaggerService(_wDAutoTagger);
+                        break;
+                    case TagGeneratorModel.Z3DE621:
+                        await DownloadModelFiles(AvailableModels.Z3D_E621);
+                        await CallAutoTaggerService(_e621AutoTagger);
                         break;
                     default:
                         Logger.LatestLogMessage = $"Something went wrong while trying to load one of the auto tagger models!";
@@ -183,9 +168,44 @@ namespace DatasetProcessor.ViewModels
             timer.Stop();
         }
 
+        private async Task DownloadModelFiles(AvailableModels model)
+        {
+            if (_fileManipulator.FileNeedsToBeDownloaded(model))
+            {
+                await _fileManipulator.DownloadModelFile(model);
+            }
+        }
+
+        /// <summary>
+        /// Calls the AutoTagger service to generate tags based on the specified parameters.
+        /// </summary>
+        /// <param name="autoTaggerService">The instance of the AutoTagger service to use.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task CallAutoTaggerService(IAutoTaggerService autoTaggerService)
+        {
+            autoTaggerService.Threshold = (float)Threshold;
+
+            if (ApplyRedundancyRemoval)
+            {
+                if (AppendCaptionsToFile)
+                {
+                    await autoTaggerService.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                }
+                else
+                {
+                    await autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                }
+            }
+            else
+            {
+                await autoTaggerService.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
+            }
+        }
+
         partial void OnThresholdChanged(double value)
         {
             Threshold = Math.Round(value, 2);
         }
+
     }
 }

@@ -4,6 +4,7 @@ namespace SmartData.Lib.Enums
     public enum TagGeneratorModel : byte
     {
         JoyTag,
-        WDv1_4,
+        WDv14,
+        Z3DE621
     }
 }

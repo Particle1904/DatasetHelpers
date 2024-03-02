@@ -10,6 +10,7 @@ using DatasetProcessor.Views;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Services;
 
@@ -48,6 +49,7 @@ public partial class App : Application
         var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
         var wDAutoTagger = _servicesProvider.GetRequiredService<WDAutoTaggerService>();
         var joyTagAutoTagger = _servicesProvider.GetRequiredService<JoyTagAutoTaggerService>();
+        var e621AutoTagger = _servicesProvider.GetRequiredService<E621AutoTaggerService>();
         var tagProcessor = _servicesProvider.GetRequiredService<ITagProcessorService>();
         var contentAwareCrop = _servicesProvider.GetRequiredService<IContentAwareCropService>();
         var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
@@ -60,8 +62,8 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, tagProcessor, contentAwareCrop,
-                    inputHooks, promptGenerator, logger, configs)
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, e621AutoTagger,
+                    tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -72,8 +74,8 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MainView()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, tagProcessor, contentAwareCrop,
-                    inputHooks, promptGenerator, logger, configs)
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, e621AutoTagger,
+                    tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
             };
         }
 
@@ -83,13 +85,6 @@ public partial class App : Application
     private void ConfigureServices(IServiceCollection services)
     {
         string _modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
-        string _WDOnnxFilename = "wdModel.onnx";
-        string _WDCsvFilename = "wdTags.csv";
-
-        string _JoyTagFilename = "jtModel.onnx";
-        string _JoyTagCsvFilename = "jtTags.csv";
-
-        string _YoloV4OnnxFilename = "yolov4.onnx";
 
         services.AddSingleton<ILoggerService, LoggerService>();
         services.AddSingleton<IFileManipulatorService, FileManipulatorService>();
@@ -99,20 +94,25 @@ public partial class App : Application
         services.AddSingleton<IConfigsService, ConfigsService>();
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
-                Path.Combine(_modelsPath, _YoloV4OnnxFilename)
-
+                Path.Combine(_modelsPath, FileNames.YoloV4OnnxFileName)
         ));
         services.AddSingleton<WDAutoTaggerService>(service =>
             new WDAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, _WDOnnxFilename),
-                Path.Combine(_modelsPath, _WDCsvFilename)
+                Path.Combine(_modelsPath, FileNames.WDOnnxFileName),
+                Path.Combine(_modelsPath, FileNames.WDCsvFileName)
+        ));
+        services.AddSingleton<E621AutoTaggerService>(service =>
+            new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<ITagProcessorService>(),
+                Path.Combine(_modelsPath, FileNames.E621OnnxFileName),
+                Path.Combine(_modelsPath, FileNames.E621CsvFileName)
         ));
         services.AddSingleton<JoyTagAutoTaggerService>(service =>
             new JoyTagAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, _JoyTagFilename),
-                Path.Combine(_modelsPath, _JoyTagCsvFilename)
+                Path.Combine(_modelsPath, FileNames.JoyTagOnnxFileName),
+                Path.Combine(_modelsPath, FileNames.JoyTagCsvFileName)
         ));
         services.AddSingleton<IInputHooksService, InputHooksService>();
         services.AddSingleton<IPromptGeneratorService>(service => new

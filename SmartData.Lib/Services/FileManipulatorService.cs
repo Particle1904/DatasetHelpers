@@ -13,8 +13,20 @@ namespace SmartData.Lib.Services
     {
         private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
+        private readonly string _wdModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdModel.onnx?download=true";
+        private readonly string _wdCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdTags.csv?download=true";
+
+        private readonly string _jtModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
+        private readonly string _jtCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
+
+        private readonly string _e621ModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Model.onnx?download=true";
+        private readonly string _e621CsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Tags.csv?download=true";
+
+        private readonly string _yolov4ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/yolov4.onnx?download=true";
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
+        public event EventHandler<string> DownloadMessageEvent;
 
         /// <summary>
         /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
@@ -345,6 +357,137 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Determines whether the specified model files need to be downloaded based on the provided model type.
+        /// </summary>
+        /// <param name="model">The type of model to check.</param>
+        /// <returns>True if the model files need to be downloaded; otherwise, false.</returns>
+        public bool FileNeedsToBeDownloaded(AvailableModels model)
+        {
+            bool result = false;
+
+            switch (model)
+            {
+                case AvailableModels.JoyTag:
+                    if (!Path.Exists(FileNames.JoyTagOnnxFileName) || !Path.Exists(FileNames.JoyTagCsvFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.WD_v1_4:
+                    if (!Path.Exists(FileNames.WDOnnxFileName) || !Path.Exists(FileNames.WDCsvFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Z3D_E621:
+                    if (!Path.Exists(FileNames.E621OnnxFileName) || !Path.Exists(FileNames.E621CsvFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Yolo_v4:
+                    if (!Path.Exists(FileNames.YoloV4OnnxFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Downloads the specified model file and associated CSV file (if applicable) based on the provided model type.
+        /// </summary>
+        /// <param name="model">The type of model to download.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task DownloadModelFile(AvailableModels model)
+        {
+            if (!Path.Exists(GetModelsFolder()))
+            {
+                Directory.CreateDirectory(GetModelsFolder());
+            }
+
+            using (HttpClient client = new HttpClient())
+            {
+                string modelUrl = string.Empty;
+                string modelFileName = string.Empty;
+                string csvUrl = string.Empty;
+                string csvFileName = string.Empty;
+
+                switch (model)
+                {
+                    case AvailableModels.JoyTag:
+                        modelUrl = _jtModelDownloadLink;
+                        modelFileName = FileNames.JoyTagOnnxFileName;
+                        csvUrl = _jtCsvDownloadLink;
+                        csvFileName = FileNames.JoyTagCsvFileName;
+                        break;
+                    case AvailableModels.WD_v1_4:
+                        modelUrl = _wdModelDownloadLink;
+                        modelFileName = FileNames.WDOnnxFileName;
+                        csvUrl = _wdCsvDownloadLink;
+                        csvFileName = FileNames.WDCsvFileName;
+                        break;
+                    case AvailableModels.Z3D_E621:
+                        modelUrl = _e621ModelDownloadLink;
+                        modelFileName = FileNames.E621OnnxFileName;
+                        csvUrl = _e621CsvDownloadLink;
+                        csvFileName = FileNames.E621CsvFileName;
+                        break;
+                    case AvailableModels.Yolo_v4:
+                        modelUrl = _yolov4ModelLink;
+                        modelFileName = FileNames.YoloV4OnnxFileName;
+                        break;
+                }
+
+                try
+                {
+                    if (!string.IsNullOrEmpty(csvUrl))
+                    {
+                        DownloadMessageEvent?.Invoke(this, $"Downloading {csvFileName} file...");
+                        await DownloadFile(client, csvUrl, Path.Combine(GetModelsFolder(), csvFileName));
+                    }
+
+                    DownloadMessageEvent?.Invoke(this, $"Downloading {modelFileName} file...");
+                    await DownloadFile(client, modelUrl, Path.Combine(GetModelsFolder(), modelFileName));
+                    DownloadMessageEvent?.Invoke(this, $"Finished downloading {modelFileName} file!");
+                }
+                catch (Exception exception)
+                {
+                    DownloadMessageEvent?.Invoke(this, $"Error while trying to download CSV or Model file. {exception.Message}.");
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Downloads a file from the specified URL and saves it to the specified file path.
+        /// </summary>
+        /// <param name="client">The HttpClient instance used to perform the download.</param>
+        /// <param name="fileUrl">The URL of the file to download.</param>
+        /// <param name="filePath">The local file path where the downloaded file will be saved.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task DownloadFile(HttpClient client, string fileUrl, string filePath)
+        {
+            if (Path.Exists(filePath))
+            {
+                return;
+            }
+
+            using (HttpResponseMessage response = await client.GetAsync(fileUrl))
+            {
+                response.EnsureSuccessStatusCode();
+                using (Stream stream = await response.Content.ReadAsStreamAsync())
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create,
+                    FileAccess.Write, FileShare.None))
+                {
+                    await stream.CopyToAsync(fileStream);
+                }
+            }
+        }
+
+        /// <summary>
         /// Sorts an image file into separate output directories based on its size.
         /// Images with a width or height less than or equal to the specified minimum size are moved to the discarded output directory,
         /// while larger images are moved to the selected output directory.
@@ -494,5 +637,11 @@ namespace SmartData.Lib.Services
                 AndTags = andTags.ToArray()
             };
         }
+
+        /// <summary>
+        /// Gets the folder path for storing model files within the current application's directory.
+        /// </summary>
+        /// <returns>The folder path for model storage.</returns>
+        private static string GetModelsFolder() => Path.Combine(Environment.CurrentDirectory, "models");
     }
 }
