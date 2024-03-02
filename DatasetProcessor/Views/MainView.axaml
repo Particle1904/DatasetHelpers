@@ -32,6 +32,10 @@
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Content_Aware_Crop}"/>
 				<Button Click="Button_Click"
+						Content="Manual Crop"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Manual_Crop}"/>
+				<Button Click="Button_Click"
 						Content="Resize Images"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Resize_Images}"/>

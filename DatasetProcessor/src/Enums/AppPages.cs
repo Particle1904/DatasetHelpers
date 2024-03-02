@@ -5,6 +5,7 @@
         Welcome,
         Sort_Images,
         Content_Aware_Crop,
+        Manual_Crop,
         Resize_Images,
         Tag_Generation,
         Process_Captions,

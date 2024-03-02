@@ -115,8 +115,6 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
             {
                 DetectedPerson? detectedPerson = results.FirstOrDefault();
@@ -189,6 +187,7 @@ namespace SmartData.Lib.Services
                     SkipMetadata = false
                 };
 
+                string fileName = Path.GetFileNameWithoutExtension(inputPath);
                 await resizedImage.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
             }
         }
@@ -447,9 +446,9 @@ namespace SmartData.Lib.Services
         /// The blurred image is then saved as a JPEG image into a new memory stream, which is converted to a byte array and returned as the result.
         /// </para>
         /// </remarks>
-        public async Task<MemoryStream> GetBlurredImageAsync(string imagePath)
+        public async Task<MemoryStream> GetBlurredImageAsync(string inputPath)
         {
-            using (Image image = await Image.LoadAsync(imagePath))
+            using (Image image = await Image.LoadAsync(inputPath))
             {
                 image.Mutate(x => x.GaussianBlur(_blurRadius));
 
@@ -457,6 +456,39 @@ namespace SmartData.Lib.Services
                 image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
 
                 return blurredImageStream;
+            }
+        }
+
+        public async Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition)
+        {
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            {
+                int x = Math.Min(startingPosition.X, endingPosition.X);
+                int y = Math.Min(startingPosition.Y, endingPosition.Y);
+                int width = Math.Abs(startingPosition.X - endingPosition.X);
+                int height = Math.Abs(startingPosition.Y - endingPosition.Y);
+
+                Rectangle cropArea = new Rectangle()
+                {
+                    X = Math.Clamp(x, 0, image.Width),
+                    Y = Math.Clamp(y, 0, image.Height),
+                    Width = Math.Clamp(width, 0, image.Width - x),
+                    Height = Math.Clamp(height, 0, image.Height - y)
+                };
+
+                Image<Rgb24> croppedImage = image.Clone();
+                croppedImage.Mutate(x => x.Crop(cropArea));
+
+                JpegEncoder encoder = new JpegEncoder()
+                {
+                    ColorType = JpegEncodingColor.Rgb,
+                    Interleaved = true,
+                    Quality = 100,
+                    SkipMetadata = false
+                };
+
+                string fileName = Path.GetFileNameWithoutExtension(inputPath);
+                await croppedImage.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
             }
         }
 

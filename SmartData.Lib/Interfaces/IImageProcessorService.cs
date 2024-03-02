@@ -18,7 +18,8 @@ namespace SmartData.Lib.Interfaces
         public Task<WDInputData> ProcessImageForTagPredictionAsync(Stream inputStream);
         public Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath);
         public Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath);
-        public Task<MemoryStream> GetBlurredImageAsync(string imagePath);
+        public Task<MemoryStream> GetBlurredImageAsync(string inputPath);
         public Task<List<string>> ReadImageMetadataAsync(Stream imageStream);
+        public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
     }
 }

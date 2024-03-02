@@ -3,8 +3,8 @@
 	<Design.PreviewWith>
 		<Border Padding="20" Background="Black">
 			<!-- Add Controls for Previewer Here -->
-			<ProgressBar Width="500"
-						 Value="50"/>
+			<Button Classes="emptyButton" Width="200" Height="200"/>
+			
 		</Border>
 	</Design.PreviewWith>
 	
@@ -39,6 +39,20 @@
 		
 		<Style Selector="^:pointerover /template/ ContentPresenter">
 			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
+	
+	<Style Selector="Button.emptyButton">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="Transparent"/>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent"/>
+		</Style>
+		<Style Selector="^:pressed">
+			<Setter Property="RenderTransform" Value="none"/>
 		</Style>
 	</Style>
 	
