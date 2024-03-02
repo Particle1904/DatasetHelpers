@@ -73,7 +73,8 @@
 		</Grid>
 		<!-- IMAGE PANEL -->
 		<Grid Grid.Row="6" Background="Transparent"
-			  ColumnDefinitions="50, 10, Auto, 10, 50">
+			  ColumnDefinitions="50, 10, Auto, 10, 50"
+			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
 			<Grid Grid.Column="0" RowDefinitions="Auto, 10, Auto, 10, Auto"
 				  VerticalAlignment="Center"
