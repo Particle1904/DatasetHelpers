@@ -36,6 +36,8 @@ namespace DatasetProcessor.ViewModels
         private string _selectedImageFilename;
         [ObservableProperty]
         private string _currentAndTotal;
+        [ObservableProperty]
+        private Point _imageSize;
 
         [ObservableProperty]
         private bool _buttonEnabled;
@@ -46,9 +48,6 @@ namespace DatasetProcessor.ViewModels
         private Point _startingPosition;
         [ObservableProperty]
         private Point _endingPosition;
-
-        public EventHandler<Point> ImageChanged;
-        public EventHandler SelectedImageChanged;
 
         public ManualCropViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
@@ -154,7 +153,7 @@ namespace DatasetProcessor.ViewModels
         {
             CurrentAndTotal = $"Currently viewing: {SelectedItemIndex + 1}/{ImageFiles?.Count}.";
             SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles[SelectedItemIndex])}.";
-            ImageChanged?.Invoke(this, new Point((int)value.Size.Width, (int)value.Size.Height));
+            ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
         }
 
         /// <summary>

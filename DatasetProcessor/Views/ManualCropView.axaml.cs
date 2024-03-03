@@ -5,7 +5,6 @@ using Avalonia.Media;
 
 using DatasetProcessor.ViewModels;
 
-using System;
 using System.Drawing;
 
 namespace DatasetProcessor.Views
@@ -109,16 +108,6 @@ namespace DatasetProcessor.Views
         }
 
         /// <summary>
-        /// Overrides the DataContextChanged method to update the associated view model.
-        /// </summary>
-        protected override void OnDataContextChanged(EventArgs e)
-        {
-            _viewModel = (ManualCropViewModel)DataContext;
-            _viewModel.ImageChanged += (sender, args) => ChangeCanvasButtonSize(args);
-            base.OnDataContextChanged(e);
-        }
-
-        /// <summary>
         /// Changes the size of the canvas button.
         /// </summary>
         /// <param name="args">The new size.</param>
@@ -155,6 +144,5 @@ namespace DatasetProcessor.Views
             _lines[3].StartPoint = new Avalonia.Point(_startingPosition.X, _startingPosition.Y);
             _lines[3].EndPoint = new Avalonia.Point(_startingPosition.X, cursorPosition.Y);
         }
-
     }
 }

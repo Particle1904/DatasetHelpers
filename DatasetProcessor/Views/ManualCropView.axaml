@@ -105,7 +105,9 @@
 				  MinWidth="256"
 				  MinHeight="256">
 				<Button Classes="emptyButton"
-						x:Name="CanvasButton"						
+						x:Name="CanvasButton"	
+						Width="{Binding ImageSize.X}"
+						Height="{Binding ImageSize.Y}"
 						PointerPressed="CanvasPressed"
 						PointerReleased="CanvasReleased"
 						PointerMoved="PointerMoving">
