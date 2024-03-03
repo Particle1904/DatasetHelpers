@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -202,7 +203,7 @@ namespace DatasetProcessor.ViewModels
                 {
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        SelectedImage = new Bitmap(ImageFiles[SelectedItemIndex]);
+                        SelectedImage = SelectBitmapInterpolation();
                     });
                 }
             }
@@ -244,7 +245,7 @@ namespace DatasetProcessor.ViewModels
             {
                 if (ImageFiles.Count != 0)
                 {
-                    SelectedImage = new Bitmap(ImageFiles[SelectedItemIndex]);
+                    SelectedImage = SelectBitmapInterpolation();
                 }
                 ButtonEnabled = true;
             }
@@ -307,7 +308,7 @@ namespace DatasetProcessor.ViewModels
             {
                 if (ImageFiles.Count != 0)
                 {
-                    SelectedImage = new Bitmap(ImageFiles[SelectedItemIndex]);
+                    SelectedImage = SelectBitmapInterpolation();
                 }
             }
         }
@@ -351,7 +352,7 @@ namespace DatasetProcessor.ViewModels
             if (ImageFiles?.Count > 0)
             {
                 SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
-                SelectedImage = new Bitmap((ImageFiles[SelectedItemIndex]));
+                SelectedImage = SelectBitmapInterpolation();
             }
             else
             {
@@ -394,6 +395,34 @@ namespace DatasetProcessor.ViewModels
             {
                 Logger.LatestLogMessage = "You need to select a folder with image files!";
             }
+        }
+
+        /// <summary>
+        /// Selects a bitmap with optional interpolation based on the size of the image.
+        /// </summary>
+        /// <returns>The selected bitmap.</returns>
+        private Bitmap SelectBitmapInterpolation()
+        {
+            Bitmap imageBitmap = new Bitmap((ImageFiles[SelectedItemIndex]));
+            if (imageBitmap.PixelSize.Width < 256 || imageBitmap.PixelSize.Height < 256)
+            {
+                double aspectRatio = (double)imageBitmap.PixelSize.Width / imageBitmap.PixelSize.Height;
+                int targetWidth = 512;
+                int targetHeight = 512;
+
+                if (aspectRatio > 1)
+                {
+                    targetHeight = (int)(targetWidth / aspectRatio);
+                }
+                else
+                {
+                    targetWidth = (int)(targetHeight * aspectRatio);
+                }
+
+                imageBitmap = imageBitmap.CreateScaledBitmap(new PixelSize(targetWidth, targetHeight), BitmapInterpolationMode.None);
+            }
+
+            return imageBitmap;
         }
     }
 }
