@@ -31,7 +31,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private int _selectedItemIndex;
         [ObservableProperty]
-        private Bitmap _selectedImage;
+        private Bitmap? _selectedImage;
         [ObservableProperty]
         private string _selectedImageFilename;
         [ObservableProperty]
@@ -62,6 +62,13 @@ namespace DatasetProcessor.ViewModels
 
             StartingPosition = Point.Empty;
             EndingPosition = Point.Empty;
+
+            InputFolderPath = string.Empty;
+            OutputFolderPath = string.Empty;
+            ImageFiles = new List<string>();
+            CurrentAndTotal = string.Empty;
+            SelectedImageFilename = string.Empty;
+            TotalImageFiles = string.Empty;
         }
 
         [RelayCommand]
@@ -149,11 +156,14 @@ namespace DatasetProcessor.ViewModels
         /// <summary>
         /// Handles changes in the SelectedImage property to update the current selected image tags.
         /// </summary>
-        partial void OnSelectedImageChanged(Bitmap value)
+        partial void OnSelectedImageChanged(Bitmap? value)
         {
             CurrentAndTotal = $"Currently viewing: {SelectedItemIndex + 1}/{ImageFiles?.Count}.";
-            SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles[SelectedItemIndex])}.";
-            ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
+            SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles?[SelectedItemIndex])}.";
+            if (value != null)
+            {
+                ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
+            }
         }
 
         /// <summary>
@@ -208,9 +218,12 @@ namespace DatasetProcessor.ViewModels
                 {
                     await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, StartingPosition, EndingPosition);
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
-                    throw;
+                    if (exception.GetType() == typeof(ArgumentOutOfRangeException))
+                    {
+                        Logger.LatestLogMessage = "An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!";
+                    }
                 }
             });
         }

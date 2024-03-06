@@ -22,7 +22,7 @@ namespace DatasetProcessor.Views
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private TimeSpan _highlightUpdateDelay = TimeSpan.FromSeconds(0.75);
 
-        private TagEditorViewModel _viewModel;
+        private TagEditorViewModel? _viewModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagEditorView"/> class.
@@ -38,7 +38,7 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles the TextChanged event of the EditorHighlight control to update tag highlighting.
         /// </summary>
-        private void OnEditorHighlightTextChanged(object sender, TextChangedEventArgs e)
+        private void OnEditorHighlightTextChanged(object? sender, TextChangedEventArgs e)
         {
             if (string.IsNullOrEmpty(EditorHighlight.Text))
             {
@@ -57,7 +57,7 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles the TextChanged event of the EditorTags control to process changes in tags.
         /// </summary>
-        private void OnTextChanged(object sender, EventArgs args)
+        private void OnTextChanged(object? sender, EventArgs args)
         {
             if (_viewModel != null)
             {
@@ -72,10 +72,13 @@ namespace DatasetProcessor.Views
         /// </summary>
         protected override void OnDataContextChanged(EventArgs e)
         {
-            _viewModel = (TagEditorViewModel)DataContext;
-            _viewModel.PropertyChanged += OnTagsPropertyChanged;
+            if (_viewModel != null)
+            {
+                _viewModel = DataContext as TagEditorViewModel;
+                _viewModel!.PropertyChanged += OnTagsPropertyChanged;
 
-            base.OnDataContextChanged(e);
+                base.OnDataContextChanged(e);
+            }
         }
 
         /// <summary>
@@ -104,11 +107,11 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles property changes in the associated view model to update tag text.
         /// </summary>
-        private void OnTagsPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnTagsPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_viewModel.CurrentImageTags))
             {
-                EditorTags.Text = _viewModel.CurrentImageTags;
+                EditorTags.Text = _viewModel?.CurrentImageTags;
             }
         }
     }

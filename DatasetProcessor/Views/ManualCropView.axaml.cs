@@ -5,13 +5,14 @@ using Avalonia.Media;
 
 using DatasetProcessor.ViewModels;
 
+using System;
 using System.Drawing;
 
 namespace DatasetProcessor.Views
 {
     public partial class ManualCropView : UserControl
     {
-        private ManualCropViewModel _viewModel;
+        private ManualCropViewModel? _viewModel;
 
         private bool _isDragging = false;
         private bool _shouldSaveCroppedImage = true;
@@ -49,9 +50,9 @@ namespace DatasetProcessor.Views
                 _startingPosition = new Point((int)clickPosition.X, (int)clickPosition.Y);
                 _viewModel.StartingPosition = new Point((int)clickPosition.X, (int)clickPosition.Y);
                 _isDragging = true;
-            }
 
-            e.Handled = true;
+                e.Handled = true;
+            }
         }
 
         /// <summary>
@@ -102,19 +103,8 @@ namespace DatasetProcessor.Views
                 Avalonia.Point clickPosition = e.GetPosition(sender as Button);
                 _viewModel.EndingPosition = new Point((int)clickPosition.X, (int)clickPosition.Y);
                 _isDragging = false;
+                e.Handled = true;
             }
-
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// Changes the size of the canvas button.
-        /// </summary>
-        /// <param name="args">The new size.</param>
-        private void ChangeCanvasButtonSize(Point args)
-        {
-            CanvasButton.Width = args.X;
-            CanvasButton.Height = args.Y;
         }
 
         /// <summary>
@@ -143,6 +133,15 @@ namespace DatasetProcessor.Views
             // RIGHT LINE
             _lines[3].StartPoint = new Avalonia.Point(_startingPosition.X, _startingPosition.Y);
             _lines[3].EndPoint = new Avalonia.Point(_startingPosition.X, cursorPosition.Y);
+        }
+
+        /// <summary>
+        /// Overrides the DataContextChanged method to update the associated view model.
+        /// </summary>
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            _viewModel = DataContext as ManualCropViewModel;
+            base.OnDataContextChanged(e);
         }
     }
 }
