@@ -60,14 +60,26 @@ namespace SmartData.Lib.Services
             string[] inputColumns = GetInputColumns();
             string[] outputColumns = GetOutputColumns();
 
-            // Try to load in GPU but fall back to CPU.
-            try
+            int[] gpuIdsToTry = new int[] { 0, 1, 2, 3 };
+
+            for (int i = 0; i < gpuIdsToTry.Length; i++)
             {
-                _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath, 1, true);
-            }
-            catch
-            {
-                _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns, inputColumnNames: inputColumns, ModelPath);
+                // Try to load into GPUs 0 and 1; fall back to CPU if both GPUs failed.
+                try
+                {
+                    _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns,
+                            inputColumnNames: inputColumns, ModelPath, i, true);
+                    break;
+                }
+                catch (EntryPointNotFoundException)
+                {
+                    if (i == gpuIdsToTry.Length - 1)
+                    {
+                        // Fall back to CPU if all GPUs failed.
+                        _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns,
+                            inputColumnNames: inputColumns, ModelPath);
+                    }
+                }
             }
 
             IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>annotations</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
