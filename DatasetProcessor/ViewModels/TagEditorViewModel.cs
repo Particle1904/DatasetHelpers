@@ -324,7 +324,6 @@ namespace DatasetProcessor.ViewModels
             if (IsActive)
             {
                 Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
-
             }
         }
 

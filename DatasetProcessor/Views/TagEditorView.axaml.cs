@@ -72,13 +72,10 @@ namespace DatasetProcessor.Views
         /// </summary>
         protected override void OnDataContextChanged(EventArgs e)
         {
-            if (_viewModel != null)
-            {
-                _viewModel = DataContext as TagEditorViewModel;
-                _viewModel!.PropertyChanged += OnTagsPropertyChanged;
+            _viewModel = DataContext as TagEditorViewModel;
+            _viewModel!.PropertyChanged += OnTagsPropertyChanged;
 
-                base.OnDataContextChanged(e);
-            }
+            base.OnDataContextChanged(e);
         }
 
         /// <summary>
@@ -111,7 +108,7 @@ namespace DatasetProcessor.Views
         {
             if (e.PropertyName == nameof(_viewModel.CurrentImageTags))
             {
-                EditorTags.Text = _viewModel?.CurrentImageTags;
+                EditorTags.Text = _viewModel.CurrentImageTags;
             }
         }
     }
