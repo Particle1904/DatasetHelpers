@@ -15,6 +15,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services;
 using SmartData.Lib.Services.MachineLearning;
+
 using System;
 using System.IO;
 
@@ -49,6 +50,7 @@ public partial class App : Application
         var fileManipulator = _servicesProvider.GetRequiredService<IFileManipulatorService>();
         var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
         var wDAutoTagger = _servicesProvider.GetRequiredService<WDAutoTaggerService>();
+        var wDv3AutoTagger = _servicesProvider.GetRequiredService<WDV3AutoTaggerService>();
         var joyTagAutoTagger = _servicesProvider.GetRequiredService<JoyTagAutoTaggerService>();
         var e621AutoTagger = _servicesProvider.GetRequiredService<E621AutoTaggerService>();
         var tagProcessor = _servicesProvider.GetRequiredService<ITagProcessorService>();
@@ -63,8 +65,8 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, e621AutoTagger,
-                    tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -75,8 +77,8 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MainView()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, joyTagAutoTagger, e621AutoTagger,
-                    tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
             };
         }
 
@@ -102,6 +104,12 @@ public partial class App : Application
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, FileNames.WDOnnxFileName),
                 Path.Combine(_modelsPath, FileNames.WDCsvFileName)
+        ));
+        services.AddSingleton<WDV3AutoTaggerService>(service =>
+            new WDV3AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<ITagProcessorService>(),
+                Path.Combine(_modelsPath, FileNames.WDV3OnnxFileName),
+                Path.Combine(_modelsPath, FileNames.WDV3CsvFileName)
         ));
         services.AddSingleton<E621AutoTaggerService>(service =>
             new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),

@@ -1,10 +1,11 @@
 ﻿namespace SmartData.Lib.Enums
 {
-    public enum AvailableModels
+    public enum AvailableModels : byte
     {
         JoyTag,
-        WD_v1_4,
-        Z3D_E621,
-        Yolo_v4
+        WD14v2,
+        WDv3,
+        Z3DE621,
+        Yolov4
     }
 }

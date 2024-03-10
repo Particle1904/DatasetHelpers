@@ -16,6 +16,9 @@ namespace SmartData.Lib.Services
         private readonly string _wdModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdModel.onnx?download=true";
         private readonly string _wdCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdTags.csv?download=true";
 
+        private readonly string _wdv3ModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Model.onnx?download=true";
+        private readonly string _wdv3CsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Tags.csv?download=true";
+
         private readonly string _jtModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
         private readonly string _jtCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
 
@@ -373,19 +376,25 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
-                case AvailableModels.WD_v1_4:
+                case AvailableModels.WD14v2:
                     if (!Path.Exists(FileNames.WDOnnxFileName) || !Path.Exists(FileNames.WDCsvFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.Z3D_E621:
+                case AvailableModels.WDv3:
+                    if (!Path.Exists(FileNames.WDV3OnnxFileName) || !Path.Exists(FileNames.WDV3CsvFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Z3DE621:
                     if (!Path.Exists(FileNames.E621OnnxFileName) || !Path.Exists(FileNames.E621CsvFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.Yolo_v4:
+                case AvailableModels.Yolov4:
                     if (!Path.Exists(FileNames.YoloV4OnnxFileName))
                     {
                         result = true;
@@ -423,19 +432,25 @@ namespace SmartData.Lib.Services
                         csvUrl = _jtCsvDownloadLink;
                         csvFileName = FileNames.JoyTagCsvFileName;
                         break;
-                    case AvailableModels.WD_v1_4:
+                    case AvailableModels.WD14v2:
                         modelUrl = _wdModelDownloadLink;
                         modelFileName = FileNames.WDOnnxFileName;
                         csvUrl = _wdCsvDownloadLink;
                         csvFileName = FileNames.WDCsvFileName;
                         break;
-                    case AvailableModels.Z3D_E621:
+                    case AvailableModels.WDv3:
+                        modelUrl = _wdv3ModelDownloadLink;
+                        modelFileName = FileNames.WDV3OnnxFileName;
+                        csvUrl = _wdv3CsvDownloadLink;
+                        csvFileName = FileNames.WDV3CsvFileName;
+                        break;
+                    case AvailableModels.Z3DE621:
                         modelUrl = _e621ModelDownloadLink;
                         modelFileName = FileNames.E621OnnxFileName;
                         csvUrl = _e621CsvDownloadLink;
                         csvFileName = FileNames.E621CsvFileName;
                         break;
-                    case AvailableModels.Yolo_v4:
+                    case AvailableModels.Yolov4:
                         modelUrl = _yolov4ModelLink;
                         modelFileName = FileNames.YoloV4OnnxFileName;
                         break;

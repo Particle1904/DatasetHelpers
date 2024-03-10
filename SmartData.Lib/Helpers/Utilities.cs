@@ -48,7 +48,7 @@ namespace SmartData.Lib.Helpers
         /// <summary>
         /// Gets an array of supported tag generator models.
         /// </summary>
-        public static TagGeneratorModel[] ModelValues => (TagGeneratorModel[])Enum.GetValues(typeof(TagGeneratorModel));
+        public static AvailableModels[] ModelValues => (AvailableModels[])Enum.GetValues(typeof(AvailableModels));
 
         /// <summary>
         /// Calculates the sigmoid function value for the given input.

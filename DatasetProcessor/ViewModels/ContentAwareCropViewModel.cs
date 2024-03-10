@@ -9,6 +9,7 @@ using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
+
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -152,7 +153,7 @@ namespace DatasetProcessor.ViewModels
             TaskStatus = ProcessingStatus.Running;
             try
             {
-                await DownloadModelFiles(AvailableModels.Yolo_v4);
+                await DownloadModelFiles(AvailableModels.Yolov4);
 
                 _contentAwareCrop.ScoreThreshold = (float)ScoreThreshold;
                 _contentAwareCrop.IouThreshold = (float)IouThreshold;

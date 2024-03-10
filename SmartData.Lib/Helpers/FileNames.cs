@@ -5,6 +5,9 @@
         public const string WDOnnxFileName = "wdModel.onnx";
         public const string WDCsvFileName = "wdTags.csv";
 
+        public const string WDV3OnnxFileName = "wdV3Model.onnx";
+        public const string WDV3CsvFileName = "wdV3Tags.csv";
+
         public const string E621OnnxFileName = "e621Model.onnx";
         public const string E621CsvFileName = "e621Tags.csv";
 

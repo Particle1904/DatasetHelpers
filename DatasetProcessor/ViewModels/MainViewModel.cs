@@ -27,6 +27,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IFileManipulatorService _fileManipulator;
     protected readonly IImageProcessorService _imageProcessor;
     protected readonly IAutoTaggerService _wDAutoTagger;
+    protected readonly IAutoTaggerService _wDv3AutoTagger;
     protected readonly IAutoTaggerService _joyTagAutoTagger;
     protected readonly IAutoTaggerService _e621AutoTagger;
     protected readonly ITagProcessorService _tagProcessor;
@@ -65,6 +66,7 @@ public partial class MainViewModel : BaseViewModel
     public MainViewModel(IFileManipulatorService fileManipulator,
                          IImageProcessorService imageProcessor,
                          WDAutoTaggerService wDAutoTagger,
+                         WDV3AutoTaggerService wDv3AutoTagger,
                          JoyTagAutoTaggerService joyTagAutoTagger,
                          E621AutoTaggerService e621AutoTagger,
                          ITagProcessorService tagProcessor,
@@ -78,6 +80,7 @@ public partial class MainViewModel : BaseViewModel
         _fileManipulator = fileManipulator;
         _imageProcessor = imageProcessor;
         _wDAutoTagger = wDAutoTagger;
+        _wDv3AutoTagger = wDv3AutoTagger;
         _joyTagAutoTagger = joyTagAutoTagger;
         _e621AutoTagger = e621AutoTagger;
         _tagProcessor = tagProcessor;
@@ -95,7 +98,7 @@ public partial class MainViewModel : BaseViewModel
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Manual_Crop, new ManualCropView() { DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)} },
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, joyTagAutoTagger, e621AutoTagger, logger, configs) }},
+            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger, e621AutoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},

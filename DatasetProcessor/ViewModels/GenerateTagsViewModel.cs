@@ -21,6 +21,7 @@ namespace DatasetProcessor.ViewModels
     {
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IAutoTaggerService _wDAutoTagger;
+        private readonly IAutoTaggerService _wDv3AutoTagger;
         private readonly IAutoTaggerService _joyTagAutoTagger;
         private readonly IAutoTaggerService _e621AutoTagger;
 
@@ -31,7 +32,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private Progress _predictionProgress;
         [ObservableProperty]
-        private TagGeneratorModel _generatorModel;
+        private AvailableModels _generatorModel;
         [ObservableProperty]
         private double _threshold;
 
@@ -48,8 +49,8 @@ namespace DatasetProcessor.ViewModels
         private bool _isUiEnabled;
 
         public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDAutoTagger,
-            JoyTagAutoTaggerService joyTagAutoTagger, E621AutoTaggerService e621AutoTagger,
-            ILoggerService logger, IConfigsService configs) : base(logger, configs)
+            WDV3AutoTaggerService wDV3AutoTagger, JoyTagAutoTaggerService joyTagAutoTagger,
+            E621AutoTaggerService e621AutoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
             _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args, LogMessageColor.Informational);
@@ -61,6 +62,14 @@ namespace DatasetProcessor.ViewModels
                 PredictionProgress.TotalFiles = args;
             };
             (_wDAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+
+            _wDv3AutoTagger = wDV3AutoTagger;
+            (_wDv3AutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                PredictionProgress = ResetProgress(PredictionProgress);
+                PredictionProgress.TotalFiles = args;
+            };
+            (_wDv3AutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             _joyTagAutoTagger = joyTagAutoTagger;
             (_joyTagAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -83,7 +92,7 @@ namespace DatasetProcessor.ViewModels
             OutputFolderPath = _configs.Configurations.CombinedOutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
 
-            GeneratorModel = TagGeneratorModel.JoyTag;
+            GeneratorModel = AvailableModels.JoyTag;
             Threshold = _configs.Configurations.TaggerThreshold;
 
             WeightedCaptions = false;
@@ -135,16 +144,20 @@ namespace DatasetProcessor.ViewModels
             {
                 switch (GeneratorModel)
                 {
-                    case TagGeneratorModel.JoyTag:
+                    case AvailableModels.JoyTag:
                         await DownloadModelFiles(AvailableModels.JoyTag);
                         await CallAutoTaggerService(_joyTagAutoTagger);
                         break;
-                    case TagGeneratorModel.WDv14:
-                        await DownloadModelFiles(AvailableModels.WD_v1_4);
+                    case AvailableModels.WD14v2:
+                        await DownloadModelFiles(AvailableModels.WD14v2);
                         await CallAutoTaggerService(_wDAutoTagger);
                         break;
-                    case TagGeneratorModel.Z3DE621:
-                        await DownloadModelFiles(AvailableModels.Z3D_E621);
+                    case AvailableModels.WDv3:
+                        await DownloadModelFiles(AvailableModels.WDv3);
+                        await CallAutoTaggerService(_wDv3AutoTagger);
+                        break;
+                    case AvailableModels.Z3DE621:
+                        await DownloadModelFiles(AvailableModels.Z3DE621);
                         await CallAutoTaggerService(_e621AutoTagger);
                         break;
                     default:
