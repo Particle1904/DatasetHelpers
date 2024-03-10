@@ -90,7 +90,7 @@ public partial class MainViewModel : BaseViewModel
         _views = new Dictionary<AppPages, UserControl>()
         {
             { AppPages.Welcome, new WelcomeView() { DataContext = new WelcomeViewModel(logger, configs) }},
-            { AppPages.Galery, new GaleryView() { DataContext = new GaleryViewModel(fileManipulator, logger, configs)} },
+            { AppPages.Gallery, new GalleryView() { DataContext = new GalleryViewModel(fileManipulator, logger, configs)} },
             { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Manual_Crop, new ManualCropView() { DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)} },

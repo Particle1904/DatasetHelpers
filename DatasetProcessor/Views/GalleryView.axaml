@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="1024"
-             x:Class="DatasetProcessor.Views.GaleryView"
+             x:Class="DatasetProcessor.Views.GalleryView"
 			 Background="{DynamicResource SecondarySurfaceDark}"
-             x:DataType="vm:GaleryViewModel">
+             x:DataType="vm:GalleryViewModel">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
@@ -41,7 +41,7 @@
 			</Button>
 		</Grid>
 		
-		<!-- GALERY -->
+		<!-- GALLERY -->
 		<ScrollViewer Grid.Row="2"
 				      Background="{DynamicResource SurfaceDark}"
 					  Height="576"
@@ -105,7 +105,7 @@
 			</Panel>
 			<!-- CURRENTLY PROCESSING -->
 			<Label Grid.Row="4"
-				   Content="{Binding GaleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+				   Content="{Binding GalleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 			<!-- ELAPSED TIME -->
 			<Label Grid.Row="6"
 				   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
@@ -117,7 +117,7 @@
 					Command="{Binding DeleteSelectedImagesCommand}"/>
 			<!-- PROGRESS BAR -->
 			<ProgressBar Grid.Row="10"
-						 Value="{Binding GaleryProcessingProgress.PercentComplete}"/>
+						 Value="{Binding GalleryProcessingProgress.PercentComplete}"/>
 			<!-- TASK STATUS -->
 			<Label Grid.Row="12"
 				   FontSize="22"

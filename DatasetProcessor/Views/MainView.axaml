@@ -24,9 +24,9 @@
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Welcome}"/>
 				<Button Click="Button_Click"
-						Content="Galery Page"
+						Content="Gallery Page"
 						Command="{Binding NavigateToPageCommand}"
-						CommandParameter="{x:Static local:AppPages.Galery}"/>
+						CommandParameter="{x:Static local:AppPages.Gallery}"/>
 				<Button Click="Button_Click"
 						Content="Sort Images"
 						Command="{Binding NavigateToPageCommand}"

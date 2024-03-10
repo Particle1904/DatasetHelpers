@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class GaleryViewModel : BaseViewModel
+    public partial class GalleryViewModel : BaseViewModel
     {
         private const int MaximumNumberOfImages = 2500;
 
@@ -43,14 +43,14 @@ namespace DatasetProcessor.ViewModels
         private string _maxImageSizeString;
 
         [ObservableProperty]
-        Progress _galeryProcessingProgress;
+        Progress _galleryProcessingProgress;
         [ObservableProperty]
         private bool _isUiEnabled;
 
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
 
-        public GaleryViewModel(IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public GalleryViewModel(IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
 
@@ -59,10 +59,10 @@ namespace DatasetProcessor.ViewModels
 
             (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
-                GaleryProcessingProgress = ResetProgress(GaleryProcessingProgress);
-                GaleryProcessingProgress.TotalFiles = args;
+                GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
+                GalleryProcessingProgress.TotalFiles = args;
             };
-            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => GaleryProcessingProgress.UpdateProgress();
+            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => GalleryProcessingProgress.UpdateProgress();
 
             MaxImageSize = 380;
             IsUiEnabled = true;
@@ -91,7 +91,7 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            GaleryProcessingProgress = ResetProgress(GaleryProcessingProgress);
+            GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
 
             _timer.Reset();
             _timer.Start();
@@ -107,7 +107,7 @@ namespace DatasetProcessor.ViewModels
             {
                 // Get images with path
                 List<string> imageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
-                GaleryProcessingProgress.TotalFiles = imageFiles.Count;
+                GalleryProcessingProgress.TotalFiles = imageFiles.Count;
                 if (imageFiles.Count != 0)
                 {
                     if (imageFiles.Count > MaximumNumberOfImages)
@@ -131,7 +131,7 @@ namespace DatasetProcessor.ViewModels
                                 Bitmap = new Bitmap(ImageFilesPath[i])
                             };
                             imageItems.Add(item);
-                            GaleryProcessingProgress.UpdateProgress();
+                            GalleryProcessingProgress.UpdateProgress();
                         }
                     });
 
@@ -170,7 +170,7 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            GaleryProcessingProgress = ResetProgress(GaleryProcessingProgress);
+            GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
 
             _timer.Reset();
             _timer.Start();
@@ -202,7 +202,7 @@ namespace DatasetProcessor.ViewModels
                 timer.Stop();
                 _timer.Stop();
 
-                // Clear the galery and load the images again
+                // Clear the gallery and load the images again
                 ImageCollection.Clear();
                 SelectedImageItems.Clear();
                 await LoadImagesFromInputFolder();

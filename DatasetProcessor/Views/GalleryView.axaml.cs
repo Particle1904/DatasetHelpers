@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace DatasetProcessor.Views
 {
-    public partial class GaleryView : UserControl
+    public partial class GalleryView : UserControl
     {
-        public GaleryView()
+        public GalleryView()
         {
             InitializeComponent();
         }

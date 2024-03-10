@@ -63,6 +63,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\GalleryView.axaml.cs">
+      <DependentUpon>GalleryView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\MainView.axaml.cs">
       <DependentUpon>MainView.axaml</DependentUpon>
     </Compile>
