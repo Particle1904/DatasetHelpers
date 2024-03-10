@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class SortImagesViewModel : ViewModelBase
+    public partial class SortImagesViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
 
@@ -49,6 +49,13 @@ namespace DatasetProcessor.ViewModels
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
             BackupFolderPath = _configs.Configurations.BackupFolder;
             _fileManipulator.CreateFolderIfNotExist(BackupFolderPath);
+
+            (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                SortProgress = ResetProgress(SortProgress);
+                SortProgress.TotalFiles = args;
+            };
+            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => SortProgress.UpdateProgress();
 
             Dimension = SupportedDimensions.Resolution512x512;
             BackupImages = false;

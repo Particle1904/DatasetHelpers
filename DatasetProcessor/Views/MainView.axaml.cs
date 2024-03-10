@@ -5,7 +5,9 @@ using Avalonia.Media.Immutable;
 using Avalonia.Platform.Storage;
 
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services;
+using SmartData.Lib.Services.MachineLearning;
 
 using System;
 using System.IO;

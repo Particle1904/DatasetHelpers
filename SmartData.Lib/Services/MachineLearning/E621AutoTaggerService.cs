@@ -1,6 +1,6 @@
 ﻿using SmartData.Lib.Interfaces;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.MachineLearning
 {
     public class E621AutoTaggerService : WDAutoTaggerService
     {

@@ -12,8 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services;
-
+using SmartData.Lib.Services.MachineLearning;
 using System;
 using System.IO;
 

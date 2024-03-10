@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ResizeImagesViewModel : ViewModelBase
+    public partial class ResizeImagesViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
         private readonly IFileManipulatorService _fileManipulator;
@@ -168,6 +168,16 @@ namespace DatasetProcessor.ViewModels
 
             _timer.Stop();
             timer.Stop();
+        }
+
+        partial void OnLanczosRadiusChanged(double value)
+        {
+            LanczosRadius = Math.Round(value, 2);
+        }
+
+        partial void OnSharpenSigmaChanged(double value)
+        {
+            SharpenSigma = Math.Round(value, 2);
         }
     }
 }

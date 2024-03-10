@@ -19,7 +19,7 @@ namespace DatasetProcessor.ViewModels
     /// <summary>
     /// View model for the Tag Editor, responsible for managing image tags and text editing.
     /// </summary>
-    public partial class TagEditorViewModel : ViewModelBase
+    public partial class TagEditorViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
@@ -90,7 +90,7 @@ namespace DatasetProcessor.ViewModels
             _inputHooks = inputHooks;
             _random = new Random();
 
-            InputFolderPath = _configs.Configurations.CombinedOutputFolder;
+            InputFolderPath = Configs.Configurations.CombinedOutputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
 
             ButtonEnabled = true;

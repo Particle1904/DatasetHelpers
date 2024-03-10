@@ -5,7 +5,6 @@
 			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
              x:Class="DatasetProcessor.Views.ProcessCaptionsView"
-			 x:DataType="vm:SortImagesViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />

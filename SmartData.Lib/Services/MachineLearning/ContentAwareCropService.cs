@@ -1,11 +1,12 @@
 ﻿using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models;
-
+using SmartData.Lib.Interfaces.MachineLearning;
+using SmartData.Lib.Models.MachineLearning;
+using SmartData.Lib.Services.Base;
 using System.Diagnostics;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.MachineLearning
 {
     public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService, INotifyProgress
     {
@@ -15,7 +16,7 @@ namespace SmartData.Lib.Services
         /// Gets or sets the threshold value for this object. The threshold value determines the cutoff point for certain calculations.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Single"/> value between 0.0 and 1.0, inclusive.
+        /// A <see cref="float"/> value between 0.0 and 1.0, inclusive.
         /// </value>
         /// <remarks>
         /// The <see cref="ScoreThreshold"/> value must be a floating-point value between 0.0 and 1.0. Values outside this range will be clamped to the nearest valid value. 
@@ -34,7 +35,7 @@ namespace SmartData.Lib.Services
         /// Gets or sets the threshold value for this object. The threshold value determines the cutoff point for certain calculations.
         /// </summary>
         /// <value>
-        /// A <see cref="System.Single"/> value between 0.0 and 1.0, inclusive.
+        /// A <see cref="float"/> value between 0.0 and 1.0, inclusive.
         /// </value>
         /// <remarks>
         /// The <see cref="ScoreThreshold"/> value must be a floating-point value between 0.0 and 1.0. Values outside this range will be clamped to the nearest valid value. 
@@ -53,7 +54,7 @@ namespace SmartData.Lib.Services
         /// Gets or sets the expansion percentage value for this object. The threshold value determines how much the Bounding Box should be expanded (in %).
         /// </summary>
         /// <value>
-        /// A <see cref="System.Single"/> value between 0.1 and 1.0, inclusive.
+        /// A <see cref="float"/> value between 0.1 and 1.0, inclusive.
         /// </value>
         /// <remarks>
         /// The <see cref="ScoreThreshold"/> value must be a floating-point value between 0.1 and 1.0. Values outside this range will be clamped to the nearest valid value. 
@@ -240,7 +241,7 @@ namespace SmartData.Lib.Services
                     {
                         for (int a = 0; a < _anchors.Length; a++)
                         {
-                            var offset = (boxY * outputSize * (classesCount + 5) * _anchors.Length) + (boxX * (classesCount + 5) * _anchors.Length) + a * (classesCount + 5);
+                            var offset = boxY * outputSize * (classesCount + 5) * _anchors.Length + boxX * (classesCount + 5) * _anchors.Length + a * (classesCount + 5);
                             var predictionBoundingBox = prediction.Skip(offset).Take(classesCount + 5).ToArray();
 
                             var boundingBoxXYWH = predictionBoundingBox.Take(4).ToArray();
@@ -252,8 +253,8 @@ namespace SmartData.Lib.Services
                             var deltaWidth = boundingBoxXYWH[2];
                             var deltaHeight = boundingBoxXYWH[3];
 
-                            float centerX = ((Utilities.Sigmoid(deltaX) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxX) * _strides[i];
-                            float centerY = ((Utilities.Sigmoid(deltaY) * _xyScale[i]) - 0.5f * (_xyScale[i] - 1) + boxY) * _strides[i];
+                            float centerX = (Utilities.Sigmoid(deltaX) * _xyScale[i] - 0.5f * (_xyScale[i] - 1) + boxX) * _strides[i];
+                            float centerY = (Utilities.Sigmoid(deltaY) * _xyScale[i] - 0.5f * (_xyScale[i] - 1) + boxY) * _strides[i];
                             float width = (float)Math.Exp(deltaWidth) * _anchors[i][a][0];
                             float height = (float)Math.Exp(deltaHeight) * _anchors[i][a][1];
 

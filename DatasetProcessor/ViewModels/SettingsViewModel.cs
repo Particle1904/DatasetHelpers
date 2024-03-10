@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class SettingsViewModel : ViewModelBase
+    public partial class SettingsViewModel : BaseViewModel
     {
         [ObservableProperty]
         private double _taggerThreshold;

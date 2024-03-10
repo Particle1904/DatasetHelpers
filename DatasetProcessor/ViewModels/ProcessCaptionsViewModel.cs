@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ProcessCaptionsViewModel : ViewModelBase
+    public partial class ProcessCaptionsViewModel : BaseViewModel
     {
         private readonly ITagProcessorService _tagProcessor;
         private readonly IFileManipulatorService _fileManipulator;

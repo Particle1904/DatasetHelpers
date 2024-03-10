@@ -1,4 +1,4 @@
-﻿namespace SmartData.Lib.Interfaces
+﻿namespace SmartData.Lib.Interfaces.MachineLearning
 {
     public interface IAutoTaggerService
     {

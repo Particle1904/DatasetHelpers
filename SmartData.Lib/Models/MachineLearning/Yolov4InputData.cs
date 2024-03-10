@@ -1,6 +1,6 @@
 ﻿using Microsoft.ML.Data;
 
-namespace SmartData.Lib.Models
+namespace SmartData.Lib.Models.MachineLearning
 {
     public class Yolov4InputData
     {

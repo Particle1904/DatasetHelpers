@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ExtractSubsetViewModel : ViewModelBase
+    public partial class ExtractSubsetViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
 

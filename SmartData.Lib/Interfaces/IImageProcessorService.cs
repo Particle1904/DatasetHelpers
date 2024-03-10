@@ -1,7 +1,7 @@
 ﻿// Ignore Spelling: Lanczos
 
 using SmartData.Lib.Enums;
-using SmartData.Lib.Models;
+using SmartData.Lib.Models.MachineLearning;
 
 namespace SmartData.Lib.Interfaces
 {

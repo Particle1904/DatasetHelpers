@@ -3,7 +3,7 @@ using Microsoft.ML.Transforms.Onnx;
 
 using SmartData.Lib.Interfaces;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.Base
 {
     public abstract class BaseAIConsumer<TInput, TOutput>
         where TInput : class

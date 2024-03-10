@@ -11,7 +11,7 @@ using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models;
+using SmartData.Lib.Models.MachineLearning;
 
 namespace SmartData.Lib.Services
 {
@@ -201,7 +201,7 @@ namespace SmartData.Lib.Services
         /// <remarks>
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
-        /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath, outputPath, or progress parameter is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath or outputPath is null.</exception>
         public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);

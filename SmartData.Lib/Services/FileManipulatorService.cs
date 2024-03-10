@@ -643,5 +643,52 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <returns>The folder path for model storage.</returns>
         private static string GetModelsFolder() => Path.Combine(Environment.CurrentDirectory, "models");
+
+        /// <summary>
+        /// Asynchronously deletes the specified image files from the input folder.
+        /// </summary>
+        /// <param name="inputPath">The path of the input folder containing the image files.</param>
+        /// <param name="imageFiles">The list of image file names to delete.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentException">Thrown when no image files are selected for deletion.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the input folder path is null or empty.</exception>
+        public async Task DeleteFilesAsync(string inputPath, List<string> imageFiles)
+        {
+            if (imageFiles.Count <= 0)
+            {
+                throw new ArgumentException($"Please select at least one image for deletion!");
+            }
+
+            if (string.IsNullOrEmpty(inputPath))
+            {
+                throw new ArgumentNullException($"Please select an input folder!");
+            }
+
+            TotalFilesChanged?.Invoke(this, imageFiles.Count);
+            foreach (string image in imageFiles)
+            {
+                string fullPath = Path.Combine(inputPath, image);
+
+                if (File.Exists(fullPath))
+                {
+                    await Task.Run(() => File.Delete(fullPath));
+
+                    // Also try to delete any related .txt
+                    string txtFile = Path.ChangeExtension(fullPath, ".txt");
+                    if (File.Exists(txtFile))
+                    {
+                        await Task.Run(() => File.Delete(txtFile));
+                    }
+                    // And try to delete any related .caption
+                    string captionFile = Path.ChangeExtension(fullPath, ".caption");
+                    if (File.Exists(captionFile))
+                    {
+                        await Task.Run(() => File.Delete(captionFile));
+                    }
+
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
     }
 }

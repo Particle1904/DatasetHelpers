@@ -1,4 +1,4 @@
-﻿namespace SmartData.Lib.Models
+﻿namespace SmartData.Lib.Models.MachineLearning
 {
     public class DetectedPerson
     {

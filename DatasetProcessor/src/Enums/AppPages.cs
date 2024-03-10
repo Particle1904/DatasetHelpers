@@ -3,6 +3,7 @@
     public enum AppPages : byte
     {
         Welcome,
+        Galery,
         Sort_Images,
         Content_Aware_Crop,
         Manual_Crop,

@@ -10,7 +10,8 @@ using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Services;
+using SmartData.Lib.Interfaces.MachineLearning;
+using SmartData.Lib.Services.MachineLearning;
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,7 @@ namespace DatasetProcessor.ViewModels;
 /// <summary>
 /// The view model that controls the main application logic and navigation.
 /// </summary>
-public partial class MainViewModel : ViewModelBase
+public partial class MainViewModel : BaseViewModel
 {
     protected readonly IFileManipulatorService _fileManipulator;
     protected readonly IImageProcessorService _imageProcessor;
@@ -89,6 +90,7 @@ public partial class MainViewModel : ViewModelBase
         _views = new Dictionary<AppPages, UserControl>()
         {
             { AppPages.Welcome, new WelcomeView() { DataContext = new WelcomeViewModel(logger, configs) }},
+            { AppPages.Galery, new GaleryView() { DataContext = new GaleryViewModel(fileManipulator, logger, configs)} },
             { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Manual_Crop, new ManualCropView() { DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)} },
@@ -153,7 +155,7 @@ public partial class MainViewModel : ViewModelBase
         Initialize(clipboard, storageProvider);
         foreach (KeyValuePair<AppPages, UserControl> view in _views)
         {
-            (view.Value.DataContext as ViewModelBase).Initialize(clipboard, storageProvider);
+            (view.Value.DataContext as BaseViewModel).Initialize(clipboard, storageProvider);
         }
     }
 
@@ -164,7 +166,7 @@ public partial class MainViewModel : ViewModelBase
     {
         foreach (var item in _views)
         {
-            ViewModelBase bindingContext = (ViewModelBase)item.Value.DataContext;
+            BaseViewModel bindingContext = (BaseViewModel)item.Value.DataContext;
             if (bindingContext != null)
             {
                 bindingContext.IsActive = false;
@@ -178,7 +180,7 @@ public partial class MainViewModel : ViewModelBase
     /// <param name="view">The target view to set as active.</param>
     private void SetViewAsActive(AppPages view)
     {
-        ViewModelBase bindingContext = (ViewModelBase)_views[view].DataContext;
+        BaseViewModel bindingContext = (BaseViewModel)_views[view].DataContext;
         if (bindingContext != null)
         {
             bindingContext.IsActive = true;

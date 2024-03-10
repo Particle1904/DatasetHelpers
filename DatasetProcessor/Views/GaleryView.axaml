@@ -1,0 +1,128 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="1024"
+             x:Class="DatasetProcessor.Views.GaleryView"
+			 Background="{DynamicResource SecondarySurfaceDark}"
+             x:DataType="vm:GaleryViewModel">
+	<Design.DesignStyle>
+		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
+	</Design.DesignStyle>
+	<Grid RowDefinitions="Auto, 10, Auto, Auto, Auto"
+		  Background="Transparent"
+		  Margin="0, 0, 14, 0">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" 
+			  Grid.Row="0" 
+			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		
+		<!-- GALERY -->
+		<ScrollViewer Grid.Row="2"
+				      Background="{DynamicResource SurfaceDark}"
+					  Height="576"
+					  MaxHeight="1024"
+					  VerticalScrollBarVisibility="Visible">
+			<ListBox Background="Transparent"
+					 SelectionMode="Toggle,Multiple"
+					 ItemsSource="{Binding ImageCollection}"
+					 HorizontalAlignment="Center"
+					 MinHeight="512"
+					 SelectedItems="{Binding SelectedImageItems}">
+				<ListBox.ItemsPanel>
+					<ItemsPanelTemplate>
+						<WrapPanel Orientation="Horizontal"
+								   ClipToBounds="True"
+								   ItemWidth="{Binding MaxImageSize}"
+								   ItemHeight="{Binding MaxImageSize}"/>
+					</ItemsPanelTemplate>
+				</ListBox.ItemsPanel>
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Spacing="4"
+									ClipToBounds="True">
+							<TextBlock Text="{Binding FileName}"
+									   HorizontalAlignment="Center"
+									   FontSize="16"/>
+							<Image Source="{Binding Bitmap}"
+								   Stretch="Uniform"
+								   StretchDirection="DownOnly"/>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</ScrollViewer>
+
+		<!-- DISPLAY SIZE SLIDER -->
+		<Grid Grid.Row="3"
+			  Margin="0, -1, 0, 0"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 10, 1*, 10, Auto, Auto"
+			  Background="{DynamicResource SurfaceDark}">
+
+			<Label Grid.Column="3"
+				   Content="Image display size:"
+				   HorizontalAlignment="Right"/>
+			<Slider Grid.Column="5"
+					Value="{Binding MaxImageSize}"
+					Minimum="256"
+					Maximum="576"/>
+			<Label Content="{Binding MaxImageSizeString}"
+				   Grid.Column="7"/>
+		</Grid>
+		
+		<!-- DELETE BUTTON AND NOTE -->
+		<Grid Grid.Row="5"
+			  RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto">
+			<Separator Grid.Row="0"/>
+			<Panel Grid.Row="2" Height="26"
+				   Background="{DynamicResource SurfaceLighterDark}">
+				<Label Foreground="{DynamicResource SecondaryLight}"
+					   Content="Note: This is a destructive operation! Always backup your files!"/>
+			</Panel>
+			<!-- CURRENTLY PROCESSING -->
+			<Label Grid.Row="4"
+				   Content="{Binding GaleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+			<!-- ELAPSED TIME -->
+			<Label Grid.Row="6"
+				   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+			<!-- PROCESS BUTTON -->
+			<Button Grid.Row="8"
+					Width="200"
+					Content="Delete selected images"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding DeleteSelectedImagesCommand}"/>
+			<!-- PROGRESS BAR -->
+			<ProgressBar Grid.Row="10"
+						 Value="{Binding GaleryProcessingProgress.PercentComplete}"/>
+			<!-- TASK STATUS -->
+			<Label Grid.Row="12"
+				   FontSize="22"
+				   Foreground="{DynamicResource Secondary}"
+				   Content="{Binding TaskStatusString}"/>
+		</Grid>
+	</Grid>
+</UserControl>

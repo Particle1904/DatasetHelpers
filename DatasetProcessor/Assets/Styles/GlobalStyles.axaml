@@ -154,4 +154,11 @@
 		<Setter Property="Foreground" Value="{DynamicResource Primary}"/>
 		<Setter Property="MaxWidth" Value="500"/>
 	</Style>
+
+	<!-- LISTBOXITEM -->
+	<Style Selector="ListBoxItem">
+		<Style Selector="^:selected /template/ ContentPresenter">
+			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
+		</Style>
+	</Style>
 </Styles>

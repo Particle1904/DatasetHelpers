@@ -8,14 +8,14 @@ using DatasetProcessor.src.Enums;
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-
+using SmartData.Lib.Interfaces.MachineLearning;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ContentAwareCropViewModel : ViewModelBase
+    public partial class ContentAwareCropViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IContentAwareCropService _contentAwareCrop;

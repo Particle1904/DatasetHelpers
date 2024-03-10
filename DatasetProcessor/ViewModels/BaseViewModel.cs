@@ -21,7 +21,7 @@ namespace DatasetProcessor.ViewModels;
 /// <summary>
 /// The base view model class that provides common functionality for view models.
 /// </summary>
-public partial class ViewModelBase : ObservableObject
+public partial class BaseViewModel : ObservableObject
 {
     [ObservableProperty]
     protected ILoggerService _logger;
@@ -76,7 +76,7 @@ public partial class ViewModelBase : ObservableObject
     /// </summary>
     /// <param name="logger">The logger service for logging messages.</param>
     /// <param name="configs">The configuration service for application settings.</param>
-    public ViewModelBase(ILoggerService logger,
+    public BaseViewModel(ILoggerService logger,
                          IConfigsService configs)
     {
         _logger = logger;

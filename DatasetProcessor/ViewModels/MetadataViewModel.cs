@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
-
+using SmartData.Lib.Interfaces.MachineLearning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class MetadataViewModel : ViewModelBase
+    public partial class MetadataViewModel : BaseViewModel
     {
         private const string _dragAndDropPath = @"avares://DatasetProcessor/Assets/Images/drag_and_drop.png";
         private readonly IImageProcessorService _imageProcessor;

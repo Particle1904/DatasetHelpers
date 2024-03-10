@@ -8,7 +8,8 @@ using DatasetProcessor.src.Enums;
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Services;
+using SmartData.Lib.Interfaces.MachineLearning;
+using SmartData.Lib.Services.MachineLearning;
 
 using System;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class GenerateTagsViewModel : ViewModelBase
+    public partial class GenerateTagsViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IAutoTaggerService _wDAutoTagger;
@@ -152,6 +153,7 @@ namespace DatasetProcessor.ViewModels
                         break;
                 }
 
+                // Stop dispatcher timer.
                 timer.Stop();
             }
             catch (Exception exception)
@@ -166,8 +168,8 @@ namespace DatasetProcessor.ViewModels
                 TaskStatus = ProcessingStatus.Finished;
             }
 
+            // Stop elapsed timer
             _timer.Stop();
-            timer.Stop();
         }
 
         private async Task DownloadModelFiles(AvailableModels model)

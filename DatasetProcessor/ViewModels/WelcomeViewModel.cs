@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class WelcomeViewModel : ViewModelBase
+    public partial class WelcomeViewModel : BaseViewModel
     {
         private const string _repoWebAddress = $@"https://github.com/Particle1904/DatasetHelpers";
         public string RepoWebAddress => _repoWebAddress;

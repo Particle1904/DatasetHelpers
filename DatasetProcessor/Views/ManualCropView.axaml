@@ -60,6 +60,7 @@
 				</Panel>
 			</Button>
 		</Grid>
+		
 		<!-- CURRENT FILE INFORMATION PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="4"
 			  ColumnDefinitions="1*, 10, 1*, 10, 1*"
@@ -71,6 +72,7 @@
 			<Label Grid.Column="4"
 				   Content="{Binding TotalImageFiles}"/>
 		</Grid>
+		
 		<!-- IMAGE PANEL -->
 		<Grid Grid.Row="6" Background="Transparent"
 			  ColumnDefinitions="50, 10, Auto, 10, 50"

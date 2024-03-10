@@ -1,9 +1,9 @@
 ﻿using Microsoft.ML.Data;
-
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Interfaces.MachineLearning;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.Base
 {
     public abstract class BaseAutoTaggerService<TInput, TOutput> : BaseAIConsumer<TInput, TOutput>, IAutoTaggerService,
             INotifyProgress

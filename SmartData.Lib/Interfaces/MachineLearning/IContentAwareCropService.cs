@@ -1,6 +1,6 @@
 ﻿using SmartData.Lib.Enums;
 
-namespace SmartData.Lib.Interfaces
+namespace SmartData.Lib.Interfaces.MachineLearning
 {
     public interface IContentAwareCropService
     {

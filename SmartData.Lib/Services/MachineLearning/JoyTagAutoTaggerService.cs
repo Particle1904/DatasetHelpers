@@ -1,10 +1,10 @@
 ﻿using Microsoft.ML.Data;
-
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models;
+using SmartData.Lib.Models.MachineLearning;
+using SmartData.Lib.Services.Base;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.MachineLearning
 {
     /// <summary>
     /// Service for generating tags for image files using a machine learning model and managing tag-related operations.

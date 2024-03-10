@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ManualCropViewModel : ViewModelBase
+    public partial class ManualCropViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
         private readonly IFileManipulatorService _fileManipulator;

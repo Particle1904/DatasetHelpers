@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class DatasetPromptGeneratorViewModel : ViewModelBase
+    public partial class DatasetPromptGeneratorViewModel : BaseViewModel
     {
         private const string _invalidMinPromptsNumberMessage = "Amount of Prompts needs to be a number between 10 and 65535.";
 
