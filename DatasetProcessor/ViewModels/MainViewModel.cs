@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input.Platform;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -44,6 +45,9 @@ public partial class MainViewModel : ViewModelBase
     {
         get => Logger.LatestLogMessage;
     }
+
+    [ObservableProperty]
+    private SolidColorBrush _logMessageColor;
 
     /// <summary>
     /// Initializes a new instance of the MainViewModel class.
@@ -201,6 +205,29 @@ public partial class MainViewModel : ViewModelBase
         if (args.PropertyName == nameof(ILoggerService.LatestLogMessage))
         {
             OnPropertyChanged(nameof(LatestLogMessage));
+        }
+
+        if (args.PropertyName == nameof(ILoggerService.MessageColor))
+        {
+            ILoggerService loggerService = (sender as ILoggerService);
+
+            switch (loggerService.MessageColor)
+            {
+                case SmartData.Lib.Enums.LogMessageColor.Error:
+                    LogMessageColor = new SolidColorBrush(Colors.IndianRed);
+                    break;
+                case SmartData.Lib.Enums.LogMessageColor.Warning:
+                    LogMessageColor = new SolidColorBrush(Colors.Yellow);
+                    break;
+                case SmartData.Lib.Enums.LogMessageColor.Informational:
+                    LogMessageColor = new SolidColorBrush(Colors.LightGreen);
+                    break;
+                default:
+                    LogMessageColor = new SolidColorBrush(Colors.IndianRed);
+                    break;
+            }
+
+            OnPropertyChanged(nameof(LogMessageColor));
         }
     }
 }

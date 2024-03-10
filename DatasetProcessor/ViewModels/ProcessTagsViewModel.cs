@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -58,11 +59,12 @@ namespace DatasetProcessor.ViewModels
                     int parsedValue = int.Parse(value);
                     if (parsedValue <= 0 || parsedValue > int.MaxValue)
                     {
-                        Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!";
+                        Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
+                            LogMessageColor.Warning);
                     }
                     else
                     {
-                        Logger.LatestLogMessage = string.Empty;
+                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
                     }
 
                     _startingNumberForFileNames = parsedValue;
@@ -71,7 +73,8 @@ namespace DatasetProcessor.ViewModels
                 catch
                 {
                     _startingNumberForFileNames = null;
-                    Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 1 as its minimum valid number.";
+                    Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 1 as its minimum valid number.",
+                        LogMessageColor.Warning);
                 }
             }
         }
@@ -168,11 +171,13 @@ namespace DatasetProcessor.ViewModels
             {
                 if (exception.GetType() == typeof(IOException))
                 {
-                    Logger.LatestLogMessage = $"Images and Tag files are named in crescent order already!";
+                    Logger.SetLatestLogMessage($"Images and Tag files are named in crescent order already!",
+                        LogMessageColor.Warning);
                 }
                 else
                 {
-                    Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
                     await Logger.SaveExceptionStackTrace(exception);
                 }
             }
@@ -195,7 +200,8 @@ namespace DatasetProcessor.ViewModels
                 {
                     if (exception.GetType() == typeof(ArgumentException))
                     {
-                        Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                        Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                            LogMessageColor.Error);
                     }
                     await Logger.SaveExceptionStackTrace(exception);
                 }
@@ -219,7 +225,8 @@ namespace DatasetProcessor.ViewModels
             }
             catch (Exception exception)
             {
-                Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
         }

@@ -4,6 +4,7 @@ using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 
 using System;
@@ -89,7 +90,8 @@ namespace DatasetProcessor.ViewModels
                 NegativePrompt = string.Empty;
                 Parameters = string.Empty;
 
-                Logger.LatestLogMessage = $"An error occurred while trying to read the image metadata (if file is a PNG then generation metadata is probably empty).{Environment.NewLine}Only PNG metadata supported.";
+                Logger.SetLatestLogMessage($"An error occurred while trying to read the image metadata (if file is a PNG then generation metadata is probably empty).{Environment.NewLine}Only PNG metadata supported.",
+                    LogMessageColor.Warning);
             }
 
             try
@@ -101,7 +103,8 @@ namespace DatasetProcessor.ViewModels
             catch (Exception exception)
             {
                 PredictedTags = string.Empty;
-                Logger.LatestLogMessage = $"An error occurred while trying to generate tags for the image! Error log will be saved inside the logs folder.";
+                Logger.SetLatestLogMessage($"An error occurred while trying to generate tags for the image! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
             IsGenerating = false;

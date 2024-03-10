@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -115,15 +116,16 @@ namespace DatasetProcessor.ViewModels
             {
                 if (exception.GetType() == typeof(FileNotFoundException))
                 {
-                    Logger.LatestLogMessage = $"{exception.Message}";
+                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
                 }
                 else if (exception.GetType() == typeof(ArgumentNullException))
                 {
-                    Logger.LatestLogMessage = exception.Message;
+                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
                 }
                 else
                 {
-                    Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
                     await Logger.SaveExceptionStackTrace(exception);
                 }
             }

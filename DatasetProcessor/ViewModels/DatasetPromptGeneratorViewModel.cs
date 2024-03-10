@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -43,11 +44,12 @@ namespace DatasetProcessor.ViewModels
                     int parsedValue = int.Parse(value);
                     if (parsedValue < 10 || parsedValue > ushort.MaxValue)
                     {
-                        Logger.LatestLogMessage = $"{_invalidMinPromptsNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!";
+                        Logger.SetLatestLogMessage($"{_invalidMinPromptsNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
+                            LogMessageColor.Warning);
                     }
                     else
                     {
-                        Logger.LatestLogMessage = string.Empty;
+                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
                     }
 
                     _amountOfGeneratedPrompts = parsedValue;
@@ -56,7 +58,8 @@ namespace DatasetProcessor.ViewModels
                 catch
                 {
                     _amountOfGeneratedPrompts = null;
-                    Logger.LatestLogMessage = $"{_invalidMinPromptsNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 10 as its minimum valid number.";
+                    Logger.SetLatestLogMessage($"{_invalidMinPromptsNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 10 as its minimum valid number.",
+                        LogMessageColor.Warning);
                 }
             }
         }
@@ -72,11 +75,12 @@ namespace DatasetProcessor.ViewModels
                     int parsedValue = int.Parse(value);
                     if (parsedValue < 10 || parsedValue > 50)
                     {
-                        Logger.LatestLogMessage = $"Amount of tags needs to be a number between 1 and 50.";
+                        Logger.SetLatestLogMessage($"Amount of tags needs to be a number between 1 and 50.",
+                            LogMessageColor.Warning);
                     }
                     else
                     {
-                        Logger.LatestLogMessage = string.Empty;
+                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
                     }
 
                     _amountOfTags = parsedValue;
@@ -85,7 +89,8 @@ namespace DatasetProcessor.ViewModels
                 catch
                 {
                     _amountOfTags = null;
-                    Logger.LatestLogMessage = $"Amount of tags needs to be a number between 1 and 50.";
+                    Logger.SetLatestLogMessage($"Amount of tags needs to be a number between 1 and 50.",
+                        LogMessageColor.Warning);
                 }
             }
         }
@@ -164,15 +169,16 @@ namespace DatasetProcessor.ViewModels
             {
                 if (exception.GetType() == typeof(FileNotFoundException))
                 {
-                    Logger.LatestLogMessage = $"{exception.Message}";
+                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
                 }
                 else if (exception.GetType() == typeof(ArgumentNullException))
                 {
-                    Logger.LatestLogMessage = exception.Message;
+                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
                 }
                 else
                 {
-                    Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
                     await Logger.SaveExceptionStackTrace(exception);
                 }
             }
@@ -211,15 +217,16 @@ namespace DatasetProcessor.ViewModels
             {
                 if (exception.GetType() == typeof(FileNotFoundException))
                 {
-                    Logger.LatestLogMessage = $"{exception.Message}";
+                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
                 }
                 else if (exception.GetType() == typeof(ArgumentNullException))
                 {
-                    Logger.LatestLogMessage = exception.Message;
+                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
                 }
                 else
                 {
-                    Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
                     await Logger.SaveExceptionStackTrace(exception);
                 }
             }

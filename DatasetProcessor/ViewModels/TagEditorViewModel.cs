@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 
 using System;
@@ -128,7 +129,8 @@ namespace DatasetProcessor.ViewModels
                 }
                 catch
                 {
-                    Logger.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!";
+                    Logger.SetLatestLogMessage($".txt or .caption file for current image not found, just type in the editor and one will be created!",
+                        LogMessageColor.Warning);
                     CurrentImageTags = string.Empty;
                 }
             }
@@ -152,7 +154,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = "Couldn't load the image.";
+                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
             }
         }
 
@@ -209,7 +211,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = $"Something went wrong while loading blurred image!";
+                Logger.SetLatestLogMessage($"Something went wrong while loading blurred image!", LogMessageColor.Warning);
             }
         }
 
@@ -231,14 +233,14 @@ namespace DatasetProcessor.ViewModels
                 }
                 else
                 {
-                    Logger.LatestLogMessage = "No images found!";
+                    Logger.SetLatestLogMessage("No images found!", LogMessageColor.Warning);
                 }
             }
             catch (Exception exception)
             {
                 if (exception.GetType() == typeof(FileNotFoundException))
                 {
-                    Logger.LatestLogMessage = "No image files were found in the directory.";
+                    Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
                 }
             }
             finally
@@ -302,7 +304,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = "No image files were found in the directory.";
+                Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
             }
             finally
             {
@@ -370,7 +372,8 @@ namespace DatasetProcessor.ViewModels
             }
             catch (Exception exception)
             {
-                Logger.LatestLogMessage = $".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}";
+                Logger.SetLatestLogMessage($".txt or .caption file for current image not found, just type in the editor and one will be created!{Environment.NewLine}{exception.StackTrace}",
+                    LogMessageColor.Warning);
                 CurrentImageTags = string.Empty;
             }
             finally
@@ -392,7 +395,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch (NullReferenceException)
             {
-                Logger.LatestLogMessage = "You need to select a folder with image files!";
+                Logger.SetLatestLogMessage("You need to select a folder with image files!", LogMessageColor.Warning);
             }
         }
 

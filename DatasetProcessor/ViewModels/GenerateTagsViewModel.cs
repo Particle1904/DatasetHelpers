@@ -51,7 +51,7 @@ namespace DatasetProcessor.ViewModels
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
-            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.LatestLogMessage = args;
+            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args, LogMessageColor.Informational);
 
             _wDAutoTagger = wDAutoTagger;
             (_wDAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -147,7 +147,8 @@ namespace DatasetProcessor.ViewModels
                         await CallAutoTaggerService(_e621AutoTagger);
                         break;
                     default:
-                        Logger.LatestLogMessage = $"Something went wrong while trying to load one of the auto tagger models!";
+                        Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the auto tagger models!",
+                            LogMessageColor.Error);
                         break;
                 }
 
@@ -155,7 +156,8 @@ namespace DatasetProcessor.ViewModels
             }
             catch (Exception exception)
             {
-                Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
             finally

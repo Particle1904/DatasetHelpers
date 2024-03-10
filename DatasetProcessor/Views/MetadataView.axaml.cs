@@ -4,6 +4,8 @@ using Avalonia.Platform.Storage;
 
 using DatasetProcessor.ViewModels;
 
+using SmartData.Lib.Enums;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,7 +40,8 @@ namespace DatasetProcessor.Views
         {
             if (_viewModel.IsGenerating)
             {
-                _viewModel.Logger.LatestLogMessage = "Already reading a file! Try again when the current file is done processing.";
+                _viewModel.Logger.SetLatestLogMessage("Already reading a file! Try again when the current file is done processing.",
+                    LogMessageColor.Warning);
                 return;
             }
 
@@ -62,7 +65,8 @@ namespace DatasetProcessor.Views
             }
             catch
             {
-                _viewModel.Logger.LatestLogMessage = $"An error occured while trying to read the image file from the {fileOrigin}.";
+                _viewModel.Logger.SetLatestLogMessage($"An error occured while trying to read the image file from the {fileOrigin}.",
+                    LogMessageColor.Error);
             }
         }
 

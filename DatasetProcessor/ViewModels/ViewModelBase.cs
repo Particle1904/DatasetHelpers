@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -96,7 +97,8 @@ public partial class ViewModelBase : ObservableObject
     {
         if (string.IsNullOrEmpty(folderPath))
         {
-            Logger.LatestLogMessage = $"A folder needs to be selected before opening it in the explorer.";
+            Logger.SetLatestLogMessage($"A folder needs to be selected before opening it in the explorer.",
+                LogMessageColor.Warning);
             return;
         }
 
@@ -104,7 +106,7 @@ public partial class ViewModelBase : ObservableObject
         {
             if (!Directory.Exists(folderPath))
             {
-                Logger.LatestLogMessage = $"Folder does not exist: {folderPath}.";
+                Logger.SetLatestLogMessage($"Folder does not exist: {folderPath}.", LogMessageColor.Warning);
                 return;
             }
 
@@ -123,7 +125,7 @@ public partial class ViewModelBase : ObservableObject
         }
         catch
         {
-            Logger.LatestLogMessage = "Unable to open the folder!";
+            Logger.SetLatestLogMessage("Unable to open the folder!", LogMessageColor.Warning);
         }
     }
 

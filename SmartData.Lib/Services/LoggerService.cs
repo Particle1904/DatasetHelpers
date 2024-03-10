@@ -1,4 +1,5 @@
-﻿using SmartData.Lib.Interfaces;
+﻿using SmartData.Lib.Enums;
+using SmartData.Lib.Interfaces;
 
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,7 +10,6 @@ namespace SmartData.Lib.Services
     public class LoggerService : ILoggerService, INotifyPropertyChanged
     {
         private string _latestLogMessage = string.Empty;
-
         public string LatestLogMessage
         {
             get => _latestLogMessage;
@@ -20,11 +20,29 @@ namespace SmartData.Lib.Services
                 _ = CleanLogMessageAsync(TimeSpan.FromSeconds(60));
             }
         }
+
+        private LogMessageColor _color = LogMessageColor.Error;
+        public LogMessageColor MessageColor
+        {
+            get => _color;
+            set
+            {
+                _color = value;
+                OnPropertyChanged(nameof(MessageColor));
+            }
+        }
+
         public string LogsFolder { get => GetLogsFolder(); }
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor)
+        {
+            LatestLogMessage = logMessage;
+            MessageColor = messageColor;
+        }
 
         /// <summary>
         /// Saves the details of an exception and its stack trace to a text file.

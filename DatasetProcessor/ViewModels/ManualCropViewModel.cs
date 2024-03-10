@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 
 using System;
@@ -106,7 +107,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = "Couldn't load the image.";
+                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
             }
         }
 
@@ -126,7 +127,7 @@ namespace DatasetProcessor.ViewModels
             }
             catch
             {
-                Logger.LatestLogMessage = "No image files were found in the directory.";
+                Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
             }
             finally
             {
@@ -206,9 +207,11 @@ namespace DatasetProcessor.ViewModels
             {
                 return;
             }
+
             if (string.IsNullOrEmpty(OutputFolderPath))
             {
-                Logger.LatestLogMessage = "You need to first select a folder for the output files! Image wont be saved.";
+                Logger.SetLatestLogMessage("You need to first select a folder for the output files! Image wont be saved.",
+                    LogMessageColor.Warning);
                 return;
             }
 
@@ -222,7 +225,8 @@ namespace DatasetProcessor.ViewModels
                 {
                     if (exception.GetType() == typeof(ArgumentOutOfRangeException))
                     {
-                        Logger.LatestLogMessage = "An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!";
+                        Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
+                            LogMessageColor.Warning);
                     }
                 }
             });

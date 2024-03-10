@@ -48,11 +48,12 @@ namespace DatasetProcessor.ViewModels
                     int parsedValue = int.Parse(value);
                     if (parsedValue < byte.MaxValue + 1 || parsedValue > ushort.MaxValue)
                     {
-                        Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!";
+                        Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
+                            LogMessageColor.Warning);
                     }
                     else
                     {
-                        Logger.LatestLogMessage = string.Empty;
+                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
                     }
 
                     _minimumResolutionForSigma = parsedValue;
@@ -61,7 +62,8 @@ namespace DatasetProcessor.ViewModels
                 catch
                 {
                     _minimumResolutionForSigma = null;
-                    Logger.LatestLogMessage = $"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 256 as its minimum valid number.";
+                    Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value cannot be empty! Use at least 256 as its minimum valid number.",
+                        LogMessageColor.Warning);
                 }
             }
         }
@@ -148,12 +150,14 @@ namespace DatasetProcessor.ViewModels
                 {
                     _minimumResolutionForSigma = 0;
                 }
-                _imageProcessor.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1, ushort.MaxValue);
+                _imageProcessor.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1,
+                    ushort.MaxValue);
                 await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
             }
             catch (Exception exception)
             {
-                Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
             finally

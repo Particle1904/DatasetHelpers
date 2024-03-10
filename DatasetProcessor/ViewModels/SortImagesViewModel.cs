@@ -128,7 +128,8 @@ namespace DatasetProcessor.ViewModels
             }
             catch (Exception exception)
             {
-                Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
             finally

@@ -117,7 +117,7 @@
 								  VerticalScrollBarVisibility="Visible">
 						<TextBlock VerticalAlignment="Stretch"
 								   FontSize="11"
-								   Foreground="#ff5757"
+								   Foreground="{Binding LogMessageColor}"
 								   HorizontalAlignment="Left"
 								   Text="{Binding LatestLogMessage}">
 						</TextBlock>

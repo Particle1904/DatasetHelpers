@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -73,7 +74,8 @@ namespace DatasetProcessor.ViewModels
             {
                 if (exception.GetType() == typeof(ArgumentException))
                 {
-                    Logger.LatestLogMessage = $"Something went wrong! Error log will be saved inside the logs folder.";
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
                 }
                 await Logger.SaveExceptionStackTrace(exception);
             }
