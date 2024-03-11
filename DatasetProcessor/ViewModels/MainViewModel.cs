@@ -123,7 +123,7 @@ public partial class MainViewModel : BaseViewModel
     [RelayCommand]
     public void NavigateToPage(AppPages parameter)
     {
-        _inputHooks.IsActive = false;
+        _inputHooks.UnsubscribeFromInputEvents();
         SetAllViewsAsInactive();
         SetViewAsActive(parameter);
         SetPageName(parameter);
@@ -136,10 +136,10 @@ public partial class MainViewModel : BaseViewModel
     [RelayCommand]
     public void NavigateToTagEditorView()
     {
-        _inputHooks.IsActive = true;
         TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_views[AppPages.Tag_Editor].DataContext;
         tagEditorViewModel.UpdateCurrentSelectedTags();
         NavigateToPage(AppPages.Tag_Editor);
+        _inputHooks.SubscribeToInputEvents();
     }
 
     /// <summary>

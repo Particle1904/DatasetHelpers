@@ -29,37 +29,18 @@ namespace SmartData.Lib.Services
         public event EventHandler AltLeftArrowCombo;
         public event EventHandler AltRightArrowCombo;
 
-        public bool IsActive { get; set; } = false;
-
         public InputHooksService()
         {
-#if !DEBUG
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
             _keyboardHook = new SimpleGlobalHook(true);
-            _keyboardHook.KeyPressed += OnKeyDown;
-            _keyboardHook.KeyPressed += (sender, e) =>
-            {
-                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
-                {
-                    _isAltActive = true;
-                }
-            };
-            _keyboardHook.KeyReleased += (sender, e) =>
-            {
-                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
-                {
-                    _isAltActive = false;
-                }
-            };
-            _keyboardHook.MousePressed += OnMouseButtonDown;
             _keyboardHook.RunAsync();
-#endif
         }
 
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)
         {
+
             if (CanProcessHook())
             {
                 return;
@@ -132,9 +113,35 @@ namespace SmartData.Lib.Services
             _keyboardTimer.Restart();
         }
 
+        public void SubscribeToInputEvents()
+        {
+            _keyboardHook.KeyPressed += OnKeyDown;
+            _keyboardHook.KeyPressed += (sender, e) =>
+            {
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
+                {
+                    _isAltActive = true;
+                }
+            };
+            _keyboardHook.KeyReleased += (sender, e) =>
+            {
+                if (e.RawEvent.Keyboard.KeyCode == KeyCode.VcLeftAlt)
+                {
+                    _isAltActive = false;
+                }
+            };
+            _keyboardHook.MousePressed += OnMouseButtonDown;
+        }
+
+        public void UnsubscribeFromInputEvents()
+        {
+            _keyboardHook.KeyPressed -= OnKeyDown;
+            _keyboardHook.MousePressed -= OnMouseButtonDown;
+        }
+
         private bool CanProcessHook()
         {
-            return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds && IsActive;
+            return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds;
         }
 
         public void Dispose()

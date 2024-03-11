@@ -16,6 +16,8 @@
 
         public event EventHandler AltLeftArrowCombo;
         public event EventHandler AltRightArrowCombo;
-        public bool IsActive { get; set; }
+
+        public void UnsubscribeFromInputEvents();
+        public void SubscribeToInputEvents();
     }
 }
