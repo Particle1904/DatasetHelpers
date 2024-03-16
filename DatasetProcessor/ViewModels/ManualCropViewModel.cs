@@ -39,6 +39,7 @@ namespace DatasetProcessor.ViewModels
         private string _currentAndTotal;
         [ObservableProperty]
         private Point _imageSize;
+        private bool _imageWasDownscaled;
 
         [ObservableProperty]
         private bool _buttonEnabled;
@@ -163,7 +164,16 @@ namespace DatasetProcessor.ViewModels
             SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles?[SelectedItemIndex])}.";
             if (value != null)
             {
-                ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
+                if (value.Size.Width > 1024 || value.Size.Height > 1024)
+                {
+                    ImageSize = new Point((int)value.Size.Width / 2, (int)value.Size.Height / 2);
+                    _imageWasDownscaled = true;
+                }
+                else
+                {
+                    ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
+                    _imageWasDownscaled = false;
+                }
             }
         }
 
@@ -219,7 +229,17 @@ namespace DatasetProcessor.ViewModels
             {
                 try
                 {
-                    await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, StartingPosition, EndingPosition);
+                    if (_imageWasDownscaled)
+                    {
+                        // Upscale the area by 2. Should probably look for a better solution.
+                        Point startingPosition = new Point(StartingPosition.X * 2, StartingPosition.Y * 2);
+                        Point endingPosition = new Point(EndingPosition.X * 2, EndingPosition.Y * 2);
+                        await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, startingPosition, endingPosition);
+                    }
+                    else
+                    {
+                        await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, StartingPosition, EndingPosition);
+                    }
                 }
                 catch (Exception exception)
                 {

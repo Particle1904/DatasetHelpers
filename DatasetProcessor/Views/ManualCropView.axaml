@@ -75,7 +75,7 @@
 		
 		<!-- IMAGE PANEL -->
 		<Grid Grid.Row="6" Background="Transparent"
-			  ColumnDefinitions="50, 10, Auto, 10, 50"
+			  ColumnDefinitions="50, 10, *, 10, 50"
 			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
 			<Grid Grid.Column="0" RowDefinitions="Auto, 10, Auto, 10, Auto"
@@ -103,21 +103,26 @@
 
 			<!-- IMAGE DISPLAY -->
 			<Grid Classes="gridPrimary" Grid.Column="2"
-				  HorizontalAlignment="Center"
+				  HorizontalAlignment="Stretch"
 				  MinWidth="256"
-				  MinHeight="256">
+				  MinHeight="256"
+				  Margin="10">
 				<Button Classes="emptyButton"
 						x:Name="CanvasButton"	
 						Width="{Binding ImageSize.X}"
 						Height="{Binding ImageSize.Y}"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
 						PointerPressed="CanvasPressed"
 						PointerReleased="CanvasReleased"
 						PointerMoved="PointerMoving">
 					<Panel x:Name="CanvasPanel" 
-						   Margin="0">
-						<Image HorizontalAlignment="Center"
-							   VerticalAlignment="Center"
-							   Stretch="None"
+						   Margin="0"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch">
+						<Image HorizontalAlignment="Stretch"
+							   VerticalAlignment="Stretch"
+							   Stretch="UniformToFill"
 							   Source="{Binding SelectedImage, Mode=TwoWay}"/>
 					</Panel>
 				</Button>
