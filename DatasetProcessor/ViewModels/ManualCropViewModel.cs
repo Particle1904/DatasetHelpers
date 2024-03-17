@@ -166,6 +166,7 @@ namespace DatasetProcessor.ViewModels
             {
                 if (value.Size.Width > 1024 || value.Size.Height > 1024)
                 {
+                    // If the image is too big, downscale it to fit on screen. Temporary solution
                     ImageSize = new Point((int)value.Size.Width / 2, (int)value.Size.Height / 2);
                     _imageWasDownscaled = true;
                 }
@@ -231,7 +232,7 @@ namespace DatasetProcessor.ViewModels
                 {
                     if (_imageWasDownscaled)
                     {
-                        // Upscale the area by 2. Should probably look for a better solution.
+                        // Upscale the area by 2. TODO: Should probably look for a better solution.
                         Point startingPosition = new Point(StartingPosition.X * 2, StartingPosition.Y * 2);
                         Point endingPosition = new Point(EndingPosition.X * 2, EndingPosition.Y * 2);
                         await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, startingPosition, endingPosition);

@@ -38,6 +38,11 @@ namespace SmartData.Lib.Services
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Set the latest Log Message and its color.
+        /// </summary>
+        /// <param name="logMessage">The Log message.</param>
+        /// <param name="messageColor">The message color.</param>
         public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor)
         {
             LatestLogMessage = logMessage;

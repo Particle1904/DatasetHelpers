@@ -419,6 +419,8 @@ namespace SmartData.Lib.Services
 
             using (HttpClient client = new HttpClient())
             {
+                client.Timeout = TimeSpan.FromMinutes(5);
+
                 string modelUrl = string.Empty;
                 string modelFileName = string.Empty;
                 string csvUrl = string.Empty;

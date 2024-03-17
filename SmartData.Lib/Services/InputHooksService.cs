@@ -38,6 +38,11 @@ namespace SmartData.Lib.Services
             _keyboardHook.RunAsync();
         }
 
+        /// <summary>
+        /// Event handler for key down event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">A <see cref="KeyboardHookEventArgs"/> that contains the event data.</param>
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)
         {
 
@@ -88,6 +93,11 @@ namespace SmartData.Lib.Services
             _keyboardTimer.Restart();
         }
 
+        /// <summary>
+        /// Event handler for mouse button down event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">A <see cref="MouseHookEventArgs"/> that contains the event data.</param>
         private void OnMouseButtonDown(object sender, MouseHookEventArgs e)
         {
             if (CanProcessHook())
@@ -113,6 +123,9 @@ namespace SmartData.Lib.Services
             _keyboardTimer.Restart();
         }
 
+        /// <summary>
+        /// Subscribes to input events such as keyboard and mouse events.
+        /// </summary>
         public void SubscribeToInputEvents()
         {
             _keyboardHook.KeyPressed += OnKeyDown;
@@ -133,12 +146,19 @@ namespace SmartData.Lib.Services
             _keyboardHook.MousePressed += OnMouseButtonDown;
         }
 
+        /// <summary>
+        /// Unsubscribes from input events.
+        /// </summary>
         public void UnsubscribeFromInputEvents()
         {
             _keyboardHook.KeyPressed -= OnKeyDown;
             _keyboardHook.MousePressed -= OnMouseButtonDown;
         }
 
+        /// <summary>
+        /// Determines whether the hook can be processed based on the elapsed time since the last event.
+        /// </summary>
+        /// <returns><c>true</c> if the hook can be processed; otherwise, <c>false</c>.</returns>
         private bool CanProcessHook()
         {
             return _keyboardTimer.Elapsed.TotalMilliseconds <= _keyboardEventsDelay.TotalMilliseconds;
