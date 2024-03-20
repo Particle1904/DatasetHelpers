@@ -7,6 +7,32 @@ namespace SmartData.Lib.Helpers
         private const int _regexTimeoutSeconds = 15;
 
         /// <summary>
+        /// Gets the timeout duration for regular expressions in seconds.
+        /// </summary>
+        /// <remarks>
+        /// The time out is in 10 seconds.
+        /// </remarks>
+        public static TimeSpan RegexTimeout => TimeSpan.FromSeconds(_regexTimeoutSeconds);
+
+        /// <summary>
+        /// Gets an array of supported dimensions.
+        /// </summary>
+        public static SupportedDimensions[] ResolutionValues => (SupportedDimensions[])Enum.GetValues(typeof(SupportedDimensions));
+
+        /// <summary>
+        /// Gets an array of supported tag generator models.
+        /// </summary>
+        public static AvailableModels[] GeneratorModelValues
+        {
+            get
+            {
+                AvailableModels[] availableModels = ((AvailableModels[])Enum.GetValues(typeof(AvailableModels)))
+                    .Where(x => x != AvailableModels.Yolov4).ToArray();
+                return availableModels;
+            }
+        }
+
+        /// <summary>
         /// Gets an array of file paths in the specified directory that match any of the provided extensions,
         /// excluding files with the name "sample_prompt_custom.txt."
         /// </summary>
@@ -31,24 +57,6 @@ namespace SmartData.Lib.Helpers
         {
             return tags.Replace(", ", ",").Replace("  ", " ").Split(",");
         }
-
-        /// <summary>
-        /// Gets the timeout duration for regular expressions in seconds.
-        /// </summary>
-        /// <remarks>
-        /// The time out is in 10 seconds.
-        /// </remarks>
-        public static TimeSpan RegexTimeout => TimeSpan.FromSeconds(_regexTimeoutSeconds);
-
-        /// <summary>
-        /// Gets an array of supported dimensions.
-        /// </summary>
-        public static SupportedDimensions[] ResolutionValues => (SupportedDimensions[])Enum.GetValues(typeof(SupportedDimensions));
-
-        /// <summary>
-        /// Gets an array of supported tag generator models.
-        /// </summary>
-        public static AvailableModels[] ModelValues => (AvailableModels[])Enum.GetValues(typeof(AvailableModels));
 
         /// <summary>
         /// Calculates the sigmoid function value for the given input.

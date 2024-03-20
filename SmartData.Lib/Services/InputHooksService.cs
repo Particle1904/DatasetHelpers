@@ -31,11 +31,13 @@ namespace SmartData.Lib.Services
 
         public InputHooksService()
         {
+#if !DEBUG
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
             _keyboardHook = new SimpleGlobalHook(true);
             _keyboardHook.RunAsync();
+#endif
         }
 
         /// <summary>
@@ -151,8 +153,10 @@ namespace SmartData.Lib.Services
         /// </summary>
         public void UnsubscribeFromInputEvents()
         {
+#if !DEBUG
             _keyboardHook.KeyPressed -= OnKeyDown;
             _keyboardHook.MousePressed -= OnMouseButtonDown;
+#endif
         }
 
         /// <summary>

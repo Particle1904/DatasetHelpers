@@ -77,7 +77,7 @@
 					  MinWidth="200"
 					  MaxWidth="200"
 					  SelectedItem="{Binding GeneratorModel}"
-					  ItemsSource="{Binding Source={x:Static local:Utilities.ModelValues}}">
+					  ItemsSource="{Binding Source={x:Static local:Utilities.GeneratorModelValues}}">
 			</ComboBox>
 		</Grid>
 		<!-- THRESHOLD SLIDER -->
