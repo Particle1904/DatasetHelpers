@@ -1,9 +1,15 @@
 ﻿// Ignore Spelling: Metadata Lanczos
 
+using HeyRed.ImageSharp.Heif.Formats.Avif;
+using HeyRed.ImageSharp.Heif.Formats.Heif;
+
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Png.Chunks;
+using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
@@ -17,7 +23,18 @@ namespace SmartData.Lib.Services
 {
     public class ImageProcessorService : IImageProcessorService, INotifyProgress
     {
-        private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+        private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
+
+        private readonly DecoderOptions _decoderOptions = new DecoderOptions()
+        {
+            Configuration = new Configuration(
+                new JpegConfigurationModule(),
+                new PngConfigurationModule(),
+                new GifConfigurationModule(),
+                new WebpConfigurationModule(),
+                new AvifConfigurationModule(),
+                new HeifConfigurationModule())
+        };
 
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
@@ -89,7 +106,7 @@ namespace SmartData.Lib.Services
         public async Task<System.Drawing.Size> GetImageSizeAsync(string filePath)
         {
             System.Drawing.Size size = new System.Drawing.Size();
-            using (Image image = await Image.LoadAsync(filePath))
+            using (Image image = await Image.LoadAsync(_decoderOptions, filePath))
             {
                 size.Width = image.Width;
                 size.Height = image.Height;
@@ -115,7 +132,7 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
                 DetectedPerson? detectedPerson = results.FirstOrDefault();
                 float[] boundingBox = detectedPerson!.BoundingBox;
@@ -238,7 +255,7 @@ namespace SmartData.Lib.Services
             inputData.Input1 = new float[448 * 448 * 3];
 
             int index = 0;
-            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(inputPath))
+            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(_decoderOptions, inputPath))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
@@ -287,7 +304,7 @@ namespace SmartData.Lib.Services
             inputData.Input1 = new float[448 * 448 * 3];
 
             int index = 0;
-            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(inputStream))
+            using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(_decoderOptions, inputStream))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
@@ -335,7 +352,7 @@ namespace SmartData.Lib.Services
             JoyTagInputData inputData = new JoyTagInputData();
             inputData.Input1 = new float[1 * 3 * 448 * 448];
 
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
@@ -396,7 +413,7 @@ namespace SmartData.Lib.Services
             inputData.Input1 = new float[416 * 416 * 3];
 
             int index = 0;
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
@@ -448,7 +465,7 @@ namespace SmartData.Lib.Services
         /// </remarks>
         public async Task<MemoryStream> GetBlurredImageAsync(string inputPath)
         {
-            using (Image image = await Image.LoadAsync(inputPath))
+            using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
             {
                 image.Mutate(x => x.GaussianBlur(_blurRadius));
 
@@ -474,7 +491,7 @@ namespace SmartData.Lib.Services
         /// </remarks>
         public async Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition)
         {
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(inputPath))
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
                 int x = Math.Min(startingPosition.X, endingPosition.X);
                 int y = Math.Min(startingPosition.Y, endingPosition.Y);
@@ -513,7 +530,7 @@ namespace SmartData.Lib.Services
         public async Task<List<string>> ReadImageMetadataAsync(Stream imageStream)
         {
             List<string> metadata = new List<string>(3);
-            using (Image image = await Image.LoadAsync(imageStream))
+            using (Image image = await Image.LoadAsync(_decoderOptions, imageStream))
             {
                 PngMetadata pngMetadata = image.Metadata.GetPngMetadata();
                 if (pngMetadata != null)
@@ -583,7 +600,7 @@ namespace SmartData.Lib.Services
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
-            using (Image image = await Image.LoadAsync(inputPath))
+            using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
             {
                 int originalWidth = image.Width;
                 int originalHeight = image.Height;

@@ -11,7 +11,7 @@ namespace SmartData.Lib.Services
 {
     public class FileManipulatorService : IFileManipulatorService, INotifyProgress
     {
-        private readonly string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
+        private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
 
         private readonly string _wdModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdModel.onnx?download=true";
         private readonly string _wdCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdTags.csv?download=true";

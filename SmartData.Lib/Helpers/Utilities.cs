@@ -33,6 +33,12 @@ namespace SmartData.Lib.Helpers
         }
 
         /// <summary>
+        /// Gets the supported images file extensions.
+        /// </summary>
+        /// <returns>The string representing a search pattern for the supported images.</returns>
+        public static string GetSupportedImagesExtension => "*.jpg,*.jpeg,*.png,*.gif,*.webp,*.avif,*heif";
+
+        /// <summary>
         /// Gets an array of file paths in the specified directory that match any of the provided extensions,
         /// excluding files with the name "sample_prompt_custom.txt."
         /// </summary>
