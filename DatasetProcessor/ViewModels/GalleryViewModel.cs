@@ -23,7 +23,7 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class GalleryViewModel : BaseViewModel
     {
-        private const int MaximumNumberOfImages = 2500;
+        private const int ItemsPerPage = 100;
 
         private readonly IFileManipulatorService _fileManipulator;
 
@@ -36,6 +36,11 @@ namespace DatasetProcessor.ViewModels
         private ObservableCollection<ImageItem> _imageCollection;
         [ObservableProperty]
         private ObservableCollection<ImageItem> _selectedImageItems;
+
+        [ObservableProperty]
+        private int _currentPage;
+        [ObservableProperty]
+        private string _currentPageString;
 
         [ObservableProperty]
         private int _maxImageSize;
@@ -71,6 +76,9 @@ namespace DatasetProcessor.ViewModels
 
             ImageCollection = new ObservableCollection<ImageItem>();
             SelectedImageItems = new ObservableCollection<ImageItem>();
+
+            CurrentPage = 0;
+            CurrentPageString = string.Empty;
         }
 
         [RelayCommand]
@@ -107,36 +115,39 @@ namespace DatasetProcessor.ViewModels
             {
                 // Get images with path
                 List<string> imageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
-                GalleryProcessingProgress.TotalFiles = imageFiles.Count;
-                if (imageFiles.Count != 0)
+
+                if (imageFiles.Count <= 0)
                 {
-                    if (imageFiles.Count > MaximumNumberOfImages)
-                    {
-                        throw new NotSupportedException($"Too many images! Only {MaximumNumberOfImages} total images per folder is supported at the moment!{Environment.NewLine}I suggest splitting your dataset into multiple folders.");
-                    }
-
-                    // Order the list of images with path.
-                    ImageFilesPath = imageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
-
-                    // Load the images into a temporary List<ImageItem> so we can sort it.
-                    List<ImageItem> imageItems = new List<ImageItem>();
-                    Logger.SetLatestLogMessage("Loading image files...", LogMessageColor.Informational);
-                    await Task.Run(() =>
-                    {
-                        for (int i = 0; i < ImageFilesPath.Count; i++)
-                        {
-                            ImageItem item = new ImageItem()
-                            {
-                                FileName = Path.GetFileName(ImageFilesPath[i]),
-                                Bitmap = new Bitmap(ImageFilesPath[i])
-                            };
-                            imageItems.Add(item);
-                            GalleryProcessingProgress.UpdateProgress();
-                        }
-                    });
-
-                    ImageCollection = new ObservableCollection<ImageItem>(imageItems);
+                    return;
                 }
+                // Order the list of images with path.
+                ImageFilesPath = imageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+
+                int startIndex = CurrentPage * ItemsPerPage;
+                int endIndex = Math.Min(startIndex + ItemsPerPage, imageFiles.Count);
+                List<string> visibleImages = ImageFilesPath.GetRange(Math.Clamp(startIndex, 0, imageFiles.Count),
+                    Math.Clamp(endIndex - startIndex, 0, imageFiles.Count));
+
+                GalleryProcessingProgress.TotalFiles = visibleImages.Count;
+
+                // Load the images into a temporary List<ImageItem> so we can sort it.
+                List<ImageItem> imageItems = new List<ImageItem>(visibleImages.Count);
+                Logger.SetLatestLogMessage("Loading image files...", LogMessageColor.Informational);
+                await Task.Run(() =>
+                {
+                    for (int i = 0; i < visibleImages.Count; i++)
+                    {
+                        ImageItem item = new ImageItem()
+                        {
+                            FileName = Path.GetFileName(visibleImages[i]),
+                            Bitmap = new Bitmap(visibleImages[i])
+                        };
+                        imageItems.Add(item);
+                        GalleryProcessingProgress.UpdateProgress();
+                    }
+                });
+
+                ImageCollection = new ObservableCollection<ImageItem>(imageItems);
             }
             catch (NotSupportedException ex)
             {
@@ -159,6 +170,29 @@ namespace DatasetProcessor.ViewModels
             timer.Stop();
             // Stop elapsed timer
             _timer.Stop();
+        }
+
+        /// <summary>
+        /// Navigates to a specific page in the image list.
+        /// </summary>
+        /// <param name="parameter">The navigation parameter indicating the page index.</param>
+        [RelayCommand]
+        private async Task GoToItem(string parameter)
+        {
+            try
+            {
+                int.TryParse(parameter, out int parameterInt);
+
+                if (ImageFilesPath?.Count != 0 && ImageFilesPath != null)
+                {
+                    CurrentPage += parameterInt;
+                    await LoadImagesFromInputFolder();
+                }
+            }
+            catch
+            {
+                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
+            }
         }
 
         /// <summary>
@@ -212,6 +246,17 @@ namespace DatasetProcessor.ViewModels
         partial void OnMaxImageSizeChanged(int value)
         {
             MaxImageSizeString = $"{value}px";
+        }
+
+        partial void OnCurrentPageChanged(int value)
+        {
+            CurrentPageString = $"Current page: {CurrentPage + 1}";
+            CurrentPage = Math.Clamp(CurrentPage, 0, Math.Abs(ImageFilesPath.Count / ItemsPerPage));
+        }
+
+        partial void OnImageCollectionChanged(ObservableCollection<ImageItem> value)
+        {
+            CurrentPageString = $"Current page: {CurrentPage + 1}";
         }
     }
 }

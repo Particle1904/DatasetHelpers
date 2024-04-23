@@ -44,15 +44,17 @@
 		<!-- GALLERY -->
 		<ScrollViewer Grid.Row="2"
 				      Background="{DynamicResource SurfaceDark}"
-					  Height="576"
-					  MaxHeight="1024"
-					  VerticalScrollBarVisibility="Visible">
+				      Height="576"
+				      MinWidth="1024"
+				      VerticalScrollBarVisibility="Visible"
+				      HorizontalAlignment="Stretch">
 			<ListBox Background="Transparent"
 					 SelectionMode="Toggle,Multiple"
 					 ItemsSource="{Binding ImageCollection}"
 					 HorizontalAlignment="Center"
 					 MinHeight="512"
-					 SelectedItems="{Binding SelectedImageItems}">
+					 SelectedItems="{Binding SelectedImageItems}"
+					 Margin="0,0,0,10">
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel Orientation="Horizontal"
@@ -63,46 +65,81 @@
 				</ListBox.ItemsPanel>
 				<ListBox.ItemTemplate>
 					<DataTemplate>
-						<StackPanel Spacing="4"
-									ClipToBounds="True">
-							<TextBlock Text="{Binding FileName}"
+						<Grid RowDefinitions="Auto, 4, *">
+							<TextBlock Grid.Row="0"
+									   Text="{Binding FileName}"
 									   HorizontalAlignment="Center"
+									   VerticalAlignment="Top"
 									   FontSize="16"/>
-							<Image Source="{Binding Bitmap}"
+							<Image Grid.Row="2"
+								   Source="{Binding Bitmap}"
 								   Stretch="Uniform"
 								   StretchDirection="DownOnly"/>
-						</StackPanel>
+						</Grid>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-		</ScrollViewer>
+		</ScrollViewer>			
 
 		<!-- DISPLAY SIZE SLIDER -->
 		<Grid Grid.Row="3"
 			  Margin="0, -1, 0, 0"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 10, 1*, 10, Auto, Auto"
-			  Background="{DynamicResource SurfaceDark}">
+			  Background="{DynamicResource SurfaceDark}"
+			  VerticalAlignment="Bottom">
+			<Grid Grid.Column="0"
+				  Grid.ColumnSpan="5"
+				  ColumnDefinitions="Auto, 10, Auto, 10, Auto"
+				  HorizontalAlignment="Left"
+				  VerticalAlignment="Bottom">
+				<Label Grid.Column="0" 
+					   Content="{Binding CurrentPageString}"
+					   HorizontalAlignment="Left"
+					   HorizontalContentAlignment="Left"
+					   Width="400"/>
+				<Button Grid.Column="2"
+						Content="&lt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="-1"/>
+				<Button Grid.Column="4"
+						Content="&gt;"
+						Height="50"
+						Width="50"
+						Command="{Binding GoToItemCommand}"
+						CommandParameter="1"/>
+			</Grid>
 
 			<Label Grid.Column="3"
 				   Content="Image display size:"
-				   HorizontalAlignment="Right"/>
+				   HorizontalAlignment="Right"
+				   VerticalAlignment="Center"
+				   Margin="0,0,0,-20"/>
 			<Slider Grid.Column="5"
 					Value="{Binding MaxImageSize}"
 					Minimum="256"
-					Maximum="576"/>
+					Maximum="576"
+					Padding="0,14,0,0"
+					VerticalAlignment="Center"/>
 			<Label Content="{Binding MaxImageSizeString}"
-				   Grid.Column="7"/>
+				   Grid.Column="7"
+				   VerticalAlignment="Center"
+				   Margin="0,0,0,-20"/>
 		</Grid>
 		
 		<!-- DELETE BUTTON AND NOTE -->
 		<Grid Grid.Row="5"
 			  RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto">
-			<Separator Grid.Row="0"/>
-			<Panel Grid.Row="2" Height="26"
-				   Background="{DynamicResource SurfaceLighterDark}">
+			<Separator Grid.Row="0"/>			
+			<StackPanel Grid.Row="2"
+						Orientation="Vertical"
+						Background="{DynamicResource SurfaceLighterDark}">
 				<Label Foreground="{DynamicResource SecondaryLight}"
-					   Content="Note: This is a destructive operation! Always backup your files!"/>
-			</Panel>
+					Content="Note: This is a destructive operation! Always backup your files!"/>
+				<Label Foreground="{DynamicResource SecondaryLight}"
+					Content="Note: You can only delete items currently selected on this page; switching pages will clear the selection."/>
+			</StackPanel>
 			<!-- CURRENTLY PROCESSING -->
 			<Label Grid.Row="4"
 				   Content="{Binding GalleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
