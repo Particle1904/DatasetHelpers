@@ -13,16 +13,20 @@ The toolkit also offers advanced content-aware smart cropping. Leveraging the Yo
 ![Alt Text](https://github.com/Particle1904/DatasetHelpers/blob/master/showcase_gif2.gif?raw=true)
 
 ## Features
-- Discard images with low resolution
-- Resize images while preserving aspect ratio
-- Generate tags using the updated WD 1.4 Tagger model (now using int8 instead of float32)
-- Mass edit .txt files with tags
-- Automatic Content Aware Crop for images with a person using YoloV4 model
-- Editor page for editing .caption and .txt files, image navigation buttons, word highlight and more
-- Mass replacing tags and renaming files in the "Process tags" tab
+- Gallery Viewer: Easily select and discard multiple images at once.
+- Bulk Image Processing: Discard low-resolution images or create backups of datasets effortlessly.
+- Automatic Content-Aware Crop: Utilize the YoloV4 model to automatically crop images with people.
+- Manual Crop: Drag and drop a rectangle over images to manually define cropping areas.
+- Image Resizing: Resize images while maintaining aspect ratio, with the option to conditionally apply sharpening to downscaled images.
+- AI-based Auto Tagging: Generate tags using four different AI models, append outputs to existing .txt files, enabling tag generation with multiple models.
+- Text File Processing: Mass process .txt files, including options to add, remove, replace, or emphasize tags, rename files, remove redundancy, and consolidate similar tags.
+- Text Editor: Edit .caption and .txt files with image navigation buttons, word highlighting, keyword filtering, and keyboard shortcuts (see the [Wiki](https://github.com/Particle1904/DatasetHelpers/wiki/Editor-Page) for keyboard shortcuts).
+- Subset Extraction: Extract a subset of a larger dataset by searching for keywords/tags in .txt and/or .caption files.
+- Prompt Generation: Generate prompts for model testing using tags/keywords found in the dataset.
+- Metadata Viewer: View metadata for .png files (Windows only due to Linux distribution differences in Drag and Drop operations).
 
 ## Getting Started
-To get started with the Dataset Processor Tools, download the provided release or build yourself.
+To get started with the Dataset Processor Tools, [download the latest provided release](https://github.com/Particle1904/DatasetHelpers/releases) or build yourself.
 To build clone this repository and open the project in Visual Studio 2022, Visual Studio Code with C# extensions or the terminal. You can then build and run the project.
 
 Remember to download the model files: https://github.com/Particle1904/DatasetHelpers/releases/tag/v0.0.0 - follow the instructions in the release page to install them!
@@ -41,15 +45,12 @@ FOR MAC:
 
 ## Requirements
 This software requires two runtimes:
-- [.NET Desktop Runtime 7.0.4](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
+- [.NET Desktop Runtime 8 or newer](https://dotnet.microsoft.com/pt-br/download/dotnet/8.0)
 - [Visual C++ Redistributable for Visual Studio 2019 for running the Model](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
-
-## Usage
-Dataset Processor Tools can be used to process image datasets for machine learning, allowing you to perform various tasks such as discarding images with low resolution, resizing images while preserving aspect ratio, generating tags using the updated WD 1.4 Tagger model, and mass editing .txt files with tags. The tools also include automatic content-aware cropping, advanced features in the Editor page, and options for mass replacing tags and renaming files.
 
 ## Technologies
 - Dataset Processor Tools is built using Avalonia in its second version, an open-source and cross-platform UI framework for building native cross platform applications.
-- ML.NET to run the WD 1.4 SwinV2 Tagger V2 Model.
+- ML.NET to run the WD 1.4 SwinV2 v2, WD SwinV2 v3, JoyTag, Z3DE621 AI Models.
 - ML.NET to run the YoloV4 model for content aware automatic crop.
 - Dataset Processor Tools was built using .NET MAUI 7.0 in its first version (but it was abandoned in favor of Avalonia for better cross-platform support), an open-source and cross-platform UI framework for building native applications.
 
