@@ -36,6 +36,14 @@ namespace SmartData.Lib.Services
                 new HeifConfigurationModule())
         };
 
+        private readonly JpegEncoder _jpegEncoder = new JpegEncoder()
+        {
+            ColorType = JpegEncodingColor.Rgb,
+            Interleaved = true,
+            Quality = 100,
+            SkipMetadata = false
+        };
+
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
 
@@ -132,7 +140,7 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
                 DetectedPerson? detectedPerson = results.FirstOrDefault();
                 float[] boundingBox = detectedPerson!.BoundingBox;
@@ -174,38 +182,32 @@ namespace SmartData.Lib.Services
                 cropWidth = Math.Min(cropWidth, image.Width - cropX);
                 cropHeight = Math.Min(cropHeight, image.Height - cropY);
 
-                Image<Rgb24> croppedImage = image.Clone();
-                croppedImage.Mutate(x => x.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
+                image.Mutate(image => image.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
 
                 double resizeFactor = Math.Min(targetWidth / (double)cropWidth, targetHeight / (double)cropHeight);
                 int resizedWidth = (int)(cropWidth * resizeFactor);
                 int resizedHeight = (int)(cropHeight * resizeFactor);
 
-                Image<Rgb24> resizedImage = croppedImage.Clone();
-                resizedImage.Mutate(x => x.Resize(new ResizeOptions
+                ResizeOptions resizeOptions = new ResizeOptions
                 {
                     Size = new Size(resizedWidth, resizedHeight),
                     Mode = ResizeMode.Stretch,
                     Position = AnchorPositionMode.Center,
+                    PadColor = Color.White,
                     Sampler = _lanczosResampler,
                     Compand = true
-                }));
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
 
                 if (ApplySharpen)
                 {
-                    resizedImage.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }
 
-                JpegEncoder encoder = new JpegEncoder()
-                {
-                    ColorType = JpegEncodingColor.Rgb,
-                    Interleaved = true,
-                    Quality = 100,
-                    SkipMetadata = false
-                };
-
+                image.Mutate(image => image.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await resizedImage.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
+                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
             }
         }
 
@@ -467,9 +469,10 @@ namespace SmartData.Lib.Services
         {
             using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
             {
-                image.Mutate(x => x.GaussianBlur(_blurRadius));
+                image.Mutate(image => image.GaussianBlur(_blurRadius));
 
                 MemoryStream blurredImageStream = new MemoryStream();
+                image.Mutate(image => image.BackgroundColor(Color.White));
                 image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
 
                 return blurredImageStream;
@@ -491,7 +494,7 @@ namespace SmartData.Lib.Services
         /// </remarks>
         public async Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition)
         {
-            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
                 int x = Math.Min(startingPosition.X, endingPosition.X);
                 int y = Math.Min(startingPosition.Y, endingPosition.Y);
@@ -506,19 +509,11 @@ namespace SmartData.Lib.Services
                     Height = Math.Clamp(height, 0, image.Height - y)
                 };
 
-                Image<Rgb24> croppedImage = image.Clone();
-                croppedImage.Mutate(x => x.Crop(cropArea));
+                image.Mutate(image => image.Crop(cropArea));
 
-                JpegEncoder encoder = new JpegEncoder()
-                {
-                    ColorType = JpegEncodingColor.Rgb,
-                    Interleaved = true,
-                    Quality = 100,
-                    SkipMetadata = false
-                };
-
+                image.Mutate(image => image.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await croppedImage.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
+                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
             }
         }
 
@@ -600,7 +595,7 @@ namespace SmartData.Lib.Services
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
-            using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
                 int originalWidth = image.Width;
                 int originalHeight = image.Height;
@@ -651,26 +646,15 @@ namespace SmartData.Lib.Services
                     Size = new Size(targetWidth, targetHeight)
                 };
 
-                image.Mutate(image =>
-                {
-                    image.BackgroundColor(Color.White);
-                    image.Resize(resizeOptions);
-                });
+                image.Mutate(image => image.Resize(resizeOptions));
 
                 if (ApplySharpen && (originalWidth >= MinimumResolutionForSigma || originalHeight >= MinimumResolutionForSigma))
                 {
                     image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }
 
-                JpegEncoder encoder = new JpegEncoder()
-                {
-                    ColorType = JpegEncodingColor.Rgb,
-                    Interleaved = true,
-                    Quality = 100,
-                    SkipMetadata = false
-                };
-
-                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), encoder);
+                image.Mutate(image => image.BackgroundColor(Color.White));
+                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
             }
         }
 
