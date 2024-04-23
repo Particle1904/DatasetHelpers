@@ -6,6 +6,7 @@ using Avalonia.Media;
 using DatasetProcessor.ViewModels;
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace DatasetProcessor.Views
@@ -23,7 +24,6 @@ namespace DatasetProcessor.Views
         public ManualCropView()
         {
             InitializeComponent();
-
             _lines = new Line[4];
             SolidColorBrush brush = new SolidColorBrush(Avalonia.Media.Color.FromArgb(255, 255, 179, 71), 0.5f);
             for (int i = 0; i < _lines.Length; i++)
@@ -34,6 +34,22 @@ namespace DatasetProcessor.Views
                     Stroke = brush
                 };
                 CanvasPanel.Children.Add(_lines[i]);
+            }
+        }
+
+        /// <summary>
+        /// Clears the lines representing the crop area by setting their stroke thickness to 0.
+        /// </summary>
+        /// <param name="sender">The object that triggered the PropertyChanged event.</param>
+        /// <param name="e">The PropertyChangedEventArgs object containing information about the property change.</param>
+        private void ClearLines(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SelectedItemIndex"))
+            {
+                for (int i = 0; i < _lines.Length; i++)
+                {
+                    _lines[i].StrokeThickness = 0;
+                }
             }
         }
 
@@ -141,6 +157,7 @@ namespace DatasetProcessor.Views
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = DataContext as ManualCropViewModel;
+            _viewModel.PropertyChanged += (sender, e) => ClearLines(sender, e);
             base.OnDataContextChanged(e);
         }
     }

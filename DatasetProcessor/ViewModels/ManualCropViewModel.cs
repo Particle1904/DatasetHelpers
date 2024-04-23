@@ -162,19 +162,24 @@ namespace DatasetProcessor.ViewModels
         {
             CurrentAndTotal = $"Currently viewing: {SelectedItemIndex + 1}/{ImageFiles?.Count}.";
             SelectedImageFilename = $"Current file: {Path.GetFileName(ImageFiles?[SelectedItemIndex])}.";
-            if (value != null)
+            if (value == null)
             {
-                if (value.Size.Width > 1024 || value.Size.Height > 1024)
-                {
-                    // If the image is too big, downscale it to fit on screen. Temporary solution
-                    ImageSize = new Point((int)value.Size.Width / 2, (int)value.Size.Height / 2);
-                    _imageWasDownscaled = true;
-                }
-                else
-                {
-                    ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
-                    _imageWasDownscaled = false;
-                }
+                return;
+            }
+
+            double widthScale = 1024.0 / value.Size.Width;
+            double heightScale = 512.0 / value.Size.Height;
+            double scaleFactor = Math.Min(widthScale, heightScale);
+
+            if (scaleFactor < 1.0)
+            {
+                ImageSize = new Point((int)(value.Size.Width * scaleFactor), (int)(value.Size.Height * scaleFactor));
+                _imageWasDownscaled = true;
+            }
+            else
+            {
+                ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
+                _imageWasDownscaled = false;
             }
         }
 
@@ -232,9 +237,12 @@ namespace DatasetProcessor.ViewModels
                 {
                     if (_imageWasDownscaled)
                     {
-                        // Upscale the area by 2. TODO: Should probably look for a better solution.
-                        Point startingPosition = new Point(StartingPosition.X * 2, StartingPosition.Y * 2);
-                        Point endingPosition = new Point(EndingPosition.X * 2, EndingPosition.Y * 2);
+                        // Create new variables so the program doesn't enter in an infinite loop calling OnEndingPositionChanged.
+                        Point startingPosition = new Point((int)(StartingPosition.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
+                            (int)(StartingPosition.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
+                        Point endingPosition = new Point((int)(EndingPosition.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
+                            (int)(EndingPosition.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
+
                         await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, startingPosition, endingPosition);
                     }
                     else
@@ -242,13 +250,14 @@ namespace DatasetProcessor.ViewModels
                         await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, StartingPosition, EndingPosition);
                     }
                 }
-                catch (Exception exception)
+                catch (ArgumentOutOfRangeException)
                 {
-                    if (exception.GetType() == typeof(ArgumentOutOfRangeException))
-                    {
-                        Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
-                            LogMessageColor.Warning);
-                    }
+                    Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
+                        LogMessageColor.Warning);
+                }
+                finally
+                {
+
                 }
             });
         }
