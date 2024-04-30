@@ -100,6 +100,7 @@ namespace DatasetProcessor.ViewModels
         private async Task LoadImagesFromInputFolder()
         {
             IsUiEnabled = false;
+            IsCancelEnabled = false;
 
             _timer.Reset();
             _timer.Start();
@@ -166,6 +167,7 @@ namespace DatasetProcessor.ViewModels
             {
                 TaskStatus = ProcessingStatus.Finished;
                 IsUiEnabled = true;
+                IsCancelEnabled = false;
             }
 
             Logger.SetLatestLogMessage("Finished loading image files.", LogMessageColor.Informational);

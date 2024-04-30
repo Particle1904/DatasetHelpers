@@ -145,7 +145,7 @@
 				   Content="{Binding GalleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 			<!-- ELAPSED TIME -->
 			<Label Grid.Row="6"
-				   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+				   Content="{Binding ElapsedTime, StringFormat='Processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 			<!-- PROCESS BUTTON -->
 			<Grid Grid.Row="8"
 				  ColumnDefinitions="Auto, 10, Auto"
