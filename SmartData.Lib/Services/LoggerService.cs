@@ -13,7 +13,7 @@ namespace SmartData.Lib.Services
         public string LatestLogMessage
         {
             get => _latestLogMessage;
-            set
+            private set
             {
                 _latestLogMessage = value;
                 OnPropertyChanged(nameof(LatestLogMessage));
@@ -25,7 +25,7 @@ namespace SmartData.Lib.Services
         public LogMessageColor MessageColor
         {
             get => _color;
-            set
+            private set
             {
                 _color = value;
                 OnPropertyChanged(nameof(MessageColor));

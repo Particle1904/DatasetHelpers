@@ -140,11 +140,19 @@
 		<Label Grid.Row="20"
 			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- GENERATE BUTTON -->
-		<Button Grid.Row="22"
-				Width="200"
-				Content="Generate tags"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding MakePredictionsCommand}"/>
+		<Grid Grid.Row="22"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Generate tags"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding MakePredictionsCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>		
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="24"
 					 Value="{Binding PredictionProgress.PercentComplete}"/>

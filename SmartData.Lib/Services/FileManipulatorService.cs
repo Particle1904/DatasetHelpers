@@ -4,12 +4,13 @@ using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
+using SmartData.Lib.Services.Base;
 
 using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
-    public class FileManipulatorService : IFileManipulatorService, INotifyProgress
+    public class FileManipulatorService : CancellableServiceBase, IFileManipulatorService, INotifyProgress
     {
         private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
 
@@ -30,6 +31,10 @@ namespace SmartData.Lib.Services
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
         public event EventHandler<string> DownloadMessageEvent;
+
+        public FileManipulatorService() : base()
+        {
+        }
 
         /// <summary>
         /// Renames all image files and their corresponding caption and text files in the specified directory to have a number in ascending order appended to their names.
@@ -79,11 +84,14 @@ namespace SmartData.Lib.Services
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await SortImageAsync(discardedOutputPath, selectedOutputPath, dimension, file);
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
@@ -108,11 +116,14 @@ namespace SmartData.Lib.Services
         public async Task BackupFilesAsync(string inputPath, string backupPath)
         {
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             foreach (var image in imageFiles)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string finalPath = Path.Combine(Path.GetFileName(image), backupPath);
-                await Task.Run(() => File.Copy(image, finalPath));
+                await Task.Run(() => File.Copy(image, finalPath), cancellationToken);
             }
         }
 
@@ -130,10 +141,14 @@ namespace SmartData.Lib.Services
                 throw new ArgumentNullException($"Please select an output folder!");
             }
 
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
             TotalFilesChanged?.Invoke(this, files.Count);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string folderPath = Path.GetDirectoryName(file);
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
 
@@ -155,6 +170,10 @@ namespace SmartData.Lib.Services
         public List<string> GetImageFiles(string inputPath)
         {
             List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+            if (imageFiles.Count > 0)
+            {
+                TotalFilesChanged?.Invoke(this, imageFiles.Count);
+            }
             imageFiles.Sort((a, b) => string.Compare(a, b));
             return imageFiles;
         }
@@ -681,9 +700,13 @@ namespace SmartData.Lib.Services
                 throw new ArgumentNullException($"Please select an input folder!");
             }
 
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
             TotalFilesChanged?.Invoke(this, imageFiles.Count);
             foreach (string image in imageFiles)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string fullPath = Path.Combine(inputPath, image);
 
                 if (File.Exists(fullPath))

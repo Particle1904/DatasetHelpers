@@ -105,8 +105,7 @@
 			<Grid Classes="gridPrimary" Grid.Column="2"
 				  HorizontalAlignment="Stretch"
 				  MinWidth="256"
-				  MinHeight="256"
-				  Margin="10">
+				  MinHeight="256">
 				<Button Classes="emptyButton"
 						x:Name="CanvasButton"	
 						Width="{Binding ImageSize.X}"
@@ -115,9 +114,10 @@
 						VerticalAlignment="Stretch"
 						PointerPressed="CanvasPressed"
 						PointerReleased="CanvasReleased"
-						PointerMoved="PointerMoving">
+						PointerMoved="PointerMoving"
+						Margin="0"
+						Padding="0">
 					<Panel x:Name="CanvasPanel" 
-						   Margin="0"
 						   HorizontalAlignment="Stretch"
 						   VerticalAlignment="Stretch">
 						<Image HorizontalAlignment="Stretch"

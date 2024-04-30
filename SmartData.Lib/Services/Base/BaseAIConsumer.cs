@@ -5,7 +5,7 @@ using SmartData.Lib.Interfaces;
 
 namespace SmartData.Lib.Services.Base
 {
-    public abstract class BaseAIConsumer<TInput, TOutput>
+    public abstract class BaseAIConsumer<TInput, TOutput> : CancellableServiceBase
         where TInput : class
         where TOutput : class, new()
     {

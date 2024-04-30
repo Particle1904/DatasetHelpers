@@ -151,11 +151,20 @@
 		<Label Grid.Row="12"
 			   Content="{Binding ElapsedTime, StringFormat='Sorting elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- SORT BUTTON -->
-		<Button Grid.Row="14"
-				Width="200"
-				Content="Sort images"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding SortImagesCommand}"/>
+		<Grid Grid.Row="14"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Grid.Column="0"
+					Width="200" 
+					Content="Sort images"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding SortImagesCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="16"
 					 Value="{Binding SortProgress.PercentComplete}"/>

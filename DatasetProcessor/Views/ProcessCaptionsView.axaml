@@ -64,15 +64,23 @@
 		<!-- CURRENTLY PROCESSING -->
 		<Label Grid.Row="6"
 			   Content="{Binding CaptionProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
-		<!-- ELAPSED TIME -->
+		<!-- ELAPSED TIME -->		
 		<Label Grid.Row="8"
 			   Content="{Binding ElapsedTime, StringFormat='Resize images elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
-		<!-- SORT BUTTON -->
-		<Button Grid.Row="10"
-				Width="200"
-				Content="Process captions"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding ProcessCaptionsCommand}"/>
+		<!-- PROCESS BUTTON -->
+		<Grid Grid.Row="10"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Process captions"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding ProcessCaptionsCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="12"
 					 Value="{Binding CaptionProcessingProgress.PercentComplete}"/>

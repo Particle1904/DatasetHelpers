@@ -35,6 +35,8 @@ namespace DatasetProcessor.ViewModels
         private Progress _sortProgress;
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
@@ -133,6 +135,16 @@ namespace DatasetProcessor.ViewModels
             {
                 await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, Dimension);
             }
+            catch (ArgumentNullException)
+            {
+                Logger.SetLatestLogMessage($"Please select the input, output and discarded folders before sorting!",
+                    LogMessageColor.Error);
+            }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
@@ -147,6 +159,24 @@ namespace DatasetProcessor.ViewModels
 
             timer.Stop();
             _timer.Stop();
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
         }
     }
 }

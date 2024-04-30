@@ -165,22 +165,19 @@ namespace DatasetProcessor.ViewModels
                     TagsToAppend, Math.Clamp((int)_amountOfTags, 1, 50)));
                 GeneratedPrompt = _tagProcessor.ApplyRedundancyRemoval(generatedPrompt);
             }
+            catch (FileNotFoundException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+            }
+            catch (ArgumentNullException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(FileNotFoundException))
-                {
-                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
-                }
-                else if (exception.GetType() == typeof(ArgumentNullException))
-                {
-                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
-                }
-                else
-                {
-                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
-                        LogMessageColor.Error);
-                    await Logger.SaveExceptionStackTrace(exception);
-                }
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
         }
 
@@ -213,22 +210,20 @@ namespace DatasetProcessor.ViewModels
                     Math.Clamp((int)_amountOfTags, 1, 50),
                     Math.Clamp((int)_amountOfGeneratedPrompts, 10, ushort.MaxValue)));
             }
+            catch (FileNotFoundException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+
+            }
+            catch (ArgumentNullException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(FileNotFoundException))
-                {
-                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
-                }
-                else if (exception.GetType() == typeof(ArgumentNullException))
-                {
-                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
-                }
-                else
-                {
-                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
-                        LogMessageColor.Error);
-                    await Logger.SaveExceptionStackTrace(exception);
-                }
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {

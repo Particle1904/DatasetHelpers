@@ -158,11 +158,19 @@
 		<Label Grid.Row="12"
 			   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- PROCESS BUTTON -->
-		<Button Grid.Row="14"
-				Width="200"
-				Content="Process tags"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding ProcessTagsCommand}"/>
+		<Grid Grid.Row="14"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Process tags"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding ProcessTagsCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="16"
 					 Value="{Binding TagProcessingProgress.PercentComplete}"/>

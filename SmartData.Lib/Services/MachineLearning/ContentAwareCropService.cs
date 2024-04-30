@@ -4,6 +4,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Models.MachineLearning;
 using SmartData.Lib.Services.Base;
+
 using System.Diagnostics;
 
 namespace SmartData.Lib.Services.MachineLearning
@@ -174,6 +175,7 @@ namespace SmartData.Lib.Services.MachineLearning
             {
                 filesList = files.ToList();
             }
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
@@ -183,6 +185,8 @@ namespace SmartData.Lib.Services.MachineLearning
             _imageProcessorService.MinimumResolutionForSigma = MinimumResolutionForSigma;
             foreach (string file in filesList)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await ProcessingRoutine(outputPath, dimension, file);
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }

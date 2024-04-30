@@ -83,6 +83,8 @@ namespace DatasetProcessor.ViewModels
 
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public ContentAwareCropViewModel(IFileManipulatorService fileManipulator, IContentAwareCropService contentAwareCrop,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
@@ -168,6 +170,11 @@ namespace DatasetProcessor.ViewModels
                 _contentAwareCrop.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1, ushort.MaxValue);
                 await _contentAwareCrop.ProcessCroppedImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
             }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
@@ -216,6 +223,25 @@ namespace DatasetProcessor.ViewModels
         partial void OnSharpenSigmaChanged(double value)
         {
             SharpenSigma = Math.Clamp(Math.Round(value, 2), 0.5d, 5d);
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_contentAwareCrop as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
         }
     }
 }

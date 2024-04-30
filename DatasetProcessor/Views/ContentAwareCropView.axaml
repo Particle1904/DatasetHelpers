@@ -184,12 +184,21 @@
 		<!-- ELAPSED TIME -->
 		<Label Grid.Row="14"
 			   Content="{Binding ElapsedTime, StringFormat='Content aware crop elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
-		<!-- SORT BUTTON -->
-		<Button Grid.Row="16"
-				Width="200"
-				Content="Auto crop images"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding CropImagesCommand}"/>
+		<!-- CROP BUTTON -->
+		<Grid Grid.Row="16"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Grid.Column="0"
+					Width="200"
+					Content="Auto crop images"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding CropImagesCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="18"
 					 Value="{Binding CropProgress.PercentComplete}"/>

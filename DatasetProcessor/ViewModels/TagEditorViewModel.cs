@@ -236,12 +236,15 @@ namespace DatasetProcessor.ViewModels
                     Logger.SetLatestLogMessage("No images found!", LogMessageColor.Warning);
                 }
             }
+            catch (FileNotFoundException)
+            {
+                Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(FileNotFoundException))
-                {
-                    Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
-                }
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {

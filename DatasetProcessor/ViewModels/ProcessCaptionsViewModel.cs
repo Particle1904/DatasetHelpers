@@ -27,6 +27,8 @@ namespace DatasetProcessor.ViewModels
         private Progress _captionProcessingProgress;
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public ProcessCaptionsViewModel(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
@@ -70,13 +72,15 @@ namespace DatasetProcessor.ViewModels
             {
                 await _tagProcessor.FindAndReplace(InputFolderPath, WordsToBeReplaced, WordsToReplace);
             }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(ArgumentException))
-                {
-                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
-                        LogMessageColor.Error);
-                }
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
             }
             finally

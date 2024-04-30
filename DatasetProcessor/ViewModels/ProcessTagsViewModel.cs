@@ -84,6 +84,8 @@ namespace DatasetProcessor.ViewModels
 
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public ProcessTagsViewModel(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
@@ -148,17 +150,19 @@ namespace DatasetProcessor.ViewModels
                 }
                 if (RenameFilesToCrescent)
                 {
+                    Logger.SetLatestLogMessage("Renaming files... Renaming operation can't be cancelled!", LogMessageColor.Informational);
+                    IsCancelEnabled = false;
                     TagProcessingProgress.Reset();
                     if (_startingNumberForFileNames == null)
                     {
                         _startingNumberForFileNames = 1;
                     }
                     await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, (int)_startingNumberForFileNames);
+                    IsCancelEnabled = true;
                 }
                 if (ApplyConsolidateTags)
                 {
                     TagProcessingProgress.Reset();
-                    //await _tagProcessorService.ConsolidateTags(InputFolderPath);
                     await _tagProcessor.ConsolidateTagsAndLogEdgeCases(InputFolderPath, Logger);
                 }
                 if (ApplyRedundancyRemoval)
@@ -167,19 +171,21 @@ namespace DatasetProcessor.ViewModels
                     await _tagProcessor.ApplyRedundancyRemovalToFiles(InputFolderPath);
                 }
             }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
+            catch (IOException)
+            {
+                Logger.SetLatestLogMessage($"Images and Tag files are named in crescent order already!",
+                        LogMessageColor.Warning);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(IOException))
-                {
-                    Logger.SetLatestLogMessage($"Images and Tag files are named in crescent order already!",
-                        LogMessageColor.Warning);
-                }
-                else
-                {
-                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                         LogMessageColor.Error);
-                    await Logger.SaveExceptionStackTrace(exception);
-                }
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {
@@ -196,13 +202,15 @@ namespace DatasetProcessor.ViewModels
                 {
                     await _tagProcessor.ProcessTagsReplacement(InputFolderPath, TagsToBeReplaced, TagsToReplace);
                 }
+                catch (OperationCanceledException)
+                {
+                    IsCancelEnabled = false;
+                    Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+                }
                 catch (Exception exception)
                 {
-                    if (exception.GetType() == typeof(ArgumentException))
-                    {
-                        Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                             LogMessageColor.Error);
-                    }
                     await Logger.SaveExceptionStackTrace(exception);
                 }
                 finally
@@ -228,6 +236,25 @@ namespace DatasetProcessor.ViewModels
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                     LogMessageColor.Error);
                 await Logger.SaveExceptionStackTrace(exception);
+            }
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_tagProcessor as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
             }
         }
     }

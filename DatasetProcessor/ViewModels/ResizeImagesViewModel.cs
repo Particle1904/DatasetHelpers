@@ -68,13 +68,16 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
-        [ObservableProperty]
-        private bool _isUiEnabled;
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime
         {
             get => _timer.Elapsed;
         }
+
+        [ObservableProperty]
+        private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public ResizeImagesViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
@@ -140,7 +143,6 @@ namespace DatasetProcessor.ViewModels
             timer.Start();
 
             TaskStatus = ProcessingStatus.Running;
-
             try
             {
                 _imageProcessor.LanczosSamplerRadius = (int)LanczosRadius;
@@ -153,6 +155,11 @@ namespace DatasetProcessor.ViewModels
                 _imageProcessor.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1,
                     ushort.MaxValue);
                 await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
+            }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
             }
             catch (Exception exception)
             {
@@ -178,6 +185,25 @@ namespace DatasetProcessor.ViewModels
         partial void OnSharpenSigmaChanged(double value)
         {
             SharpenSigma = Math.Round(value, 2);
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_imageProcessor as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
         }
     }
 }

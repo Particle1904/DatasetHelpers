@@ -18,10 +18,11 @@ using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning;
+using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services
 {
-    public class ImageProcessorService : IImageProcessorService, INotifyProgress
+    public class ImageProcessorService : CancellableServiceBase, IImageProcessorService, INotifyProgress
     {
         private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
 
@@ -96,7 +97,7 @@ namespace SmartData.Lib.Services
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
-        public ImageProcessorService()
+        public ImageProcessorService() : base()
         {
             BlocksPerRow = _baseResolution / _divisor;
             _totalBlocks = BlocksPerRow * BlocksPerRow;
@@ -224,12 +225,14 @@ namespace SmartData.Lib.Services
         public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
             foreach (var file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await semaphore.WaitAsync();
 
                 try

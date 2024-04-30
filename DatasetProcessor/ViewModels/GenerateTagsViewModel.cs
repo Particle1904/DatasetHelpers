@@ -47,6 +47,8 @@ namespace DatasetProcessor.ViewModels
         private bool _applyRedundancyRemoval;
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDAutoTagger,
             WDV3AutoTaggerService wDV3AutoTagger, JoyTagAutoTaggerService joyTagAutoTagger,
@@ -169,6 +171,11 @@ namespace DatasetProcessor.ViewModels
                 // Stop dispatcher timer.
                 timer.Stop();
             }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
@@ -223,6 +230,27 @@ namespace DatasetProcessor.ViewModels
         {
             Threshold = Math.Round(value, 2);
         }
+        [RelayCommand]
 
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_wDAutoTagger as ICancellableService)?.CancelCurrentTask();
+            (_wDv3AutoTagger as ICancellableService)?.CancelCurrentTask();
+            (_joyTagAutoTagger as ICancellableService)?.CancelCurrentTask();
+            (_e621AutoTagger as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
+        }
     }
 }

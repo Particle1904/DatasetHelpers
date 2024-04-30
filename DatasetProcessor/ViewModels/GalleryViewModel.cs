@@ -23,9 +23,9 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class GalleryViewModel : BaseViewModel
     {
-        private const int ItemsPerPage = 100;
-
         private readonly IFileManipulatorService _fileManipulator;
+
+        private const int ItemsPerPage = 200;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -51,6 +51,8 @@ namespace DatasetProcessor.ViewModels
         Progress _galleryProcessingProgress;
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
@@ -99,8 +101,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -118,6 +118,10 @@ namespace DatasetProcessor.ViewModels
 
                 if (imageFiles.Count <= 0)
                 {
+                    // Stop dispatcher timer
+                    timer.Stop();
+                    // Stop elapsed timer
+                    _timer.Stop();
                     return;
                 }
                 // Order the list of images with path.
@@ -149,12 +153,12 @@ namespace DatasetProcessor.ViewModels
 
                 ImageCollection = new ObservableCollection<ImageItem>(imageItems);
             }
-            catch (NotSupportedException ex)
+            catch (NotSupportedException exception)
             {
-                Logger.SetLatestLogMessage(ex.Message, LogMessageColor.Error);
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
                 return;
             }
-            catch
+            catch (Exception)
             {
                 Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
             }
@@ -204,8 +208,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
-
             _timer.Reset();
             _timer.Start();
             DispatcherTimer timer = new DispatcherTimer()
@@ -221,6 +223,11 @@ namespace DatasetProcessor.ViewModels
                 List<string> filesForDeletion = SelectedImageItems.Select(x => x.FileName).ToList();
 
                 await _fileManipulator.DeleteFilesAsync(InputFolderPath, filesForDeletion);
+            }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
             }
             catch (Exception exception)
             {
@@ -257,6 +264,24 @@ namespace DatasetProcessor.ViewModels
         partial void OnImageCollectionChanged(ObservableCollection<ImageItem> value)
         {
             CurrentPageString = $"Current page: {CurrentPage + 1}";
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
         }
     }
 }

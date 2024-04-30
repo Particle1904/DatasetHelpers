@@ -1,5 +1,6 @@
 ﻿using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Services.Base;
 
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -8,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
 {
-    public class TagProcessorService : ITagProcessorService, INotifyProgress
+    public class TagProcessorService : CancellableServiceBase, ITagProcessorService, INotifyProgress
     {
         private readonly string _txtSearchPattern = "*.txt";
         private readonly string _captionSearchPattern = "*.caption";
@@ -146,11 +147,14 @@ namespace SmartData.Lib.Services
         public async Task ProcessAllTagFiles(string inputFolderPath, string tagsToAdd, string tagsToEmphasize, string tagsToRemove)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ProcessListOfTags(readTags, tagsToAdd, tagsToEmphasize, tagsToRemove);
                 await File.WriteAllTextAsync(file, processedTags);
@@ -167,6 +171,7 @@ namespace SmartData.Lib.Services
         public async Task ConsolidateTags(string inputFolderPath)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
@@ -174,6 +179,8 @@ namespace SmartData.Lib.Services
             {
                 foreach (string file in files)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     string readTags = await File.ReadAllTextAsync(file);
                     string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
                     await File.WriteAllTextAsync(file, consolidatedTags);
@@ -202,6 +209,7 @@ namespace SmartData.Lib.Services
             stopwatch.Start();
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
@@ -209,20 +217,29 @@ namespace SmartData.Lib.Services
             {
                 foreach (string file in files)
                 {
-                    string readTags = await File.ReadAllTextAsync(file);
-                    string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
-
-                    string[] splitTags = consolidatedTags.Split(", ");
-                    foreach (string item in splitTags)
+                    try
                     {
-                        if (item.Split(' ').Length >= 4)
-                        {
-                            logStringBuilder.AppendLine($"FILE: {file} | CONSOLIDATED TAG: {item}");
-                        }
-                    }
+                        cancellationToken.ThrowIfCancellationRequested();
 
-                    await File.WriteAllTextAsync(file, consolidatedTags);
-                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
+                        string readTags = await File.ReadAllTextAsync(file);
+                        string consolidatedTags = ProcessConsolidateTags(sha256, readTags);
+
+                        string[] splitTags = consolidatedTags.Split(", ");
+                        foreach (string item in splitTags)
+                        {
+                            if (item.Split(' ').Length >= 4)
+                            {
+                                logStringBuilder.AppendLine($"FILE: {file} | CONSOLIDATED TAG: {item}");
+                            }
+                        }
+
+                        await File.WriteAllTextAsync(file, consolidatedTags);
+                        ProgressUpdated?.Invoke(this, EventArgs.Empty);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -240,11 +257,14 @@ namespace SmartData.Lib.Services
         public async Task FindAndReplace(string inputFolderPath, string wordsToBeReplaced, string wordsToReplace)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _captionSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string readCaption = await File.ReadAllTextAsync(file);
                 string processedCaption = ProcessSearchAndReplace(readCaption, wordsToBeReplaced, wordsToReplace);
                 await File.WriteAllTextAsync(file, processedCaption);
@@ -262,11 +282,14 @@ namespace SmartData.Lib.Services
         public async Task ProcessTagsReplacement(string inputFolderPath, string tagsToBeReplaced, string tagsToReplace)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (var file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ReplaceListOfTags(readTags, tagsToBeReplaced, tagsToReplace);
                 await File.WriteAllTextAsync(file, processedTags);
@@ -282,11 +305,14 @@ namespace SmartData.Lib.Services
         public async Task RandomizeTagsOfFiles(string inputFolderPath)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = RandomizeTags(readTags);
                 await File.WriteAllTextAsync(file, processedTags);
@@ -302,11 +328,14 @@ namespace SmartData.Lib.Services
         public async Task ApplyRedundancyRemovalToFiles(string inputFolderPath)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _txtSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string readTags = await File.ReadAllTextAsync(file);
                 string processedTags = ApplyRedundancyRemoval(readTags);
                 await File.WriteAllTextAsync(file, processedTags);

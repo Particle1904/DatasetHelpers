@@ -106,12 +106,20 @@
 		<!-- ELAPSED TIME -->
 		<Label Grid.Row="10"
 			   Content="{Binding ElapsedTime, StringFormat='Subsect extraction elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
-		<!-- PROCESS BUTTON -->
-		<Button Grid.Row="12"
-				Width="200"
-				Content="Extract subset"
-				IsEnabled="{Binding IsUiEnabled}"
-				Command="{Binding FilterSubsetCommand}"/>
+		<!-- EXTRACT BUTTON -->
+		<Grid Grid.Row="12"
+			  ColumnDefinitions="Auto, 10, Auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Extract subset"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding FilterSubsetCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>		
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="14"
 					 Value="{Binding FilterProgress.PercentComplete}"/>

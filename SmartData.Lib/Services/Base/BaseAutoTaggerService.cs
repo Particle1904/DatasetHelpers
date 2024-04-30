@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML.Data;
+
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -96,10 +97,14 @@ namespace SmartData.Lib.Services.Base
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await PostProcessTags(outputPath, weightedCaptions, file);
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
@@ -121,10 +126,14 @@ namespace SmartData.Lib.Services.Base
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await PostProcessTagsAndAppendToFile(outputPath, weightedCaptions, file);
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
@@ -147,10 +156,14 @@ namespace SmartData.Lib.Services.Base
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 await GenerateTagsWithRedundant(outputPath, appendToFile, weightedCaptions, file);
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }

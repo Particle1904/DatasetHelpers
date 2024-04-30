@@ -147,11 +147,19 @@
 			<Label Grid.Row="6"
 				   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 			<!-- PROCESS BUTTON -->
-			<Button Grid.Row="8"
-					Width="200"
-					Content="Delete selected images"
-					IsEnabled="{Binding IsUiEnabled}"
-					Command="{Binding DeleteSelectedImagesCommand}"/>
+			<Grid Grid.Row="8"
+				  ColumnDefinitions="Auto, 10, Auto"
+				  HorizontalAlignment="Center">
+				<Button Width="200"
+						Content="Delete selected images"
+						IsEnabled="{Binding IsUiEnabled}"
+						Command="{Binding DeleteSelectedImagesCommand}"/>
+				<Button Grid.Column="2"
+						Width="120"
+						Content="Cancel"
+						IsEnabled="{Binding IsCancelEnabled}"
+						Command="{Binding CancelTaskCommand}"/>
+			</Grid>			
 			<!-- PROGRESS BAR -->
 			<ProgressBar Grid.Row="10"
 						 Value="{Binding GalleryProcessingProgress.PercentComplete}"/>

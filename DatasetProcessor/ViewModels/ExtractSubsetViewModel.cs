@@ -33,8 +33,11 @@ namespace DatasetProcessor.ViewModels
         private string _tagsToFilter;
         [ObservableProperty]
         private Progress _filterProgress;
+
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
 
         public ExtractSubsetViewModel(IFileManipulatorService fileManipulator, ILoggerService logger,
             IConfigsService configs) : base(logger, configs)
@@ -81,15 +84,6 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            if (FilterProgress == null)
-            {
-                FilterProgress = new Progress();
-            }
-            if (FilterProgress.PercentFloat != 0f)
-            {
-                FilterProgress.Reset();
-            }
-
             TaskStatus = ProcessingStatus.Running;
             try
             {
@@ -112,27 +106,47 @@ namespace DatasetProcessor.ViewModels
                 FilterProgress.Reset();
                 await _fileManipulator.CreateSubsetAsync(result, OutputFolderPath);
             }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
+            catch (FileNotFoundException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+            }
+            catch (ArgumentNullException exception)
+            {
+                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
+            }
             catch (Exception exception)
             {
-                if (exception.GetType() == typeof(FileNotFoundException))
-                {
-                    Logger.SetLatestLogMessage($"{exception.Message}", LogMessageColor.Error);
-                }
-                else if (exception.GetType() == typeof(ArgumentNullException))
-                {
-                    Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
-                }
-                else
-                {
-                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                         LogMessageColor.Error);
-                    await Logger.SaveExceptionStackTrace(exception);
-                }
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
+            }
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
             }
         }
     }
