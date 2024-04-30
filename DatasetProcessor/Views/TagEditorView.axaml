@@ -177,7 +177,7 @@
 				</Grid>
 				<Grid Grid.Row="4"
 					  Classes="gridSecondary"
-					  RowDefinitions="2*, 10, 1*, 10, Auto">
+					  RowDefinitions="2*, 10, auto, 10, 1*, 10, Auto">
 					<!-- TAGS EDITOR -->
 					<AvaloniaEdit:TextEditor Grid.Row="0"
 											 x:Name="EditorTags"
@@ -190,22 +190,27 @@
 											 BorderThickness="1"
 											 FontSize="17"
 											 FontWeight="Light"/>
+					<Label Grid.Row="2" 
+						   Foreground="{Binding TokenTextColor}"
+						   Content="{Binding CurrentImageTokenCount}"
+						   HorizontalAlignment="Right"
+						   Margin="0, -8, 3, 0"/>
 					<!-- HIGHLIGHT PANEL -->
-					<Grid Grid.Row="2"
+					<Grid Grid.Row="4"
 						  Classes="gridPrimary"
 						  RowDefinitions="Auto, 10, *">
 						<Label Grid.Row="0"
 							   Padding="8"
 							   Content="Highlight words:"
 							   HorizontalAlignment="Left"/>
-						<TextBox Grid.Row="2" 
+						<TextBox Grid.Row="6" 
 								 x:Name="EditorHighlight"
 								 TextWrapping="Wrap"
 								 Background="Transparent"
 								 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 								 Text="{Binding WordsToHighlight}"/>
 					</Grid>
-					<Label Grid.Row="4"
+					<Label Grid.Row="6"
 						   FontSize="12"
 						   Foreground="{DynamicResource SecondaryLight}"
 						   Content="Note: text changes are automatically saved whenever you type anything in the text box."/>

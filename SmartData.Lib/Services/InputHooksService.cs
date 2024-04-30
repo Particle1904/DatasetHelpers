@@ -1,5 +1,4 @@
 ﻿using SharpHook;
-using SharpHook.Native;
 
 using SmartData.Lib.Interfaces;
 
@@ -47,7 +46,7 @@ namespace SmartData.Lib.Services
         /// <param name="e">A <see cref="KeyboardHookEventArgs"/> that contains the event data.</param>
         private void OnKeyDown(object sender, KeyboardHookEventArgs e)
         {
-
+#if !DEBUG
             if (CanProcessHook())
             {
                 return;
@@ -93,6 +92,7 @@ namespace SmartData.Lib.Services
             }
 
             _keyboardTimer.Restart();
+#endif
         }
 
         /// <summary>
@@ -102,6 +102,7 @@ namespace SmartData.Lib.Services
         /// <param name="e">A <see cref="MouseHookEventArgs"/> that contains the event data.</param>
         private void OnMouseButtonDown(object sender, MouseHookEventArgs e)
         {
+#if !DEBUG
             if (CanProcessHook())
             {
                 return;
@@ -123,6 +124,7 @@ namespace SmartData.Lib.Services
             }
 
             _keyboardTimer.Restart();
+#endif
         }
 
         /// <summary>
@@ -130,6 +132,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         public void SubscribeToInputEvents()
         {
+#if !DEBUG
             _keyboardHook.KeyPressed += OnKeyDown;
             _keyboardHook.KeyPressed += (sender, e) =>
             {
@@ -146,6 +149,7 @@ namespace SmartData.Lib.Services
                 }
             };
             _keyboardHook.MousePressed += OnMouseButtonDown;
+#endif
         }
 
         /// <summary>

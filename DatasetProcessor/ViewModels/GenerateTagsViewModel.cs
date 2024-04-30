@@ -203,26 +203,26 @@ namespace DatasetProcessor.ViewModels
         /// <summary>
         /// Calls the AutoTagger service to generate tags based on the specified parameters.
         /// </summary>
-        /// <param name="autoTaggerService">The instance of the AutoTagger service to use.</param>
+        /// <param name="autoTagger">The instance of the AutoTagger service to use.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task CallAutoTaggerService(IAutoTaggerService autoTaggerService)
+        private async Task CallAutoTaggerService(IAutoTaggerService autoTagger)
         {
-            autoTaggerService.Threshold = (float)Threshold;
+            autoTagger.Threshold = (float)Threshold;
 
             if (ApplyRedundancyRemoval)
             {
                 if (AppendCaptionsToFile)
                 {
-                    await autoTaggerService.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                    await autoTagger.GenerateTagsAndAppendToFile(InputFolderPath, OutputFolderPath, WeightedCaptions);
                 }
                 else
                 {
-                    await autoTaggerService.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
+                    await autoTagger.GenerateTags(InputFolderPath, OutputFolderPath, WeightedCaptions);
                 }
             }
             else
             {
-                await autoTaggerService.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
+                await autoTagger.GenerateTagsAndKeepRedundant(InputFolderPath, OutputFolderPath, AppendCaptionsToFile);
             }
         }
 

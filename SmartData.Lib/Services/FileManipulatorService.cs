@@ -28,6 +28,8 @@ namespace SmartData.Lib.Services
 
         private readonly string _yolov4ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/yolov4.onnx?download=true";
 
+        private readonly string _clipTokenizerLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/cliptokenizer.onnx?download=true";
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
         public event EventHandler<string> DownloadMessageEvent;
@@ -419,6 +421,12 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
+                case AvailableModels.CLIPTokenizer:
+                    if (!Path.Exists(FileNames.CLIPTokenixerOnnxFileName))
+                    {
+                        result = true;
+                    }
+                    break;
             }
 
             return result;
@@ -474,6 +482,10 @@ namespace SmartData.Lib.Services
                     case AvailableModels.Yolov4:
                         modelUrl = _yolov4ModelLink;
                         modelFileName = FileNames.YoloV4OnnxFileName;
+                        break;
+                    case AvailableModels.CLIPTokenizer:
+                        modelUrl = _clipTokenizerLink;
+                        modelFileName = FileNames.CLIPTokenixerOnnxFileName;
                         break;
                 }
 

@@ -57,6 +57,7 @@ public partial class App : Application
         var contentAwareCrop = _servicesProvider.GetRequiredService<IContentAwareCropService>();
         var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
         var promptGenerator = _servicesProvider.GetRequiredService<IPromptGeneratorService>();
+        var clipTokenizer = _servicesProvider.GetRequiredService<ICLIPTokenizerService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
@@ -66,7 +67,7 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
-                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -78,7 +79,7 @@ public partial class App : Application
             singleViewPlatform.MainView = new MainView()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
-                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, logger, configs)
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, logger, configs)
             };
         }
 
@@ -122,6 +123,9 @@ public partial class App : Application
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, FileNames.JoyTagOnnxFileName),
                 Path.Combine(_modelsPath, FileNames.JoyTagCsvFileName)
+        ));
+        services.AddSingleton<ICLIPTokenizerService>(service =>
+            new CLIPTokenizerService(Path.Combine(_modelsPath, FileNames.CLIPTokenixerOnnxFileName)
         ));
         services.AddSingleton<IInputHooksService, InputHooksService>();
         services.AddSingleton<IPromptGeneratorService>(service => new

@@ -195,14 +195,14 @@ namespace SmartData.Lib.Services
         /// Additionally, the total time taken for the operation is logged.
         /// </summary>
         /// <param name="inputFolderPath">The path of the directory containing the text files with tags to consolidate.</param>
-        /// <param name="loggerService">The logger service responsible for handling log storage.</param>
+        /// <param name="logger">The logger service responsible for handling log storage.</param>
         /// <remarks>
         /// This method reads text files from the specified folder, consolidates similar tags in each file,
         /// and saves the consolidated tags back to the respective files. Progress is tracked using the provided
         /// progress object. Edge cases encountered during consolidation are logged within this method, and
         /// the total time taken for the operation is also logged.
         /// </remarks>
-        public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService loggerService)
+        public async Task ConsolidateTagsAndLogEdgeCases(string inputFolderPath, ILoggerService logger)
         {
             StringBuilder logStringBuilder = new StringBuilder();
             Stopwatch stopwatch = new Stopwatch();
@@ -245,7 +245,7 @@ namespace SmartData.Lib.Services
 
             stopwatch.Stop();
             logStringBuilder.AppendLine($"{Environment.NewLine}TIME TAKEN: {stopwatch.Elapsed.Hours}:{stopwatch.Elapsed.Minutes}:{stopwatch.Elapsed.Seconds}");
-            await loggerService.SaveStringBuilderToLogFile(logStringBuilder);
+            await logger.SaveStringBuilderToLogFile(logStringBuilder);
         }
 
         /// <summary>

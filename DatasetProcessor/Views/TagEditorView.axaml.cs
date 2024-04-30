@@ -32,7 +32,7 @@ namespace DatasetProcessor.Views
             InitializeComponent();
 
             EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged(sender, args));
-            EditorTags.TextChanged += OnTextChanged;
+            EditorTags.TextChanged += async (sender, args) => await OnTextChangedAsync(sender, args);
         }
 
         /// <summary>
@@ -57,13 +57,15 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles the TextChanged event of the EditorTags control to process changes in tags.
         /// </summary>
-        private void OnTextChanged(object? sender, EventArgs args)
+        private async Task OnTextChangedAsync(object? sender, EventArgs args)
         {
             if (_viewModel != null)
             {
                 _viewModel.PropertyChanged -= OnTagsPropertyChanged;
                 _viewModel.CurrentImageTags = EditorTags.Text;
                 _viewModel.PropertyChanged += OnTagsPropertyChanged;
+
+                await _viewModel.CountTokensForCurrentImageCommand.ExecuteAsync(null);
             }
         }
 

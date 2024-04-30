@@ -1,16 +1,12 @@
 ﻿using Microsoft.ML;
 using Microsoft.ML.Transforms.Onnx;
 
-using SmartData.Lib.Interfaces;
-
 namespace SmartData.Lib.Services.Base
 {
     public abstract class BaseAIConsumer<TInput, TOutput> : CancellableServiceBase
         where TInput : class
         where TOutput : class, new()
     {
-        protected readonly IImageProcessorService _imageProcessorService;
-
         protected string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
         protected MLContext _mlContext;
@@ -30,10 +26,8 @@ namespace SmartData.Lib.Services.Base
             }
         }
 
-        protected BaseAIConsumer(IImageProcessorService imageProcessorService, string modelPath)
+        protected BaseAIConsumer(string modelPath)
         {
-            _imageProcessorService = imageProcessorService;
-
             ModelPath = modelPath;
 
             _mlContext = new MLContext();
@@ -55,7 +49,7 @@ namespace SmartData.Lib.Services.Base
         /// Retrieves a prediction pipeline for making predictions using the ONNX model.
         /// </summary>
         /// <returns>An instance of ITransformer representing the prediction pipeline.</returns>
-        protected ITransformer GetPredictionPipeline<TData>() where TData : class
+        protected virtual ITransformer GetPredictionPipeline<TData>() where TData : class
         {
             string[] inputColumns = GetInputColumns();
             string[] outputColumns = GetOutputColumns();

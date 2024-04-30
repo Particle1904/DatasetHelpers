@@ -11,7 +11,8 @@ namespace SmartData.Lib.Services.Base
         where TInput : class
         where TOutput : class, new()
     {
-        protected readonly ITagProcessorService _tagProcessorService;
+        protected readonly IImageProcessorService _imageProcessor;
+        protected readonly ITagProcessorService _tagProcessor;
 
         protected string[] _tags;
 
@@ -46,13 +47,14 @@ namespace SmartData.Lib.Services.Base
         /// <summary>
         /// Initializes a new instance of the AutoTaggerService class.
         /// </summary>
-        /// <param name="imageProcessorService">The service responsible for image processing.</param>
-        /// <param name="tagProcessorService">The service responsible for processing tags.</param>
+        /// <param name="imageProcessor">The service responsible for image processing.</param>
+        /// <param name="tagProcessor">The service responsible for processing tags.</param>
         /// <param name="modelPath">The path to the machine learning model.</param>
         /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
-        public BaseAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) : base(imageProcessorService, modelPath)
+        public BaseAutoTaggerService(IImageProcessorService imageProcessor, ITagProcessorService tagProcessor, string modelPath, string tagsPath) : base(modelPath)
         {
-            _tagProcessorService = tagProcessorService;
+            _imageProcessor = imageProcessor;
+            _tagProcessor = tagProcessor;
             TagsPath = tagsPath;
         }
 
@@ -180,7 +182,7 @@ namespace SmartData.Lib.Services.Base
         protected async Task GenerateTagsWithRedundant(string outputPath, bool appendToFile, bool weightedCaptions, string file)
         {
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
+            string commaSeparated = _tagProcessor.GetCommaSeparatedString(orderedPredictions);
 
             string txtFile = Path.ChangeExtension(file, ".txt");
 
@@ -211,9 +213,9 @@ namespace SmartData.Lib.Services.Base
         protected async Task PostProcessTags(string outputPath, bool weightedCaptions, string file)
         {
             List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
+            string commaSeparated = _tagProcessor.GetCommaSeparatedString(orderedPredictions);
 
-            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+            string redundantRemoved = _tagProcessor.ApplyRedundancyRemoval(commaSeparated);
 
             string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
 
@@ -242,11 +244,11 @@ namespace SmartData.Lib.Services.Base
                 string existingCaption = await File.ReadAllTextAsync(txtFile);
 
                 List<string> orderedPredictions = await GetOrderedByScoreListOfTagsAsync(file, weightedCaptions);
-                string commaSeparated = _tagProcessorService.GetCommaSeparatedString(orderedPredictions);
+                string commaSeparated = _tagProcessor.GetCommaSeparatedString(orderedPredictions);
 
                 string existingPlusGenerated = $"{existingCaption.Replace("_", " ")}, {commaSeparated}";
 
-                string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(existingPlusGenerated);
+                string redundantRemoved = _tagProcessor.ApplyRedundancyRemoval(existingPlusGenerated);
 
                 string resultPath = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(file)}.txt");
 
@@ -319,9 +321,9 @@ namespace SmartData.Lib.Services.Base
                 listOrdered.Add(item.Key);
             }
 
-            string commaSeparated = _tagProcessorService.GetCommaSeparatedString(listOrdered);
+            string commaSeparated = _tagProcessor.GetCommaSeparatedString(listOrdered);
 
-            string redundantRemoved = _tagProcessorService.ApplyRedundancyRemoval(commaSeparated);
+            string redundantRemoved = _tagProcessor.ApplyRedundancyRemoval(commaSeparated);
 
             UnloadModel();
 

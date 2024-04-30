@@ -11,6 +11,7 @@ namespace SmartData.Lib.Services.MachineLearning
 {
     public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService, INotifyProgress
     {
+        private readonly IImageProcessorService _imageProcessor;
 
         private float _scoreThreshold = 0.5f;
         /// <summary>
@@ -130,8 +131,9 @@ namespace SmartData.Lib.Services.MachineLearning
             }
         }
 
-        public ContentAwareCropService(IImageProcessorService imageProcessorService, string modelPath) : base(imageProcessorService, modelPath)
+        public ContentAwareCropService(IImageProcessorService imageProcessor, string modelPath) : base(modelPath)
         {
+            _imageProcessor = imageProcessor;
         }
 
         protected override string[] GetInputColumns()
@@ -179,10 +181,10 @@ namespace SmartData.Lib.Services.MachineLearning
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
-            _imageProcessorService.LanczosSamplerRadius = LanczosRadius;
-            _imageProcessorService.ApplySharpen = ApplySharpen;
-            _imageProcessorService.SharpenSigma = (float)SharpenSigma;
-            _imageProcessorService.MinimumResolutionForSigma = MinimumResolutionForSigma;
+            _imageProcessor.LanczosSamplerRadius = LanczosRadius;
+            _imageProcessor.ApplySharpen = ApplySharpen;
+            _imageProcessor.SharpenSigma = (float)SharpenSigma;
+            _imageProcessor.MinimumResolutionForSigma = MinimumResolutionForSigma;
             foreach (string file in filesList)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -202,9 +204,9 @@ namespace SmartData.Lib.Services.MachineLearning
         private async Task ProcessingRoutine(string outputPath, SupportedDimensions dimension, string file)
         {
             Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
-            System.Drawing.Size imageSize = await _imageProcessorService.GetImageSizeAsync(file);
+            System.Drawing.Size imageSize = await _imageProcessor.GetImageSizeAsync(file);
             var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
-            await _imageProcessorService.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
+            await _imageProcessor.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
         }
 
         /// <summary>
@@ -214,7 +216,7 @@ namespace SmartData.Lib.Services.MachineLearning
         /// <returns>A task representing the asynchronous operation that yields the YOLOv4 bounding box prediction.</returns>
         private async Task<Yolov4OutputData> GetPredictionAsync(string inputImagePath)
         {
-            Yolov4InputData inputData = await _imageProcessorService.ProcessImageForBoundingBoxPredictionAsync(inputImagePath);
+            Yolov4InputData inputData = await _imageProcessor.ProcessImageForBoundingBoxPredictionAsync(inputImagePath);
 
             Yolov4OutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
             return prediction;

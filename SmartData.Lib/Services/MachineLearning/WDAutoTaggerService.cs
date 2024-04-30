@@ -24,7 +24,7 @@ namespace SmartData.Lib.Services.MachineLearning
 
         public override async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
         {
-            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(inputImagePath);
+            WDInputData inputData = await _imageProcessor.ProcessImageForTagPredictionAsync(inputImagePath);
 
             WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
             return prediction.PredictionsSigmoid;
@@ -68,7 +68,7 @@ namespace SmartData.Lib.Services.MachineLearning
 
         public override async Task<VBuffer<float>> GetPredictionAsync(Stream imageStream)
         {
-            WDInputData inputData = await _imageProcessorService.ProcessImageForTagPredictionAsync(imageStream);
+            WDInputData inputData = await _imageProcessor.ProcessImageForTagPredictionAsync(imageStream);
 
             WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
             return prediction.PredictionsSigmoid;

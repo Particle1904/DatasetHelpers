@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
@@ -7,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Interfaces.MachineLearning;
 
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace DatasetProcessor.ViewModels
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
         private readonly IInputHooksService _inputHooks;
+        private readonly ICLIPTokenizerService _clipTokenizer;
         private Random _random;
 
         [ObservableProperty]
@@ -52,6 +55,11 @@ namespace DatasetProcessor.ViewModels
         private bool _editingTxt;
         [ObservableProperty]
         private string _currentImageTags;
+        [ObservableProperty]
+        private string _currentImageTokenCount;
+
+        [ObservableProperty]
+        private SolidColorBrush _tokenTextColor;
 
         private bool _showBlurredImage;
         private MemoryStream _currentImageMemoryStream = null;
@@ -80,14 +88,17 @@ namespace DatasetProcessor.ViewModels
         /// <param name="fileManipulator">The file manipulation service for file operations.</param>
         /// <param name="imageProcessor">The image processing service for image-related operations.</param>
         /// <param name="inputHooks">The input hooks service for managing user input.</param>
+        /// <param name="clipTokenizer">The clip tokenizer service for token operations.</param>
         /// <param name="logger">The logger service for logging messages.</param>
         /// <param name="configs">The configuration service for application settings.</param>
         public TagEditorViewModel(IFileManipulatorService fileManipulator, IImageProcessorService imageProcessor,
-                IInputHooksService inputHooks, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+                IInputHooksService inputHooks, ICLIPTokenizerService clipTokenizer, ILoggerService logger,
+                IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
             _imageProcessor = imageProcessor;
             _inputHooks = inputHooks;
+            _clipTokenizer = clipTokenizer;
             _random = new Random();
 
             InputFolderPath = Configs.Configurations.CombinedOutputFolder;
@@ -96,9 +107,10 @@ namespace DatasetProcessor.ViewModels
             ButtonEnabled = true;
             IsExactFilter = false;
 
-            _editingTxt = true;
+            EditingTxt = true;
 
             SelectedItemIndex = 0;
+            CurrentImageTokenCount = string.Empty;
 
             _inputHooks.ButtonF1 += (sender, args) => OnNavigationButtonDown("-1");
             _inputHooks.ButtonF2 += (sender, args) => OnNavigationButtonDown("1");
@@ -114,6 +126,8 @@ namespace DatasetProcessor.ViewModels
 
             _inputHooks.AltLeftArrowCombo += (sender, args) => OnNavigationButtonDown("-1");
             _inputHooks.AltRightArrowCombo += (sender, args) => OnNavigationButtonDown("1");
+
+            TokenTextColor = new SolidColorBrush(Colors.LightGreen);
         }
 
         /// <summary>
@@ -289,6 +303,26 @@ namespace DatasetProcessor.ViewModels
         private async Task CopyCurrentImageTagsToClipboard()
         {
             await CopyToClipboard(CurrentImageTags);
+        }
+
+        [RelayCommand]
+        private async Task CountTokensForCurrentImage()
+        {
+            if (_fileManipulator.FileNeedsToBeDownloaded(AvailableModels.CLIPTokenizer))
+            {
+                await _fileManipulator.DownloadModelFile(AvailableModels.CLIPTokenizer);
+            }
+
+            int count = await Task.Run(() => _clipTokenizer.CountTokens(CurrentImageTags));
+            CurrentImageTokenCount = $"Token count: {count}/75";
+            if (count < 75)
+            {
+                TokenTextColor = new SolidColorBrush(Colors.LightGreen);
+            }
+            else
+            {
+                TokenTextColor = new SolidColorBrush(Colors.PaleVioletRed);
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML.Data;
+
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning;
@@ -25,7 +26,7 @@ namespace SmartData.Lib.Services.MachineLearning
 
         public override async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
         {
-            JoyTagInputData inputData = await _imageProcessorService.ProcessImageForJoyTagPredictionAsync(inputImagePath);
+            JoyTagInputData inputData = await _imageProcessor.ProcessImageForJoyTagPredictionAsync(inputImagePath);
 
             JoyTagOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
             return prediction.PredictionsSigmoid;

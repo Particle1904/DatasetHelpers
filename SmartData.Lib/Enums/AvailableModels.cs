@@ -6,6 +6,7 @@
         WD14v2,
         WDv3,
         Z3DE621,
-        Yolov4
+        Yolov4,
+        CLIPTokenizer
     }
 }

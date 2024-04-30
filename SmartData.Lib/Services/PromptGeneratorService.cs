@@ -8,16 +8,16 @@ namespace SmartData.Lib.Services
 {
     public class PromptGeneratorService : IPromptGeneratorService, INotifyProgress
     {
-        protected readonly ITagProcessorService _tagProcessorService;
-        protected readonly IFileManipulatorService _fileManipulatorService;
+        protected readonly ITagProcessorService _tagProcessor;
+        protected readonly IFileManipulatorService _fileManipulator;
 
         StringBuilder _stringBuilder;
         Random _random;
 
-        public PromptGeneratorService(ITagProcessorService tagProcessorService, IFileManipulatorService fileManipulatorService)
+        public PromptGeneratorService(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator)
         {
-            _tagProcessorService = tagProcessorService;
-            _fileManipulatorService = fileManipulatorService;
+            _tagProcessor = tagProcessor;
+            _fileManipulator = fileManipulator;
             _stringBuilder = new StringBuilder();
             _random = new Random();
         }
@@ -91,7 +91,7 @@ namespace SmartData.Lib.Services
             for (int i = 0; i < amountOfPrompts; i++)
             {
                 string generatedPrompt = GeneratePromptFromDataset(tags, prependTags, appendTags, amountOfTags);
-                string cleanedPrompt = _tagProcessorService.ApplyRedundancyRemoval(generatedPrompt);
+                string cleanedPrompt = _tagProcessor.ApplyRedundancyRemoval(generatedPrompt);
                 prompts[i] = cleanedPrompt;
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }

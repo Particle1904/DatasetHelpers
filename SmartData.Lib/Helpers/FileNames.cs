@@ -15,5 +15,7 @@
         public const string JoyTagCsvFileName = "jtTags.csv";
 
         public const string YoloV4OnnxFileName = "yolov4.onnx";
+
+        public const string CLIPTokenixerOnnxFileName = "cliptokenizer.onnx";
     }
 }

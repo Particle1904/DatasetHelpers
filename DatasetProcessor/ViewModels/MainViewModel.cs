@@ -34,6 +34,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IContentAwareCropService _contentAwareCrop;
     protected readonly IInputHooksService _inputHooks;
     protected readonly IPromptGeneratorService _promptGenerator;
+    protected readonly ICLIPTokenizerService _clipTokenizer;
 
     [ObservableProperty]
     private UserControl _dynamicView;
@@ -73,6 +74,7 @@ public partial class MainViewModel : BaseViewModel
                          IContentAwareCropService contentAwareCrop,
                          IInputHooksService inputHooks,
                          IPromptGeneratorService promptGenerator,
+                         ICLIPTokenizerService clipTokenizer,
                          ILoggerService logger,
                          IConfigsService configs) :
         base(logger, configs)
@@ -87,6 +89,7 @@ public partial class MainViewModel : BaseViewModel
         _contentAwareCrop = contentAwareCrop;
         _inputHooks = inputHooks;
         _promptGenerator = promptGenerator;
+        _clipTokenizer = clipTokenizer;
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -101,7 +104,7 @@ public partial class MainViewModel : BaseViewModel
             { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger, e621AutoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, logger, configs) }},
+            { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, clipTokenizer, logger, configs) }},
             { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(fileManipulator, logger, configs) }},
             { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, logger, configs) }},
             { AppPages.Settings, new SettingsView() { DataContext = new SettingsViewModel(logger, configs) }}
@@ -214,9 +217,9 @@ public partial class MainViewModel : BaseViewModel
 
         if (args.PropertyName == nameof(ILoggerService.MessageColor))
         {
-            ILoggerService loggerService = (sender as ILoggerService);
+            ILoggerService logger = (sender as ILoggerService);
 
-            switch (loggerService.MessageColor)
+            switch (logger.MessageColor)
             {
                 case SmartData.Lib.Enums.LogMessageColor.Error:
                     LogMessageColor = new SolidColorBrush(Colors.IndianRed);
