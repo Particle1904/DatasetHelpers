@@ -1,4 +1,7 @@
 ﻿using SharpHook;
+#if !DEBUG
+using SharpHook.Native;
+#endif
 
 using SmartData.Lib.Interfaces;
 
