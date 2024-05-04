@@ -54,6 +54,15 @@ namespace SmartData.Lib.Services.Base
             string[] inputColumns = GetInputColumns();
             string[] outputColumns = GetOutputColumns();
 
+            TryToLoadOnGPU(inputColumns, outputColumns);
+
+            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());
+
+            return _pipeline.Fit(emptyDv);
+        }
+
+        protected void TryToLoadOnGPU(string[] inputColumns, string[] outputColumns)
+        {
             int[] gpuIdsToTry = new int[] { 0, 1, 2, 3 };
 
             for (int i = 0; i < gpuIdsToTry.Length; i++)
@@ -75,10 +84,6 @@ namespace SmartData.Lib.Services.Base
                     }
                 }
             }
-
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());
-
-            return _pipeline.Fit(emptyDv);
         }
 
         /// <summary>

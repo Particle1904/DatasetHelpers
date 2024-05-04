@@ -3,6 +3,8 @@
 using HeyRed.ImageSharp.Heif.Formats.Avif;
 using HeyRed.ImageSharp.Heif.Formats.Heif;
 
+using Microsoft.ML.OnnxRuntime.Tensors;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -453,6 +455,77 @@ namespace SmartData.Lib.Services
                 });
             }
             return inputData;
+        }
+
+        public async Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath, float upscaleFactor)
+        {
+            UpscalerInputData inputData = new UpscalerInputData();
+
+            using (Image<Bgra32> image = await Image.LoadAsync<Bgra32>(_decoderOptions, inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _bicubicResampler,
+                    Compand = true,
+                    PadColor = new Bgra32(0, 0, 0),
+                    Size = new Size((int)(image.Width * upscaleFactor), (int)(image.Height * upscaleFactor)),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                inputData.Input = new DenseTensor<float>(new[] { 1, 3, image.Height, image.Width });
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Bgra32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Bgra32 pixel = ref pixelRow[x];
+
+                            float r = pixel.R * 1f / 255f;
+                            float g = pixel.G * 1f / 255f;
+                            float b = pixel.B * 1f / 255f;
+
+                            inputData.Input[0, 0, y, x] = b;
+                            inputData.Input[0, 1, y, x] = g;
+                            inputData.Input[0, 2, y, x] = r;
+                        }
+                    }
+                });
+            }
+            return inputData;
+        }
+
+        public void SaveUpscaledImage(string outputPath, UpscalerOutputData upscalerOutputData)
+        {
+            int width = upscalerOutputData.Output.Dimensions[3];
+            int height = upscalerOutputData.Output.Dimensions[2];
+
+            byte[] imageByte = new byte[3 * width * height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    int baseIndex = (row * width + col) * 3;
+                    byte r = (byte)Math.Clamp(upscalerOutputData.Output[0, 2, row, col] * 255, 0, 255);
+                    byte g = (byte)Math.Clamp(upscalerOutputData.Output[0, 1, row, col] * 255, 0, 255);
+                    byte b = (byte)Math.Clamp(upscalerOutputData.Output[0, 0, row, col] * 255, 0, 255);
+
+                    imageByte[baseIndex] = r;
+                    imageByte[baseIndex + 1] = g;
+                    imageByte[baseIndex + 2] = b;
+                }
+            }
+
+            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+            using (Image<Rgb24> image = Image.LoadPixelData<Rgb24>(bytes, width, height))
+            {
+                image.SaveAsPng(outputPath);
+            }
         }
 
         /// <summary>

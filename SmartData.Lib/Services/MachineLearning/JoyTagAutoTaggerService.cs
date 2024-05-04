@@ -19,7 +19,8 @@ namespace SmartData.Lib.Services.MachineLearning
         /// <param name="tagProcessorService">The service responsible for processing tags.</param>
         /// <param name="modelPath">The path to the machine learning model.</param>
         /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
-        public JoyTagAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) :
+        public JoyTagAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService,
+            string modelPath, string tagsPath) :
             base(imageProcessorService, tagProcessorService, modelPath, tagsPath)
         {
         }

@@ -44,7 +44,10 @@ namespace SmartData.Lib.Services.MachineLearning
             }
 
             DenseTensor<string> inputTensor = new DenseTensor<string>(new string[] { inputText }, new int[] { 1 });
-            List<NamedOnnxValue> inputString = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor<string>("string_input", inputTensor) };
+            List<NamedOnnxValue> inputString = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor<string>("string_input", inputTensor)
+            };
             IDisposableReadOnlyCollection<DisposableNamedOnnxValue> tokens = _session.Run(inputString);
             List<long> inputIds = (tokens.ToList().First().Value as IEnumerable<long>).ToList();
             // Remove beginning (49406) of stream and ending (49407) of stream tokens
