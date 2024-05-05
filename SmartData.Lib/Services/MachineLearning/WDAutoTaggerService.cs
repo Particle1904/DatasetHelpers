@@ -1,4 +1,6 @@
-﻿using Microsoft.ML.Data;
+﻿using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
+
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning;
 using SmartData.Lib.Services.Base;
@@ -22,26 +24,37 @@ namespace SmartData.Lib.Services.MachineLearning
         {
         }
 
-        public override async Task<VBuffer<float>> GetPredictionAsync(string inputImagePath)
+        public override async Task<WDOutputData> GetPredictionAsync(string inputImagePath)
         {
             WDInputData inputData = await _imageProcessor.ProcessImageForTagPredictionAsync(inputImagePath);
+            List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
+            };
 
-            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
-            return prediction.PredictionsSigmoid;
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
+            {
+                Tensor<float> tensorPrediction = prediction[0].AsTensor<float>();
+
+                WDOutputData outputData = new WDOutputData()
+                {
+                    PredictionsSigmoid = tensorPrediction.ToArray()
+                };
+                return outputData;
+            }
         }
 
         public override async Task<List<string>> GetOrderedByScoreListOfTagsAsync(string imagePath, bool weightedCaptions = false)
         {
             Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
 
-            VBuffer<float> predictions = await GetPredictionAsync(imagePath).ConfigureAwait(false);
-            float[] values = predictions.GetValues().ToArray();
+            WDOutputData values = await GetPredictionAsync(imagePath);
 
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 0; i < values.PredictionsSigmoid.Length; i++)
             {
-                if (values[i] > Threshold)
+                if (values.PredictionsSigmoid[i] > Threshold)
                 {
-                    predictionsDict.Add(_tags[i], values[i]);
+                    predictionsDict.Add(_tags[i], values.PredictionsSigmoid[i]);
                 }
             }
 
@@ -66,12 +79,62 @@ namespace SmartData.Lib.Services.MachineLearning
             return listOrdered;
         }
 
-        public override async Task<VBuffer<float>> GetPredictionAsync(Stream imageStream)
+        public override async Task<WDOutputData> GetPredictionAsync(Stream imageStream)
         {
             WDInputData inputData = await _imageProcessor.ProcessImageForTagPredictionAsync(imageStream);
+            List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
+            };
 
-            WDOutputData prediction = await Task.Run(() => _predictionEngine?.Predict(inputData));
-            return prediction.PredictionsSigmoid;
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
+            {
+                Tensor<float> tensorPrediction = prediction[0].AsTensor<float>();
+
+                WDOutputData outputData = new WDOutputData()
+                {
+                    PredictionsSigmoid = tensorPrediction.ToArray()
+                };
+                return outputData;
+            }
+        }
+
+        public override async Task<string> InterrogateImageFromStream(Stream imageStream)
+        {
+            if (!_isModelLoaded)
+            {
+                await LoadModel();
+                _isModelLoaded = true;
+            }
+
+            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
+
+            WDOutputData values = await GetPredictionAsync(imageStream);
+
+            for (int i = 0; i < values.PredictionsSigmoid.Length; i++)
+            {
+                if (values.PredictionsSigmoid[i] > _threshold)
+                {
+                    predictionsDict.Add(_tags[i], values.PredictionsSigmoid[i]);
+                }
+            }
+
+            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
+
+            List<string> listOrdered = new List<string>();
+
+            foreach (KeyValuePair<string, float> item in sortedDict)
+            {
+                listOrdered.Add(item.Key);
+            }
+
+            string commaSeparated = _tagProcessor.GetCommaSeparatedString(listOrdered);
+
+            string redundantRemoved = _tagProcessor.ApplyRedundancyRemoval(commaSeparated);
+
+            UnloadModel();
+
+            return redundantRemoved;
         }
     }
 }

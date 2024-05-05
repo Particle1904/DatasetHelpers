@@ -4,6 +4,7 @@
     <Nullable>annotations</Nullable>
     <LangVersion>latest</LangVersion>
     <ApplicationIcon>Assets\Icons\icon.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   

@@ -1,5 +1,4 @@
-﻿using Microsoft.ML;
-using Microsoft.ML.Transforms.Onnx;
+﻿using Microsoft.ML.OnnxRuntime;
 
 namespace SmartData.Lib.Services.Base
 {
@@ -9,10 +8,7 @@ namespace SmartData.Lib.Services.Base
     {
         protected string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
 
-        protected MLContext _mlContext;
-        protected OnnxScoringEstimator _pipeline;
-        protected PredictionEngine<TInput, TOutput> _predictionEngine;
-        protected ITransformer _predictionPipe;
+        protected InferenceSession _session;
 
         public string ModelPath { get; set; }
 
@@ -26,11 +22,13 @@ namespace SmartData.Lib.Services.Base
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseAIConsumer{TInput, TOutput}"/> class.
+        /// </summary>
+        /// <param name="modelPath">Path to the machine learning model.</param>
         protected BaseAIConsumer(string modelPath)
         {
             ModelPath = modelPath;
-
-            _mlContext = new MLContext();
         }
 
         /// <summary>
@@ -46,71 +44,52 @@ namespace SmartData.Lib.Services.Base
         protected abstract string[] GetOutputColumns();
 
         /// <summary>
-        /// Retrieves a prediction pipeline for making predictions using the ONNX model.
+        /// Loads the machine learning model and initializes the prediction session.
         /// </summary>
-        /// <returns>An instance of ITransformer representing the prediction pipeline.</returns>
-        protected virtual ITransformer GetPredictionPipeline<TData>() where TData : class
+        protected virtual async Task LoadModel()
         {
-            string[] inputColumns = GetInputColumns();
-            string[] outputColumns = GetOutputColumns();
+            int[] gpuIdsToTry = { 0, 1 };
 
-            TryToLoadOnGPU(inputColumns, outputColumns);
-
-            IDataView emptyDv = _mlContext.Data.LoadFromEnumerable<TData>(Array.Empty<TData>());
-
-            return _pipeline.Fit(emptyDv);
-        }
-
-        protected void TryToLoadOnGPU(string[] inputColumns, string[] outputColumns)
-        {
-            int[] gpuIdsToTry = new int[] { 0, 1, 2, 3 };
+            SessionOptions sessionOptions = new SessionOptions();
+            sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
+            sessionOptions.EnableMemoryPattern = false;
 
             for (int i = 0; i < gpuIdsToTry.Length; i++)
             {
-                // Try to load into GPUs 0 and 1; fall back to CPU if both GPUs failed.
                 try
                 {
-                    _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns,
-                            inputColumnNames: inputColumns, ModelPath, i, true);
-                    break;
+                    sessionOptions.AppendExecutionProvider_DML(gpuIdsToTry[i]);
                 }
-                catch (EntryPointNotFoundException)
-                {
-                    if (i == gpuIdsToTry.Length - 1)
-                    {
-                        // Fall back to CPU if all GPUs failed.
-                        _pipeline = _mlContext.Transforms.ApplyOnnxModel(outputColumnNames: outputColumns,
-                            inputColumnNames: inputColumns, ModelPath);
-                    }
-                }
-            }
-        }
+                catch (Exception) { /* DML Failed */ }
 
-        /// <summary>
-        /// Loads the machine learning model and initializes the prediction pipeline and engine.
-        /// </summary>
-        /// <returns>A Task representing the asynchronous operation.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when either the model path or the tags path is null, empty, or consists only of white spaces.</exception>
-        protected virtual async Task LoadModel()
-        {
-            _predictionPipe = await Task.Run(() => GetPredictionPipeline<TInput>());
-            _predictionEngine = _mlContext.Model.CreatePredictionEngine<TInput, TOutput>(_predictionPipe);
+                try
+                {
+                    sessionOptions.AppendExecutionProvider_CUDA(gpuIdsToTry[i]);
+                }
+                catch (Exception) { /* CUDA Failed */ }
+
+                try
+                {
+                    sessionOptions.AppendExecutionProvider_ROCm(gpuIdsToTry[i]);
+                }
+                catch (Exception) { /* ROCm Failed */ }
+            }
+
+            sessionOptions.ApplyConfiguration();
+            _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));
         }
 
         /// <summary>
         /// Unloads the machine learning model and releases associated resources.
         /// </summary>
         /// <remarks>
-        /// This method disposes of the prediction engine and releases any resources
-        /// associated with it, setting the prediction engine and prediction pipeline to null.
+        /// This method disposes of the session and releases any resources
+        /// associated with it, setting the session to null.
         /// After calling this method, the model will no longer be loaded.
         /// </remarks>
         protected virtual void UnloadModel()
         {
-            _predictionEngine?.Dispose();
-            _predictionEngine = null;
-            _predictionPipe = null;
-
+            _session?.Dispose();
             _isModelLoaded = false;
         }
     }

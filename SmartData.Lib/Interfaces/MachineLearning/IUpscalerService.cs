@@ -1,7 +1,10 @@
-﻿namespace SmartData.Lib.Interfaces.MachineLearning
+﻿using SixLabors.ImageSharp;
+
+namespace SmartData.Lib.Interfaces.MachineLearning
 {
     public interface IUpscalerService
     {
-        public Task UpscaleImageAsync(string inputImagePath, string outputImagePath);
+        public Task UpscaleImageAndSaveAsync(string inputImagePath, string outputImagePath);
+        public Task<Image> UpscaleImageAsync(string inputImagePath);
     }
 }

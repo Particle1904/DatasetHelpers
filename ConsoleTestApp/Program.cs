@@ -17,19 +17,19 @@ namespace ConsoleTestApp
             NativeLibrary.SetDllImportResolver(Assembly.Load("Microsoft.ML.OnnxRuntime"), OnnxRuntimeImportResolver);
 
             IImageProcessorService imageProcessor = new ImageProcessorService();
-            IUpscalerService upscalerService = new UpscalerService(imageProcessor, @"Downloads\RealSR_BSRGAN_DFO_s64w8_SwinIR-M_x4_GAN.onnx");
+            IUpscalerService upscalerService = new UpscalerService(imageProcessor, @"C:\Users\Leonardo\Downloads\RealSR_BSRGAN_DFO_s64w8_SwinIR-M_x4_GAN.onnx");
 
             try
             {
-                await upscalerService.UpscaleImageAsync(@"Downloads\cat2.png",
-                    @"Downloads\cat_2.png");
+                await upscalerService.UpscaleImageAndSaveAsync(@"C:\Users\Leonardo\Downloads\cat2.png",
+                    @"C:\Users\Leonardo\Downloads\cat_2.png");
             }
             catch (OnnxRuntimeException ex)
             {
             }
         }
 
-        public static IntPtr OnnxRuntimeImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+        private static IntPtr OnnxRuntimeImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
             if (libraryName != "onnxruntime")
             {
@@ -40,7 +40,7 @@ namespace ConsoleTestApp
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                location = Path.Combine(location, "win-x64");
+                location = Path.Combine(location, "win-x86");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {

@@ -4,6 +4,7 @@
     <TargetFrameworks>net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +14,6 @@
     <PackageReference Include="Microsoft.ML" Version="3.0.1" />
     <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="3.0.1" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.10.0" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.17.3" />
 	<PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.17.3" />	  
     <PackageReference Include="Microsoft.ML.OnnxTransformer" Version="3.0.1" />
     <PackageReference Include="SharpHook" Version="5.3.3" />

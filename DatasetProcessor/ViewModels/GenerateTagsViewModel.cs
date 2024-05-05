@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces.MachineLearning;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -186,6 +188,7 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
+                UnloadAllModels();
             }
 
             // Stop elapsed timer
@@ -226,12 +229,23 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Unload all AI models to free memory.
+        /// </summary>
+        private void UnloadAllModels()
+        {
+            (_wDAutoTagger as IUnloadModel)?.UnloadAIModel();
+            (_wDv3AutoTagger as IUnloadModel)?.UnloadAIModel();
+            (_joyTagAutoTagger as IUnloadModel)?.UnloadAIModel();
+            (_e621AutoTagger as IUnloadModel)?.UnloadAIModel();
+        }
+
         partial void OnThresholdChanged(double value)
         {
             Threshold = Math.Round(value, 2);
         }
-        [RelayCommand]
 
+        [RelayCommand]
         private void CancelTask()
         {
             (_fileManipulator as ICancellableService)?.CancelCurrentTask();

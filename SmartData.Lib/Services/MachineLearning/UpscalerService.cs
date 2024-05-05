@@ -1,5 +1,9 @@
-﻿using Microsoft.ML.OnnxRuntime;
+﻿using Interfaces.MachineLearning;
+
+using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+
+using SixLabors.ImageSharp;
 
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -8,14 +12,12 @@ using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services.MachineLearning
 {
-    public class UpscalerService : BaseAIConsumer<UpscalerInputData, UpscalerOutputData>, IUpscalerService, INotifyProgress
+    public class UpscalerService : BaseAIConsumer<UpscalerInputData, UpscalerOutputData>, IUpscalerService, INotifyProgress, IUnloadModel
     {
         private readonly IImageProcessorService _imageProcessor;
 
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
-
-        private InferenceSession _session;
 
         public UpscalerService(IImageProcessorService imageProcessor, string modelPath) : base(modelPath)
         {
@@ -31,53 +33,74 @@ namespace SmartData.Lib.Services.MachineLearning
             return new string[] { "output" };
         }
 
-        public async Task UpscaleImageAsync(string inputImagePath, string outputImagePath)
+        /// <summary>
+        /// Asynchronously upscales an input image and saves the upscaled image to the specified output path.
+        /// </summary>
+        /// <param name="inputImagePath">The path to the input image.</param>
+        /// <param name="outputImagePath">The path to save the upscaled image.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task UpscaleImageAndSaveAsync(string inputImagePath, string outputImagePath)
         {
-            // TODO: Change it so the model is loaded when upscaling
-            // images from a folder instead of a single image.
-            if (!_isModelLoaded)
+            if (!IsModelLoaded)
             {
                 await LoadModel();
+                _isModelLoaded = true;
             }
 
-            UpscalerInputData inputData = await _imageProcessor.ProcessImageForUpscalingAsync(inputImagePath, 1.0f);
+            UpscalerInputData inputData = await _imageProcessor.ProcessImageForUpscalingAsync(inputImagePath);
             List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
             {
-                NamedOnnxValue.CreateFromTensor<float>("input", inputData.Input)
+                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
             };
-            IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues));
-            Tensor<float> tensorPrediction = prediction[0].AsTensor<float>();
 
-            float[] outputArray = tensorPrediction.ToArray();
-            var outputData = new UpscalerOutputData()
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
             {
-                Output = new DenseTensor<float>(outputArray, tensorPrediction.Dimensions.ToArray())
-            };
+                Tensor<float> tensorPrediction = prediction[0].AsTensor<float>();
 
-            _imageProcessor.SaveUpscaledImage(outputImagePath, outputData);
+                float[] outputArray = tensorPrediction.ToArray();
+                UpscalerOutputData outputData = new UpscalerOutputData()
+                {
+                    Output = new DenseTensor<float>(outputArray, tensorPrediction.Dimensions.ToArray())
+                };
+                _imageProcessor.SaveUpscaledImage(outputImagePath, outputData);
+            }
         }
 
-        protected override async Task LoadModel()
+        /// <summary>
+        /// Asynchronously upscales an input image.
+        /// </summary>
+        /// <param name="inputImagePath">The path to the input image.</param>
+        /// <returns>A task representing the asynchronous operation. The result is the upscaled image.</returns>
+        public async Task<Image> UpscaleImageAsync(string inputImagePath)
         {
-            SessionOptions sessionOptions = new SessionOptions();
-            try
+            if (!IsModelLoaded)
             {
-                sessionOptions.AppendExecutionProvider_DML();
-            }
-            catch (Exception)
-            {
-                // LOG here
-            }
-            try
-            {
-                sessionOptions.AppendExecutionProvider_CUDA();
-            }
-            catch (Exception)
-            {
-                // LOG here
+                await LoadModel();
+                _isModelLoaded = true;
             }
 
-            _session = new InferenceSession(ModelPath, sessionOptions);
+            UpscalerInputData inputData = await _imageProcessor.ProcessImageForUpscalingAsync(inputImagePath);
+            List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
+            };
+
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
+            {
+                Tensor<float> tensorPrediction = prediction[0].AsTensor<float>();
+
+                float[] outputArray = tensorPrediction.ToArray();
+                UpscalerOutputData outputData = new UpscalerOutputData()
+                {
+                    Output = new DenseTensor<float>(outputArray, tensorPrediction.Dimensions.ToArray())
+                };
+                return _imageProcessor.GetUpscaledImage(outputData);
+            }
+        }
+
+        public void UnloadAIModel()
+        {
+            UnloadModel();
         }
     }
 }
