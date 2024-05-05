@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatasetProcessor", "Dataset
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatasetProcessorDesktop", "DatasetProcessorDesktop\DatasetProcessorDesktop.csproj", "{8BC8B600-5317-4805-8038-39F47BBCA19D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTestApp", "ConsoleTestApp\ConsoleTestApp.csproj", "{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,18 +55,6 @@ Global
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x64.Build.0 = Release|Any CPU
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x86.ActiveCfg = Release|x86
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x86.Build.0 = Release|x86
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|x64.Build.0 = Debug|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|x86.ActiveCfg = Debug|x86
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Debug|x86.Build.0 = Debug|x86
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|x64.ActiveCfg = Release|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|x64.Build.0 = Release|Any CPU
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|x86.ActiveCfg = Release|x86
-		{2FCCE0E8-E7EB-40DC-998C-8968DA2AF47C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
