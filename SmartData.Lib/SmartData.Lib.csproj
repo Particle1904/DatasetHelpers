@@ -12,10 +12,8 @@
     <PackageReference Include="LibHeif.Native.linux-x64" Version="1.15.1" />
     <PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
     <PackageReference Include="Microsoft.ML" Version="3.0.1" />
-    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="3.0.1" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.10.0" />
-	<PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.17.3" />	  
-    <PackageReference Include="Microsoft.ML.OnnxTransformer" Version="3.0.1" />
+	<PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.17.3" />
     <PackageReference Include="SharpHook" Version="5.3.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.3" />
