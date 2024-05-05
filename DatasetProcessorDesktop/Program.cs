@@ -2,6 +2,9 @@
 using Avalonia.Svg.Skia;
 
 using System;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace DatasetProcessor.Desktop;
 
@@ -22,6 +25,7 @@ class Program
 
     public static AppBuilder BuildAvaloniaApp()
     {
+        NativeLibrary.SetDllImportResolver(Assembly.Load("Microsoft.ML.OnnxRuntime"), OnnxRuntimeImportResolver);
         GC.KeepAlive(typeof(SvgImageExtension).Assembly);
         GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
 
@@ -29,5 +33,33 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
+    }
+
+    private static IntPtr OnnxRuntimeImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    {
+        if (libraryName != "onnxruntime")
+        {
+            return IntPtr.Zero;
+        }
+
+        string location = Path.Combine(Environment.CurrentDirectory, "runtimes");
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            location = Path.Combine(location, "win-x64");
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            location = Path.Combine(location, "linux-x64");
+        }
+        else
+        {
+            location = Path.Combine(location, "osx-x64");
+        }
+
+        IntPtr libHandle = IntPtr.Zero;
+        NativeLibrary.TryLoad(Path.Combine(location, "native", "onnxruntime.dll"), out libHandle);
+
+        return libHandle;
     }
 }
