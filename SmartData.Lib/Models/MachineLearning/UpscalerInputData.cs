@@ -3,10 +3,10 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 
 namespace SmartData.Lib.Models.MachineLearning
 {
-    public class JoyTagInputData
+    public class UpscalerInputData
     {
-        [ColumnName("input_1:0")]
-        [VectorType(1, 3, 448, 448)]
+        [ColumnName("input")]
+        [VectorType(1, 3, 0, 0)]
         public DenseTensor<float>? Input { get; set; }
     }
 }

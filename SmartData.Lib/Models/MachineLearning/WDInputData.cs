@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML.Data;
+using Microsoft.ML.OnnxRuntime.Tensors;
 
 namespace SmartData.Lib.Models.MachineLearning
 {
@@ -6,6 +7,6 @@ namespace SmartData.Lib.Models.MachineLearning
     {
         [ColumnName("input_1:0")]
         [VectorType(1, 448, 448, 3)]
-        public float[]? Input1 { get; set; }
+        public DenseTensor<float> Input { get; set; }
     }
 }

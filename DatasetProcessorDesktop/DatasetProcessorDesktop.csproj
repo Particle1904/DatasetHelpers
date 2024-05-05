@@ -8,6 +8,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
@@ -15,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.17.3" />
   </ItemGroup>
 
   <ItemGroup>

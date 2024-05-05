@@ -1,4 +1,6 @@
-﻿using Microsoft.ML.Data;
+﻿using Interfaces.MachineLearning;
+
+using Microsoft.ML.Data;
 
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -6,7 +8,7 @@ using SmartData.Lib.Interfaces.MachineLearning;
 
 namespace SmartData.Lib.Services.Base
 {
-    public abstract class BaseAutoTaggerService<TInput, TOutput> : BaseAIConsumer<TInput, TOutput>, IAutoTaggerService,
+    public abstract class BaseAutoTaggerService<TInput, TOutput> : BaseAIConsumer<TInput, TOutput>, IAutoTaggerService, IUnloadModel,
             INotifyProgress
         where TInput : class
         where TOutput : class, new()
@@ -16,11 +18,10 @@ namespace SmartData.Lib.Services.Base
 
         protected string[] _tags;
 
-        private float _threshold = 0.2f;
-
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
+        protected float _threshold = 0.2f;
         /// <summary>
         /// Gets or sets the threshold value for this object. The threshold value determines the cutoff point for certain calculations.
         /// </summary>
@@ -96,6 +97,7 @@ namespace SmartData.Lib.Services.Base
             if (!_isModelLoaded)
             {
                 await LoadModel();
+                _isModelLoaded = true;
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
@@ -125,6 +127,7 @@ namespace SmartData.Lib.Services.Base
             if (!_isModelLoaded)
             {
                 await LoadModel();
+                _isModelLoaded = true;
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
@@ -155,6 +158,7 @@ namespace SmartData.Lib.Services.Base
             if (!_isModelLoaded)
             {
                 await LoadModel();
+                _isModelLoaded = true;
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
@@ -278,57 +282,21 @@ namespace SmartData.Lib.Services.Base
         /// </summary>
         /// <param name="imagePath">The path of the image file to make predictions on.</param>
         /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        public abstract Task<VBuffer<float>> GetPredictionAsync(string inputImagePath);
+        public abstract Task<TOutput> GetPredictionAsync(string inputImagePath);
 
         /// <summary>
         /// Retrieves predictions for the specified image stream using the prediction engine, which is a machine learning model trained to make predictions. The method returns a <see cref="VBuffer{float}"/> object containing the predicted values.
         /// </summary>
         /// <param name="imageStream">The stream containing the image data to make predictions on.</param>
         /// <returns>A <see cref="VBuffer{float}"/> object containing the predicted values.</returns>
-        public abstract Task<VBuffer<float>> GetPredictionAsync(Stream imageStream);
+        public abstract Task<TOutput> GetPredictionAsync(Stream imageStream);
 
         /// <summary>
         /// Interrogates an image from a stream and returns a string representation of the predicted tags.
         /// </summary>
         /// <param name="imageStream">The stream containing the image data.</param>
         /// <returns>A string representation of the predicted tags.</returns>
-        public virtual async Task<string> InterrogateImageFromStream(Stream imageStream)
-        {
-            if (!_isModelLoaded)
-            {
-                await LoadModel();
-            }
-
-            Dictionary<string, float> predictionsDict = new Dictionary<string, float>();
-
-            VBuffer<float> predictions = await GetPredictionAsync(imageStream).ConfigureAwait(false);
-            float[] values = predictions.GetValues().ToArray();
-
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (values[i] > _threshold)
-                {
-                    predictionsDict.Add(_tags[i], values[i]);
-                }
-            }
-
-            IOrderedEnumerable<KeyValuePair<string, float>> sortedDict = predictionsDict.OrderByDescending(x => x.Value);
-
-            List<string> listOrdered = new List<string>();
-
-            foreach (KeyValuePair<string, float> item in sortedDict)
-            {
-                listOrdered.Add(item.Key);
-            }
-
-            string commaSeparated = _tagProcessor.GetCommaSeparatedString(listOrdered);
-
-            string redundantRemoved = _tagProcessor.ApplyRedundancyRemoval(commaSeparated);
-
-            UnloadModel();
-
-            return redundantRemoved;
-        }
+        public abstract Task<string> InterrogateImageFromStream(Stream imageStream);
 
         /// <summary>
         /// Loads tags from a CSV file and assigns them to the '_tags' field.
@@ -340,6 +308,11 @@ namespace SmartData.Lib.Services.Base
             {
                 _tags = File.ReadAllLines(csvPath);
             }
+        }
+
+        public void UnloadAIModel()
+        {
+            UnloadModel();
         }
     }
 }

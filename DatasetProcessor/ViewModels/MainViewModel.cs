@@ -112,7 +112,10 @@ public partial class MainViewModel : BaseViewModel
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            _views.Add(AppPages.Metadata_Viewer, new MetadataView() { DataContext = new MetadataViewModel(imageProcessor, wDAutoTagger, logger, configs) });
+            _views.Add(AppPages.Metadata_Viewer, new MetadataView()
+            {
+                DataContext = new MetadataViewModel(fileManipulator, imageProcessor, wDAutoTagger, logger, configs)
+            });
         }
 
         _dynamicView = _views[AppPages.Welcome];

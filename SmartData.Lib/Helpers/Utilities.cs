@@ -27,7 +27,7 @@ namespace SmartData.Lib.Helpers
             get
             {
                 AvailableModels[] availableModels = ((AvailableModels[])Enum.GetValues(typeof(AvailableModels)))
-                    .Where(x => x != AvailableModels.Yolov4).ToArray();
+                    .Where(x => x != AvailableModels.Yolov4 && x != AvailableModels.CLIPTokenizer).ToArray();
                 return availableModels;
             }
         }

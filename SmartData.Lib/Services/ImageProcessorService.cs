@@ -3,6 +3,8 @@
 using HeyRed.ImageSharp.Heif.Formats.Avif;
 using HeyRed.ImageSharp.Heif.Formats.Heif;
 
+using Microsoft.ML.OnnxRuntime.Tensors;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -252,14 +254,15 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
         /// <returns>An <see cref="WDInputData"/> object containing the processed image as a float array.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
         public async Task<WDInputData> ProcessImageForTagPredictionAsync(string inputPath)
         {
-            WDInputData inputData = new WDInputData();
-            inputData.Input1 = new float[448 * 448 * 3];
+            WDInputData inputData = new WDInputData()
+            {
+                Input = new DenseTensor<float>(new int[] { 1, 448, 448, 3 })
+            };
 
-            int index = 0;
             using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(_decoderOptions, inputPath))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
@@ -286,9 +289,9 @@ namespace SmartData.Lib.Services
                             pixel.R = pixel.B;
                             pixel.B = temp;
 
-                            inputData.Input1[index++] = pixel.R;
-                            inputData.Input1[index++] = pixel.G;
-                            inputData.Input1[index++] = pixel.B;
+                            inputData.Input[0, y, x, 0] = pixel.R;
+                            inputData.Input[0, y, x, 1] = pixel.G;
+                            inputData.Input[0, y, x, 2] = pixel.B;
                         }
                     }
                 });
@@ -306,9 +309,8 @@ namespace SmartData.Lib.Services
         public async Task<WDInputData> ProcessImageForTagPredictionAsync(Stream inputStream)
         {
             WDInputData inputData = new WDInputData();
-            inputData.Input1 = new float[448 * 448 * 3];
+            inputData.Input = new DenseTensor<float>(new int[] { 1, 448, 448, 3 });
 
-            int index = 0;
             using (Image<Bgr24> image = await Image.LoadAsync<Bgr24>(_decoderOptions, inputStream))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
@@ -335,9 +337,9 @@ namespace SmartData.Lib.Services
                             pixel.R = pixel.B;
                             pixel.B = temp;
 
-                            inputData.Input1[index++] = pixel.R;
-                            inputData.Input1[index++] = pixel.G;
-                            inputData.Input1[index++] = pixel.B;
+                            inputData.Input[0, y, x, 0] = pixel.R;
+                            inputData.Input[0, y, x, 1] = pixel.G;
+                            inputData.Input[0, y, x, 2] = pixel.B;
                         }
                     }
                 });
@@ -346,16 +348,19 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Asynchronously processes an image for tag prediction, using the JoyTag model, by resizing it to 448x448 and converting it to a float array.
+        /// Asynchronously processes an image for tag prediction, using the JoyTag model, by resizing it to 448x448 
+        /// and converting it to a float array.
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
         /// <returns>An <see cref="JoyTagInputData"/> object containing the processed image as a float array.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
         public async Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath)
         {
-            JoyTagInputData inputData = new JoyTagInputData();
-            inputData.Input1 = new float[1 * 3 * 448 * 448];
+            JoyTagInputData inputData = new JoyTagInputData()
+            {
+                Input = new DenseTensor<float>(new int[] { 1, 3, 448, 448 })
+            };
 
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
@@ -370,8 +375,6 @@ namespace SmartData.Lib.Services
                 };
 
                 image.Mutate(image => image.Resize(resizeOptions));
-
-                float[,,,] reshapedInput = new float[1, 3, 448, 448];
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -390,16 +393,12 @@ namespace SmartData.Lib.Services
                             g = (g - 0.4578275f) / 0.26130258f;
                             b = (b - 0.40821073f) / 0.27577711f;
 
-                            reshapedInput[0, 0, y, x] = r;
-                            reshapedInput[0, 1, y, x] = g;
-                            reshapedInput[0, 2, y, x] = b;
+                            inputData.Input[0, 0, y, x] = r;
+                            inputData.Input[0, 1, y, x] = g;
+                            inputData.Input[0, 2, y, x] = b;
                         }
                     }
                 });
-
-                Buffer.BlockCopy(reshapedInput, 0, inputData.Input1, 0, inputData.Input1.Length * sizeof(float));
-
-                float[] flattenedArray = reshapedInput.Cast<float>().ToArray();
             }
 
             return inputData;
@@ -410,14 +409,15 @@ namespace SmartData.Lib.Services
         /// </summary>
         /// <param name="inputPath">The path of the image to be processed.</param>
         /// <returns>A <see cref="Yolov4InputData"/> object containing the processed image as a float array.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by inputPath does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by inputPath.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
         public async Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath)
         {
-            Yolov4InputData inputData = new Yolov4InputData();
-            inputData.Input1 = new float[416 * 416 * 3];
+            Yolov4InputData inputData = new Yolov4InputData()
+            {
+                Input = new DenseTensor<float>(new int[] { 1, 416, 416, 3 })
+            };
 
-            int index = 0;
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
             {
                 ResizeOptions resizeOptions = new ResizeOptions()
@@ -445,14 +445,118 @@ namespace SmartData.Lib.Services
                             float g = pixel.G * 1f / 255f;
                             float b = pixel.B * 1f / 255f;
 
-                            inputData.Input1[index++] = r;
-                            inputData.Input1[index++] = g;
-                            inputData.Input1[index++] = b;
+                            inputData.Input[0, y, x, 0] = r;
+                            inputData.Input[0, y, x, 1] = g;
+                            inputData.Input[0, y, x, 2] = b;
                         }
                     }
                 });
             }
             return inputData;
+        }
+
+        /// <summary>
+        /// Asynchronously processes an image for upscaling by converting it to a float array.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>An <see cref="UpscalerInputData"/> object containing the processed image as a float array.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
+        public async Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath)
+        {
+            UpscalerInputData inputData = new UpscalerInputData();
+
+            using (Image<Bgra32> image = await Image.LoadAsync<Bgra32>(_decoderOptions, inputPath))
+            {
+                inputData.Input = new DenseTensor<float>(new[] { 1, 3, image.Height, image.Width });
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Bgra32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Bgra32 pixel = ref pixelRow[x];
+
+                            float r = pixel.R * 1f / 255f;
+                            float g = pixel.G * 1f / 255f;
+                            float b = pixel.B * 1f / 255f;
+
+                            inputData.Input[0, 0, y, x] = b;
+                            inputData.Input[0, 1, y, x] = g;
+                            inputData.Input[0, 2, y, x] = r;
+                        }
+                    }
+                });
+            }
+            return inputData;
+        }
+
+        /// <summary>
+        /// Saves the upscaled image data to the specified output path.
+        /// </summary>
+        /// <param name="outputPath">The path where the upscaled image will be saved.</param>
+        /// <param name="upscalerOutputData">The data containing the upscaled image.</param>
+        public void SaveUpscaledImage(string outputPath, UpscalerOutputData upscalerOutputData)
+        {
+            int width = upscalerOutputData.Output.Dimensions[3];
+            int height = upscalerOutputData.Output.Dimensions[2];
+
+            byte[] imageByte = new byte[3 * width * height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    int baseIndex = (row * width + col) * 3;
+                    byte r = (byte)Math.Clamp(upscalerOutputData.Output[0, 2, row, col] * 255, 0, 255);
+                    byte g = (byte)Math.Clamp(upscalerOutputData.Output[0, 1, row, col] * 255, 0, 255);
+                    byte b = (byte)Math.Clamp(upscalerOutputData.Output[0, 0, row, col] * 255, 0, 255);
+
+                    imageByte[baseIndex] = r;
+                    imageByte[baseIndex + 1] = g;
+                    imageByte[baseIndex + 2] = b;
+                }
+            }
+
+            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+            using (Image<Rgb24> image = Image.LoadPixelData<Rgb24>(bytes, width, height))
+            {
+                image.SaveAsPng(outputPath);
+            }
+        }
+
+        /// <summary>
+        /// Gets the upscaled image from UpscalerOutputData.
+        /// </summary>
+        /// <param name="upscalerOutputData">The output data containing the upscaled image data.</param>
+        /// <returns>The upscaled image.</returns>
+        public Image GetUpscaledImage(UpscalerOutputData upscalerOutputData)
+        {
+            int width = upscalerOutputData.Output.Dimensions[3];
+            int height = upscalerOutputData.Output.Dimensions[2];
+
+            byte[] imageByte = new byte[3 * width * height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    int baseIndex = (row * width + col) * 3;
+                    byte r = (byte)Math.Clamp(upscalerOutputData.Output[0, 2, row, col] * 255, 0, 255);
+                    byte g = (byte)Math.Clamp(upscalerOutputData.Output[0, 1, row, col] * 255, 0, 255);
+                    byte b = (byte)Math.Clamp(upscalerOutputData.Output[0, 0, row, col] * 255, 0, 255);
+
+                    imageByte[baseIndex] = r;
+                    imageByte[baseIndex + 1] = g;
+                    imageByte[baseIndex + 2] = b;
+                }
+            }
+
+            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+            using (Image<Rgb24> image = Image.LoadPixelData<Rgb24>(bytes, width, height))
+            {
+                return image;
+            }
         }
 
         /// <summary>

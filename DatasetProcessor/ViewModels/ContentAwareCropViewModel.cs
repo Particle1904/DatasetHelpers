@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces.MachineLearning;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -185,6 +187,7 @@ namespace DatasetProcessor.ViewModels
             {
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
+                (_contentAwareCrop as IUnloadModel)?.UnloadAIModel();
             }
 
             _timer.Stop();

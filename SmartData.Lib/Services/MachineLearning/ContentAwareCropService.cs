@@ -1,4 +1,8 @@
-﻿using SmartData.Lib.Enums;
+﻿using Interfaces.MachineLearning;
+
+using Microsoft.ML.OnnxRuntime;
+
+using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -9,7 +13,7 @@ using System.Diagnostics;
 
 namespace SmartData.Lib.Services.MachineLearning
 {
-    public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService, INotifyProgress
+    public class ContentAwareCropService : BaseAIConsumer<Yolov4InputData, Yolov4OutputData>, IContentAwareCropService, INotifyProgress, IUnloadModel
     {
         private readonly IImageProcessorService _imageProcessor;
 
@@ -155,16 +159,18 @@ namespace SmartData.Lib.Services.MachineLearning
         /// - Obtains the person bounding box results based on the predictions and image size.
         /// - Constructs the result path for the cropped image.
         /// - Crops the image and saves it using the image processor service.
-        /// - raise events to signal the progress status of the operation.
+        /// - Raises events to signal the progress status of the operation.
         /// </summary>
         /// <param name="inputPath">The input path containing the images to process.</param>
         /// <param name="outputPath">The output path to store the cropped images.</param>
+        /// <param name="dimension">The dimensions to which the images should be cropped.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ProcessCroppedImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             if (!_isModelLoaded)
             {
                 await LoadModel();
+                _isModelLoaded = true;
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
@@ -217,9 +223,21 @@ namespace SmartData.Lib.Services.MachineLearning
         private async Task<Yolov4OutputData> GetPredictionAsync(string inputImagePath)
         {
             Yolov4InputData inputData = await _imageProcessor.ProcessImageForBoundingBoxPredictionAsync(inputImagePath);
+            List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
+            };
 
-            Yolov4OutputData prediction = await Task.Run(() => _predictionEngine.Predict(inputData));
-            return prediction;
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
+            {
+                Yolov4OutputData outputData = new Yolov4OutputData()
+                {
+                    Identity0 = prediction[0].AsTensor<float>().ToArray(),
+                    Identity1 = prediction[1].AsTensor<float>().ToArray(),
+                    Identity2 = prediction[2].AsTensor<float>().ToArray(),
+                };
+                return outputData;
+            }
         }
 
         /// <summary>
@@ -247,7 +265,8 @@ namespace SmartData.Lib.Services.MachineLearning
                     {
                         for (int a = 0; a < _anchors.Length; a++)
                         {
-                            var offset = boxY * outputSize * (classesCount + 5) * _anchors.Length + boxX * (classesCount + 5) * _anchors.Length + a * (classesCount + 5);
+                            var offset = boxY * outputSize * (classesCount + 5) * _anchors.Length + boxX * (classesCount + 5) *
+                                _anchors.Length + a * (classesCount + 5);
                             var predictionBoundingBox = prediction.Skip(offset).Take(classesCount + 5).ToArray();
 
                             var boundingBoxXYWH = predictionBoundingBox.Take(4).ToArray();
@@ -293,7 +312,8 @@ namespace SmartData.Lib.Services.MachineLearning
                             float maxScore = predictionScores.Max();
                             if (maxScore > _scoreThreshold)
                             {
-                                detectedObjects.Add(new float[] { originalX1, originalY1, originalX2, originalY2, maxScore, predictionScores.IndexOf(maxScore) });
+                                detectedObjects.Add(new float[] { originalX1, originalY1, originalX2, originalY2,
+                                    maxScore, predictionScores.IndexOf(maxScore) });
                             }
                         }
                     }
@@ -371,6 +391,11 @@ namespace SmartData.Lib.Services.MachineLearning
         private static float CalculateBoundingBoxArea(float[] boundinbBox)
         {
             return (boundinbBox[2] - boundinbBox[0]) * (boundinbBox[3] - boundinbBox[1]);
+        }
+
+        public void UnloadAIModel()
+        {
+            UnloadModel();
         }
     }
 }

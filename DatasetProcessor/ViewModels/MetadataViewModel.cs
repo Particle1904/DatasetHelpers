@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ namespace DatasetProcessor.ViewModels
     public partial class MetadataViewModel : BaseViewModel
     {
         private const string _dragAndDropPath = @"avares://DatasetProcessor/Assets/Images/drag_and_drop.png";
+        private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
         private readonly IAutoTaggerService _autoTagger;
 
@@ -48,9 +50,10 @@ namespace DatasetProcessor.ViewModels
 
         public bool IsGenerating { get; private set; } = false;
 
-        public MetadataViewModel(IImageProcessorService imageProcessor, IAutoTaggerService autoTagger, ILoggerService logger,
-            IConfigsService configs) : base(logger, configs)
+        public MetadataViewModel(IFileManipulatorService fileManipulator, IImageProcessorService imageProcessor,
+            IAutoTaggerService autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
+            _fileManipulator = fileManipulator;
             _imageProcessor = imageProcessor;
             _autoTagger = autoTagger;
 
@@ -96,8 +99,14 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
+                if (_fileManipulator.FileNeedsToBeDownloaded(AvailableModels.WD14v2))
+                {
+                    await _fileManipulator.DownloadModelFile(AvailableModels.WD14v2);
+                }
+
                 PredictedTags = "Generating tags...";
                 _autoTagger.Threshold = (float)Threshold;
+
                 PredictedTags = await _autoTagger.InterrogateImageFromStream(interrogationStream);
             }
             catch (Exception exception)
