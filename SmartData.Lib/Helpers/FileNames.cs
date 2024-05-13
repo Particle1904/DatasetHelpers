@@ -25,6 +25,17 @@
         #endregion
 
         #region Upscalers
+        public const string HFA2kFileName = "HFA2k.onnx";
+        public const string HFA2kAVCSRFormerLightFileName = "HFA2kAVCSRFormerLight.onnx";
+        public const string HFA2kCompactFileName = "HFA2kCompact.onnx";
+        public const string LSDIRFileName = "LSDIR.onnx";
+        public const string LSDIRCompact3FileName = "LSDIRCompact3.onnx";
+        public const string LSDIRplusCompressionFileName = "LSDIRplusCompression.onnx";
+        public const string LSDIRplusNoneFileName = "LSDIRplusNone.onnx";
+        public const string LSDIRplusRealFileName = "LSDIRplusReal.onnx";
+        public const string Nomos8kSCFileName = "Nomos8kSC.onnx";
+        public const string Nomos8kSCSRFormerFileName = "Nomos8kSCSRFormer.onnx";
+        public const string ParimgCompactFileName = "ParimgCompact.onnx";
         public const string SwinIRFileName = "swinIR.onnx";
         public const string Swin2SRFileName = "swin2SR.onnx";
         #endregion

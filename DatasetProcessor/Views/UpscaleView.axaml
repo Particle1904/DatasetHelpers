@@ -74,8 +74,8 @@
 				   HorizontalAlignment="Left"/>
 			<ComboBox Grid.Column="2" Grid.ColumnSpan="3"
 					  HorizontalAlignment="Right"
-					  MinWidth="200"
-					  MaxWidth="200"
+					  MinWidth="300"
+					  MaxWidth="300"
 					  SelectedItem="{Binding UpscalerModel}"
 					  ItemsSource="{Binding Source={x:Static local:Utilities.GeneratorUpscalerModelValues}}">
 			</ComboBox>			

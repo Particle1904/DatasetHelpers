@@ -14,24 +14,35 @@ namespace SmartData.Lib.Services
     {
         private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
 
-        private readonly string _wdModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdModel.onnx?download=true";
-        private readonly string _wdCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdTags.csv?download=true";
+        private readonly string _wdModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdModel.onnx?download=true";
+        private readonly string _wdCsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdTags.csv?download=true";
 
-        private readonly string _wdv3ModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Model.onnx?download=true";
-        private readonly string _wdv3CsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Tags.csv?download=true";
+        private readonly string _wdv3ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Model.onnx?download=true";
+        private readonly string _wdv3CsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Tags.csv?download=true";
 
-        private readonly string _jtModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
-        private readonly string _jtCsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
+        private readonly string _jtModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
+        private readonly string _jtCsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
 
-        private readonly string _e621ModelDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Model.onnx?download=true";
-        private readonly string _e621CsvDownloadLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Tags.csv?download=true";
+        private readonly string _e621ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Model.onnx?download=true";
+        private readonly string _e621CsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Tags.csv?download=true";
 
         private readonly string _yolov4ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/yolov4.onnx?download=true";
 
         private readonly string _clipTokenizerLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/cliptokenizer.onnx?download=true";
 
+        private readonly string _parimgCompactModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/ParimgCompact.onnx?download=true";
         private readonly string _swinIRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/swinIR.onnx?download=true";
         private readonly string _swin2SRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/swin2SR.onnx?download=true";
+        private readonly string _HFA2kCompactModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/HFA2kCompact.onnx?download=true";
+        private readonly string _HFA2kAVCSRFormerLightModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/HFA2kAVCSRFormerLight.onnx?download=true";
+        private readonly string _HFA2kx4ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/HFA2k.onnx?download=true";
+        private readonly string _nomos8kSCSRFormerModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/Nomos8kSCSRFormer.onnx?download=true";
+        private readonly string _nomos8kSCModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/Nomos8kSC.onnx?download=true";
+        private readonly string _LSDIRplusRealModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIRplusReal.onnx?download=true";
+        private readonly string _LSDIRplusNoneModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIRplusNone.onnx?download=true";
+        private readonly string _LSDIRplusCompressionModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIRplusCompression.onnx?download=true";
+        private readonly string _LSDIRCompact3ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIRCompact3.onnx?download=true";
+        private readonly string _LSDIRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIR.onnx?download=true";
 
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
@@ -424,23 +435,91 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
+                case AvailableModels.ParimgCompactx2:
+                    if (!Path.Exists(FileNames.ParimgCompactFileName))
+                    { 
+                        result = true; 
+                    }
+                    break;
+                case AvailableModels.HFA2kCompactx2:
+                    if (!Path.Exists(FileNames.HFA2kCompactFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.HFA2kAVCSRFormerLightx2:
+                    if (!Path.Exists(FileNames.HFA2kAVCSRFormerLightFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.HFA2kx4:
+                    if (!Path.Exists(FileNames.HFA2kFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.SwinIRx4:
+                    if (!Path.Exists(FileNames.SwinIRFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Swin2SRx4:
+                    if (!Path.Exists(FileNames.Swin2SRFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Nomos8kSCSRFormerx4:
+                    if (!Path.Exists(FileNames.Nomos8kSCSRFormerFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Nomos8kSCx4:
+                    if (!Path.Exists(FileNames.Nomos8kSCFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LSDIRplusRealx4:
+                    if (!Path.Exists(FileNames.LSDIRplusRealFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LSDIRplusNonex4:
+                    if (!Path.Exists(FileNames.LSDIRplusNoneFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LSDIRplusCompressionx4:
+                    if (!Path.Exists(FileNames.LSDIRplusCompressionFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LSDIRCompact3x4:
+                    if (!Path.Exists(FileNames.LSDIRCompact3FileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LSDIRx4:
+                    if (!Path.Exists(FileNames.LSDIRFileName))
+                    {
+                        result = true;
+                    }
+                    break;
                 case AvailableModels.CLIPTokenizer:
                     if (!Path.Exists(FileNames.CLIPTokenixerOnnxFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.SwinIR:
-                    if (!Path.Exists(FileNames.SwinIRFileName))
-                    {
-                        result = true;
-                    }
-                    break;
-                case AvailableModels.Swin2SR:
-                    if (!Path.Exists(FileNames.Swin2SRFileName))
-                    {
-                        result = true;
-                    }
+                default:
                     break;
             }
 
@@ -471,44 +550,90 @@ namespace SmartData.Lib.Services
                 switch (model)
                 {
                     case AvailableModels.JoyTag:
-                        modelUrl = _jtModelDownloadLink;
+                        modelUrl = _jtModelLink;
                         modelFileName = FileNames.JoyTagOnnxFileName;
-                        csvUrl = _jtCsvDownloadLink;
+                        csvUrl = _jtCsvLink;
                         csvFileName = FileNames.JoyTagCsvFileName;
                         break;
                     case AvailableModels.WD14v2:
-                        modelUrl = _wdModelDownloadLink;
+                        modelUrl = _wdModelLink;
                         modelFileName = FileNames.WDOnnxFileName;
-                        csvUrl = _wdCsvDownloadLink;
+                        csvUrl = _wdCsvLink;
                         csvFileName = FileNames.WDCsvFileName;
                         break;
                     case AvailableModels.WDv3:
-                        modelUrl = _wdv3ModelDownloadLink;
+                        modelUrl = _wdv3ModelLink;
                         modelFileName = FileNames.WDV3OnnxFileName;
-                        csvUrl = _wdv3CsvDownloadLink;
+                        csvUrl = _wdv3CsvLink;
                         csvFileName = FileNames.WDV3CsvFileName;
                         break;
                     case AvailableModels.Z3DE621:
-                        modelUrl = _e621ModelDownloadLink;
+                        modelUrl = _e621ModelLink;
                         modelFileName = FileNames.E621OnnxFileName;
-                        csvUrl = _e621CsvDownloadLink;
+                        csvUrl = _e621CsvLink;
                         csvFileName = FileNames.E621CsvFileName;
                         break;
                     case AvailableModels.Yolov4:
                         modelUrl = _yolov4ModelLink;
                         modelFileName = FileNames.YoloV4OnnxFileName;
                         break;
+                    case AvailableModels.ParimgCompactx2:
+                        modelUrl = _parimgCompactModelLink;
+                        modelFileName = FileNames.ParimgCompactFileName;
+                        break;
+                    case AvailableModels.HFA2kCompactx2:
+                        modelUrl = _HFA2kCompactModelLink;
+                        modelFileName = FileNames.HFA2kCompactFileName;
+                        break;
+                    case AvailableModels.HFA2kAVCSRFormerLightx2:
+                        modelUrl = _HFA2kAVCSRFormerLightModelLink;
+                        modelFileName = FileNames.HFA2kAVCSRFormerLightFileName;
+                        break;
+                    case AvailableModels.HFA2kx4:
+                        modelUrl = _HFA2kx4ModelLink;
+                        modelFileName = FileNames.HFA2kFileName;
+                        break;
+                    case AvailableModels.SwinIRx4:
+                        modelUrl = _swinIRModelLink;
+                        modelFileName = FileNames.SwinIRFileName;
+                        break;
+                    case AvailableModels.Swin2SRx4:
+                        modelUrl = _swin2SRModelLink;
+                        modelFileName = FileNames.Swin2SRFileName;
+                        break;
+                    case AvailableModels.Nomos8kSCSRFormerx4:
+                        modelUrl = _nomos8kSCSRFormerModelLink;
+                        modelFileName = FileNames.Nomos8kSCSRFormerFileName;
+                        break;
+                    case AvailableModels.Nomos8kSCx4:
+                        modelUrl = _nomos8kSCModelLink;
+                        modelFileName = FileNames.Nomos8kSCFileName;
+                        break;
+                    case AvailableModels.LSDIRplusRealx4:
+                        modelUrl = _LSDIRplusRealModelLink;
+                        modelFileName = FileNames.LSDIRplusRealFileName;
+                        break;
+                    case AvailableModels.LSDIRplusNonex4:
+                        modelUrl = _LSDIRplusNoneModelLink;
+                        modelFileName = FileNames.LSDIRplusNoneFileName;
+                        break;
+                    case AvailableModels.LSDIRplusCompressionx4:
+                        modelUrl = _LSDIRplusCompressionModelLink;
+                        modelFileName = FileNames.LSDIRplusCompressionFileName;
+                        break;
+                    case AvailableModels.LSDIRCompact3x4:
+                        modelUrl = _LSDIRCompact3ModelLink;
+                        modelFileName = FileNames.LSDIRCompact3FileName;
+                        break;
+                    case AvailableModels.LSDIRx4:
+                        modelUrl = _LSDIRModelLink;
+                        modelFileName = FileNames.LSDIRFileName;
+                        break;
                     case AvailableModels.CLIPTokenizer:
                         modelUrl = _clipTokenizerLink;
                         modelFileName = FileNames.CLIPTokenixerOnnxFileName;
                         break;
-                    case AvailableModels.SwinIR:
-                        modelUrl = _swinIRModelLink;
-                        modelFileName = FileNames.SwinIRFileName;
-                        break;
-                    case AvailableModels.Swin2SR:
-                        modelUrl = _swin2SRModelLink;
-                        modelFileName = FileNames.Swin2SRFileName;
+                    default:
                         break;
                 }
 

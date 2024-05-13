@@ -46,9 +46,20 @@ namespace SmartData.Lib.Helpers
             get
             {
                 AvailableModels[] availableModels =
-                {                    
-                    AvailableModels.SwinIR,
-                    AvailableModels.Swin2SR
+                {
+                    AvailableModels.ParimgCompactx2,
+                    AvailableModels.HFA2kCompactx2,
+                    AvailableModels.HFA2kAVCSRFormerLightx2,
+                    AvailableModels.HFA2kx4,
+                    AvailableModels.SwinIRx4,
+                    AvailableModels.Swin2SRx4,
+                    AvailableModels.Nomos8kSCSRFormerx4,
+                    AvailableModels.Nomos8kSCx4,
+                    AvailableModels.LSDIRplusRealx4,
+                    AvailableModels.LSDIRplusNonex4,
+                    AvailableModels.LSDIRplusCompressionx4,
+                    AvailableModels.LSDIRCompact3x4,
+                    AvailableModels.LSDIRx4
                 };
                 return availableModels;
             }
