@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 using DatasetProcessor.ViewModels;
 
@@ -11,5 +12,11 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        WindowState = WindowState.Maximized;
     }
 }

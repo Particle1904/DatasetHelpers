@@ -35,6 +35,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IInputHooksService _inputHooks;
     protected readonly IPromptGeneratorService _promptGenerator;
     protected readonly ICLIPTokenizerService _clipTokenizer;
+    protected readonly IUpscalerService _uspcalerService;
 
     [ObservableProperty]
     private UserControl _dynamicView;
@@ -57,11 +58,16 @@ public partial class MainViewModel : BaseViewModel
     /// </summary>
     /// <param name="fileManipulator">The file manipulation service.</param>
     /// <param name="imageProcessor">The image processing service.</param>
-    /// <param name="autoTagger">The auto-tagging service.</param>
+    /// <param name="wDAutoTagger">The WD 1.4 auto-tagging service.</param>
+    /// <param name="wDv3AutoTagger">The WD 3 auto-tagging service.</param>
+    /// <param name="joyTagAutoTagger">The JoyTag auto-tagging service.</param>
+    /// <param name="e621AutoTagger">The E621 auto-tagging service.</param>
     /// <param name="tagProcessor">The tag processing service.</param>
     /// <param name="contentAwareCrop">The content-aware crop service.</param>
     /// <param name="inputHooks">The input hooks service.</param>
     /// <param name="promptGenerator">The prompt generator service.</param>
+    /// <param name="clipTokenizer">The clip tokenizer.</param>
+    /// <param name="upscalerService">The upscaler service.</param>
     /// <param name="logger">The logger service.</param>
     /// <param name="configs">The configuration service.</param>
     public MainViewModel(IFileManipulatorService fileManipulator,
@@ -75,6 +81,7 @@ public partial class MainViewModel : BaseViewModel
                          IInputHooksService inputHooks,
                          IPromptGeneratorService promptGenerator,
                          ICLIPTokenizerService clipTokenizer,
+                         IUpscalerService upscalerService,
                          ILoggerService logger,
                          IConfigsService configs) :
         base(logger, configs)
@@ -90,6 +97,7 @@ public partial class MainViewModel : BaseViewModel
         _inputHooks = inputHooks;
         _promptGenerator = promptGenerator;
         _clipTokenizer = clipTokenizer;
+        _uspcalerService = upscalerService;
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -101,6 +109,7 @@ public partial class MainViewModel : BaseViewModel
             { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
             { AppPages.Manual_Crop, new ManualCropView() { DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)} },
             { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs) }},
+            { AppPages.Upscale_Images, new UpscaleView() { DataContext = new UpscaleViewModel(fileManipulator, upscalerService, logger, configs) } },
             { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger, e621AutoTagger, logger, configs) }},
             { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
             { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},

@@ -58,6 +58,7 @@ public partial class App : Application
         var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
         var promptGenerator = _servicesProvider.GetRequiredService<IPromptGeneratorService>();
         var clipTokenizer = _servicesProvider.GetRequiredService<ICLIPTokenizerService>();
+        var upscalerService = _servicesProvider.GetRequiredService<IUpscalerService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
@@ -67,7 +68,8 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
-                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, logger, configs)
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscalerService,
+                    logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -79,7 +81,8 @@ public partial class App : Application
             singleViewPlatform.MainView = new MainView()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
-                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, logger, configs)
+                    e621AutoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscalerService,
+                    logger, configs)
             };
         }
 
@@ -131,5 +134,7 @@ public partial class App : Application
         services.AddSingleton<IPromptGeneratorService>(service => new
             PromptGeneratorService(service.GetRequiredService<ITagProcessorService>(),
                 service.GetRequiredService<IFileManipulatorService>()));
+        services.AddSingleton<IUpscalerService>(service =>
+            new UpscalerService(service.GetRequiredService<IImageProcessorService>(), string.Empty));
     }
 }

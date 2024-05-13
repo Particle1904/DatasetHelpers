@@ -57,7 +57,8 @@ namespace DatasetProcessor.ViewModels
             E621AutoTaggerService e621AutoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
-            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args, LogMessageColor.Informational);
+            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args,
+                LogMessageColor.Informational);
 
             _wDAutoTagger = wDAutoTagger;
             (_wDAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -149,19 +150,19 @@ namespace DatasetProcessor.ViewModels
                 switch (GeneratorModel)
                 {
                     case AvailableModels.JoyTag:
-                        await DownloadModelFiles(AvailableModels.JoyTag);
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.JoyTag);
                         await CallAutoTaggerService(_joyTagAutoTagger);
                         break;
                     case AvailableModels.WD14v2:
-                        await DownloadModelFiles(AvailableModels.WD14v2);
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.WD14v2);
                         await CallAutoTaggerService(_wDAutoTagger);
                         break;
                     case AvailableModels.WDv3:
-                        await DownloadModelFiles(AvailableModels.WDv3);
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3);
                         await CallAutoTaggerService(_wDv3AutoTagger);
                         break;
                     case AvailableModels.Z3DE621:
-                        await DownloadModelFiles(AvailableModels.Z3DE621);
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Z3DE621);
                         await CallAutoTaggerService(_e621AutoTagger);
                         break;
                     default:
@@ -194,15 +195,7 @@ namespace DatasetProcessor.ViewModels
             // Stop elapsed timer
             _timer.Stop();
         }
-
-        private async Task DownloadModelFiles(AvailableModels model)
-        {
-            if (_fileManipulator.FileNeedsToBeDownloaded(model))
-            {
-                await _fileManipulator.DownloadModelFile(model);
-            }
-        }
-
+        
         /// <summary>
         /// Calls the AutoTagger service to generate tags based on the specified parameters.
         /// </summary>

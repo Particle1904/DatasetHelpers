@@ -44,6 +44,10 @@
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Resize_Images}"/>
 				<Button Click="Button_Click"
+						Content="Upscale Images"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Upscale_Images}"/>
+				<Button Click="Button_Click"
 						Content="Generate Tags"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Tag_Generation}"/>

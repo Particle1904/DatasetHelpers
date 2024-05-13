@@ -71,4 +71,8 @@
       <DependentUpon>MainView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\UpscaleView.axaml" />
+  </ItemGroup>
 </Project>

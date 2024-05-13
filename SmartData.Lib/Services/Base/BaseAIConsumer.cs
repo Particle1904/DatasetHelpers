@@ -48,32 +48,33 @@ namespace SmartData.Lib.Services.Base
         /// </summary>
         protected virtual async Task LoadModel()
         {
+            if(_session != null) 
+            {
+                _session = null;
+            }
+
             int[] gpuIdsToTry = { 0, 1 };
 
             SessionOptions sessionOptions = new SessionOptions();
             sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
             sessionOptions.EnableMemoryPattern = false;
-
-            for (int i = 0; i < gpuIdsToTry.Length; i++)
+            try
             {
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_DML(gpuIdsToTry[i]);
-                }
-                catch (Exception) { /* DML Failed */ }
-
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_CUDA(gpuIdsToTry[i]);
-                }
-                catch (Exception) { /* CUDA Failed */ }
-
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_ROCm(gpuIdsToTry[i]);
-                }
-                catch (Exception) { /* ROCm Failed */ }
+                sessionOptions.AppendExecutionProvider_DML(0);
             }
+            catch (Exception) { /* DML Failed */ }
+
+            try
+            {
+                sessionOptions.AppendExecutionProvider_CUDA(0);
+            }
+            catch (Exception) { /* CUDA Failed */ }
+
+            try
+            {
+                sessionOptions.AppendExecutionProvider_ROCm(0);
+            }
+            catch (Exception) { /* ROCm Failed */ }
 
             sessionOptions.ApplyConfiguration();
             _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));

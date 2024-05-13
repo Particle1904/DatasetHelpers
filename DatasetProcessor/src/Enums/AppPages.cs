@@ -8,6 +8,7 @@
         Content_Aware_Crop,
         Manual_Crop,
         Resize_Images,
+        Upscale_Images,
         Tag_Generation,
         Process_Captions,
         Process_Tags,

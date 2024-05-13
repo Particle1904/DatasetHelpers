@@ -30,6 +30,9 @@ namespace SmartData.Lib.Services
 
         private readonly string _clipTokenizerLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/cliptokenizer.onnx?download=true";
 
+        private readonly string _swinIRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/swinIR.onnx?download=true";
+        private readonly string _swin2SRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/swin2SR.onnx?download=true";
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
         public event EventHandler<string> DownloadMessageEvent;
@@ -427,6 +430,18 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
+                case AvailableModels.SwinIR:
+                    if (!Path.Exists(FileNames.SwinIRFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.Swin2SR:
+                    if (!Path.Exists(FileNames.Swin2SRFileName))
+                    {
+                        result = true;
+                    }
+                    break;
             }
 
             return result;
@@ -486,6 +501,14 @@ namespace SmartData.Lib.Services
                     case AvailableModels.CLIPTokenizer:
                         modelUrl = _clipTokenizerLink;
                         modelFileName = FileNames.CLIPTokenixerOnnxFileName;
+                        break;
+                    case AvailableModels.SwinIR:
+                        modelUrl = _swinIRModelLink;
+                        modelFileName = FileNames.SwinIRFileName;
+                        break;
+                    case AvailableModels.Swin2SR:
+                        modelUrl = _swin2SRModelLink;
+                        modelFileName = FileNames.Swin2SRFileName;
                         break;
                 }
 

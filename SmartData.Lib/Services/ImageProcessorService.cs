@@ -468,7 +468,31 @@ namespace SmartData.Lib.Services
 
             using (Image<Bgra32> image = await Image.LoadAsync<Bgra32>(_decoderOptions, inputPath))
             {
-                inputData.Input = new DenseTensor<float>(new[] { 1, 3, image.Height, image.Width });
+                // Resize image to even Width and Height for Swin2SR model.
+                int height = image.Height;
+                if (image.Height % 2 != 0)
+                {
+                    height -= 1;
+                }
+                int width = image.Width;
+                if (image.Width % 2 != 0)
+                {
+                    width -= 1;
+                }
+
+                inputData.Input = new DenseTensor<float>(new[] { 1, 3, height, width });
+
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _lanczosResampler,
+                    Compand = true,
+                    PadColor = new Rgb24(0, 0, 0),
+                    Size = new Size(height, width),
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {

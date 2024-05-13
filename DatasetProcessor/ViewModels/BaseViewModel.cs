@@ -176,6 +176,18 @@ public partial class BaseViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Download model files if necessary.
+    /// </summary>
+    /// <param name="model">The model to be downloaded.</param>
+    protected async Task DownloadModelFiles(IFileManipulatorService fileManipulator, AvailableModels model)
+    {
+        if (fileManipulator.FileNeedsToBeDownloaded(model))
+        {
+            await fileManipulator.DownloadModelFile(model);
+        }
+    }
+
+    /// <summary>
     /// Initializes the view model with the clipboard and storage provider.
     /// </summary>
     /// <param name="clipboard">The clipboard provider for managing clipboard operations.</param>

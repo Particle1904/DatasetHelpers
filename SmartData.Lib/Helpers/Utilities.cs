@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Enums;
+﻿using Enums;
+
+using SmartData.Lib.Enums;
 
 namespace SmartData.Lib.Helpers
 {
@@ -26,8 +28,28 @@ namespace SmartData.Lib.Helpers
         {
             get
             {
-                AvailableModels[] availableModels = ((AvailableModels[])Enum.GetValues(typeof(AvailableModels)))
-                    .Where(x => x != AvailableModels.Yolov4 && x != AvailableModels.CLIPTokenizer).ToArray();
+                AvailableModels[] availableModels = { 
+                    AvailableModels.JoyTag,
+                    AvailableModels.WD14v2,
+                    AvailableModels.WDv3,
+                    AvailableModels.Z3DE621
+                };
+                return availableModels;
+            }
+        }
+
+        /// <summary>
+        /// Gets an array of supported upscaler models.
+        /// </summary>
+        public static AvailableModels[] GeneratorUpscalerModelValues
+        {
+            get
+            {
+                AvailableModels[] availableModels =
+                {                    
+                    AvailableModels.SwinIR,
+                    AvailableModels.Swin2SR
+                };
                 return availableModels;
             }
         }
