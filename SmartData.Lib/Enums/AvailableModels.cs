@@ -12,21 +12,21 @@
         Yolov4,
         #endregion
         #region 2x Upscalers
-        ParimgCompactx2,
-        HFA2kCompactx2,
-        HFA2kAVCSRFormerLightx2,
+        ParimgCompact_x2,
+        HFA2kCompact_x2,
+        HFA2kAVCSRFormerLight_x2,
         #endregion
         #region 4x Upscalers
-        HFA2kx4,
-        SwinIRx4,
-        Swin2SRx4,
-        Nomos8kSCSRFormerx4,
-        Nomos8kSCx4,
-        LSDIRplusRealx4,
-        LSDIRplusNonex4,
-        LSDIRplusCompressionx4,
-        LSDIRCompact3x4,
-        LSDIRx4,
+        HFA2k_x4,
+        SwinIR_x4,
+        Swin2SR_x4,
+        Nomos8kSCSRFormer_x4,
+        Nomos8kSC_x4,
+        LSDIRplusReal_x4,
+        LSDIRplusNone_x4,
+        LSDIRplusCompression_x4,
+        LSDIRCompact3_x4,
+        LSDIR_x4,
         #endregion
         CLIPTokenizer
     }

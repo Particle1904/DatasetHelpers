@@ -146,43 +146,43 @@ namespace SmartData.Lib.Services.MachineLearning
 
             switch (model)
             { 
-                case AvailableModels.ParimgCompactx2:
+                case AvailableModels.ParimgCompact_x2:
                     ModelPath = Path.Combine(_modelsPath, FileNames.ParimgCompactFileName);
                     break;
-                case AvailableModels.HFA2kCompactx2:
+                case AvailableModels.HFA2kCompact_x2:
                     ModelPath = Path.Combine(_modelsPath, FileNames.HFA2kCompactFileName);
                     break;
-                case AvailableModels.HFA2kAVCSRFormerLightx2:
+                case AvailableModels.HFA2kAVCSRFormerLight_x2:
                     ModelPath = Path.Combine(_modelsPath, FileNames.HFA2kAVCSRFormerLightFileName);
                     break;
-                case AvailableModels.HFA2kx4:
+                case AvailableModels.HFA2k_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.HFA2kFileName);
                     break;
-                case AvailableModels.SwinIRx4:
+                case AvailableModels.SwinIR_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.SwinIRFileName);
                     break;
-                case AvailableModels.Swin2SRx4:
+                case AvailableModels.Swin2SR_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.Swin2SRFileName);
                     break;
-                case AvailableModels.Nomos8kSCSRFormerx4:
+                case AvailableModels.Nomos8kSCSRFormer_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.Nomos8kSCSRFormerFileName);
                     break;
-                case AvailableModels.Nomos8kSCx4:
+                case AvailableModels.Nomos8kSC_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.Nomos8kSCFileName);
                     break;
-                case AvailableModels.LSDIRplusRealx4:
+                case AvailableModels.LSDIRplusReal_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRplusRealFileName);
                     break;
-                case AvailableModels.LSDIRplusNonex4:
+                case AvailableModels.LSDIRplusNone_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRplusNoneFileName);
                     break;
-                case AvailableModels.LSDIRplusCompressionx4:
+                case AvailableModels.LSDIRplusCompression_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRplusCompressionFileName);
                     break;
-                case AvailableModels.LSDIRCompact3x4:
+                case AvailableModels.LSDIRCompact3_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRCompact3FileName);
                     break;
-                case AvailableModels.LSDIRx4:
+                case AvailableModels.LSDIR_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRFileName);
                     break;
                 case AvailableModels.JoyTag:

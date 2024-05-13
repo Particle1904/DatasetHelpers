@@ -435,79 +435,79 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
-                case AvailableModels.ParimgCompactx2:
+                case AvailableModels.ParimgCompact_x2:
                     if (!Path.Exists(FileNames.ParimgCompactFileName))
                     { 
                         result = true; 
                     }
                     break;
-                case AvailableModels.HFA2kCompactx2:
+                case AvailableModels.HFA2kCompact_x2:
                     if (!Path.Exists(FileNames.HFA2kCompactFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.HFA2kAVCSRFormerLightx2:
+                case AvailableModels.HFA2kAVCSRFormerLight_x2:
                     if (!Path.Exists(FileNames.HFA2kAVCSRFormerLightFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.HFA2kx4:
+                case AvailableModels.HFA2k_x4:
                     if (!Path.Exists(FileNames.HFA2kFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.SwinIRx4:
+                case AvailableModels.SwinIR_x4:
                     if (!Path.Exists(FileNames.SwinIRFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.Swin2SRx4:
+                case AvailableModels.Swin2SR_x4:
                     if (!Path.Exists(FileNames.Swin2SRFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.Nomos8kSCSRFormerx4:
+                case AvailableModels.Nomos8kSCSRFormer_x4:
                     if (!Path.Exists(FileNames.Nomos8kSCSRFormerFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.Nomos8kSCx4:
+                case AvailableModels.Nomos8kSC_x4:
                     if (!Path.Exists(FileNames.Nomos8kSCFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.LSDIRplusRealx4:
+                case AvailableModels.LSDIRplusReal_x4:
                     if (!Path.Exists(FileNames.LSDIRplusRealFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.LSDIRplusNonex4:
+                case AvailableModels.LSDIRplusNone_x4:
                     if (!Path.Exists(FileNames.LSDIRplusNoneFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.LSDIRplusCompressionx4:
+                case AvailableModels.LSDIRplusCompression_x4:
                     if (!Path.Exists(FileNames.LSDIRplusCompressionFileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.LSDIRCompact3x4:
+                case AvailableModels.LSDIRCompact3_x4:
                     if (!Path.Exists(FileNames.LSDIRCompact3FileName))
                     {
                         result = true;
                     }
                     break;
-                case AvailableModels.LSDIRx4:
+                case AvailableModels.LSDIR_x4:
                     if (!Path.Exists(FileNames.LSDIRFileName))
                     {
                         result = true;
@@ -577,55 +577,55 @@ namespace SmartData.Lib.Services
                         modelUrl = _yolov4ModelLink;
                         modelFileName = FileNames.YoloV4OnnxFileName;
                         break;
-                    case AvailableModels.ParimgCompactx2:
+                    case AvailableModels.ParimgCompact_x2:
                         modelUrl = _parimgCompactModelLink;
                         modelFileName = FileNames.ParimgCompactFileName;
                         break;
-                    case AvailableModels.HFA2kCompactx2:
+                    case AvailableModels.HFA2kCompact_x2:
                         modelUrl = _HFA2kCompactModelLink;
                         modelFileName = FileNames.HFA2kCompactFileName;
                         break;
-                    case AvailableModels.HFA2kAVCSRFormerLightx2:
+                    case AvailableModels.HFA2kAVCSRFormerLight_x2:
                         modelUrl = _HFA2kAVCSRFormerLightModelLink;
                         modelFileName = FileNames.HFA2kAVCSRFormerLightFileName;
                         break;
-                    case AvailableModels.HFA2kx4:
+                    case AvailableModels.HFA2k_x4:
                         modelUrl = _HFA2kx4ModelLink;
                         modelFileName = FileNames.HFA2kFileName;
                         break;
-                    case AvailableModels.SwinIRx4:
+                    case AvailableModels.SwinIR_x4:
                         modelUrl = _swinIRModelLink;
                         modelFileName = FileNames.SwinIRFileName;
                         break;
-                    case AvailableModels.Swin2SRx4:
+                    case AvailableModels.Swin2SR_x4:
                         modelUrl = _swin2SRModelLink;
                         modelFileName = FileNames.Swin2SRFileName;
                         break;
-                    case AvailableModels.Nomos8kSCSRFormerx4:
+                    case AvailableModels.Nomos8kSCSRFormer_x4:
                         modelUrl = _nomos8kSCSRFormerModelLink;
                         modelFileName = FileNames.Nomos8kSCSRFormerFileName;
                         break;
-                    case AvailableModels.Nomos8kSCx4:
+                    case AvailableModels.Nomos8kSC_x4:
                         modelUrl = _nomos8kSCModelLink;
                         modelFileName = FileNames.Nomos8kSCFileName;
                         break;
-                    case AvailableModels.LSDIRplusRealx4:
+                    case AvailableModels.LSDIRplusReal_x4:
                         modelUrl = _LSDIRplusRealModelLink;
                         modelFileName = FileNames.LSDIRplusRealFileName;
                         break;
-                    case AvailableModels.LSDIRplusNonex4:
+                    case AvailableModels.LSDIRplusNone_x4:
                         modelUrl = _LSDIRplusNoneModelLink;
                         modelFileName = FileNames.LSDIRplusNoneFileName;
                         break;
-                    case AvailableModels.LSDIRplusCompressionx4:
+                    case AvailableModels.LSDIRplusCompression_x4:
                         modelUrl = _LSDIRplusCompressionModelLink;
                         modelFileName = FileNames.LSDIRplusCompressionFileName;
                         break;
-                    case AvailableModels.LSDIRCompact3x4:
+                    case AvailableModels.LSDIRCompact3_x4:
                         modelUrl = _LSDIRCompact3ModelLink;
                         modelFileName = FileNames.LSDIRCompact3FileName;
                         break;
-                    case AvailableModels.LSDIRx4:
+                    case AvailableModels.LSDIR_x4:
                         modelUrl = _LSDIRModelLink;
                         modelFileName = FileNames.LSDIRFileName;
                         break;

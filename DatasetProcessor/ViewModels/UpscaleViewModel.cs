@@ -63,7 +63,7 @@ namespace DatasetProcessor.ViewModels
             OutputFolderPath = _configs.Configurations.ResizedFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
 
-            UpscalerModel = AvailableModels.SwinIRx4;
+            UpscalerModel = AvailableModels.SwinIR_x4;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
@@ -111,57 +111,57 @@ namespace DatasetProcessor.ViewModels
                 IsCancelEnabled = true;
                 switch (UpscalerModel)
                 {                    
-                    case AvailableModels.ParimgCompactx2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.ParimgCompactx2);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.ParimgCompactx2);
+                    case AvailableModels.ParimgCompact_x2:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.ParimgCompact_x2);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.ParimgCompact_x2);
                         break;
-                    case AvailableModels.HFA2kCompactx2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kCompactx2);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kCompactx2);
+                    case AvailableModels.HFA2kCompact_x2:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kCompact_x2);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kCompact_x2);
                         break;
-                    case AvailableModels.HFA2kAVCSRFormerLightx2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kAVCSRFormerLightx2);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kAVCSRFormerLightx2);
+                    case AvailableModels.HFA2kAVCSRFormerLight_x2:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kAVCSRFormerLight_x2);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kAVCSRFormerLight_x2);
                         break;
-                    case AvailableModels.HFA2kx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kx4);
+                    case AvailableModels.HFA2k_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2k_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2k_x4);
                         break;
-                    case AvailableModels.SwinIRx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.SwinIRx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SwinIRx4);
+                    case AvailableModels.SwinIR_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.SwinIR_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SwinIR_x4);
                         break;
-                    case AvailableModels.Swin2SRx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Swin2SRx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Swin2SRx4);
+                    case AvailableModels.Swin2SR_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Swin2SR_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Swin2SR_x4);
                         break;
-                    case AvailableModels.Nomos8kSCSRFormerx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSCSRFormerx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSCSRFormerx4);
+                    case AvailableModels.Nomos8kSCSRFormer_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSCSRFormer_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSCSRFormer_x4);
                         break;
-                    case AvailableModels.Nomos8kSCx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSCx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSCx4);
+                    case AvailableModels.Nomos8kSC_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSC_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSC_x4);
                         break;
-                    case AvailableModels.LSDIRplusRealx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusRealx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusRealx4);
+                    case AvailableModels.LSDIRplusReal_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusReal_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusReal_x4);
                         break;
-                    case AvailableModels.LSDIRplusNonex4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusNonex4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusNonex4);
+                    case AvailableModels.LSDIRplusNone_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusNone_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusNone_x4);
                         break;
-                    case AvailableModels.LSDIRplusCompressionx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusCompressionx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusCompressionx4);
+                    case AvailableModels.LSDIRplusCompression_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusCompression_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusCompression_x4);
                         break;
-                    case AvailableModels.LSDIRCompact3x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRCompact3x4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRCompact3x4);
+                    case AvailableModels.LSDIRCompact3_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRCompact3_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRCompact3_x4);
                         break;
-                    case AvailableModels.LSDIRx4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRx4);
-                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRx4);
+                    case AvailableModels.LSDIR_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIR_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIR_x4);
                         break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the upscaler models!",

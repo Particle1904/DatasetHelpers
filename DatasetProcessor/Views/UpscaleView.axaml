@@ -11,7 +11,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
@@ -80,15 +80,25 @@
 					  ItemsSource="{Binding Source={x:Static local:Utilities.GeneratorUpscalerModelValues}}">
 			</ComboBox>			
 		</Grid>
-		<Separator Grid.Row="6"/>
+		<!-- NOTE TEXT BOX -->
+		<Panel Grid.Row="6"
+			   Background="{DynamicResource SurfaceDark}">
+			<TextBlock HorizontalAlignment="Center"
+					   Margin="10"
+					   TextAlignment="Center"
+					   FontWeight="Light"
+					   Foreground="{DynamicResource Secondary}"
+				   Text="Note: This functionality will upscale images by 2x or 4x of their original size; pay attention to the Model name in the Dropdown menu.&#10;Some models require the input image Width and Height to be divisible by 16 or 64, but most models can accept any size.&#10;My personal recommendation for upscaling is the SwinIR model; its the best one for keeping the original image structure."/>
+		</Panel>
+		<Separator Grid.Row="8"/>
 		<!-- CURRENTLY PROCESSING -->
-		<Label Grid.Row="8"
+		<Label Grid.Row="10"
 			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
 		<!-- ELAPSED TIME -->
-		<Label Grid.Row="10"
+		<Label Grid.Row="12"
 			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- UPSCALE BUTTON -->
-		<Grid Grid.Row="12"
+		<Grid Grid.Row="14"
 			  ColumnDefinitions="Auto, 10, Auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
@@ -102,10 +112,10 @@
 					Command="{Binding CancelTaskCommand}"/>
 		</Grid>
 		<!-- PROGRESS BAR -->
-		<ProgressBar Grid.Row="14"
+		<ProgressBar Grid.Row="16"
 					 Value="{Binding UpscalingProgress.PercentComplete}"/>
 		<!-- TASK STATUS -->
-		<Label Grid.Row="16"
+		<Label Grid.Row="18"
 			   FontSize="22"
 			   Foreground="{DynamicResource Secondary}"
 			   Content="{Binding TaskStatusString}"/>
