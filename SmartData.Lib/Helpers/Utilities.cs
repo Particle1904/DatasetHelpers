@@ -1,6 +1,4 @@
-﻿using Enums;
-
-using SmartData.Lib.Enums;
+﻿using SmartData.Lib.Enums;
 
 namespace SmartData.Lib.Helpers
 {
@@ -59,7 +57,13 @@ namespace SmartData.Lib.Helpers
                     AvailableModels.LSDIRplusNone_x4,
                     AvailableModels.LSDIRplusCompression_x4,
                     AvailableModels.LSDIRCompact3_x4,
-                    AvailableModels.LSDIR_x4
+                    AvailableModels.LSDIR_x4,
+                    AvailableModels.Nomos8k_x4,
+                    AvailableModels.Nomos8kDAT_x4,
+                    AvailableModels.NomosUni_x4,
+                    AvailableModels.RealWebPhoto_x4,
+                    AvailableModels.RealWebPhotoDAT_x4,
+                    AvailableModels.SPANkendata_x4,
                 };
                 return availableModels;
             }

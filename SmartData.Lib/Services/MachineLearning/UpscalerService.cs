@@ -185,6 +185,24 @@ namespace SmartData.Lib.Services.MachineLearning
                 case AvailableModels.LSDIR_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.LSDIRFileName);
                     break;
+                case AvailableModels.Nomos8k_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.Nomos8kFileName);
+                    break;
+                case AvailableModels.Nomos8kDAT_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.Nomos8kDATFileName);
+                    break;
+                case AvailableModels.NomosUni_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.NomosUniFileName);
+                    break;
+                case AvailableModels.RealWebPhoto_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.RealWebPhotoFileName);
+                    break;
+                case AvailableModels.RealWebPhotoDAT_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.RealWebPhotoDATFileName);
+                    break;
+                case AvailableModels.SPANkendata_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.SPANkendataFileName);
+                    break;
                 case AvailableModels.JoyTag:
                 case AvailableModels.WD14v2:
                 case AvailableModels.WDv3:

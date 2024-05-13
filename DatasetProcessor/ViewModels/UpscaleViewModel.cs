@@ -5,8 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
-using Enums;
-
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -104,6 +102,7 @@ namespace DatasetProcessor.ViewModels
             timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
             timer.Start();
 
+            UpscalingProgress = ResetProgress(UpscalingProgress);
             TaskStatus = ProcessingStatus.Running;
 
             try
@@ -162,6 +161,30 @@ namespace DatasetProcessor.ViewModels
                     case AvailableModels.LSDIR_x4:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIR_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIR_x4);
+                        break;
+                    case AvailableModels.Nomos8k_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8k_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8k_x4);
+                        break;
+                    case AvailableModels.Nomos8kDAT_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kDAT_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kDAT_x4);
+                        break;
+                    case AvailableModels.NomosUni_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.NomosUni_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.NomosUni_x4);
+                        break;
+                    case AvailableModels.RealWebPhoto_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.RealWebPhoto_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.RealWebPhoto_x4);
+                        break;
+                    case AvailableModels.RealWebPhotoDAT_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.RealWebPhotoDAT_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.RealWebPhotoDAT_x4);
+                        break;
+                    case AvailableModels.SPANkendata_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.SPANkendata_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SPANkendata_x4);
                         break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the upscaler models!",

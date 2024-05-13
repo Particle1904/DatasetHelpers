@@ -38,6 +38,12 @@
         public const string ParimgCompactFileName = "ParimgCompact.onnx";
         public const string SwinIRFileName = "swinIR.onnx";
         public const string Swin2SRFileName = "swin2SR.onnx";
+        public const string Nomos8kFileName = "Nomos8k.onnx";
+        public const string Nomos8kDATFileName = "Nomos8kDAT.onnx";
+        public const string NomosUniFileName = "NomosUni.onnx";
+        public const string RealWebPhotoFileName = "RealWebPhoto.onnx";
+        public const string RealWebPhotoDATFileName = "RealWebPhotoDAT.onnx";
+        public const string SPANkendataFileName = "SPANkendata.onnx";
         #endregion
     }
 }

@@ -43,10 +43,19 @@ class Program
         }
 
         string location = Path.Combine(Environment.CurrentDirectory, "runtimes");
-
+        
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            location = Path.Combine(location, "win-x64");
+            string processArchitecture = string.Empty;
+            if (Environment.Is64BitProcess)
+            {
+                processArchitecture = "x64";
+            }
+            else
+            {
+                processArchitecture = "x86";
+            }
+            location = Path.Combine(location, $"win-{processArchitecture}");
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
