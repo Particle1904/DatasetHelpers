@@ -480,7 +480,7 @@ namespace SmartData.Lib.Services
                     width -= 1;
                 }
 
-                inputData.Input = new DenseTensor<float>(new[] { 1, 3, height, width });
+                inputData.Input = new DenseTensor<float>(new[] { 1, 3, width, height });
 
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {
@@ -489,7 +489,7 @@ namespace SmartData.Lib.Services
                     Sampler = _lanczosResampler,
                     Compand = true,
                     PadColor = new Rgb24(0, 0, 0),
-                    Size = new Size(height, width),
+                    Size = new Size(width, height),
                 };
 
                 image.Mutate(image => image.Resize(resizeOptions));
