@@ -13,10 +13,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
@@ -194,11 +191,6 @@ namespace DatasetProcessor.ViewModels
                         break;
                 }
             }
-            catch (OnnxRuntimeException exception)
-            {
-                Logger.SetLatestLogMessage($"An error occured while running inference on the model!", LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
-            }
             catch (OperationCanceledException)
             {
                 IsCancelEnabled = false;
@@ -206,9 +198,16 @@ namespace DatasetProcessor.ViewModels
             }
             catch (Exception exception)
             {
-                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
-                    LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                if (exception.Message.Contains("Not enough memory resources"))
+                {
+                    Logger.SetLatestLogMessage($"Not enough Memory to process operation! Try reducing the image size.", LogMessageColor.Error);
+                }
+                else
+                {
+                    Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
+                    await Logger.SaveExceptionStackTrace(exception);
+                }
             }
             finally
             {

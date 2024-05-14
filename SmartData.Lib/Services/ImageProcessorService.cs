@@ -464,25 +464,25 @@ namespace SmartData.Lib.Services
         /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
         public async Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath)
         {
-            UpscalerInputData inputData = new UpscalerInputData();
+             UpscalerInputData inputData = new UpscalerInputData();
 
             using (Image<Bgra32> image = await Image.LoadAsync<Bgra32>(_decoderOptions, inputPath))
             {
-                // Resize image to even Width and Height for Swin2SR model.
+                // Adjust the image dimensions to be even.
                 int height = image.Height;
-                if (image.Height % 2 != 0)
+                if(height % 2 != 0) 
                 {
                     height -= 1;
                 }
                 int width = image.Width;
-                if (image.Width % 2 != 0)
-                {
+                if (width % 2 != 0)
+                { 
                     width -= 1;
                 }
 
                 inputData.Input = new DenseTensor<float>(new[] { 1, 3, height, width });
 
-                ResizeOptions resizeOptions = new ResizeOptions()
+                ResizeOptions resizeOptions = new ResizeOptions
                 {
                     Mode = ResizeMode.BoxPad,
                     Position = AnchorPositionMode.Center,
@@ -503,9 +503,9 @@ namespace SmartData.Lib.Services
                         {
                             ref Bgra32 pixel = ref pixelRow[x];
 
-                            float r = pixel.R * 1f / 255f;
-                            float g = pixel.G * 1f / 255f;
-                            float b = pixel.B * 1f / 255f;
+                            float r = pixel.R / 255f;
+                            float g = pixel.G / 255f;
+                            float b = pixel.B / 255f;
 
                             inputData.Input[0, 0, y, x] = b;
                             inputData.Input[0, 1, y, x] = g;
@@ -514,6 +514,7 @@ namespace SmartData.Lib.Services
                     }
                 });
             }
+
             return inputData;
         }
 
