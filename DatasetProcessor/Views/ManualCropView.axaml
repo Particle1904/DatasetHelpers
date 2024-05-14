@@ -63,7 +63,7 @@
 		
 		<!-- CURRENT FILE INFORMATION PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="4"
-			  ColumnDefinitions="1*, 10, 1*, 10, 1*"
+			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, Auto"
 			  Height="40">
 			<Label Grid.Column="0"
 				   Content="{Binding SelectedImageFilename}"/>
@@ -71,6 +71,18 @@
 				   Content="{Binding CurrentAndTotal}"/>
 			<Label Grid.Column="4"
 				   Content="{Binding TotalImageFiles}"/>
+			<Button Grid.Column="6"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding CopyCurrentImageCommand}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/copy.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
 		</Grid>
 		
 		<!-- IMAGE PANEL -->

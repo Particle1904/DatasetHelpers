@@ -112,6 +112,17 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        [RelayCommand]
+        private void CopyCurrentImage()
+        {
+            if (!string.IsNullOrEmpty(SelectedImageFilename) && !string.IsNullOrEmpty(OutputFolderPath))
+            {
+                string currentImage = ImageFiles[SelectedItemIndex];
+                string outputPath = Path.Combine(OutputFolderPath, Path.GetFileName(currentImage));
+                File.Copy(currentImage, outputPath);
+            }
+        }
+
         /// <summary>
         /// Loads image files from the specified input folder and prepares the view model for editing.
         /// </summary>

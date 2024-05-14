@@ -29,6 +29,7 @@
   
   <ItemGroup>
     <None Remove="Assets\Icons\content_copy.svg" />
+    <None Remove="Assets\Icons\copy.svg" />
     <None Remove="Assets\Icons\dice.svg" />
     <None Remove="Assets\Icons\folder_opened.svg" />
     <None Remove="Assets\Icons\icon.png" />
