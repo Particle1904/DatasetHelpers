@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Microsoft.ML.OnnxRuntime;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -109,7 +111,7 @@ namespace DatasetProcessor.ViewModels
             {
                 IsCancelEnabled = true;
                 switch (UpscalerModel)
-                {                    
+                {
                     case AvailableModels.ParimgCompact_x2:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.ParimgCompact_x2);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.ParimgCompact_x2);
@@ -191,6 +193,11 @@ namespace DatasetProcessor.ViewModels
                             LogMessageColor.Error);
                         break;
                 }
+            }
+            catch (OnnxRuntimeException exception)
+            {
+                Logger.SetLatestLogMessage($"An error occured while running inference on the model!", LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
             catch (OperationCanceledException)
             {

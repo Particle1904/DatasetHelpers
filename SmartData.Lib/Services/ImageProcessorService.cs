@@ -480,7 +480,7 @@ namespace SmartData.Lib.Services
                     width -= 1;
                 }
 
-                inputData.Input = new DenseTensor<float>(new[] { 1, 3, width, height });
+                inputData.Input = new DenseTensor<float>(new[] { 1, 3, height, width });
 
                 ResizeOptions resizeOptions = new ResizeOptions()
                 {

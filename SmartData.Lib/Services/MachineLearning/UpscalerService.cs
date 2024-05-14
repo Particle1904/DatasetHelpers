@@ -62,12 +62,15 @@ namespace SmartData.Lib.Services.MachineLearning
                 try
                 {
                     await UpscaleImageAndSaveAsync(file, upscaledImagePath);
-                }
+                } 
                 catch (Exception)
                 {
                     throw new ArgumentException($"An error occured while trying to upscale image.{Environment.NewLine}It could be that the selected model can only upscale images that have Width and Height Divisible by 16 or 64!");
                 }
-         
+                finally
+                {
+                    
+                }
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
