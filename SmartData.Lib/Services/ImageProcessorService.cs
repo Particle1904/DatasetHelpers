@@ -5,6 +5,9 @@ using HeyRed.ImageSharp.Heif.Formats.Heif;
 
 using Microsoft.ML.OnnxRuntime.Tensors;
 
+using Models;
+using Models.MachineLearning;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -49,6 +52,7 @@ namespace SmartData.Lib.Services
 
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
+        private CubicResampler _cubicResampler;
 
         private const ushort _semaphoreConcurrent = 6;
 
@@ -106,6 +110,7 @@ namespace SmartData.Lib.Services
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
             _bicubicResampler = new BicubicResampler();
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
+            _cubicResampler = CubicResampler.MitchellNetravali;
             MinimumResolutionForSigma = 512;
         }
 
@@ -385,17 +390,9 @@ namespace SmartData.Lib.Services
                         {
                             Rgb24 pixel = pixelRow[x];
 
-                            float r = pixel.R / 255.0f;
-                            float g = pixel.G / 255.0f;
-                            float b = pixel.B / 255.0f;
-
-                            r = (r - 0.48145466f) / 0.26862954f;
-                            g = (g - 0.4578275f) / 0.26130258f;
-                            b = (b - 0.40821073f) / 0.27577711f;
-
-                            inputData.Input[0, 0, y, x] = r;
-                            inputData.Input[0, 1, y, x] = g;
-                            inputData.Input[0, 2, y, x] = b;
+                            inputData.Input[0, 0, y, x] = (pixel.R / 255.0f - 0.48145466f) / 0.26862954f;
+                            inputData.Input[0, 1, y, x] = (pixel.G / 255.0f - 0.4578275f) / 0.26130258f;
+                            inputData.Input[0, 2, y, x] = (pixel.B / 255.0f - 0.40821073f) / 0.27577711f;
                         }
                     }
                 });
@@ -441,13 +438,9 @@ namespace SmartData.Lib.Services
                         {
                             ref Rgb24 pixel = ref pixelRow[x];
 
-                            float r = pixel.R * 1f / 255f;
-                            float g = pixel.G * 1f / 255f;
-                            float b = pixel.B * 1f / 255f;
-
-                            inputData.Input[0, y, x, 0] = r;
-                            inputData.Input[0, y, x, 1] = g;
-                            inputData.Input[0, y, x, 2] = b;
+                            inputData.Input[0, y, x, 0] = pixel.R / 255f;
+                            inputData.Input[0, y, x, 1] = pixel.G / 255f;
+                            inputData.Input[0, y, x, 2] = pixel.B / 255f;
                         }
                     }
                 });
@@ -464,19 +457,19 @@ namespace SmartData.Lib.Services
         /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
         public async Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath)
         {
-             UpscalerInputData inputData = new UpscalerInputData();
+            UpscalerInputData inputData = new UpscalerInputData();
 
             using (Image<Bgra32> image = await Image.LoadAsync<Bgra32>(_decoderOptions, inputPath))
             {
                 // Adjust the image dimensions to be even.
                 int height = image.Height;
-                if(height % 2 != 0) 
+                if (height % 2 != 0)
                 {
                     height -= 1;
                 }
                 int width = image.Width;
                 if (width % 2 != 0)
-                { 
+                {
                     width -= 1;
                 }
 
@@ -503,13 +496,9 @@ namespace SmartData.Lib.Services
                         {
                             ref Bgra32 pixel = ref pixelRow[x];
 
-                            float r = pixel.R / 255f;
-                            float g = pixel.G / 255f;
-                            float b = pixel.B / 255f;
-
-                            inputData.Input[0, 0, y, x] = b;
-                            inputData.Input[0, 1, y, x] = g;
-                            inputData.Input[0, 2, y, x] = r;
+                            inputData.Input[0, 0, y, x] = pixel.B / 255f;
+                            inputData.Input[0, 1, y, x] = pixel.G / 255f;
+                            inputData.Input[0, 2, y, x] = pixel.R / 255f;
                         }
                     }
                 });
@@ -519,14 +508,258 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously processes an image and its corresponding mask for inpainting by converting them to float arrays.
+        /// </summary>
+        /// <param name="inputImagePath">The path of the image to be processed.</param>
+        /// <param name="inputMaskPath">The path of the mask to be processed.</param>
+        /// <returns>An <see cref="LaMaInputData"/> object containing the processed image and mask as float arrays.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputImagePath"/> or <paramref name="inputMaskPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputImagePath"/> or <paramref name="inputMaskPath"/>.</exception>
+        /// <exception cref="ArgumentException">The dimensions of the mask do not match the dimensions of the image.</exception>
+        public async Task<LaMaInputData> ProcessImageForInpaintAsync(string inputImagePath, string inputMaskPath)
+        {
+            LaMaInputData inputData = new LaMaInputData()
+            {
+                InputImage = new DenseTensor<float>(new[] { 1, 3, 512, 512 }),
+                InputMask = new DenseTensor<float>(new[] { 1, 1, 512, 512 })
+            };
+
+            ResizeOptions resizeOptions = new ResizeOptions()
+            {
+                Mode = ResizeMode.BoxPad,
+                Position = AnchorPositionMode.Center,
+                Sampler = _cubicResampler,
+                Compand = true,
+                PadColor = new Rgb24(0, 0, 0),
+                Size = new Size(512, 512),
+            };
+
+            // Process input image
+            Point imageSize;
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputImagePath))
+            {
+                inputData.OriginalSize = new Point(image.Width, image.Height);
+
+                imageSize = new Point(image.Width, image.Height);
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Rgba32 pixel = ref pixelRow[x];
+
+                            inputData.InputImage[0, 0, y, x] = pixel.R / 255f;
+                            inputData.InputImage[0, 1, y, x] = pixel.G / 255f;
+                            inputData.InputImage[0, 2, y, x] = pixel.B / 255f;
+                        }
+                    }
+                });
+            }
+
+            // Process input mask
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputMaskPath))
+            {
+                if (image.Width != imageSize.X || image.Height != imageSize.Y)
+                {
+                    throw new ArgumentException("The mask and the image must have the same Width and Height!");
+                }
+
+                image.Mutate(image => image.Resize(resizeOptions));
+
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Rgba32 pixel = ref pixelRow[x];
+
+                            float color = 0.0f;
+                            if ((pixel.R + pixel.G + pixel.B) > 0)
+                            {
+                                color = 1.0f;
+                            }
+
+                            inputData.InputMask[0, 0, y, x] = color;
+                        }
+                    }
+                });
+            }
+
+            return inputData;
+        }
+
+        /// <summary>
+        /// Processes the input image and mask for tile-based inpainting, and returns an array of <see cref="TileData"/>.
+        /// </summary>
+        /// <param name="inputImagePath">The file path to the input image.</param>
+        /// <param name="inputMaskPath">The file path to the input mask.</param>
+        /// <param name="tileSize">The size of each tile in pixels. Default is 512.</param>
+        /// <returns>An array of <see cref="TileData"/> containing the processed image and mask data for each tile.</returns>
+        /// <exception cref="ArgumentException">Thrown when the input image and mask do not have the same size or the number of tiles do not match.</exception>
+        /// <remarks>
+        /// This method splits the input image and mask into tiles of the specified size, processes each tile to extract the pixel data,
+        /// and creates an array of <see cref="TileData"/> containing the processed data for each tile. The tiles are then returned as an array.
+        /// </remarks>
+        public async Task<TileData[]> ProcessImageForTileInpaintAsync(string inputImagePath, string inputMaskPath, int tileSize = 512)
+        {
+            System.Drawing.Size imageSize = await GetImageSizeAsync(inputImagePath);
+            System.Drawing.Size maskSize = await GetImageSizeAsync(inputMaskPath);
+            if (!imageSize.Equals(maskSize))
+            {
+                throw new ArgumentException("Image and Mask must be same size!");
+            }
+
+            TileImage[] imageTiles = await ExtractTilesFromImage(inputImagePath, tileSize);
+            TileImage[] maskTiles = await ExtractTilesFromImage(inputMaskPath, tileSize);
+            if (imageTiles.Length != maskTiles.Length)
+            {
+                throw new ArgumentException("The number of Image Tiles and Mask Tiles isn't the same! The number of tiles must be the same!");
+            }
+
+            List<TileData> tiles = new List<TileData>(imageTiles.Length);
+            for (int i = 0; i < imageTiles.Length; i++)
+            {
+                LaMaInputData inputData = new LaMaInputData()
+                {
+                    InputImage = new DenseTensor<float>(new[] { 1, 3, 512, 512 }),
+                    InputMask = new DenseTensor<float>(new[] { 1, 1, 512, 512 }),
+                    OriginalSize = new Point(imageSize.Width, imageSize.Height)
+                };
+
+                // Process image data
+                using (Image<Rgba32> image = imageTiles[i].Image.CloneAs<Rgba32>())
+                {
+                    image.ProcessPixelRows(accessor =>
+                    {
+                        for (int y = 0; y < accessor.Height; y++)
+                        {
+                            Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                            for (int x = 0; x < pixelRow.Length; x++)
+                            {
+                                ref Rgba32 pixel = ref pixelRow[x];
+
+                                inputData.InputImage[0, 0, y, x] = pixel.R / 255f;
+                                inputData.InputImage[0, 1, y, x] = pixel.G / 255f;
+                                inputData.InputImage[0, 2, y, x] = pixel.B / 255f;
+                            }
+                        }
+                    });
+                }
+
+                // Process mask data
+                using (Image<Rgba32> mask = maskTiles[i].Image.CloneAs<Rgba32>())
+                {
+                    mask.ProcessPixelRows(accessor =>
+                    {
+                        for (int y = 0; y < accessor.Height; y++)
+                        {
+                            Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                            for (int x = 0; x < pixelRow.Length; x++)
+                            {
+                                ref Rgba32 pixel = ref pixelRow[x];
+
+                                float color = 0.0f;
+                                if ((pixel.R + pixel.G + pixel.B) > 0)
+                                {
+                                    color = 1.0f;
+                                }
+
+                                inputData.InputMask[0, 0, y, x] = color;
+                            }
+                        }
+                    });
+                }
+
+                TileData tile = new TileData(inputData, imageTiles[i].RowIndex, imageTiles[i].ColumnIndex);
+                tiles.Add(tile);
+            }
+
+            return tiles.ToArray();
+        }
+
+        /// <summary>
+        /// Extracts tiles from the input image with the specified tile size.
+        /// </summary>
+        /// <param name="inputImagePath">The file path to the input image.</param>
+        /// <param name="tileSize">The size of each tile in pixels.</param>
+        /// <returns>An array of <see cref="TileImage"/> containing the extracted image tiles.</returns>
+        /// <remarks>
+        /// This method splits the input image into tiles of the specified size and resizes each tile to the specified tile size.
+        /// Each tile is then returned as a <see cref="TileImage"/> object containing the image data and tile indices.
+        /// </remarks>
+        private async Task<TileImage[]> ExtractTilesFromImage(string inputImagePath, int tileSize)
+        {
+            ResizeOptions resizeOptions = new ResizeOptions()
+            {
+                Mode = ResizeMode.BoxPad,
+                Position = AnchorPositionMode.TopLeft,
+                Compand = true,
+                PadColor = new Rgb24(0, 0, 0),
+                Size = new Size(tileSize, tileSize),
+            };
+
+            int rows;
+            int columns;
+            List<TileImage> imageTiles = new List<TileImage>();
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputImagePath))
+            {
+                rows = (int)Math.Ceiling(image.Height / (float)tileSize);
+                columns = (int)Math.Ceiling(image.Width / (float)tileSize);
+
+                for (int y = 0; y < rows; y++)
+                {
+                    for (int x = 0; x < columns; x++)
+                    {
+                        int cropX = x * tileSize;
+                        int cropY = y * tileSize;
+                        int cropWidth;
+                        if (x == columns - 1)
+                        {
+                            cropWidth = image.Width - cropX;
+                        }
+                        else
+                        {
+                            cropWidth = tileSize;
+                        }
+                        int cropHeight;
+                        if (y == rows - 1)
+                        {
+                            cropHeight = image.Height - cropY;
+                        }
+                        else
+                        {
+                            cropHeight = tileSize;
+                        }
+
+                        Image<Rgba32> cloneImage = image.Clone();
+                        Rectangle cropArea = new Rectangle(cropX, cropY, cropWidth, cropHeight);
+                        cloneImage.Mutate(image => image.Crop(cropArea));
+                        cloneImage.Mutate(image => image.Resize(resizeOptions));
+
+                        imageTiles.Add(new TileImage(cloneImage, x, y));
+                    }
+                }
+            }
+
+            return imageTiles.ToArray();
+        }
+
+        /// <summary>
         /// Saves the upscaled image data to the specified output path.
         /// </summary>
         /// <param name="outputPath">The path where the upscaled image will be saved.</param>
-        /// <param name="upscalerOutputData">The data containing the upscaled image.</param>
-        public void SaveUpscaledImage(string outputPath, UpscalerOutputData upscalerOutputData)
+        /// <param name="outputData">The data containing the upscaled image.</param>
+        public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData)
         {
-            int width = upscalerOutputData.Output.Dimensions[3];
-            int height = upscalerOutputData.Output.Dimensions[2];
+            int width = outputData.Output.Dimensions[3];
+            int height = outputData.Output.Dimensions[2];
 
             byte[] imageByte = new byte[3 * width * height];
             for (int row = 0; row < height; row++)
@@ -534,9 +767,9 @@ namespace SmartData.Lib.Services
                 for (int col = 0; col < width; col++)
                 {
                     int baseIndex = (row * width + col) * 3;
-                    byte r = (byte)Math.Clamp(upscalerOutputData.Output[0, 2, row, col] * 255, 0, 255);
-                    byte g = (byte)Math.Clamp(upscalerOutputData.Output[0, 1, row, col] * 255, 0, 255);
-                    byte b = (byte)Math.Clamp(upscalerOutputData.Output[0, 0, row, col] * 255, 0, 255);
+                    byte r = (byte)Math.Clamp(outputData.Output[0, 2, row, col] * 255, 0, 255);
+                    byte g = (byte)Math.Clamp(outputData.Output[0, 1, row, col] * 255, 0, 255);
+                    byte b = (byte)Math.Clamp(outputData.Output[0, 0, row, col] * 255, 0, 255);
 
                     imageByte[baseIndex] = r;
                     imageByte[baseIndex + 1] = g;
@@ -552,14 +785,15 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Gets the upscaled image from UpscalerOutputData.
+        /// Saves the inpainted image data to the specified output path.
         /// </summary>
-        /// <param name="upscalerOutputData">The output data containing the upscaled image data.</param>
-        /// <returns>The upscaled image.</returns>
-        public Image GetUpscaledImage(UpscalerOutputData upscalerOutputData)
+        /// <param name="outputPath">The path where the inpainted image will be saved.</param>
+        /// <param name="inputData">The input data containing the original size of the image.</param>
+        /// <param name="outputData">The output data containing the inpainted image.</param>
+        public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData)
         {
-            int width = upscalerOutputData.Output.Dimensions[3];
-            int height = upscalerOutputData.Output.Dimensions[2];
+            int width = outputData.OutputImage.Dimensions[3];
+            int height = outputData.OutputImage.Dimensions[2];
 
             byte[] imageByte = new byte[3 * width * height];
             for (int row = 0; row < height; row++)
@@ -567,9 +801,113 @@ namespace SmartData.Lib.Services
                 for (int col = 0; col < width; col++)
                 {
                     int baseIndex = (row * width + col) * 3;
-                    byte r = (byte)Math.Clamp(upscalerOutputData.Output[0, 2, row, col] * 255, 0, 255);
-                    byte g = (byte)Math.Clamp(upscalerOutputData.Output[0, 1, row, col] * 255, 0, 255);
-                    byte b = (byte)Math.Clamp(upscalerOutputData.Output[0, 0, row, col] * 255, 0, 255);
+                    byte r = (byte)Math.Clamp(outputData.OutputImage[0, 2, row, col], 0, 255);
+                    byte g = (byte)Math.Clamp(outputData.OutputImage[0, 1, row, col], 0, 255);
+                    byte b = (byte)Math.Clamp(outputData.OutputImage[0, 0, row, col], 0, 255);
+
+                    imageByte[baseIndex] = b;
+                    imageByte[baseIndex + 1] = g;
+                    imageByte[baseIndex + 2] = r;
+                }
+            }
+
+            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+
+            using (Image<Rgb24> image = Image.LoadPixelData<Rgb24>(bytes, width, height))
+            {
+                float originalAspectRatio = (float)inputData.OriginalSize.X / inputData.OriginalSize.Y;
+                float currentAspectRatio = (float)width / height;
+
+                int cropWidth = width;
+                int cropHeight = height;
+
+                if (currentAspectRatio > originalAspectRatio)
+                {
+                    cropWidth = (int)(height * originalAspectRatio);
+                }
+                else if (currentAspectRatio < originalAspectRatio)
+                {
+                    cropHeight = (int)(width / originalAspectRatio);
+                }
+
+                int cropX = (width - cropWidth) / 2;
+                int cropY = (height - cropHeight) / 2;
+
+                image.Mutate(image => image.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
+                image.Mutate(image => image.Resize(inputData.OriginalSize.X, inputData.OriginalSize.Y, KnownResamplers.Lanczos3));
+
+                image.SaveAsPng(outputPath);
+            }
+        }
+
+        /// <summary>
+        /// Saves the inpainted image to the specified output path by combining the processed image tiles.
+        /// </summary>
+        /// <param name="outputPath">The file path where the resulting inpainted image will be saved.</param>
+        /// <param name="inputData">An array of <see cref="TileData"/> representing the input data of the image tiles.</param>
+        /// <param name="outputData">An array of <see cref="LaMaOutputData"/> containing the output data of the inpainted image tiles.</param>
+        /// <param name="tileSize">The size of each tile in pixels. Default is 512.</param>
+        /// <remarks>
+        /// This method creates a new image by assembling the inpainted tiles from the <paramref name="outputData"/> array.
+        /// Each tile's pixel data is processed and placed in the appropriate position in the resulting image based on the row and column indices.
+        /// The assembled image is then saved as a PNG file at the specified <paramref name="outputPath"/>.
+        /// </remarks>
+        public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512)
+        {
+            using (Image<Rgba32> resultImage = new Image<Rgba32>(inputData[0].LaMaInputData.OriginalSize.X,
+                inputData[0].LaMaInputData.OriginalSize.Y))
+            {
+                for (int i = 0; i < outputData.Length; i++)
+                {
+                    int width = outputData[i].OutputImage.Dimensions[2];
+                    int height = outputData[i].OutputImage.Dimensions[3];
+
+                    byte[] imageByte = new byte[3 * width * height];
+                    for (int row = 0; row < height; row++)
+                    {
+                        for (int col = 0; col < width; col++)
+                        {
+                            int baseIndex = (row * width + col) * 3;
+                            byte r = (byte)Math.Clamp(outputData[i].OutputImage[0, 2, row, col], 0, 255);
+                            byte g = (byte)Math.Clamp(outputData[i].OutputImage[0, 1, row, col], 0, 255);
+                            byte b = (byte)Math.Clamp(outputData[i].OutputImage[0, 0, row, col], 0, 255);
+
+                            imageByte[baseIndex] = b;
+                            imageByte[baseIndex + 1] = g;
+                            imageByte[baseIndex + 2] = r;
+                        }
+                    }
+
+                    ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+
+                    Image<Rgb24> tile = Image.LoadPixelData<Rgb24>(bytes, width, height);
+                    Point location = new Point(tileSize * outputData[i].RowIndex, tileSize * outputData[i].ColumnIndex);
+                    resultImage.Mutate(image => image.DrawImage(tile, location, 1));
+                }
+
+                resultImage.SaveAsPng(outputPath);
+            }
+        }
+
+        /// <summary>
+        /// Gets the upscaled image from UpscalerOutputData.
+        /// </summary>
+        /// <param name="outputData">The output data containing the upscaled image data.</param>
+        /// <returns>The upscaled image.</returns>
+        public Image GetUpscaledImage(UpscalerOutputData outputData)
+        {
+            int width = outputData.Output.Dimensions[3];
+            int height = outputData.Output.Dimensions[2];
+
+            byte[] imageByte = new byte[3 * width * height];
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    int baseIndex = (row * width + col) * 3;
+                    byte r = (byte)Math.Clamp(outputData.Output[0, 2, row, col] * 255, 0, 255);
+                    byte g = (byte)Math.Clamp(outputData.Output[0, 1, row, col] * 255, 0, 255);
+                    byte b = (byte)Math.Clamp(outputData.Output[0, 0, row, col] * 255, 0, 255);
 
                     imageByte[baseIndex] = r;
                     imageByte[baseIndex + 1] = g;

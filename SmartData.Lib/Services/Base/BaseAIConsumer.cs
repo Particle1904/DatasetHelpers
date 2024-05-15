@@ -22,6 +22,8 @@ namespace SmartData.Lib.Services.Base
             }
         }
 
+        protected bool _useGPU = true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseAIConsumer{TInput, TOutput}"/> class.
         /// </summary>
@@ -56,25 +58,30 @@ namespace SmartData.Lib.Services.Base
             int[] gpuIdsToTry = { 0, 1 };
 
             SessionOptions sessionOptions = new SessionOptions();
-            sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
-            sessionOptions.EnableMemoryPattern = false;
-            try
+            
+            if (_useGPU)
             {
-                sessionOptions.AppendExecutionProvider_DML(0);
-            }
-            catch (Exception) { /* DML Failed */ }
+                sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
+                sessionOptions.EnableMemoryPattern = false;
 
-            try
-            {
-                sessionOptions.AppendExecutionProvider_CUDA(0);
-            }
-            catch (Exception) { /* CUDA Failed */ }
+                try
+                {
+                    sessionOptions.AppendExecutionProvider_DML(0);
+                }
+                catch (Exception) { /* DML Failed */ }
 
-            try
-            {
-                sessionOptions.AppendExecutionProvider_ROCm(0);
+                try
+                {
+                    sessionOptions.AppendExecutionProvider_CUDA(0);
+                }
+                catch (Exception) { /* CUDA Failed */ }
+
+                try
+                {
+                    sessionOptions.AppendExecutionProvider_ROCm(0);
+                }
+                catch (Exception) { /* ROCm Failed */ }
             }
-            catch (Exception) { /* ROCm Failed */ }
 
             sessionOptions.ApplyConfiguration();
             _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));

@@ -9,6 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
+using Interfaces.MachineLearning;
+
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.MachineLearning;

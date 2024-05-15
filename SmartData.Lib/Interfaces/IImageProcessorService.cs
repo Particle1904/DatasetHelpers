@@ -1,5 +1,8 @@
 ﻿// Ignore Spelling: Lanczos
 
+using Models;
+using Models.MachineLearning;
+
 using SixLabors.ImageSharp;
 
 using SmartData.Lib.Enums;
@@ -21,8 +24,12 @@ namespace SmartData.Lib.Interfaces
         public Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath);
         public Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath);
         public Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath);
-        public void SaveUpscaledImage(string outputPath, UpscalerOutputData upscalerOutputData);
-        public Image GetUpscaledImage(UpscalerOutputData upscalerOutputData);
+        public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputImagePath, string inputMaskPath);
+        public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputImagePath, string inputMaskPath, int tileSize = 512);
+        public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData);
+        public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData);
+        public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);
+        public Image GetUpscaledImage(UpscalerOutputData outputData);
         public Task<MemoryStream> GetBlurredImageAsync(string inputPath);
         public Task<List<string>> ReadImageMetadataAsync(Stream imageStream);
         public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
