@@ -92,17 +92,15 @@ namespace DatasetProcessor.ViewModels
             };
             (_e621AutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
-            InputFolderPath = _configs.Configurations.ResizedFolder;
+            InputFolderPath = _configs.Configurations.GenerateTagsConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configs.Configurations.CombinedOutputFolder;
+            OutputFolderPath = _configs.Configurations.UpscaleImagesConfigs.OutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
-
-            GeneratorModel = AvailableModels.JoyTag;
-            Threshold = _configs.Configurations.TaggerThreshold;
-
-            WeightedCaptions = false;
-            AppendCaptionsToFile = false;
-            ApplyRedundancyRemoval = true;
+            GeneratorModel = _configs.Configurations.GenerateTagsConfigs.AutoTaggerModel;
+            Threshold = _configs.Configurations.GenerateTagsConfigs.PredictionsThreshold;
+            WeightedCaptions = _configs.Configurations.GenerateTagsConfigs.WeightedCaptions;
+            AppendCaptionsToFile = _configs.Configurations.GenerateTagsConfigs.AppendToExistingFile;
+            ApplyRedundancyRemoval = _configs.Configurations.GenerateTagsConfigs.ApplyRedudancyRemoval;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
@@ -195,7 +193,7 @@ namespace DatasetProcessor.ViewModels
             // Stop elapsed timer
             _timer.Stop();
         }
-        
+
         /// <summary>
         /// Calls the AutoTagger service to generate tags based on the specified parameters.
         /// </summary>

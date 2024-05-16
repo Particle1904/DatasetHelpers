@@ -9,8 +9,6 @@ using CommunityToolkit.Mvvm.Input;
 using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
-using Interfaces.MachineLearning;
-
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.MachineLearning;
@@ -103,23 +101,64 @@ public partial class MainViewModel : BaseViewModel
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
-        _views = new Dictionary<AppPages, UserControl>()
+        _views = new Dictionary<AppPages, UserControl>();
+        _views.Add(AppPages.Welcome, new WelcomeView()
         {
-            { AppPages.Welcome, new WelcomeView() { DataContext = new WelcomeViewModel(logger, configs) }},
-            { AppPages.Gallery, new GalleryView() { DataContext = new GalleryViewModel(fileManipulator, logger, configs)} },
-            { AppPages.Sort_Images, new SortImagesView() { DataContext = new SortImagesViewModel(fileManipulator, logger, configs) }},
-            { AppPages.Content_Aware_Crop, new ContentAwareCropView() { DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs) }},
-            { AppPages.Manual_Crop, new ManualCropView() { DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)} },
-            { AppPages.Resize_Images, new ResizeImagesView() { DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Upscale_Images, new UpscaleView() { DataContext = new UpscaleViewModel(fileManipulator, upscalerService, logger, configs) } },
-            { AppPages.Tag_Generation, new GenerateTagsView() { DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger, e621AutoTagger, logger, configs) }},
-            { AppPages.Process_Captions, new ProcessCaptionsView() { DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Process_Tags, new ProcessTagsView() { DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs) }},
-            { AppPages.Tag_Editor, new TagEditorView() { DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, clipTokenizer, logger, configs) }},
-            { AppPages.Extract_Subset, new ExtractSubsetView() { DataContext= new ExtractSubsetViewModel(fileManipulator, logger, configs) }},
-            { AppPages.Prompt_Generator, new DatasetPromptGeneratorView() { DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, logger, configs) }},
-            { AppPages.Settings, new SettingsView() { DataContext = new SettingsViewModel(logger, configs) }}
-        };
+            DataContext = new WelcomeViewModel(logger, configs)
+        });
+        _views.Add(AppPages.Gallery, new GalleryView()
+        {
+            DataContext = new GalleryViewModel(fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Sort_Images, new SortImagesView()
+        {
+            DataContext = new SortImagesViewModel(fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Content_Aware_Crop, new ContentAwareCropView()
+        {
+            DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs)
+        });
+        _views.Add(AppPages.Manual_Crop, new ManualCropView()
+        {
+            DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Resize_Images, new ResizeImagesView()
+        {
+            DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Upscale_Images, new UpscaleView()
+        {
+            DataContext = new UpscaleViewModel(fileManipulator, upscalerService, logger, configs)
+        });
+        _views.Add(AppPages.Tag_Generation, new GenerateTagsView()
+        {
+            DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger,
+                joyTagAutoTagger, e621AutoTagger, logger, configs)
+        });
+        _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
+        {
+            DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Process_Tags, new ProcessTagsView()
+        {
+            DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Tag_Editor, new TagEditorView()
+        {
+            DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, clipTokenizer, logger, configs)
+        });
+        _views.Add(AppPages.Extract_Subset, new ExtractSubsetView()
+        {
+            DataContext = new ExtractSubsetViewModel(fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Prompt_Generator, new DatasetPromptGeneratorView()
+        {
+            DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, fileManipulator, logger, configs)
+        });
+        _views.Add(AppPages.Settings, new SettingsView()
+        {
+            DataContext = new SettingsViewModel(logger, configs)
+        });
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {

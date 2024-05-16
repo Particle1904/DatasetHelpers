@@ -43,7 +43,7 @@ namespace DatasetProcessor.ViewModels
             };
             (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => CaptionProcessingProgress.UpdateProgress();
 
-            InputFolderPath = _configs.Configurations.CombinedOutputFolder;
+            InputFolderPath = _configs.Configurations.ProcessCaptionsConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
 
             IsUiEnabled = true;

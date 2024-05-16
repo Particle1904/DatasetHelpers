@@ -61,9 +61,6 @@ namespace DatasetProcessor.ViewModels
         {
             _fileManipulator = fileManipulator;
 
-            InputFolderPath = Configs.Configurations.CombinedOutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-
             (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
@@ -71,7 +68,11 @@ namespace DatasetProcessor.ViewModels
             };
             (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => GalleryProcessingProgress.UpdateProgress();
 
-            MaxImageSize = 380;
+
+            InputFolderPath = Configs.Configurations.GalleryConfigs.InputFolder;
+            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            MaxImageSize = Configs.Configurations.GalleryConfigs.ImageDisplaySize;
+
             IsUiEnabled = true;
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;

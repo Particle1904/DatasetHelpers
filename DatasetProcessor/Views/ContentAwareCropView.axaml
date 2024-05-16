@@ -165,7 +165,7 @@
 				   VerticalAlignment="Center"/>
 			<Grid Grid.Column="6" ColumnDefinitions="Auto, 10, Auto">
 				<TextBlock Grid.Column="0" 
-						   Text="Minimum resolution for Sigman (256x min):"
+						   Text="Minimum resolution for Sigma (256x min):"
 						   MaxWidth="200"
 						   VerticalAlignment="Center"/>
 				<TextBox Grid.Column="2"

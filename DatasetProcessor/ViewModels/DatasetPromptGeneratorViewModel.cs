@@ -19,6 +19,7 @@ namespace DatasetProcessor.ViewModels
 
         private readonly IPromptGeneratorService _promptGenerator;
         private readonly ITagProcessorService _tagProcessor;
+        private readonly IFileManipulatorService _fileManipulator;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -101,10 +102,11 @@ namespace DatasetProcessor.ViewModels
         private bool _isUiEnabled;
 
         public DatasetPromptGeneratorViewModel(IPromptGeneratorService promptGenerator, ITagProcessorService tagProcessor,
-            ILoggerService logger, IConfigsService configs) : base(logger, configs)
+            IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _promptGenerator = promptGenerator;
             _tagProcessor = tagProcessor;
+            _fileManipulator = fileManipulator;
 
             (_promptGenerator as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -113,13 +115,16 @@ namespace DatasetProcessor.ViewModels
             };
             (_promptGenerator as INotifyProgress).ProgressUpdated += (sender, args) => GenerationProgress.UpdateProgress();
 
-            InputFolderPath = string.Empty;
-            OutputFolderPath = string.Empty;
-            TagsToPrepend = string.Empty;
-            TagsToAppend = "masterpiece, best quality, absurdres";
+            InputFolderPath = _configs.Configurations.PromptGeneratorConfigs.InputFolder;
+            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            OutputFolderPath = _configs.Configurations.PromptGeneratorConfigs.OutputFolder;
+            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            TagsToPrepend = _configs.Configurations.PromptGeneratorConfigs.TagsToPrepend;
+            TagsToAppend = _configs.Configurations.PromptGeneratorConfigs.TagsToAppend;
+            AmountOfTags = _configs.Configurations.PromptGeneratorConfigs.AmountOfTags.ToString();
+            AmountOfGeneratedPrompts = _configs.Configurations.PromptGeneratorConfigs.AmountOfPrompts.ToString();
+
             GeneratedPrompt = string.Empty;
-            _amountOfTags = 20;
-            _amountOfGeneratedPrompts = 1000;
             IsUiEnabled = true;
 
             TaskStatus = ProcessingStatus.Idle;

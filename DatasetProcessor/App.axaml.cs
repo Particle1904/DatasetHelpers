@@ -98,7 +98,7 @@ public partial class App : Application
         services.AddSingleton<IImageProcessorService, ImageProcessorService>();
         services.AddSingleton<ITagProcessorService, TagProcessorService>();
         services.AddSingleton<ILoggerService, LoggerService>();
-        services.AddSingleton<IConfigsService, ConfigsService>();
+        services.AddSingleton<IConfigsService, ConfigurationsService>();
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, FileNames.YoloV4OnnxFileName)

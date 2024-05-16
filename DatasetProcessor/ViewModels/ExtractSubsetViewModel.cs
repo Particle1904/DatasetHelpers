@@ -51,11 +51,14 @@ namespace DatasetProcessor.ViewModels
             };
             (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => FilterProgress.UpdateProgress();
 
-            InputFolderPath = string.Empty;
-            OutputFolderPath = string.Empty;
+            InputFolderPath = _configs.Configurations.ExtractSubsetConfigs.InputFolder;
+            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            OutputFolderPath = _configs.Configurations.ExtractSubsetConfigs.OutputFolder;
+            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            SearchTags = _configs.Configurations.ExtractSubsetConfigs.SearchTxt;
+            SearchCaptions = _configs.Configurations.ExtractSubsetConfigs.SearchCaption;
+            IsExactFilter = _configs.Configurations.ExtractSubsetConfigs.ExactMatchesFiltering;
 
-            SearchTags = true;
-            SearchCaptions = true;
             IsUiEnabled = true;
         }
 

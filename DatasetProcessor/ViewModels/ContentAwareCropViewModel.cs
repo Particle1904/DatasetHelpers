@@ -101,19 +101,18 @@ namespace DatasetProcessor.ViewModels
             };
             (_contentAwareCrop as INotifyProgress).ProgressUpdated += (sender, args) => CropProgress.UpdateProgress();
 
-            InputFolderPath = _configs.Configurations.SelectedFolder;
+            InputFolderPath = _configs.Configurations.ContentAwareCropConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configs.Configurations.ResizedFolder;
+            OutputFolderPath = _configs.Configurations.ContentAwareCropConfigs.OutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
-
-            ScoreThreshold = 0.5f;
-            IouThreshold = 0.4f;
-            ExpansionPercentage = 0.15f;
-            Dimension = SupportedDimensions.Resolution512x512;
-
-            LanczosRadius = 3.0d;
-            ApplySharpen = false;
-            SharpenSigma = 0.7d;
+            ScoreThreshold = _configs.Configurations.ContentAwareCropConfigs.PredictionsCertaintyThreshold;
+            IouThreshold = _configs.Configurations.ContentAwareCropConfigs.IouThreshold;
+            ExpansionPercentage = _configs.Configurations.ContentAwareCropConfigs.ExpansionPercentage;
+            Dimension = _configs.Configurations.ContentAwareCropConfigs.OutputDimensionSize;
+            LanczosRadius = _configs.Configurations.ContentAwareCropConfigs.LanczosRadius;
+            ApplySharpen = _configs.Configurations.ContentAwareCropConfigs.ApplySharpenSigma;
+            SharpenSigma = _configs.Configurations.ContentAwareCropConfigs.SharpenSigma;
+            MinimumResolutionForSigma = configs.Configurations.ContentAwareCropConfigs.MinimumResolutionForSharpen.ToString();
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;

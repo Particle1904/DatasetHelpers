@@ -25,12 +25,6 @@ namespace DatasetProcessor.ViewModels
 
         public SettingsViewModel(ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            TaggerThreshold = _configs.Configurations.TaggerThreshold;
-            SelectedFolderPath = _configs.Configurations.SelectedFolder;
-            DiscardedFolderPath = _configs.Configurations.DiscardedFolder;
-            BackupFolderPath = _configs.Configurations.BackupFolder;
-            ResizedFolderPath = _configs.Configurations.ResizedFolder;
-            CombinedOutputFolderPath = _configs.Configurations.CombinedOutputFolder;
         }
 
         [RelayCommand]
@@ -86,36 +80,6 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private async Task SaveSettingsAsync()
         {
-            if (TaggerThreshold != 0)
-            {
-                Configs.Configurations.TaggerThreshold = (float)TaggerThreshold;
-            }
-
-            if (!string.IsNullOrEmpty(SelectedFolderPath))
-            {
-                Configs.Configurations.SelectedFolder = SelectedFolderPath;
-            }
-
-            if (!string.IsNullOrEmpty(DiscardedFolderPath))
-            {
-                Configs.Configurations.DiscardedFolder = DiscardedFolderPath;
-            }
-
-            if (!string.IsNullOrEmpty(BackupFolderPath))
-            {
-                Configs.Configurations.BackupFolder = BackupFolderPath;
-            }
-
-            if (!string.IsNullOrEmpty(ResizedFolderPath))
-            {
-                Configs.Configurations.ResizedFolder = ResizedFolderPath;
-            }
-
-            if (!string.IsNullOrEmpty(CombinedOutputFolderPath))
-            {
-                Configs.Configurations.CombinedOutputFolder = CombinedOutputFolderPath;
-            }
-
             await Configs.SaveConfigurationsAsync();
         }
 

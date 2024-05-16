@@ -23,6 +23,8 @@ namespace DatasetProcessor.ViewModels
     /// </summary>
     public partial class TagEditorViewModel : BaseViewModel
     {
+
+
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
         private readonly IInputHooksService _inputHooks;
@@ -100,13 +102,12 @@ namespace DatasetProcessor.ViewModels
             _inputHooks = inputHooks;
             _clipTokenizer = clipTokenizer;
             _random = new Random();
+            _configs = configs;
 
-            InputFolderPath = Configs.Configurations.CombinedOutputFolder;
+            InputFolderPath = _configs.Configurations.TagEditorConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-
+            IsExactFilter = _configs.Configurations.TagEditorConfigs.ExactMatchesFiltering;
             ButtonEnabled = true;
-            IsExactFilter = false;
-
             EditingTxt = true;
 
             SelectedItemIndex = 0;

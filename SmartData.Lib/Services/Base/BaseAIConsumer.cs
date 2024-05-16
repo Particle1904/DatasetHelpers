@@ -50,7 +50,7 @@ namespace SmartData.Lib.Services.Base
         /// </summary>
         protected virtual async Task LoadModel()
         {
-            if(_session != null) 
+            if (_session != null)
             {
                 _session = null;
             }
@@ -58,11 +58,14 @@ namespace SmartData.Lib.Services.Base
             int[] gpuIdsToTry = { 0, 1 };
 
             SessionOptions sessionOptions = new SessionOptions();
-            
+
             if (_useGPU)
             {
                 sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
                 sessionOptions.EnableMemoryPattern = false;
+                sessionOptions.EnableCpuMemArena = false;
+                //sessionOptions.LogVerbosityLevel = 1;
+                //sessionOptions.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
 
                 try
                 {

@@ -10,7 +10,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.Base;
 
-namespace SmartData.Lib.Services
+namespace SmartData.Lib.Services.MachineLearning
 {
     public class InpaintService : BaseAIConsumer<LaMaInputData, LaMaOutputData>, IInpaintService, INotifyProgress, IUnloadModel
     {
@@ -22,7 +22,7 @@ namespace SmartData.Lib.Services
         public InpaintService(IImageProcessorService imageProcessor, string modelPath) : base(modelPath)
         {
             _imageProcessor = imageProcessor;
-            _useGPU = false;
+            //_useGPU = false;            
         }
 
         protected override string[] GetInputColumns()

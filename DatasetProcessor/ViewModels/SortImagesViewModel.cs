@@ -45,13 +45,6 @@ namespace DatasetProcessor.ViewModels
         {
             _fileManipulator = fileManipulator;
 
-            DiscardedFolderPath = _configs.Configurations.DiscardedFolder;
-            _fileManipulator.CreateFolderIfNotExist(DiscardedFolderPath);
-            OutputFolderPath = _configs.Configurations.SelectedFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
-            BackupFolderPath = _configs.Configurations.BackupFolder;
-            _fileManipulator.CreateFolderIfNotExist(BackupFolderPath);
-
             (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 SortProgress = ResetProgress(SortProgress);
@@ -59,8 +52,16 @@ namespace DatasetProcessor.ViewModels
             };
             (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => SortProgress.UpdateProgress();
 
-            Dimension = SupportedDimensions.Resolution512x512;
-            BackupImages = false;
+            InputFolderPath = _configs.Configurations.SortImagesConfigs.InputFolder;
+            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            OutputFolderPath = _configs.Configurations.SortImagesConfigs.OutputFolder;
+            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            BackupFolderPath = _configs.Configurations.SortImagesConfigs.BackupFolder;
+            _fileManipulator.CreateFolderIfNotExist(BackupFolderPath);
+            DiscardedFolderPath = _configs.Configurations.SortImagesConfigs.DiscardedFolder;
+            _fileManipulator.CreateFolderIfNotExist(DiscardedFolderPath);
+            Dimension = _configs.Configurations.SortImagesConfigs.DimensionSizeForDiscarded;
+            BackupImages = _configs.Configurations.SortImagesConfigs.BackupBeforeProcessing;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;

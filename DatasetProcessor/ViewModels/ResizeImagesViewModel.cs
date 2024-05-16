@@ -94,14 +94,15 @@ namespace DatasetProcessor.ViewModels
 
             Dimension = SupportedDimensions.Resolution512x512;
 
-            InputFolderPath = _configs.Configurations.SelectedFolder;
+            InputFolderPath = _configs.Configurations.ResizeImagesConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configs.Configurations.ResizedFolder;
+            OutputFolderPath = _configs.Configurations.ResizeImagesConfigs.OutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
-
-            LanczosRadius = 3.0d;
-            ApplySharpen = false;
-            SharpenSigma = 0.7d;
+            Dimension = _configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
+            LanczosRadius = _configs.Configurations.ResizeImagesConfigs.LanczosRadius;
+            ApplySharpen = _configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
+            SharpenSigma = _configs.Configurations.ResizeImagesConfigs.SharpenSigma;
+            MinimumResolutionForSigma = _configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen.ToString();
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;

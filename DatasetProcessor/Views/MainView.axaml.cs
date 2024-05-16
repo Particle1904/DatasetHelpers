@@ -71,7 +71,7 @@ public partial class MainView : UserControl
             _tagProcessor = new TagProcessorService();
             _inputHooks = new InputHooksService();
             _logger = new LoggerService();
-            _configs = new ConfigsService();
+            _configs = new ConfigurationsService();
             _contentAwareCrop = new ContentAwareCropService(_imageProcessor,
                 Path.Combine(modelsPath, YoloV4OnnxFilename));
             _promptGenerator = new PromptGeneratorService(_tagProcessor, _fileManipulator);

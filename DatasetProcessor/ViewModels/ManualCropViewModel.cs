@@ -65,8 +65,8 @@ namespace DatasetProcessor.ViewModels
             StartingPosition = Point.Empty;
             EndingPosition = Point.Empty;
 
-            InputFolderPath = string.Empty;
-            OutputFolderPath = string.Empty;
+            InputFolderPath = _configs.Configurations.ManualCropConfigs.InputFolder;
+            OutputFolderPath = _configs.Configurations.ManualCropConfigs.OutputFolder;
             ImageFiles = new List<string>();
             CurrentAndTotal = string.Empty;
             SelectedImageFilename = string.Empty;

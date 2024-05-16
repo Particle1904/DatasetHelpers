@@ -100,15 +100,14 @@ namespace DatasetProcessor.ViewModels
             };
             (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => TagProcessingProgress.UpdateProgress();
 
-            InputFolderPath = _configs.Configurations.CombinedOutputFolder;
+            InputFolderPath = _configs.Configurations.ProcessTagsConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            RandomizeTags = _configs.Configurations.ProcessTagsConfigs.RandomizeTags;
+            RenameFilesToCrescent = _configs.Configurations.ProcessTagsConfigs.RenameFiles;
+            ApplyRedundancyRemoval = _configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval;
+            ApplyConsolidateTags = _configs.Configurations.ProcessTagsConfigs.ConsolidateTags;
 
             SortedByFrequency = string.Empty;
-
-            RandomizeTags = false;
-            RenameFilesToCrescent = false;
-            ApplyRedundancyRemoval = false;
-
             _timer = new Stopwatch();
 
             IsUiEnabled = true;

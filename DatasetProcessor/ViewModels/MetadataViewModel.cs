@@ -33,6 +33,8 @@ namespace DatasetProcessor.ViewModels
         private string _parameters;
         [ObservableProperty]
         private string _predictedTags;
+        [ObservableProperty]
+        private AvailableModels _generatorModel;
 
         private double _threshold;
         public double Threshold
@@ -57,7 +59,8 @@ namespace DatasetProcessor.ViewModels
             _imageProcessor = imageProcessor;
             _autoTagger = autoTagger;
 
-            Threshold = configs.Configurations.TaggerThreshold;
+            Threshold = _configs.Configurations.MetadataViewerConfigs.PredictionsThreshold;
+            _generatorModel = _configs.Configurations.MetadataViewerConfigs.AutoTaggerModel;
 
             SelectedImage = new Bitmap(AssetLoader.Open(new Uri(_dragAndDropPath)));
         }
@@ -99,9 +102,9 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                if (_fileManipulator.FileNeedsToBeDownloaded(AvailableModels.WD14v2))
+                if (_fileManipulator.FileNeedsToBeDownloaded(GeneratorModel))
                 {
-                    await _fileManipulator.DownloadModelFile(AvailableModels.WD14v2);
+                    await _fileManipulator.DownloadModelFile(GeneratorModel);
                 }
 
                 PredictedTags = "Generating tags...";

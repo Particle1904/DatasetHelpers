@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatasetProcessor", "Dataset
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatasetProcessorDesktop", "DatasetProcessorDesktop\DatasetProcessorDesktop.csproj", "{8BC8B600-5317-4805-8038-39F47BBCA19D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConsoleApp\TestConsoleApp.csproj", "{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x64.Build.0 = Release|Any CPU
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x86.ActiveCfg = Release|x86
 		{8BC8B600-5317-4805-8038-39F47BBCA19D}.Release|x86.Build.0 = Release|x86
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|x64.Build.0 = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|x64.ActiveCfg = Release|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|x64.Build.0 = Release|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1C9D467-2C72-4054-AA02-C5C1CFD7BC86}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

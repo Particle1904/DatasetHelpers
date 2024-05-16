@@ -5,8 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
-using Microsoft.ML.OnnxRuntime;
-
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -55,12 +53,11 @@ namespace DatasetProcessor.ViewModels
             };
             (_upscaler as INotifyProgress).ProgressUpdated += (sender, args) => UpscalingProgress.UpdateProgress();
 
-            InputFolderPath = _configs.Configurations.DiscardedFolder;
+            InputFolderPath = _configs.Configurations.UpscaleImagesConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configs.Configurations.ResizedFolder;
+            OutputFolderPath = _configs.Configurations.UpscaleImagesConfigs.OutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
-
-            UpscalerModel = AvailableModels.SwinIR_x4;
+            UpscalerModel = _configs.Configurations.UpscaleImagesConfigs.UpscalerModel;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
