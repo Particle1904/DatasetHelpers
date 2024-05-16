@@ -17,7 +17,7 @@ namespace SmartData.Lib.Enums
         Resolution832x832 = 832,
         Resolution864x864 = 864,
         Resolution896x896 = 896,
-        Resolution897x897 = 928,
+        Resolution928x928 = 928,
         Resolution960x960 = 960,
         Resolution992x992 = 992,
         Resolution1024x1024 = 1024,

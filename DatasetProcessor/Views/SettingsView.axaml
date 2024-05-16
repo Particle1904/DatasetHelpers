@@ -3,7 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+			 xmlns:local="clr-namespace:SmartData.Lib.Enums;assembly=SmartData.Lib"
+             xmlns:local2="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="5000"
 			 x:Class="DatasetProcessor.Views.SettingsView"
              x:DataType="vm:SettingsViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
@@ -12,120 +14,374 @@
 	</Design.DesignStyle>
 	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto">
 		<Grid Classes="gridSecondary" Grid.Row="0"
-			  RowDefinitions="1*, 10, 1*"
-			  ColumnDefinitions="1*, 10, 4*">
-			<Label Grid.Row="0"
+			  RowDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0" 
 				   Grid.Column="0"
-				   Grid.ColumnSpan="3"
-				   Content="{Binding Configs.SelectedFolderDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Button Grid.Row="2"
+				   Grid.ColumnSpan="4"
+				   Content="Gallery Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowGallerySettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
 					Grid.Column="0"
-					Command="{Binding SelectSortedFolderCommand}"
-					Content="Select 'sorted' folder"/>
-			<TextBlock Grid.Row="2"
-					   Grid.Column="2"
-					   Text="{Binding SelectedFolderPath}"/>
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowGallerySettings}"					
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGaleryInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding GalleryInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Label Grid.Row="2"
+						   Grid.Column="0"
+						   Content="Default image display size:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="2"
+							 Grid.Column="2"
+							 Text="{Binding GalleryDisplayImageSize}"
+							 Watermark="Enter here a number between 256 and 576."/>
+				</Grid>
+			</Border>
 		</Grid>
+		
+		<Separator Grid.Row="1"
+				   Margin="0, 10, 0, 10"/>
 		
 		<Grid Classes="gridSecondary" Grid.Row="2"
-			  RowDefinitions="1*, 10, 1*"
-			  ColumnDefinitions="1*, 10, 4*">
+			  RowDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
-				   Grid.ColumnSpan="3"
-				   Content="{Binding Configs.DiscardedFolderDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Button Grid.Row="2"
+				   Grid.ColumnSpan="4"
+				   Content="Sort Images Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowSortImagesSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="2"
 					Grid.Column="0"
-					Content="Select 'discarded' folder"
-					Command="{Binding SelectDiscardedFolderCommand}"
-					FontSize="14"/>
-			<TextBlock Grid.Row="2"
-					   Grid.Column="2"
-					   Text="{Binding DiscardedFolderPath}"/>
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowSortImagesSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectSortImagesInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding SortImagesInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Command="{Binding SelectSortImagesOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding SortImagesOutputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="4"
+							Grid.Column="0"
+							Content="Select discarded folder"
+							FontSize="12"
+							Command="{Binding SelectSortImagesDiscardedFolderCommand}"/>
+					<Label Grid.Row="4"
+						   Grid.Column="2"
+						   Content="{Binding SortImagesDiscardedFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="6"
+							Grid.Column="0"
+							Content="Select backup folder"
+							Command="{Binding SelectSortImagesBackupFolderCommand}"/>
+					<Label Grid.Row="6"
+						   Grid.Column="2"
+						   Content="{Binding SortImagesBackupFolder}"
+						   HorizontalAlignment="Left"/>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding SortImagesBackup}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Backup images before processing?"/>
+					</Grid>
+					<Grid Grid.Row="10"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="*, auto">
+						<Label Grid.Column="0"
+							   HorizontalAlignment="Left"
+							   Content="Select dimension size for discarding images (images with resolution lower than selected will be discarded):"/>
+						<ComboBox Grid.Column="1"
+								  HorizontalAlignment="Right"
+								  MinWidth="200"
+								  MaxWidth="200"
+								  SelectedItem="{Binding SortImagesMinimumDimension}"
+								  ItemsSource="{Binding Source={x:Static local2:Utilities.ResolutionValues}}">
+						</ComboBox>
+					</Grid>
+				</Grid>
+			</Border>
 		</Grid>
-		
+
+		<Separator Grid.Row="3"
+				   Margin="0, 10, 0, 10"/>
+
 		<Grid Classes="gridSecondary" Grid.Row="4"
-			  RowDefinitions="1*, 10, 1*"
-			  ColumnDefinitions="1*, 10, 4*">
+			  RowDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
-				   Grid.ColumnSpan="3"
-				   Content="{Binding Configs.BackupFolderDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Button Grid.Row="2"
+				   Grid.ColumnSpan="4"
+				   Content="Content Aware Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowContentAwareSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="2"
 					Grid.Column="0"
-					Content="Select 'backup' folder"
-					Command="{Binding SelectBackupFolderCommand}"/>
-			<TextBlock Grid.Row="2"
-					   Grid.Column="2"
-					   Text="{Binding BackupFolderPath}"/>
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowContentAwareSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectContentAwareInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding ContentAwareInputFolder}"
+						   HorizontalAlignment="Left"
+						   Margin="-92, 0, 0, 0"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectContentAwareOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding ContentAwareOutputFolder}"
+						   HorizontalAlignment="Left"
+						   Margin="-92, 0, 0, 0"/>
+					<Grid Grid.Row="4"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Threshold for prediction certainty:"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="0.1"
+								Maximum="1"
+								Value="{Binding ContentAwareScoreThreshold}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4" 
+							   Content="{Binding ContentAwareScoreThreshold}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Grid Grid.Row="6"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Threshold for Intersection over Union (IoU):"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="0.1"
+								Maximum="1"
+								Value="{Binding ContentAwareIouThreshold}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4"
+							   Content="{Binding ContentAwareIouThreshold}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Bounding Box expansion in percentage:"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="0.1"
+								Maximum="1"
+								Value="{Binding ContentAwareExpansionPercentage}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4"
+							   Content="{Binding ExpansionPercentageString}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Grid Grid.Row="10"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="*, auto">
+						<Label Grid.Column="0"
+							   HorizontalAlignment="Left"
+							   Content="Select dimension size for output images:"/>
+						<ComboBox Grid.Column="1"
+								  HorizontalAlignment="Right"
+								  MinWidth="200"
+								  MaxWidth="200"
+								  SelectedItem="{Binding ContentAwareOutputDimension}"
+								  ItemsSource="{Binding Source={x:Static local2:Utilities.ResolutionValues}}">
+						</ComboBox>
+					</Grid>
+					<Grid Grid.Row="12"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Lanczos sampler radius:"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="1"
+								Maximum="25"
+								Value="{Binding ContentAwareLanczosRadius}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4"
+							   Content="{Binding ContentAwareLanczosRadius}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Grid Grid.Row="14"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ContentAwareApplySharpen}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Apply Sharpen Sigma?"/>
+					</Grid>
+					<Grid Grid.Row="16"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Sharpen Sigma:"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="0.5"
+								Maximum="5"
+								Value="{Binding ContentAwareSharpenSigma}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4"
+							   Content="{Binding ContentAwareSharpenSigma}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Label Grid.Row="18"
+						   Grid.Column="0"
+						   Content="Minimum Resolution for Sharpen Sigma:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="18"
+							 Grid.Column="2"
+							 Text="{Binding ContentAwareSigmaResolution}"
+							 Watermark="Enter here a number between 256 and 65535. Images bigger than this value will be sharpened."/>
+				</Grid>
+			</Border>
 		</Grid>
-		
-		<Grid Classes="gridSecondary" Grid.Row="6"
-			  RowDefinitions="1*, 10, 1*"
-			  ColumnDefinitions="1*, 10, 4*">
-			<Label Grid.Row="0"
-				   Grid.Column="0"
-				   Grid.ColumnSpan="3"
-				   Content="{Binding Configs.ResizedFolderDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Button Grid.Row="2"
-					Grid.Column="0"
-					Content="Select 'resized' folder"
-					Command="{Binding SelectResizedFolderCommand}"/>
-			<TextBlock Grid.Row="2"
-					   Grid.Column="2"
-					   Text="{Binding ResizedFolderPath}"/>
-		</Grid>
-		
-		<Grid Classes="gridSecondary" Grid.Row="8"
-			  RowDefinitions="1*, 10, 1*"
-			  ColumnDefinitions="1*, 10, 4*">
-			<Label Grid.Row="0"
-				   Grid.Column="0"
-				   Grid.ColumnSpan="3"
-				   Content="{Binding Configs.CombinedFolderDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Button Grid.Row="2"
-					Grid.Column="0"
-					Content="Select 'combined' folder"
-					FontSize="14"
-					Command="{Binding SelectCombinedOutputFolderCommand}"/>
-			<TextBlock Grid.Row="2"
-					   Grid.Column="2"
-					   Text="{Binding CombinedOutputFolderPath}"/>
-		</Grid>
-		<Grid Classes="gridSecondary"
-				  Grid.Row="10"
-				  ColumnDefinitions="Auto, 10, *, 10, Auto"
-				  RowDefinitions="Auto, 10, Auto">
-			<Label Grid.Column="0"
-				   Grid.ColumnSpan="5"
-				   Content="{Binding Configs.TaggerThresholdDescription}"
-				   Foreground="{DynamicResource Secondary}"
-				   HorizontalAlignment="Left"/>
-			<Label Grid.Column="0"
-				   Grid.Row="2"
-				   Content="Threshold for predictions:"/>
-			<Slider Grid.Column="2"
-					Grid.Row="2"
-					Minimum="0.1"
-					Maximum="1"
-					Value="{Binding TaggerThreshold}"/>
-			<Label Grid.Column="4"
-				   Grid.Row="2"
-				   Width="50"
-				   HorizontalAlignment="Right"
-				   Content="{Binding TaggerThreshold}"/>
-		</Grid>
-		<Separator Grid.Row="11"/>
+
+		<Separator Grid.Row="3"
+				   Margin="0, 10, 0, 10"/>
 		<Button Grid.Row="12"
 				MaxWidth="200"
 			    Content="Save settings"
