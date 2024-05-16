@@ -89,35 +89,117 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        [ObservableProperty]
+        private bool _showManualCropSettings;
+        [ObservableProperty]
+        private string _manualCropInputFolder;
+        [ObservableProperty]
+        private string _manualCropOutputFolder;
+
+        [ObservableProperty]
+        private bool _showResizeImagesSettings;
+        [ObservableProperty]
+        private string _resizeImagesInputFolder;
+        [ObservableProperty]
+        private string _resizeImagesOutputFolder;
+        [ObservableProperty]
+        private SupportedDimensions _resizeImagesOutputDimension;
+        [ObservableProperty]
+        private int _resizeImagesLanczosRadius;
+        [ObservableProperty]
+        private bool _resizeImagesApplySharpen;
+        [ObservableProperty]
+        public double _resizeImagesSharpenSigma;
+        private int? _resizeImagesSigmaResolution;
+        public string ResizeImagesSigmaResolution
+        {
+            get => _resizeImagesSigmaResolution.ToString();
+            set
+            {
+                try
+                {
+                    int parsedValue = int.Parse(value);
+                    _resizeImagesSigmaResolution = parsedValue;
+                    OnPropertyChanged(nameof(ResizeImagesSigmaResolution));
+                }
+                catch
+                {
+                    _resizeImagesSigmaResolution = null;
+                }
+            }
+        }
+
+        [ObservableProperty]
+        private bool _showUpscaleImagesSettings;
+        [ObservableProperty]
+        private string _upscaleImagesInputFolder;
+        [ObservableProperty]
+        private string _upscaleImagesOutputFolder;
+        [ObservableProperty]
+        private AvailableModels _upscalerModel;
+
+        [ObservableProperty]
+        private bool _showGenerateTagsSettings;
+
+        [ObservableProperty]
+        private bool _showProcessCaptionsSettings;
+
+        [ObservableProperty]
+        private bool _showProcessTagsSettings;
+
+        [ObservableProperty]
+        private bool _showEditorSettings;
+
+        [ObservableProperty]
+        private bool _showExtractSubsetSettings;
+
+        [ObservableProperty]
+        private bool _showPromptGeneratorSettings;
+
+        [ObservableProperty]
+        private bool _showMetadataViewerSettings;
+
         public SettingsViewModel(ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            ShowGallerySettings = false;
-            GalleryInputFolder = _configs.Configurations.GalleryConfigs.InputFolder;
-            GalleryDisplayImageSize = _configs.Configurations.GalleryConfigs.ImageDisplaySize.ToString();
+            GalleryInputFolder = Configs.Configurations.GalleryConfigs.InputFolder;
+            GalleryDisplayImageSize = Configs.Configurations.GalleryConfigs.ImageDisplaySize.ToString();
 
-            ShowSortImagesSettings = false;
-            SortImagesInputFolder = _configs.Configurations.SortImagesConfigs.InputFolder;
-            SortImagesOutputFolder = _configs.Configurations.SortImagesConfigs.OutputFolder;
-            SortImagesDiscardedFolder = _configs.Configurations.SortImagesConfigs.DiscardedFolder;
-            SortImagesBackupFolder = _configs.Configurations.SortImagesConfigs.BackupFolder;
-            SortImagesBackup = _configs.Configurations.SortImagesConfigs.BackupBeforeProcessing;
-            SortImagesMinimumDimension = _configs.Configurations.SortImagesConfigs.DimensionSizeForDiscarded;
+            SortImagesInputFolder = Configs.Configurations.SortImagesConfigs.InputFolder;
+            SortImagesOutputFolder = Configs.Configurations.SortImagesConfigs.OutputFolder;
+            SortImagesDiscardedFolder = Configs.Configurations.SortImagesConfigs.DiscardedFolder;
+            SortImagesBackupFolder = Configs.Configurations.SortImagesConfigs.BackupFolder;
+            SortImagesBackup = Configs.Configurations.SortImagesConfigs.BackupBeforeProcessing;
+            SortImagesMinimumDimension = Configs.Configurations.SortImagesConfigs.DimensionSizeForDiscarded;
 
-            ShowContentAwareSettings = true;
-            ContentAwareInputFolder = _configs.Configurations.ContentAwareCropConfigs.InputFolder;
-            ContentAwareOutputFolder = _configs.Configurations.ContentAwareCropConfigs.OutputFolder;
-            ContentAwareScoreThreshold = _configs.Configurations.ContentAwareCropConfigs.PredictionsCertaintyThreshold;
-            ContentAwareIouThreshold = _configs.Configurations.ContentAwareCropConfigs.IouThreshold;
-            ContentAwareExpansionPercentage = _configs.Configurations.ContentAwareCropConfigs.ExpansionPercentage;
-            ContentAwareOutputDimension = _configs.Configurations.ContentAwareCropConfigs.OutputDimensionSize;
-            ContentAwareLanczosRadius = _configs.Configurations.ContentAwareCropConfigs.LanczosRadius;
-            ContentAwareApplySharpen = _configs.Configurations.ContentAwareCropConfigs.ApplySharpenSigma;
-            ContentAwareSharpenSigma = _configs.Configurations.ContentAwareCropConfigs.SharpenSigma;
-            ContentAwareSigmaResolution = _configs.Configurations.ContentAwareCropConfigs.MinimumResolutionForSharpen.ToString();
+            ContentAwareInputFolder = Configs.Configurations.ContentAwareCropConfigs.InputFolder;
+            ContentAwareOutputFolder = Configs.Configurations.ContentAwareCropConfigs.OutputFolder;
+            ContentAwareScoreThreshold = Configs.Configurations.ContentAwareCropConfigs.PredictionsCertaintyThreshold;
+            ContentAwareIouThreshold = Configs.Configurations.ContentAwareCropConfigs.IouThreshold;
+            ContentAwareExpansionPercentage = Configs.Configurations.ContentAwareCropConfigs.ExpansionPercentage;
+            ContentAwareOutputDimension = Configs.Configurations.ContentAwareCropConfigs.OutputDimensionSize;
+            ContentAwareLanczosRadius = Configs.Configurations.ContentAwareCropConfigs.LanczosRadius;
+            ContentAwareApplySharpen = Configs.Configurations.ContentAwareCropConfigs.ApplySharpenSigma;
+            ContentAwareSharpenSigma = Configs.Configurations.ContentAwareCropConfigs.SharpenSigma;
+            ContentAwareSigmaResolution = Configs.Configurations.ContentAwareCropConfigs.MinimumResolutionForSharpen.ToString();
+
+            ManualCropInputFolder = Configs.Configurations.ManualCropConfigs.InputFolder;
+            ManualCropOutputFolder = Configs.Configurations.ManualCropConfigs.OutputFolder;
+
+            ResizeImagesInputFolder = Configs.Configurations.ResizeImagesConfigs.InputFolder;
+            ResizeImagesOutputFolder = Configs.Configurations.ResizeImagesConfigs.OutputFolder;
+            ResizeImagesOutputDimension = Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
+            ResizeImagesLanczosRadius = Configs.Configurations.ResizeImagesConfigs.LanczosRadius;
+            ResizeImagesApplySharpen = Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
+            ResizeImagesSharpenSigma = Configs.Configurations.ResizeImagesConfigs.SharpenSigma;
+            ResizeImagesSigmaResolution = Configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen.ToString();
+
+            UpscaleImagesInputFolder = Configs.Configurations.UpscaleImagesConfigs.InputFolder;
+            UpscaleImagesOutputFolder = Configs.Configurations.UpscaleImagesConfigs.OutputFolder;
+            UpscalerModel = Configs.Configurations.UpscaleImagesConfigs.UpscalerModel;
         }
 
         [RelayCommand]
-        private async Task SelectGaleryInputFolderAsync()
+        private async Task SelectGalleryInputFolderAsync()
         {
             string result = await SelectFolderPath();
             if (!string.IsNullOrEmpty(result))
@@ -187,6 +269,66 @@ namespace DatasetProcessor.ViewModels
         }
 
         [RelayCommand]
+        private async Task SelectManualCropInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ManualCropInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectManualCropOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ManualCropOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectResizeImagesInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ResizeImagesInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectResizeImagesOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ResizeImagesOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectUpscaleImagesInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                UpscaleImagesInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectUpscaleImagesOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                UpscaleImagesOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
         private void ToggleBool(string propertyName)
         {
             switch (propertyName)
@@ -199,6 +341,36 @@ namespace DatasetProcessor.ViewModels
                     break;
                 case "ShowContentAwareSettings":
                     ShowContentAwareSettings = !ShowContentAwareSettings;
+                    break;
+                case "ShowManualCropSettings":
+                    ShowManualCropSettings = !ShowManualCropSettings;
+                    break;
+                case "ShowResizeImagesSettings":
+                    ShowResizeImagesSettings = !ShowResizeImagesSettings;
+                    break;
+                case "ShowUpscaleImagesSettings":
+                    ShowUpscaleImagesSettings = !ShowUpscaleImagesSettings;
+                    break;
+                case "ShowGenerateTagsSettings":
+                    ShowGenerateTagsSettings = !ShowGenerateTagsSettings;
+                    break;
+                case "ShowProcessCaptionsSettings":
+                    ShowProcessCaptionsSettings = !ShowProcessCaptionsSettings;
+                    break;
+                case "ShowProcessTagsSettings":
+                    ShowProcessTagsSettings = !ShowProcessTagsSettings;
+                    break;
+                case "ShowEditorSettings":
+                    ShowEditorSettings = !ShowEditorSettings;
+                    break;
+                case "ShowExtractSubsetSettings":
+                    ShowExtractSubsetSettings = !ShowExtractSubsetSettings;
+                    break;
+                case "ShowPromptGeneratorSettings":
+                    ShowPromptGeneratorSettings = !ShowPromptGeneratorSettings;
+                    break;
+                case "ShowMetadataViewerSettings":
+                    ShowMetadataViewerSettings = !ShowMetadataViewerSettings;
                     break;
             }
         }
@@ -228,7 +400,24 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.ContentAwareCropConfigs.MinimumResolutionForSharpen = Math.Clamp(
                 int.Parse(ContentAwareSigmaResolution), 256, ushort.MaxValue);
 
+            Configs.Configurations.ManualCropConfigs.InputFolder = ManualCropInputFolder;
+            Configs.Configurations.ManualCropConfigs.OutputFolder = ManualCropOutputFolder;
+
+            Configs.Configurations.ResizeImagesConfigs.InputFolder = ResizeImagesInputFolder;
+            Configs.Configurations.ResizeImagesConfigs.OutputFolder = ResizeImagesOutputFolder;
+            Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize = ResizeImagesOutputDimension;
+            Configs.Configurations.ResizeImagesConfigs.LanczosRadius = ResizeImagesLanczosRadius;
+            Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma = ResizeImagesApplySharpen;
+            Configs.Configurations.ResizeImagesConfigs.SharpenSigma = (float)ResizeImagesSharpenSigma;
+            Configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen = Math.Clamp(
+                int.Parse(ResizeImagesSigmaResolution), 256, ushort.MaxValue);
+
+            Configs.Configurations.UpscaleImagesConfigs.InputFolder = UpscaleImagesInputFolder;
+            Configs.Configurations.UpscaleImagesConfigs.OutputFolder = UpscaleImagesOutputFolder;
+            Configs.Configurations.UpscaleImagesConfigs.UpscalerModel = UpscalerModel;
+
             await Configs.SaveConfigurationsAsync();
+            Logger.SetLatestLogMessage($"Settings saved!", LogMessageColor.Informational);
         }
 
         partial void OnContentAwareScoreThresholdChanged(double value)
@@ -250,6 +439,11 @@ namespace DatasetProcessor.ViewModels
         partial void OnContentAwareSharpenSigmaChanged(double value)
         {
             ContentAwareSharpenSigma = Math.Round(value, 2);
+        }
+
+        partial void OnResizeImagesSharpenSigmaChanged(double value)
+        {
+            ResizeImagesSharpenSigma = Math.Round(value, 2);
         }
     }
 }

@@ -17,6 +17,11 @@ namespace SmartData.Lib.Services
     {
         public Config Configurations { get; private set; }
 
+        private JsonSerializerOptions _jsonOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        };
+
         private readonly string _configsFilePath = Path.Combine(AppContext.BaseDirectory, "config.json");
 
         /// <summary>
@@ -78,7 +83,7 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SaveConfigurationsAsync()
         {
-            string json = JsonSerializer.Serialize<Config>(Configurations);
+            string json = JsonSerializer.Serialize<Config>(Configurations, _jsonOptions);
             await File.WriteAllTextAsync(_configsFilePath, json, Encoding.UTF8);
         }
 
@@ -95,11 +100,7 @@ namespace SmartData.Lib.Services
         {
             if (!File.Exists(_configsFilePath))
             {
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions()
-                {
-                    WriteIndented = true
-                };
-                string json = JsonSerializer.Serialize<Config>(Configurations, jsonOptions);
+                string json = JsonSerializer.Serialize<Config>(Configurations, _jsonOptions);
                 await File.WriteAllTextAsync(_configsFilePath, json, Encoding.UTF8);
             }
         }
