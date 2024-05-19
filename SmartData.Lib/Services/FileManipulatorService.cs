@@ -44,11 +44,12 @@ namespace SmartData.Lib.Services
         private readonly string _LSDIRCompact3ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIRCompact3.onnx?download=true";
         private readonly string _LSDIRModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/LSDIR.onnx?download=true";
         private readonly string _Nomos8kModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/Nomos8k.onnx?download=true";
-        private readonly string _Nomos8kDATModelLink  = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/Nomos8kDAT.onnx?download=true";
+        private readonly string _Nomos8kDATModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/Nomos8kDAT.onnx?download=true";
         private readonly string _NomosUniModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/NomosUni.onnx?download=true";
         private readonly string _RealWebPhotoModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/RealWebPhoto.onnx?download=true";
         private readonly string _RealWebPhotoDATModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/RealWebPhotoDAT.onnx?download=true";
         private readonly string _SPANkendataModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/SPANkendata.onnx?download=true";
+        private readonly string _GTAVModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/GTAV.onnx?download=true";
 
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
@@ -443,8 +444,8 @@ namespace SmartData.Lib.Services
                     break;
                 case AvailableModels.ParimgCompact_x2:
                     if (!Path.Exists(FileNames.ParimgCompactFileName))
-                    { 
-                        result = true; 
+                    {
+                        result = true;
                     }
                     break;
                 case AvailableModels.HFA2kCompact_x2:
@@ -520,37 +521,43 @@ namespace SmartData.Lib.Services
                     }
                     break;
                 case AvailableModels.Nomos8k_x4:
-                    if(!Path.Exists(FileNames.Nomos8kFileName))
+                    if (!Path.Exists(FileNames.Nomos8kFileName))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Nomos8kDAT_x4:
-                    if(!Path.Exists(FileNames.Nomos8kDATFileName))
+                    if (!Path.Exists(FileNames.Nomos8kDATFileName))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.NomosUni_x4:
-                    if(!Path.Exists(FileNames.NomosUniFileName))
+                    if (!Path.Exists(FileNames.NomosUniFileName))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.RealWebPhoto_x4:
-                    if(!Path.Exists(FileNames.RealWebPhotoFileName))
+                    if (!Path.Exists(FileNames.RealWebPhotoFileName))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.RealWebPhotoDAT_x4:
-                    if(!Path.Exists(FileNames.RealWebPhotoDATFileName))
+                    if (!Path.Exists(FileNames.RealWebPhotoDATFileName))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.SPANkendata_x4:
                     if (!Path.Exists(FileNames.SPANkendataFileName))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.GTAV5_x4:
+                    if (!Path.Exists(FileNames.GTAVFileName))
                     {
                         result = true;
                     }
@@ -698,6 +705,10 @@ namespace SmartData.Lib.Services
                     case AvailableModels.SPANkendata_x4:
                         modelUrl = _SPANkendataModelLink;
                         modelFileName = FileNames.SPANkendataFileName;
+                        break;
+                    case AvailableModels.GTAV5_x4:
+                        modelUrl = _GTAVModelLink;
+                        modelFileName = FileNames.GTAVFileName;
                         break;
                     default:
                         break;

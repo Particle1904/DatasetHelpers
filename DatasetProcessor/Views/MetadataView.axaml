@@ -10,7 +10,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, *" ColumnDefinitions="Auto, 10, *"
+	<Grid RowDefinitions="auto, 10, *" ColumnDefinitions="auto, 10, *"
 		  Background="Transparent">
 		<!-- IMAGE DISPLAY -->
 		<Grid Classes="gridPrimary"
@@ -26,8 +26,8 @@
 			  Grid.Column="2" RowDefinitions="1*, 10, 1*, 10, 1*">
 			<!-- POSITIVE PROMPT -->
 			<Grid Classes="gridSecondary" Grid.Row="0" 
-				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto"
+				  RowDefinitions="auto, 10, *" 
+				  ColumnDefinitions="*, 10, auto"
 				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Positive prompt:"
@@ -43,8 +43,8 @@
 			</Grid>
 			<!-- NEGATIVE PROMPT -->
 			<Grid Classes="gridSecondary" Grid.Row="2" 
-				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto"
+				  RowDefinitions="auto, 10, *" 
+				  ColumnDefinitions="*, 10, auto"
 				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Negative prompt:"
@@ -60,8 +60,8 @@
 			</Grid>
 			<!-- GENERATION PARAMETERS -->
 			<Grid Classes="gridSecondary" Grid.Row="4" 
-				  RowDefinitions="Auto, 10, *" 
-				  ColumnDefinitions="*, 10, Auto"
+				  RowDefinitions="auto, 10, *" 
+				  ColumnDefinitions="*, 10, auto"
 				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
 					   Content="Generation parameters:"
@@ -78,11 +78,11 @@
 		</Grid>
 
 		<Grid Classes="gridPrimary" Grid.Row="2" Grid.ColumnSpan="3"
-			  RowDefinitions="Auto, 10, *, 16">
+			  RowDefinitions="auto, 10, *, 16">
 			<!-- THRESHOLD SLIDER -->
 			<Grid Classes="gridSecondary"
 				  Grid.Row="0"
-				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+				  ColumnDefinitions="auto, 10, *, 10, auto">
 				<Label Grid.Column="0"
 					   Content="Threshold for predictions:"/>
 				<Slider Grid.Column="2"
@@ -97,7 +97,7 @@
 			<!-- GENERATED TAGS PANEL -->
 			<Grid Classes="gridSecondary"
 				  Grid.Row="2"
-				  RowDefinitions="Auto, 10, *"
+				  RowDefinitions="auto, 10, *"
 				  ColumnDefinitions="*, 10, 40"
 				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"

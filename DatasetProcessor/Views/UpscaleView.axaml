@@ -11,10 +11,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -39,7 +39,7 @@
 			</Button>
 		</Grid>
 		<!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -68,7 +68,7 @@
 			  Grid.Row="4"
 			  MinHeight="36"
 			  Margin="0,0,0,-1"
-			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Content="Select the upscaler model:"
 				   HorizontalAlignment="Left"/>
@@ -99,7 +99,7 @@
 			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- UPSCALE BUTTON -->
 		<Grid Grid.Row="14"
-			  ColumnDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
 					Content="Upscale images"

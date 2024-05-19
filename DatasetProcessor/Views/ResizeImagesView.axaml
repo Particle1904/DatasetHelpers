@@ -12,10 +12,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, auto, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 			</Button>
 		</Grid>
 		<!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -67,7 +67,7 @@
 		<!-- DIMENSION CONFIGS-->
 		<Grid Classes="gridSecondary"
 			  Grid.Row="4"
-			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Content="Select the output dimension size:"
 				   HorizontalAlignment="Left"/>
@@ -82,7 +82,7 @@
 		<!-- LANCOZS SAMPLER SLIDER -->
 		<Grid Classes="gridSecondary"
 				  Grid.Row="5"
-				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+				  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Width="300"
 				   Content="Lanczos sampler radius:"/>
@@ -98,7 +98,7 @@
 		<!-- SHARPEN SIGMA SLIDER -->
 		<Grid Classes="gridSecondary"
 				  Grid.Row="6"
-				  ColumnDefinitions="Auto, 10, *, 10, Auto, 10, Auto">
+				  ColumnDefinitions="auto, 10, *, 10, auto, 10, auto">
 			<CheckBox Grid.Column="0"
 					  Width="282"
 					  Margin="10"
@@ -115,7 +115,7 @@
 				   HorizontalAlignment="Right"
 				   Content="{Binding SharpenSigma}"
 				   VerticalAlignment="Center"/>
-			<Grid Grid.Column="6" ColumnDefinitions="Auto, 10, Auto">
+			<Grid Grid.Column="6" ColumnDefinitions="auto, 10, auto">
 				<TextBlock Grid.Column="0"
 						   Text="Minimum resolution for Sharpen (256x min):"
 						   MaxWidth="200"
@@ -138,7 +138,7 @@
 			   Content="{Binding ElapsedTime, StringFormat='Resize images elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- RESIZE BUTTON -->
 		<Grid Grid.Row="12"
-			  ColumnDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
 					Content="Resize images"

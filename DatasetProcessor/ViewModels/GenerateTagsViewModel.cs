@@ -22,10 +22,10 @@ namespace DatasetProcessor.ViewModels
     public partial class GenerateTagsViewModel : BaseViewModel
     {
         private readonly IFileManipulatorService _fileManipulator;
-        private readonly IAutoTaggerService _wDAutoTagger;
-        private readonly IAutoTaggerService _wDv3AutoTagger;
-        private readonly IAutoTaggerService _joyTagAutoTagger;
-        private readonly IAutoTaggerService _e621AutoTagger;
+        private readonly IAutoTaggerService _wDautoTagger;
+        private readonly IAutoTaggerService _wDv3autoTagger;
+        private readonly IAutoTaggerService _joyTagautoTagger;
+        private readonly IAutoTaggerService _e621autoTagger;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -52,45 +52,45 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDAutoTagger,
-            WDV3AutoTaggerService wDV3AutoTagger, JoyTagAutoTaggerService joyTagAutoTagger,
-            E621AutoTaggerService e621AutoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDautoTagger,
+            WDV3AutoTaggerService wDV3autoTagger, JoyTagAutoTaggerService joyTagautoTagger,
+            E621AutoTaggerService e621autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
             _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args,
                 LogMessageColor.Informational);
 
-            _wDAutoTagger = wDAutoTagger;
-            (_wDAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            _wDautoTagger = wDautoTagger;
+            (_wDautoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 PredictionProgress = ResetProgress(PredictionProgress);
                 PredictionProgress.TotalFiles = args;
             };
-            (_wDAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+            (_wDautoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
-            _wDv3AutoTagger = wDV3AutoTagger;
-            (_wDv3AutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            _wDv3autoTagger = wDV3autoTagger;
+            (_wDv3autoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 PredictionProgress = ResetProgress(PredictionProgress);
                 PredictionProgress.TotalFiles = args;
             };
-            (_wDv3AutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+            (_wDv3autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
-            _joyTagAutoTagger = joyTagAutoTagger;
-            (_joyTagAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            _joyTagautoTagger = joyTagautoTagger;
+            (_joyTagautoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 PredictionProgress = ResetProgress(PredictionProgress);
                 PredictionProgress.TotalFiles = args;
             };
-            (_joyTagAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+            (_joyTagautoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
-            _e621AutoTagger = e621AutoTagger;
-            (_e621AutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            _e621autoTagger = e621autoTagger;
+            (_e621autoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 PredictionProgress = ResetProgress(PredictionProgress);
                 PredictionProgress.TotalFiles = args;
             };
-            (_e621AutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+            (_e621autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.GenerateTagsConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
@@ -149,19 +149,19 @@ namespace DatasetProcessor.ViewModels
                 {
                     case AvailableModels.JoyTag:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.JoyTag);
-                        await CallAutoTaggerService(_joyTagAutoTagger);
+                        await CallautoTaggerService(_joyTagautoTagger);
                         break;
                     case AvailableModels.WD14v2:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.WD14v2);
-                        await CallAutoTaggerService(_wDAutoTagger);
+                        await CallautoTaggerService(_wDautoTagger);
                         break;
                     case AvailableModels.WDv3:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3);
-                        await CallAutoTaggerService(_wDv3AutoTagger);
+                        await CallautoTaggerService(_wDv3autoTagger);
                         break;
                     case AvailableModels.Z3DE621:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.Z3DE621);
-                        await CallAutoTaggerService(_e621AutoTagger);
+                        await CallautoTaggerService(_e621autoTagger);
                         break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the auto tagger models!",
@@ -195,11 +195,11 @@ namespace DatasetProcessor.ViewModels
         }
 
         /// <summary>
-        /// Calls the AutoTagger service to generate tags based on the specified parameters.
+        /// Calls the autoTagger service to generate tags based on the specified parameters.
         /// </summary>
-        /// <param name="autoTagger">The instance of the AutoTagger service to use.</param>
+        /// <param name="autoTagger">The instance of the autoTagger service to use.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task CallAutoTaggerService(IAutoTaggerService autoTagger)
+        private async Task CallautoTaggerService(IAutoTaggerService autoTagger)
         {
             autoTagger.Threshold = (float)Threshold;
 
@@ -225,10 +225,10 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         private void UnloadAllModels()
         {
-            (_wDAutoTagger as IUnloadModel)?.UnloadAIModel();
-            (_wDv3AutoTagger as IUnloadModel)?.UnloadAIModel();
-            (_joyTagAutoTagger as IUnloadModel)?.UnloadAIModel();
-            (_e621AutoTagger as IUnloadModel)?.UnloadAIModel();
+            (_wDautoTagger as IUnloadModel)?.UnloadAIModel();
+            (_wDv3autoTagger as IUnloadModel)?.UnloadAIModel();
+            (_joyTagautoTagger as IUnloadModel)?.UnloadAIModel();
+            (_e621autoTagger as IUnloadModel)?.UnloadAIModel();
         }
 
         partial void OnThresholdChanged(double value)
@@ -240,10 +240,10 @@ namespace DatasetProcessor.ViewModels
         private void CancelTask()
         {
             (_fileManipulator as ICancellableService)?.CancelCurrentTask();
-            (_wDAutoTagger as ICancellableService)?.CancelCurrentTask();
-            (_wDv3AutoTagger as ICancellableService)?.CancelCurrentTask();
-            (_joyTagAutoTagger as ICancellableService)?.CancelCurrentTask();
-            (_e621AutoTagger as ICancellableService)?.CancelCurrentTask();
+            (_wDautoTagger as ICancellableService)?.CancelCurrentTask();
+            (_wDv3autoTagger as ICancellableService)?.CancelCurrentTask();
+            (_joyTagautoTagger as ICancellableService)?.CancelCurrentTask();
+            (_e621autoTagger as ICancellableService)?.CancelCurrentTask();
         }
 
         partial void OnIsUiEnabledChanged(bool value)
@@ -256,6 +256,11 @@ namespace DatasetProcessor.ViewModels
             {
                 IsCancelEnabled = true;
             }
+        }
+
+        partial void OnAppendCaptionsToFileChanged(bool value)
+        {
+            ApplyRedundancyRemoval = value;
         }
     }
 }

@@ -12,9 +12,9 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto">
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 30, auto">
 		<Grid Classes="gridSecondary" Grid.Row="0"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0" 
 				   Grid.Column="0"
@@ -79,7 +79,7 @@
 				   Margin="0, 10, 0, 10"/>
 		
 		<Grid Classes="gridSecondary" Grid.Row="2"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
@@ -186,7 +186,7 @@
 				   Margin="0, 10, 0, 10"/>
 
 		<Grid Classes="gridSecondary" Grid.Row="4"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
@@ -369,7 +369,7 @@
 					</Grid>
 					<Label Grid.Row="18"
 						   Grid.Column="0"
-						   Content="Minimum Resolution for Sharpen Sigma:"
+						   Content="Minimum resolution for Sharpen Sigma:"
 						   HorizontalAlignment="Left"
 						   VerticalAlignment="Center"/>
 					<TextBox Grid.Row="18"
@@ -384,7 +384,7 @@
 				   Margin="0, 10, 0, 10"/>
 
 		<Grid Classes="gridSecondary" Grid.Row="6"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
@@ -450,7 +450,7 @@
 				   Margin="0, 10, 0, 10"/>
 
 		<Grid Classes="gridSecondary" Grid.Row="8"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
@@ -576,7 +576,7 @@
 					</Grid>
 					<Label Grid.Row="12"
 						   Grid.Column="0"
-						   Content="Minimum Resolution for Sharpen Sigma:"
+						   Content="Minimum resolution for Sharpen Sigma:"
 						   HorizontalAlignment="Left"
 						   VerticalAlignment="Center"/>
 					<TextBox Grid.Row="12"
@@ -591,7 +591,7 @@
 						   Margin="0, 10, 0, 10"/>
 
 		<Grid Classes="gridSecondary" Grid.Row="10"
-			  RowDefinitions="Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
 				   Grid.Column="0"
@@ -668,9 +668,566 @@
 			</Border>
 		</Grid>
 
+		<Separator Grid.Row="11"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="12"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Tag Generation Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowGenerateTagsSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowGenerateTagsSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGenerateTagsInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding GenerateTagsInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGenerateTagsOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding GenerateTagsOutputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Grid Grid.Row="4"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="*, auto">
+						<Label Grid.Column="0"
+							   HorizontalAlignment="Left"
+							   Content="Select the auto tagger model:"/>
+						<ComboBox Grid.Column="1"
+								  HorizontalAlignment="Right"
+								  MinWidth="200"
+								  MaxWidth="200"
+								  SelectedItem="{Binding TagGeneratorModel}"
+								  ItemsSource="{Binding Source={x:Static local2:Utilities.GeneratorModelValues}}">
+						</ComboBox>
+					</Grid>
+					<Grid Grid.Row="6"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3"
+						  ColumnDefinitions="1*,1*,1*,1*,auto">
+						<Label Grid.Column="0"
+							   Grid.ColumnSpan="2"
+							   HorizontalAlignment="Left"
+							   Content="Generator threshold:"/>
+						<Slider Grid.Column="2"
+								Grid.ColumnSpan="2"
+								Minimum="0.1"
+								Maximum="1"
+								Value="{Binding GenerateTagsThreshold}"
+								Margin="0, 0, 15, 0"/>
+						<Label Grid.Column="4"
+							   Content="{Binding GenerateTagsThreshold}"
+							   Margin="0, 0, 12, 0"
+							   Width="45"/>
+					</Grid>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding GenerateTagsApplyRedudancyRemoval}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Apply redudancy removal?"/>
+					</Grid>
+					<Grid Grid.Row="10"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding GenerateTagsAppendGeneratedTags}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Append generated tags to existing .txt files?"/>
+					</Grid>
+					<Grid Grid.Row="12"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding GenerateTagsWeighted}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Generate weighted tags?"/>
+					</Grid>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<Separator Grid.Row="13"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="14"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Process Captions Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowProcessCaptionsSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowProcessCaptionsSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectProcessCaptionsInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding ProcessCaptionsInputFolder}"
+						   HorizontalAlignment="Left"/>				
+				</Grid>
+			</Border>
+		</Grid>
+
 		<Separator Grid.Row="15"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="16"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Process Tags Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowProcessTagsSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowProcessTagsSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectProcessTagsInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding ProcessTagsInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Grid Grid.Row="2"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ProcessTagsRandomizeTags}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Randomize tags?"/>
+					</Grid>
+					<Grid Grid.Row="4"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ProcessTagsRenameFiles}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Rename files?"/>
+					</Grid>					
+					<Grid Grid.Row="6"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ProcessTagsApplyRedudancyRemoval}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Apply redudancy Removal?"/>
+					</Grid>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ProcessTagsConsolidateTags}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Consolidate tags?"/>
+					</Grid>
+				</Grid>
+			</Border>			
+		</Grid>
+
+		<Separator Grid.Row="17"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="18"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Tag Editor Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowEditorSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowEditorSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectEditorInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding EditorInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Grid Grid.Row="2"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding EditorExactMatches}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Exact matches when filtering?"/>
+					</Grid>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<Separator Grid.Row="19"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="20"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Extract Subset Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowExtractSubsetSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowExtractSubsetSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectExtractSubsetInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding ExtractSubsetInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectExtractSubsetOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding ExtractSubsetOutputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Grid Grid.Row="4"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding SearchTxt}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Search txt files?"/>
+					</Grid>
+					<Grid Grid.Row="6"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding SearchCaption}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Search caption files?"/>
+					</Grid>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding ExactMatchesFiltering}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Exact matches when filtering?"/>
+					</Grid>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<Separator Grid.Row="21"
+						   Margin="0, 10, 0, 10"/>
+
+		<Grid Classes="gridSecondary" Grid.Row="22"
+			  RowDefinitions="auto, 12, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Prompt Generator Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowPromptGeneratorSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowPromptGeneratorSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectPromptGeneratorInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding PromptGeneratorInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectPromptGeneratorOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding PromptGeneratorOutputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Label Grid.Row="4"
+						   Grid.Column="0"
+						   Content="Tags to prepend:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="4"
+							 Grid.Column="2"
+							 Text="{Binding PromptGeneratorTagsToPrepend}"
+							 Watermark="Enter here the tags you want to prepend."/>
+					<Label Grid.Row="6"
+						   Grid.Column="0"
+						   Content="Tags to append:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="6"
+							 Grid.Column="2"
+							 Text="{Binding PromptGeneratorTagsToAppend}"
+							 Watermark="Enter here the tags you want to append."/>
+					<Label Grid.Row="8"
+						   Grid.Column="0"
+						   Content="Amount of random tags:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="8"
+							 Grid.Column="2"
+							 Text="{Binding PromptGeneratorAmountOfTags}"
+							 Watermark="Enter here a number between 10 and 50."/>
+					<Label Grid.Row="10"
+						   Grid.Column="0"
+						   Content="Default image display size:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="10"
+							 Grid.Column="2"
+							 Text="{Binding PromptGeneratorAmountOfPrompts}"
+							 Watermark="Enter here a number between 10 and 65535."/>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<Separator Grid.Row="23"
 				   Margin="0, 10, 0, 10"/>
-		<Button Grid.Row="16"
+		<Button Grid.Row="24"
 				MaxWidth="200"
 			    Content="Save settings"
 				Command="{Binding SaveSettingsCommand}"/>

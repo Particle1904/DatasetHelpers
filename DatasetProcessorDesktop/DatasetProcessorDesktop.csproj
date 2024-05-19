@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.17.3" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.18.0" />
   </ItemGroup>
 
   <ItemGroup>

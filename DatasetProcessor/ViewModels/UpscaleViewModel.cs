@@ -182,6 +182,10 @@ namespace DatasetProcessor.ViewModels
                         await DownloadModelFiles(_fileManipulator, AvailableModels.SPANkendata_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SPANkendata_x4);
                         break;
+                    case AvailableModels.GTAV5_x4:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.GTAV5_x4);
+                        await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.GTAV5_x4);
+                        break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the upscaler models!",
                             LogMessageColor.Error);

@@ -12,10 +12,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 20"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 20"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -56,7 +56,7 @@
 		</Grid>
 		<!-- FILTER BUTTONS BAR -->
 		<Grid Classes="gridSecondary" Grid.Row="4"
-			  ColumnDefinitions="4*, 10, 1*, 10, 1*, 10, Auto"
+			  ColumnDefinitions="4*, 10, 1*, 10, 1*, 10, auto"
 			  Height="60">
 			<TextBox Grid.Column="0"
 					 Height="60"
@@ -82,7 +82,7 @@
 		<Grid Grid.Row="6" Background="Transparent"
 			  ColumnDefinitions="50, 10, 1*, 10, 50, 10, 1*">
 			<!-- BACKWARDS BUTTONS -->
-			<Grid Grid.Column="0" RowDefinitions="Auto, 10, Auto, 10, Auto"
+			<Grid Grid.Column="0" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"
 				  Background="Transparent">
 				<Button Grid.Row="0"
@@ -122,7 +122,7 @@
 			</Grid>
 
 			<!-- FORWARD BUTTONS -->
-			<Grid Grid.Column="4" RowDefinitions="Auto, 10, Auto, 10, Auto"
+			<Grid Grid.Column="4" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"
 				  Background="Transparent">
 				<Button Grid.Row="0"
@@ -148,7 +148,7 @@
 			<!-- EDITOR PANEL -->
 			<Grid Grid.Column="6"
 				  Background="{DynamicResource SurfaceDark}"
-				  RowDefinitions="Auto, 10, Auto, 10, *">
+				  RowDefinitions="auto, 10, auto, 10, *">
 				<Grid Grid.Row="0"
 					  Classes="gridSecondary"
 					  ColumnDefinitions="3*, 10, 1*">
@@ -177,7 +177,7 @@
 				</Grid>
 				<Grid Grid.Row="4"
 					  Classes="gridSecondary"
-					  RowDefinitions="2*, 10, auto, 10, 1*, 10, Auto">
+					  RowDefinitions="2*, 10, auto, 10, 1*, 10, auto">
 					<!-- TAGS EDITOR -->
 					<AvaloniaEdit:TextEditor Grid.Row="0"
 											 x:Name="EditorTags"
@@ -198,7 +198,7 @@
 					<!-- HIGHLIGHT PANEL -->
 					<Grid Grid.Row="4"
 						  Classes="gridPrimary"
-						  RowDefinitions="Auto, 10, *">
+						  RowDefinitions="auto, 10, *">
 						<Label Grid.Row="0"
 							   Padding="8"
 							   Content="Highlight words:"

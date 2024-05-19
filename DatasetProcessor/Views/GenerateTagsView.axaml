@@ -11,10 +11,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, Auto, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, auto, auto, 10, auto, 10, auto, 10, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -39,7 +39,7 @@
 			</Button>
 		</Grid>
 		<!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -68,7 +68,7 @@
 			  Grid.Row="4"
 			  MinHeight="36"
 			  Margin="0,0,0,-1"
-			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Content="Select the auto tagger model:"
 				   HorizontalAlignment="Left"/>
@@ -83,7 +83,7 @@
 		<!-- THRESHOLD SLIDER -->
 		<Grid Classes="gridSecondary"
 				  Grid.Row="6"
-				  ColumnDefinitions="Auto, 10, *, 10, Auto">
+				  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Content="Threshold for predictions:"/>
 			<Slider Grid.Column="2"
@@ -119,7 +119,7 @@
 			<CheckBox HorizontalAlignment="Left"
 					  Margin="10"
 					  IsChecked="{Binding WeightedCaptions}"
-					  Content="Would you like to generate weighted captions (the Process Tags page doesn't support editing weighted captions)?&#xa;WD 1.4 Auto Tagger confidence for the tag will be used! For example: (car:0.75), (streets:0.45)">
+					  Content="Would you like to generate weighted captions (the Process Tags page doesn't support editing weighted captions)?&#xa;WD 1.4 auto Tagger confidence for the tag will be used! For example: (car:0.75), (streets:0.45)">
 			</CheckBox>
 		</Panel>
 		<!-- NOTE TEXT BOX -->
@@ -141,7 +141,7 @@
 			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- GENERATE BUTTON -->
 		<Grid Grid.Row="22"
-			  ColumnDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
 					Content="Generate tags"

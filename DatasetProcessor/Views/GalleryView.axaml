@@ -10,13 +10,13 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, Auto, Auto"
+	<Grid RowDefinitions="auto, 10, auto, auto, auto"
 		  Background="Transparent"
 		  Margin="0, 0, 14, 0">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" 
 			  Grid.Row="0" 
-			  ColumnDefinitions="Auto, 10, *, 10, Auto">
+			  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -65,7 +65,7 @@
 				</ListBox.ItemsPanel>
 				<ListBox.ItemTemplate>
 					<DataTemplate>
-						<Grid RowDefinitions="Auto, 4, *">
+						<Grid RowDefinitions="auto, 4, *">
 							<TextBlock Grid.Row="0"
 									   Text="{Binding FileName}"
 									   HorizontalAlignment="Center"
@@ -84,12 +84,12 @@
 		<!-- DISPLAY SIZE SLIDER -->
 		<Grid Grid.Row="3"
 			  Margin="0, -1, 0, 0"
-			  ColumnDefinitions="1*, 1*, 1*, 1*, 10, 1*, 10, Auto, Auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 10, 1*, 10, auto, auto"
 			  Background="{DynamicResource SurfaceDark}"
 			  VerticalAlignment="Bottom">
 			<Grid Grid.Column="0"
 				  Grid.ColumnSpan="5"
-				  ColumnDefinitions="Auto, 10, Auto, 10, Auto"
+				  ColumnDefinitions="auto, 10, auto, 10, auto"
 				  HorizontalAlignment="Left"
 				  VerticalAlignment="Bottom">
 				<Label Grid.Column="0" 
@@ -130,7 +130,7 @@
 		
 		<!-- DELETE BUTTON AND NOTE -->
 		<Grid Grid.Row="5"
-			  RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto">
+			  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto">
 			<Separator Grid.Row="0"/>			
 			<StackPanel Grid.Row="2"
 						Orientation="Vertical"
@@ -148,7 +148,7 @@
 				   Content="{Binding ElapsedTime, StringFormat='Processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 			<!-- PROCESS BUTTON -->
 			<Grid Grid.Row="8"
-				  ColumnDefinitions="Auto, 10, Auto"
+				  ColumnDefinitions="auto, 10, auto"
 				  HorizontalAlignment="Center">
 				<Button Width="200"
 						Content="Delete selected images"

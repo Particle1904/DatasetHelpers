@@ -10,7 +10,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 60, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 60, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Margin="0, 60, 0, 0">
 		<Label Grid.Column="0" Grid.ColumnSpan="5"
 			   Grid.Row="0"

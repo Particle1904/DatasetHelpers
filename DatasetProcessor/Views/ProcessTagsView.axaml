@@ -10,10 +10,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 16"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto, 16"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 		<!-- INPUT FIELDS -->
 		<Grid Classes="gridSecondary"
 			  Grid.Row="2"
-			  RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto, 10, auto, 10, auto"
 			  ColumnDefinitions="1*, 10, 2*, 10, 2*">
 			<!-- TAGS TO ADD -->
 			<Label Grid.Row="0"
@@ -88,7 +88,7 @@
 		</Grid>
 		<!-- CHECK BOXES -->
 		<Grid Classes="gridSecondary" Grid.Row="4" 
-			  RowDefinitions="Auto, Auto, Auto, Auto">
+			  RowDefinitions="auto, auto, auto, auto">
 			<CheckBox Grid.Row="0"
 					  HorizontalAlignment="Left"
 					  Margin="10"
@@ -159,7 +159,7 @@
 			   Content="{Binding ElapsedTime, StringFormat='Tag processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- PROCESS BUTTON -->
 		<Grid Grid.Row="14"
-			  ColumnDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
 					Content="Process tags"

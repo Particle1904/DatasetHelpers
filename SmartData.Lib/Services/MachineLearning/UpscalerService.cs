@@ -12,8 +12,6 @@ using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Models.MachineLearning;
 using SmartData.Lib.Services.Base;
 
-using System.Reflection;
-
 namespace SmartData.Lib.Services.MachineLearning
 {
     public class UpscalerService : BaseAIConsumer<UpscalerInputData, UpscalerOutputData>, IUpscalerService, INotifyProgress, IUnloadModel
@@ -54,7 +52,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 cancellationToken.ThrowIfCancellationRequested();
 
                 string upscaledImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.png");
-                if(File.Exists(upscaledImagePath)) 
+                if (File.Exists(upscaledImagePath))
                 {
                     continue;
                 }
@@ -62,14 +60,14 @@ namespace SmartData.Lib.Services.MachineLearning
                 try
                 {
                     await UpscaleImageAndSaveAsync(file, upscaledImagePath);
-                } 
+                }
                 catch (Exception)
                 {
                     throw new ArgumentException($"An error occured while trying to upscale image.{Environment.NewLine}It could be that the selected model can only upscale images that have Width and Height Divisible by 16 or 64!");
                 }
                 finally
                 {
-                    
+
                 }
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
@@ -148,7 +146,7 @@ namespace SmartData.Lib.Services.MachineLearning
             }
 
             switch (model)
-            { 
+            {
                 case AvailableModels.ParimgCompact_x2:
                     ModelPath = Path.Combine(_modelsPath, FileNames.ParimgCompactFileName);
                     break;
@@ -206,12 +204,15 @@ namespace SmartData.Lib.Services.MachineLearning
                 case AvailableModels.SPANkendata_x4:
                     ModelPath = Path.Combine(_modelsPath, FileNames.SPANkendataFileName);
                     break;
+                case AvailableModels.GTAV5_x4:
+                    ModelPath = Path.Combine(_modelsPath, FileNames.GTAVFileName);
+                    break;
                 case AvailableModels.JoyTag:
                 case AvailableModels.WD14v2:
                 case AvailableModels.WDv3:
                 case AvailableModels.Z3DE621:
                 case AvailableModels.Yolov4:
-                case AvailableModels.CLIPTokenizer:     
+                case AvailableModels.CLIPTokenizer:
                 default:
                     throw new ArgumentException("Model is not a Upscaler Model!");
             }

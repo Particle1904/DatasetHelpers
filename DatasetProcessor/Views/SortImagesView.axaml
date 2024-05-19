@@ -12,10 +12,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 30, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 			</Button>
 		</Grid>
 		<!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -65,8 +65,8 @@
 			</Button>
 		</Grid>
 		<!-- DISCARDED FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="4" ColumnDefinitions="Auto, 10, *, 10, Auto"
-			  RowDefinitions="Auto, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="4" ColumnDefinitions="auto, 10, *, 10, auto"
+			  RowDefinitions="auto, 10, auto">
 			<Button Grid.Column="0"
 					Grid.Row="0"
 					Content="Select discarded folder"
@@ -107,8 +107,8 @@
 			</ComboBox>
 		</Grid>
 		<!-- BACKUP FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="6" ColumnDefinitions="Auto, 10, *, 10, Auto"
-			  RowDefinitions="Auto, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="6" ColumnDefinitions="auto, 10, *, 10, auto"
+			  RowDefinitions="auto, 10, auto">
 			<Button Grid.Column="0"
 					Grid.Row="0"
 					Content="Select backup folder"
@@ -152,7 +152,7 @@
 			   Content="{Binding ElapsedTime, StringFormat='Sorting elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
 		<!-- SORT BUTTON -->
 		<Grid Grid.Row="14"
-			  ColumnDefinitions="Auto, 10, Auto"
+			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Grid.Column="0"
 					Width="200" 

@@ -140,24 +140,109 @@ namespace DatasetProcessor.ViewModels
 
         [ObservableProperty]
         private bool _showGenerateTagsSettings;
+        [ObservableProperty]
+        private string _generateTagsInputFolder;
+        [ObservableProperty]
+        private string _generateTagsOutputFolder;
+        [ObservableProperty]
+        private AvailableModels _tagGeneratorModel;
+        [ObservableProperty]
+        private double _generateTagsThreshold;
+        [ObservableProperty]
+        private bool _generateTagsApplyRedudancyRemoval;
+        [ObservableProperty]
+        private bool _generateTagsAppendGeneratedTags;
+        [ObservableProperty]
+        private bool _generateTagsWeighted;
 
         [ObservableProperty]
         private bool _showProcessCaptionsSettings;
+        [ObservableProperty]
+        private string _processCaptionsInputFolder;
 
         [ObservableProperty]
         private bool _showProcessTagsSettings;
+        [ObservableProperty]
+        private string _processTagsInputFolder;
+        [ObservableProperty]
+        private bool _processTagsRandomizeTags;
+        [ObservableProperty]
+        private bool _processTagsRenameFiles;
+        [ObservableProperty]
+        private bool _processTagsApplyRedudancyRemoval;
+        [ObservableProperty]
+        private bool _processTagsConsolidateTags;
 
         [ObservableProperty]
         private bool _showEditorSettings;
+        [ObservableProperty]
+        private string _editorInputFolder;
+        [ObservableProperty]
+        private bool _editorExactMatches;
 
         [ObservableProperty]
         private bool _showExtractSubsetSettings;
+        [ObservableProperty]
+        private string _extractSubsetInputFolder;
+        [ObservableProperty]
+        private string _extractSubsetOutputFolder;
+        [ObservableProperty]
+        private bool _extractSubsetSearchTxt;
+        [ObservableProperty]
+        private bool _extractSubsetSearchCaption;
+        [ObservableProperty]
+        private bool _extractSubsetExactMatchesFiltering;
 
         [ObservableProperty]
         private bool _showPromptGeneratorSettings;
+        [ObservableProperty]
+        private string _promptGeneratorInputFolder;
+        [ObservableProperty]
+        private string _promptGeneratorOutputFolder;
+        [ObservableProperty]
+        private string _promptGeneratorTagsToPrepend;
+        [ObservableProperty]
+        private string _promptGeneratorTagsToAppend;
+        private int? _promptGeneratorAmountOfTags;
+        public string PromptGeneratorAmountOfTags
+        {
+            get => _promptGeneratorAmountOfTags.ToString();
+            set
+            {
+                try
+                {
+                    int parsedValue = int.Parse(value);
+                    _promptGeneratorAmountOfTags = parsedValue;
+                    OnPropertyChanged(nameof(PromptGeneratorAmountOfTags));
+                }
+                catch
+                {
+                    _promptGeneratorAmountOfTags = null;
+                }
+            }
+        }
+        private int? _promptGeneratorAmountOfPrompts;
+        public string PromptGeneratorAmountOfPrompts
+        {
+            get => _promptGeneratorAmountOfPrompts.ToString();
+            set
+            {
+                try
+                {
+                    int parsedValue = int.Parse(value);
+                    _promptGeneratorAmountOfPrompts = parsedValue;
+                    OnPropertyChanged(nameof(PromptGeneratorAmountOfPrompts));
+                }
+                catch
+                {
+                    _promptGeneratorAmountOfPrompts = null;
+                }
+            }
+        }
 
         [ObservableProperty]
         private bool _showMetadataViewerSettings;
+        // TODO: Add configs for Metadata page.
 
         public SettingsViewModel(ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
@@ -196,6 +281,38 @@ namespace DatasetProcessor.ViewModels
             UpscaleImagesInputFolder = Configs.Configurations.UpscaleImagesConfigs.InputFolder;
             UpscaleImagesOutputFolder = Configs.Configurations.UpscaleImagesConfigs.OutputFolder;
             UpscalerModel = Configs.Configurations.UpscaleImagesConfigs.UpscalerModel;
+
+            GenerateTagsInputFolder = Configs.Configurations.GenerateTagsConfigs.InputFolder;
+            GenerateTagsOutputFolder = Configs.Configurations.GenerateTagsConfigs.OutputFolder;
+            TagGeneratorModel = Configs.Configurations.GenerateTagsConfigs.AutoTaggerModel;
+            GenerateTagsThreshold = Configs.Configurations.GenerateTagsConfigs.PredictionsThreshold;
+            GenerateTagsApplyRedudancyRemoval = Configs.Configurations.GenerateTagsConfigs.ApplyRedudancyRemoval;
+            GenerateTagsAppendGeneratedTags = Configs.Configurations.GenerateTagsConfigs.AppendToExistingFile;
+            GenerateTagsWeighted = Configs.Configurations.GenerateTagsConfigs.WeightedCaptions;
+
+            ProcessCaptionsInputFolder = Configs.Configurations.ProcessCaptionsConfigs.InputFolder;
+
+            ProcessTagsInputFolder = Configs.Configurations.ProcessTagsConfigs.InputFolder;
+            ProcessTagsRandomizeTags = Configs.Configurations.ProcessTagsConfigs.RandomizeTags;
+            ProcessTagsRenameFiles = Configs.Configurations.ProcessTagsConfigs.RenameFiles;
+            ProcessTagsApplyRedudancyRemoval = Configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval;
+            ProcessTagsConsolidateTags = Configs.Configurations.ProcessTagsConfigs.ConsolidateTags;
+
+            EditorInputFolder = Configs.Configurations.TagEditorConfigs.InputFolder;
+            EditorExactMatches = Configs.Configurations.TagEditorConfigs.ExactMatchesFiltering;
+
+            ExtractSubsetInputFolder = Configs.Configurations.ExtractSubsetConfigs.InputFolder;
+            ExtractSubsetOutputFolder = Configs.Configurations.ExtractSubsetConfigs.OutputFolder;
+            ExtractSubsetSearchTxt = Configs.Configurations.ExtractSubsetConfigs.SearchTxt;
+            ExtractSubsetSearchCaption = Configs.Configurations.ExtractSubsetConfigs.SearchCaption;
+            ExtractSubsetExactMatchesFiltering = Configs.Configurations.ExtractSubsetConfigs.ExactMatchesFiltering;
+
+            PromptGeneratorInputFolder = Configs.Configurations.PromptGeneratorConfigs.InputFolder;
+            PromptGeneratorOutputFolder = Configs.Configurations.PromptGeneratorConfigs.OutputFolder;
+            PromptGeneratorTagsToPrepend = Configs.Configurations.PromptGeneratorConfigs.TagsToPrepend;
+            PromptGeneratorTagsToAppend = Configs.Configurations.PromptGeneratorConfigs.TagsToAppend;
+            PromptGeneratorAmountOfTags = Configs.Configurations.PromptGeneratorConfigs.AmountOfTags.ToString();
+            PromptGeneratorAmountOfPrompts = Configs.Configurations.PromptGeneratorConfigs.AmountOfPrompts.ToString();
         }
 
         [RelayCommand]
@@ -329,6 +446,96 @@ namespace DatasetProcessor.ViewModels
         }
 
         [RelayCommand]
+        private async Task SelectGenerateTagsInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                GenerateTagsInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectGenerateTagsOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                GenerateTagsOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectProcessCaptionsInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ProcessCaptionsInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectProcessTagsInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ProcessTagsInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectEditorInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                EditorInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectExtractSubsetInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ExtractSubsetInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectExtractSubsetOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                ExtractSubsetOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectPromptGeneratorInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                PromptGeneratorInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectPromptGeneratorOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                PromptGeneratorOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
         private void ToggleBool(string propertyName)
         {
             switch (propertyName)
@@ -416,6 +623,40 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.UpscaleImagesConfigs.OutputFolder = UpscaleImagesOutputFolder;
             Configs.Configurations.UpscaleImagesConfigs.UpscalerModel = UpscalerModel;
 
+            Configs.Configurations.GenerateTagsConfigs.InputFolder = GenerateTagsInputFolder;
+            Configs.Configurations.GenerateTagsConfigs.OutputFolder = GenerateTagsOutputFolder;
+            Configs.Configurations.GenerateTagsConfigs.AutoTaggerModel = TagGeneratorModel;
+            Configs.Configurations.GenerateTagsConfigs.PredictionsThreshold = (float)GenerateTagsThreshold;
+            Configs.Configurations.GenerateTagsConfigs.ApplyRedudancyRemoval = GenerateTagsApplyRedudancyRemoval;
+            Configs.Configurations.GenerateTagsConfigs.AppendToExistingFile = GenerateTagsAppendGeneratedTags;
+            Configs.Configurations.GenerateTagsConfigs.WeightedCaptions = GenerateTagsWeighted;
+
+            Configs.Configurations.ProcessCaptionsConfigs.InputFolder = ProcessCaptionsInputFolder;
+
+            Configs.Configurations.ProcessTagsConfigs.InputFolder = ProcessTagsInputFolder;
+            Configs.Configurations.ProcessTagsConfigs.RandomizeTags = ProcessTagsRandomizeTags;
+            Configs.Configurations.ProcessTagsConfigs.RenameFiles = ProcessTagsRenameFiles;
+            Configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval = ProcessTagsApplyRedudancyRemoval;
+            Configs.Configurations.ProcessTagsConfigs.ConsolidateTags = ProcessTagsConsolidateTags;
+
+            Configs.Configurations.TagEditorConfigs.InputFolder = EditorInputFolder;
+            Configs.Configurations.TagEditorConfigs.ExactMatchesFiltering = EditorExactMatches;
+
+            Configs.Configurations.ExtractSubsetConfigs.InputFolder = ExtractSubsetInputFolder;
+            Configs.Configurations.ExtractSubsetConfigs.OutputFolder = ExtractSubsetOutputFolder;
+            Configs.Configurations.ExtractSubsetConfigs.SearchTxt = ExtractSubsetSearchTxt;
+            Configs.Configurations.ExtractSubsetConfigs.SearchCaption = ExtractSubsetSearchCaption;
+            Configs.Configurations.ExtractSubsetConfigs.ExactMatchesFiltering = ExtractSubsetExactMatchesFiltering;
+
+            Configs.Configurations.PromptGeneratorConfigs.InputFolder = PromptGeneratorInputFolder;
+            Configs.Configurations.PromptGeneratorConfigs.OutputFolder = PromptGeneratorOutputFolder;
+            Configs.Configurations.PromptGeneratorConfigs.TagsToPrepend = PromptGeneratorTagsToPrepend;
+            Configs.Configurations.PromptGeneratorConfigs.TagsToAppend = PromptGeneratorTagsToAppend;
+            Configs.Configurations.PromptGeneratorConfigs.AmountOfTags = Math.Clamp(int.Parse(PromptGeneratorAmountOfTags),
+                10, 50);
+            Configs.Configurations.PromptGeneratorConfigs.AmountOfPrompts = Math.Clamp(int.Parse(PromptGeneratorAmountOfPrompts),
+                10, ushort.MaxValue);
+
             await Configs.SaveConfigurationsAsync();
             Logger.SetLatestLogMessage($"Settings saved!", LogMessageColor.Informational);
         }
@@ -444,6 +685,11 @@ namespace DatasetProcessor.ViewModels
         partial void OnResizeImagesSharpenSigmaChanged(double value)
         {
             ResizeImagesSharpenSigma = Math.Round(value, 2);
+        }
+
+        partial void OnGenerateTagsThresholdChanged(double value)
+        {
+            GenerateTagsThreshold = Math.Round(value, 2);
         }
     }
 }

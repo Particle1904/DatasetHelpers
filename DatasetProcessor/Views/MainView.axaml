@@ -83,7 +83,7 @@
 			</StackPanel>
 		</SplitView.Pane>
 		<Grid Classes="gridPrimary"
-			  RowDefinitions="40, *, Auto">
+			  RowDefinitions="40, *, auto">
 			<!-- TITTLE BAR -->
 			<Label Grid.Row="0"
 				   Content="{Binding PageName}"

@@ -26,7 +26,7 @@ namespace SmartData.Lib.Helpers
         {
             get
             {
-                AvailableModels[] availableModels = { 
+                AvailableModels[] availableModels = {
                     AvailableModels.JoyTag,
                     AvailableModels.WD14v2,
                     AvailableModels.WDv3,
@@ -64,6 +64,7 @@ namespace SmartData.Lib.Helpers
                     AvailableModels.RealWebPhoto_x4,
                     AvailableModels.RealWebPhotoDAT_x4,
                     AvailableModels.SPANkendata_x4,
+                    AvailableModels.GTAV5_x4
                 };
                 return availableModels;
             }

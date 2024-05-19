@@ -63,7 +63,6 @@ namespace SmartData.Lib.Services.Base
             {
                 sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
                 sessionOptions.EnableMemoryPattern = false;
-                sessionOptions.EnableCpuMemArena = false;
                 //sessionOptions.LogVerbosityLevel = 1;
                 //sessionOptions.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
 

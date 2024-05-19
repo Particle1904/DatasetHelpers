@@ -33,6 +33,7 @@
         LSDIRplusCompression_x4,
         LSDIRCompact3_x4,
         LSDIR_x4,
+        GTAV5_x4,
         #endregion
         CLIPTokenizer
     }

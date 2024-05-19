@@ -44,6 +44,7 @@
         public const string RealWebPhotoFileName = "RealWebPhoto.onnx";
         public const string RealWebPhotoDATFileName = "RealWebPhotoDAT.onnx";
         public const string SPANkendataFileName = "SPANkendata.onnx";
+        public const string GTAVFileName = "GTAV.onnx";
         #endregion
     }
 }

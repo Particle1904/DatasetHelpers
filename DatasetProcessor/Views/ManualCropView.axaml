@@ -8,10 +8,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto" 
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto" 
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -36,7 +36,7 @@
 			</Button>
 		</Grid>
 		<!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -63,7 +63,7 @@
 		
 		<!-- CURRENT FILE INFORMATION PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="4"
-			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, Auto"
+			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, auto"
 			  Height="40">
 			<Label Grid.Column="0"
 				   Content="{Binding SelectedImageFilename}"/>
@@ -90,7 +90,7 @@
 			  ColumnDefinitions="50, 10, *, 10, 50"
 			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
-			<Grid Grid.Column="0" RowDefinitions="Auto, 10, Auto, 10, Auto"
+			<Grid Grid.Column="0" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"
 				  Background="Transparent">
 				<Button Grid.Row="0"
@@ -141,7 +141,7 @@
 			</Grid>
 
 			<!-- FORWARD BUTTONS -->
-			<Grid Grid.Column="4" RowDefinitions="Auto, 10, Auto, 10, Auto"
+			<Grid Grid.Column="4" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"
 				  Background="Transparent">
 				<Button Grid.Row="0"

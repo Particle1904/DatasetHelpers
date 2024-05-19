@@ -58,10 +58,10 @@ public partial class MainViewModel : BaseViewModel
     /// </summary>
     /// <param name="fileManipulator">The file manipulation service.</param>
     /// <param name="imageProcessor">The image processing service.</param>
-    /// <param name="wDAutoTagger">The WD 1.4 auto-tagging service.</param>
-    /// <param name="wDv3AutoTagger">The WD 3 auto-tagging service.</param>
-    /// <param name="joyTagAutoTagger">The JoyTag auto-tagging service.</param>
-    /// <param name="e621AutoTagger">The E621 auto-tagging service.</param>
+    /// <param name="wDautoTagger">The WD 1.4 auto-tagging service.</param>
+    /// <param name="wDv3autoTagger">The WD 3 auto-tagging service.</param>
+    /// <param name="joyTagautoTagger">The JoyTag auto-tagging service.</param>
+    /// <param name="e621autoTagger">The E621 auto-tagging service.</param>
     /// <param name="tagProcessor">The tag processing service.</param>
     /// <param name="contentAwareCrop">The content-aware crop service.</param>
     /// <param name="inputHooks">The input hooks service.</param>

@@ -10,10 +10,10 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto, 10, Auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="Auto, 10, *, 10, Auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 		<!-- INPUT FIELDS -->
 		<Grid Classes="gridSecondary"
 			  Grid.Row="2"
-			  RowDefinitions="Auto, 10, Auto, 10, Auto"
+			  RowDefinitions="auto, 10, auto, 10, auto"
 			  ColumnDefinitions="1*, 10, 2*, 10, 2*">
 			<!-- TAGS TO ADD -->
 			<Label Grid.Row="0"
@@ -75,8 +75,8 @@
 		</Grid>
 		<Separator Grid.Row="5"/>
 		<Grid Classes="gridSecondary" Grid.Row="6"
-				  RowDefinitions="Auto, 10, *"
-				  ColumnDefinitions="*, 10, Auto"
+				  RowDefinitions="auto, 10, *"
+				  ColumnDefinitions="*, 10, auto"
 				  MaxHeight="160">
 			<Label Grid.Row="0" Grid.Column="0"
 				   Content="Generated prompt:"
@@ -95,7 +95,7 @@
 		<!-- OUTPUT PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="8" 
 			  ColumnDefinitions="1*, 10, 4*"
-			  RowDefinitions="Auto, 10, Auto, 10, Auto">
+			  RowDefinitions="auto, 10, auto, 10, auto">
 			<Button Grid.Column="0"
 					Grid.Row="2"
 					IsEnabled="{Binding IsUiEnabled}"
