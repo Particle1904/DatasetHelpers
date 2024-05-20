@@ -7,26 +7,27 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is. 
-Before opening an issue, please check the logs folder inside the root folder where the application is installed; if there's 1 or more files, upload them.
+### Bug Description
+Provide a clear and concise description of the bug. Before opening an issue, please check the logs folder inside the root directory where the application is installed. If there are any log files, attach them to this report.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+### Steps to Reproduce
+Outline the steps to reproduce the behavior:
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+Navigate to '...'
+Click on '...'
+Scroll down to '...'
+Observe the error
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+### Expected Behavior
+Describe what you expected to happen in clear and concise terms.
 
-**Desktop (please complete the following information):**
- - OS: Windows or Linux
- - Release version
+### Screenshots
+If applicable, include screenshots to help illustrate the problem.
 
-**Additional context**
-Add any other context about the problem here.
+### Environment Details
+Complete the following information:
+- Operating System: [e.g., Windows, Linux]
+- Application Version: [e.g., 2.5.0]
+
+### Additional Context
+Provide any other relevant context or information about the issue here.
