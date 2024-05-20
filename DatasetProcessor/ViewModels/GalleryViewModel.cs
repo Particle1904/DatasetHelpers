@@ -154,15 +154,17 @@ namespace DatasetProcessor.ViewModels
                 });
 
                 ImageCollection = new ObservableCollection<ImageItem>(imageItems);
+                Logger.SetLatestLogMessage("Finished loading image files.", LogMessageColor.Informational);
             }
             catch (NotSupportedException exception)
             {
                 Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
                 return;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
+                Logger.SetLatestLogMessage("Something went wrong while trying to load the images. Error log will be saved inside the logs folder.", LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {
@@ -170,8 +172,6 @@ namespace DatasetProcessor.ViewModels
                 IsUiEnabled = true;
                 IsCancelEnabled = false;
             }
-
-            Logger.SetLatestLogMessage("Finished loading image files.", LogMessageColor.Informational);
 
             // Stop dispatcher timer
             timer.Stop();
