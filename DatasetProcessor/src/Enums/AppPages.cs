@@ -7,6 +7,7 @@
         Sort_Images,
         Content_Aware_Crop,
         Manual_Crop,
+        Inpaint_Images,
         Resize_Images,
         Upscale_Images,
         Tag_Generation,

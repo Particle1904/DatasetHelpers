@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    public partial class ManualCropViewModel : BaseViewModel
+    public partial class InpaintViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
         private readonly IFileManipulatorService _fileManipulator;
@@ -34,6 +34,9 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private Bitmap? _selectedImage;
         [ObservableProperty]
+        private Bitmap? _selectedImageMask;
+        private MemoryStream _selectedImageMaskBitmap;
+        [ObservableProperty]
         private string _selectedImageFilename;
         [ObservableProperty]
         private string _currentAndTotal;
@@ -47,11 +50,19 @@ namespace DatasetProcessor.ViewModels
         private bool _isUiEnabled;
 
         [ObservableProperty]
-        private Point _startingPosition;
-        [ObservableProperty]
-        private Point _endingPosition;
+        private Point _circlePosition;
 
-        public ManualCropViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
+        [ObservableProperty]
+        float _circleRadius;
+        public float CircleWidthHeight
+        {
+            get => CircleRadius * 2.0f;
+        }
+
+        [ObservableProperty]
+        Color _drawingColor;
+
+        public InpaintViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _imageProcessor = imageProcessor;
@@ -62,15 +73,14 @@ namespace DatasetProcessor.ViewModels
 
             SelectedItemIndex = 0;
 
-            StartingPosition = Point.Empty;
-            EndingPosition = Point.Empty;
-
-            InputFolderPath = _configs.Configurations.ManualCropConfigs.InputFolder;
-            OutputFolderPath = _configs.Configurations.ManualCropConfigs.OutputFolder;
+            InputFolderPath = string.Empty;
+            OutputFolderPath = string.Empty;
             ImageFiles = new List<string>();
             CurrentAndTotal = string.Empty;
             SelectedImageFilename = string.Empty;
             TotalImageFiles = string.Empty;
+
+            CircleRadius = 15.0f;
         }
 
         [RelayCommand]
@@ -109,17 +119,6 @@ namespace DatasetProcessor.ViewModels
             catch
             {
                 Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
-            }
-        }
-
-        [RelayCommand]
-        private void CopyCurrentImage()
-        {
-            if (!string.IsNullOrEmpty(SelectedImageFilename) && !string.IsNullOrEmpty(OutputFolderPath))
-            {
-                string currentImage = ImageFiles[SelectedItemIndex];
-                string outputPath = Path.Combine(OutputFolderPath, Path.GetFileName(currentImage));
-                File.Copy(currentImage, outputPath);
             }
         }
 
@@ -192,6 +191,11 @@ namespace DatasetProcessor.ViewModels
                 ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
                 _imageWasDownscaled = false;
             }
+
+            _selectedImageMaskBitmap = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width,
+                (int)SelectedImage.Size.Height);
+            _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
+            SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
         }
 
         /// <summary>
@@ -200,6 +204,61 @@ namespace DatasetProcessor.ViewModels
         partial void OnImageFilesChanged(List<string> value)
         {
             TotalImageFiles = $"Total files found: {ImageFiles.Count.ToString()}.";
+        }
+
+        partial void OnCirclePositionChanged(Point value)
+        {
+            if (SelectedImage == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(OutputFolderPath))
+            {
+                Logger.SetLatestLogMessage("You need to first select a folder for the output files! Image wont be saved.",
+                    LogMessageColor.Warning);
+                return;
+            }
+
+            try
+            {
+                SixLabors.ImageSharp.Color color;
+                if (DrawingColor.Equals(Color.White))
+                {
+                    color = SixLabors.ImageSharp.Color.White;
+                }
+                else if (DrawingColor.Equals(Color.Black))
+                {
+                    color = SixLabors.ImageSharp.Color.Black;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (_imageWasDownscaled)
+                {
+                    // Create new variables so the program doesn't enter in an infinite loop calling OnEndingPositionChanged.
+                    Point position = new Point((int)(value.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
+                        (int)(value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
+
+                    _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
+                        new SixLabors.ImageSharp.Point(position.X, position.Y), CircleRadius, color);
+                }
+                else
+                {
+                    _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
+                        new SixLabors.ImageSharp.Point(value.X, value.Y), CircleRadius, color);
+                }
+
+                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
+                SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
+                    LogMessageColor.Warning);
+            }
         }
 
         /// <summary>
@@ -214,59 +273,6 @@ namespace DatasetProcessor.ViewModels
             {
                 Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
             }
-        }
-
-        /// <summary>
-        /// Handles the change event of the ending position of the crop region.
-        /// </summary>
-        /// <param name="value">The new ending position of the crop region.</param>
-        /// <remarks>
-        /// This method is triggered when the ending position of the crop region changes.
-        /// It checks if an image is selected and if an output folder path is specified.
-        /// If both conditions are met, it asynchronously crops the image based on the specified crop region
-        /// (defined by the starting and ending positions) and saves the cropped image to the output folder.
-        /// If no output folder is specified, it logs a message indicating that an output folder needs to be selected.
-        /// If an error occurs during the cropping process, it throws an exception.
-        /// </remarks>
-        partial void OnEndingPositionChanged(Point value)
-        {
-            if (SelectedImage == null)
-            {
-                return;
-            }
-
-            if (string.IsNullOrEmpty(OutputFolderPath))
-            {
-                Logger.SetLatestLogMessage("You need to first select a folder for the output files! Image wont be saved.",
-                    LogMessageColor.Warning);
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    if (_imageWasDownscaled)
-                    {
-                        // Create new variables so the program doesn't enter in an infinite loop calling OnEndingPositionChanged.
-                        Point startingPosition = new Point((int)(StartingPosition.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
-                            (int)(StartingPosition.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
-                        Point endingPosition = new Point((int)(EndingPosition.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
-                            (int)(EndingPosition.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
-
-                        await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, startingPosition, endingPosition);
-                    }
-                    else
-                    {
-                        await _imageProcessor.CropImageAsync(ImageFiles[SelectedItemIndex], OutputFolderPath, StartingPosition, EndingPosition);
-                    }
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
-                        LogMessageColor.Warning);
-                }
-            });
         }
     }
 }

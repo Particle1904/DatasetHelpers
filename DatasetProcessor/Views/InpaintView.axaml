@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:Class="DatasetProcessor.Views.ManualCropView"
-			 mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="768"	
+             x:Class="DatasetProcessor.Views.InpaintView"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto" 
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
@@ -60,7 +60,7 @@
 				</Panel>
 			</Button>
 		</Grid>
-		
+
 		<!-- CURRENT FILE INFORMATION PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="4"
 			  ColumnDefinitions="1*, 10, 1*, 10, 1*, 10, auto"
@@ -84,10 +84,10 @@
 				</Panel>
 			</Button>
 		</Grid>
-		
+
 		<!-- IMAGE PANEL -->
 		<Grid Grid.Row="6" Background="Transparent"
-			  ColumnDefinitions="50, 10, *, 10, 50"
+			  ColumnDefinitions="50, 10, *, 10, *, 10, 50"
 			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
 			<Grid Grid.Column="0" RowDefinitions="auto, 10, auto, 10, auto"
@@ -118,30 +118,67 @@
 				  HorizontalAlignment="Stretch"
 				  MinWidth="256"
 				  MinHeight="256">
-				<Button Classes="emptyButton"
-						x:Name="CanvasButton"	
-						Width="{Binding ImageSize.X}"
-						Height="{Binding ImageSize.Y}"
-						HorizontalAlignment="Stretch"
-						VerticalAlignment="Stretch"
-						PointerPressed="CanvasPressed"
-						PointerReleased="CanvasReleased"
-						PointerMoved="PointerMoving"
-						Margin="0"
-						Padding="0">
-					<Panel x:Name="CanvasPanel" 
+					<Panel Width="{Binding ImageSize.X}"
+						   Height="{Binding ImageSize.Y}"
 						   HorizontalAlignment="Stretch"
-						   VerticalAlignment="Stretch">
+						   VerticalAlignment="Stretch"
+						   Margin="0">						
 						<Image HorizontalAlignment="Stretch"
-							   VerticalAlignment="Stretch"
-							   Stretch="UniformToFill"
-							   Source="{Binding SelectedImage, Mode=TwoWay}"/>
+								VerticalAlignment="Stretch"
+								Stretch="UniformToFill"
+								Source="{Binding SelectedImage, Mode=TwoWay}"/>						
 					</Panel>
-				</Button>
+			</Grid>
+			<Grid Grid.Column="2"
+				  HorizontalAlignment="Stretch"
+				  MinWidth="256"
+				  MinHeight="256"
+				  Background="Transparent">
+				<Panel x:Name="CanvasPanel"
+					   Width="{Binding ImageSize.X}"
+					   Height="{Binding ImageSize.Y}"
+					   HorizontalAlignment="Stretch"
+					   VerticalAlignment="Stretch"
+					   Margin="0"
+					   Opacity="0.75"
+					   PointerPressed="CanvasPressed"
+					   PointerMoved="PointerMoving"
+					   PointerReleased="CanvasReleased">
+					<Image HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Stretch="UniformToFill"
+						   Source="{Binding SelectedImageMask, Mode=TwoWay}"/>
+				</Panel>
+				
+				<Ellipse x:Name="EllipseControl"
+						 Width="{Binding CircleWidthHeight}"
+						 Height="{Binding CircleWidthHeight}"
+						 Stroke="{DynamicResource SecondaryDark}"
+						 StrokeThickness="2"
+						 VerticalAlignment="Top"
+						 HorizontalAlignment="Left">
+				</Ellipse>
 			</Grid>
 
+			<!-- IMAGE DISPLAY -->
+			<Grid Classes="gridPrimary" Grid.Column="4"
+				  HorizontalAlignment="Stretch"
+				  MinWidth="256"
+				  MinHeight="256">
+				<Panel Width="{Binding ImageSize.X}"
+					   Height="{Binding ImageSize.Y}"
+					   HorizontalAlignment="Stretch"
+					   VerticalAlignment="Stretch"
+					   Margin="0">
+					<Image HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Stretch="UniformToFill"
+						   Source="{Binding SelectedImage, Mode=TwoWay}"/>
+				</Panel>
+			</Grid>			
+			
 			<!-- FORWARD BUTTONS -->
-			<Grid Grid.Column="4" RowDefinitions="auto, 10, auto, 10, auto"
+			<Grid Grid.Column="6" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"
 				  Background="Transparent">
 				<Button Grid.Row="0"
@@ -163,17 +200,6 @@
 						Command="{Binding GoToItemCommand}"
 						CommandParameter="100"/>
 			</Grid>
-		</Grid>
-
-		<!-- NOTE TEXT BOX -->
-		<Panel Grid.Row="8"
-			   Background="{DynamicResource SurfaceDark}">
-			<TextBlock HorizontalAlignment="Center"
-					   Margin="10"
-					   TextAlignment="Center"
-					   FontWeight="Light"
-					   Foreground="{DynamicResource Secondary}"
-					   Text="Note: Hold the Right-click button and drag to select the crop area; release the Right-click button to save the cropped image. &#xa;To cancel the crop operation, press the Left-click button while holding down Right-click button.&#xa;Cropped images will be automatically saved in the output folder using the original image file name. Selecting a new crop area will overwrite the existing cropped image." />
-		</Panel>
+		</Grid>	
 	</Grid>
 </UserControl>

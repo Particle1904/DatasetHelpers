@@ -31,6 +31,8 @@ namespace SmartData.Lib.Interfaces
         public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);
         public Image GetUpscaledImage(UpscalerOutputData outputData);
         public Task<MemoryStream> GetBlurredImageAsync(string inputPath);
+        public MemoryStream CreateImageMask(int width, int height);
+        public MemoryStream DrawCircleOnMask(MemoryStream maskStream, Point position, float radius, Color color);
         public Task<List<string>> ReadImageMetadataAsync(Stream imageStream);
         public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
     }

@@ -9,6 +9,7 @@ using Models;
 using Models.MachineLearning;
 
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -1038,6 +1039,50 @@ namespace SmartData.Lib.Services
                 }
             }
             return metadata;
+        }
+
+        /// <summary>
+        /// Creates an image mask of the specified width and height, filled with a black background, and returns it as a PNG image in a memory stream.
+        /// </summary>
+        /// <param name="width">The width of the image mask to be created.</param>
+        /// <param name="height">The height of the image mask to be created.</param>
+        /// <returns>A <see cref="MemoryStream"/> containing the PNG image of the created black image mask.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method creates a new image of the specified dimensions using the ImageSharp library, fills it with a black background, and then saves it as a PNG image into a memory stream.
+        /// </para>
+        /// <para>
+        /// The resulting memory stream containing the PNG image is returned to the caller.
+        /// </para>
+        /// </remarks>
+        public MemoryStream CreateImageMask(int width, int height)
+        {
+            using (Image<Rgba32> image = new Image<Rgba32>(width, height))
+            {
+                image.Mutate(image => image.BackgroundColor(Color.Black));
+
+                MemoryStream imageMaskStream = new MemoryStream();
+                image.SaveAsJpeg(imageMaskStream, _jpegEncoder);
+
+                return imageMaskStream;
+            }
+        }
+
+        public MemoryStream DrawCircleOnMask(MemoryStream maskStream, Point position, float radius, Color color)
+        {
+            maskStream.Seek(0, SeekOrigin.Begin);
+            using (Image image = Image.Load(maskStream))
+            {
+                SolidBrush brush = new SolidBrush(color);
+                SixLabors.ImageSharp.Drawing.EllipsePolygon circle = new SixLabors.ImageSharp.Drawing.EllipsePolygon(position.X,
+                    position.Y, radius);
+                image.Mutate(image => image.Fill(brush, circle));
+
+                MemoryStream imageMaskStream = new MemoryStream();
+                image.SaveAsJpeg(imageMaskStream, _jpegEncoder);
+
+                return imageMaskStream;
+            }
         }
 
         /// <summary>

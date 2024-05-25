@@ -23,8 +23,6 @@ namespace DatasetProcessor.ViewModels
     /// </summary>
     public partial class TagEditorViewModel : BaseViewModel
     {
-
-
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
         private readonly IInputHooksService _inputHooks;

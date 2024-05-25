@@ -122,6 +122,10 @@ public partial class MainViewModel : BaseViewModel
         {
             DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)
         });
+        _views.Add(AppPages.Inpaint_Images, new InpaintView()
+        {
+            DataContext = new InpaintViewModel(imageProcessor, fileManipulator, logger, configs)
+        });
         _views.Add(AppPages.Resize_Images, new ResizeImagesView()
         {
             DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs)
