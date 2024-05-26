@@ -109,7 +109,14 @@ namespace DatasetProcessor.ViewModels
 
         public void SaveCurrentImageMask()
         {
-            SelectedImageMask.Save(GetCurrentFileMaskFilename());
+            try
+            {
+                SelectedImageMask.Save(GetCurrentFileMaskFilename(), 100);
+            }
+            catch (Exception)
+            {
+                SaveCurrentImageMask();
+            }
         }
 
         [RelayCommand]

@@ -142,6 +142,19 @@ namespace SmartData.Lib.Services.MachineLearning
             _imageProcessor.SaveInpaintedImage(outputImagePath, inputData, outputs.ToArray());
         }
 
+        /// <summary>
+        /// Inpaints all images in a specified folder and saves the results to the specified output folder.
+        /// </summary>
+        /// <param name="inputFolderPath">The folder path containing the input images to be inpainted.</param>
+        /// <param name="outputFolderPath">The folder path where the inpainted output images will be saved.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method finds all images in the input folder that do not contain "_mask" in their filenames,
+        /// processes each image by calling <see cref="InpaintImageTilesAsync(string, string, string)"/>,
+        /// and saves the resulting inpainted images to the output folder.
+        /// It raises events to indicate total files to be processed and progress updates.
+        /// </remarks>
+        /// <exception cref="ArgumentException">Thrown when an error occurs during inpainting of an image.</exception>
         public async Task InpaintImagesAsync(string inputFolderPath, string outputFolderPath)
         {
             if (!IsModelLoaded)
