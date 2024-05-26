@@ -8,7 +8,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Design.DesignStyle>
-	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto"
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
 		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
@@ -85,8 +85,29 @@
 			</Button>
 		</Grid>
 
+		<!-- BRUSH SIZE -->
+		<Grid Classes="gridSecondary" Grid.Row="6"
+			  ColumnDefinitions="auto, 10, auto, 10, auto, 10, *"
+			  Height="40">
+			<Label Content="Paint brush size:"/>
+			<Slider Grid.Column="2"
+					VerticalAlignment="Center"
+					Minimum="1"
+					Maximum="100"
+					MinWidth="300"
+					Margin="0,-8,0,0"
+					Value="{Binding CircleRadius}"/>
+			<Label Grid.Column="4"
+				   Content="{Binding CircleRadius}"/>
+			<Button Grid.Column="6"
+					Content="Inpaint current image"
+					HorizontalAlignment="Right"
+					Command="{Binding InpaintCurrentImageCommand}"
+					IsEnabled="{Binding InpaintCurrentButtonEnabled}"/>
+		</Grid>
+
 		<!-- IMAGE PANEL -->
-		<Grid Grid.Row="6" Background="Transparent"
+		<Grid Grid.Row="8" Background="Transparent"
 			  ColumnDefinitions="50, 10, *, 10, *, 10, 50"
 			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
@@ -116,8 +137,8 @@
 			<!-- IMAGE DISPLAY -->
 			<Grid Classes="gridPrimary" Grid.Column="2"
 				  HorizontalAlignment="Stretch"
-				  MinWidth="256"
-				  MinHeight="256">
+				  MinWidth="128"
+				  MinHeight="128">
 					<Panel Width="{Binding ImageSize.X}"
 						   Height="{Binding ImageSize.Y}"
 						   HorizontalAlignment="Stretch"
@@ -140,10 +161,12 @@
 					   HorizontalAlignment="Stretch"
 					   VerticalAlignment="Stretch"
 					   Margin="0"
-					   Opacity="0.75"
+					   Opacity="0.55"
 					   PointerPressed="CanvasPressed"
 					   PointerMoved="PointerMoving"
-					   PointerReleased="CanvasReleased">
+					   PointerReleased="CanvasReleased"
+					   PointerEntered="PointerEntered"
+					   PointerExited="PointerExited">
 					<Image HorizontalAlignment="Stretch"
 						   VerticalAlignment="Stretch"
 						   Stretch="UniformToFill"
@@ -200,6 +223,47 @@
 						Command="{Binding GoToItemCommand}"
 						CommandParameter="100"/>
 			</Grid>
-		</Grid>	
+		</Grid>
+
+		<!-- NOTE TEXT BOX -->
+		<Panel Grid.Row="10"
+			   Background="{DynamicResource SurfaceDark}">
+			<TextBlock HorizontalAlignment="Center"
+					   Margin="10"
+					   TextAlignment="Center"
+					   FontWeight="Light"
+					   Foreground="{DynamicResource Secondary}"
+					   Text="Note: Hold the Left-click button and drag to paint with white.&#xa;Hold the Right-click button and drag to paint with black.&#xa;Areas paited with white will be inpainted by the AI model." />
+		</Panel>
+
+		<Separator Grid.Row="12"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="14"
+			   Content="{Binding PredictionProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="16"
+			   Content="{Binding ElapsedTime, StringFormat='Generation elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- INPAITING BUTTON -->
+		<Grid Grid.Row="18"
+			  ColumnDefinitions="auto, 10, auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Inpaint images"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding InpaintingImagesCommand}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="20"
+					 Value="{Binding InpaintingProgress.PercentComplete}"/>
+		<!-- TASK STATUS -->
+		<Label Grid.Row="22"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
 	</Grid>
 </UserControl>

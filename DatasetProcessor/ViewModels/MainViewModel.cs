@@ -36,6 +36,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IPromptGeneratorService _promptGenerator;
     protected readonly ICLIPTokenizerService _clipTokenizer;
     protected readonly IUpscalerService _uspcalerService;
+    protected readonly IInpaintService _inpaintService;
 
     [ObservableProperty]
     private UserControl _dynamicView;
@@ -68,6 +69,7 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="promptGenerator">The prompt generator service.</param>
     /// <param name="clipTokenizer">The clip tokenizer.</param>
     /// <param name="upscalerService">The upscaler service.</param>
+    /// <param name="inpaintService">The inpaint service.</param>
     /// <param name="logger">The logger service.</param>
     /// <param name="configs">The configuration service.</param>
     public MainViewModel(IFileManipulatorService fileManipulator,
@@ -82,6 +84,7 @@ public partial class MainViewModel : BaseViewModel
                          IPromptGeneratorService promptGenerator,
                          ICLIPTokenizerService clipTokenizer,
                          IUpscalerService upscalerService,
+                         IInpaintService inpaintService,
                          ILoggerService logger,
                          IConfigsService configs) :
         base(logger, configs)
@@ -98,6 +101,7 @@ public partial class MainViewModel : BaseViewModel
         _promptGenerator = promptGenerator;
         _clipTokenizer = clipTokenizer;
         _uspcalerService = upscalerService;
+        _inpaintService = inpaintService;
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -124,7 +128,7 @@ public partial class MainViewModel : BaseViewModel
         });
         _views.Add(AppPages.Inpaint_Images, new InpaintView()
         {
-            DataContext = new InpaintViewModel(imageProcessor, fileManipulator, logger, configs)
+            DataContext = new InpaintViewModel(imageProcessor, inpaintService, fileManipulator, logger, configs)
         });
         _views.Add(AppPages.Resize_Images, new ResizeImagesView()
         {

@@ -62,7 +62,8 @@ public partial class App : Application
         var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
         var promptGenerator = _servicesProvider.GetRequiredService<IPromptGeneratorService>();
         var clipTokenizer = _servicesProvider.GetRequiredService<ICLIPTokenizerService>();
-        var upscalerService = _servicesProvider.GetRequiredService<IUpscalerService>();
+        var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
+        var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
@@ -72,8 +73,8 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, joyTagautoTagger,
-                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscalerService,
-                    logger, configs)
+                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
+                    inpaint, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -85,8 +86,8 @@ public partial class App : Application
             singleViewPlatform.MainView = new MainView()
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, joyTagautoTagger,
-                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscalerService,
-                    logger, configs)
+                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
+                    inpaint, logger, configs)
             };
         }
 
@@ -105,34 +106,34 @@ public partial class App : Application
         services.AddSingleton<IConfigsService, ConfigurationsService>();
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
-                Path.Combine(_modelsPath, FileNames.YoloV4OnnxFileName)
+                Path.Combine(_modelsPath, Filenames.YoloV4OnnxFilename)
         ));
         services.AddSingleton<WDAutoTaggerService>(service =>
             new WDAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, FileNames.WDOnnxFileName),
-                Path.Combine(_modelsPath, FileNames.WDCsvFileName)
+                Path.Combine(_modelsPath, Filenames.WDOnnxFilename),
+                Path.Combine(_modelsPath, Filenames.WDCsvFilename)
         ));
         services.AddSingleton<WDV3AutoTaggerService>(service =>
             new WDV3AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, FileNames.WDV3OnnxFileName),
-                Path.Combine(_modelsPath, FileNames.WDV3CsvFileName)
+                Path.Combine(_modelsPath, Filenames.WDV3OnnxFilename),
+                Path.Combine(_modelsPath, Filenames.WDV3CsvFilename)
         ));
         services.AddSingleton<E621AutoTaggerService>(service =>
             new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, FileNames.E621OnnxFileName),
-                Path.Combine(_modelsPath, FileNames.E621CsvFileName)
+                Path.Combine(_modelsPath, Filenames.E621OnnxFilename),
+                Path.Combine(_modelsPath, Filenames.E621CsvFilename)
         ));
         services.AddSingleton<JoyTagAutoTaggerService>(service =>
             new JoyTagAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, FileNames.JoyTagOnnxFileName),
-                Path.Combine(_modelsPath, FileNames.JoyTagCsvFileName)
+                Path.Combine(_modelsPath, Filenames.JoyTagOnnxFilename),
+                Path.Combine(_modelsPath, Filenames.JoyTagCsvFilename)
         ));
         services.AddSingleton<ICLIPTokenizerService>(service =>
-            new CLIPTokenizerService(Path.Combine(_modelsPath, FileNames.CLIPTokenixerOnnxFileName)
+            new CLIPTokenizerService(Path.Combine(_modelsPath, Filenames.CLIPTokenixerFilename)
         ));
         services.AddSingleton<IInputHooksService, InputHooksService>();
         services.AddSingleton<IPromptGeneratorService>(service => new
@@ -140,6 +141,10 @@ public partial class App : Application
                 service.GetRequiredService<IFileManipulatorService>()));
         services.AddSingleton<IUpscalerService>(service =>
             new UpscalerService(service.GetRequiredService<IImageProcessorService>(), string.Empty));
+        services.AddSingleton<IInpaintService>(service =>
+            new InpaintService(service.GetRequiredService<IImageProcessorService>(),
+                Path.Combine(_modelsPath, Filenames.LaMaFilename)
+        ));
     }
 
     /// <summary>

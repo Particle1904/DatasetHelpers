@@ -20,7 +20,7 @@ namespace DatasetProcessor.Views
         public InpaintView()
         {
             InitializeComponent();
-            SolidColorBrush brush = new SolidColorBrush(Avalonia.Media.Color.FromArgb(255, 255, 179, 71), 0.5f);
+            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, 255, 179, 71), 0.5f);
         }
 
         /// <summary>
@@ -81,10 +81,30 @@ namespace DatasetProcessor.Views
         {
             if (sender != null && e != null && _viewModel != null)
             {
-                Avalonia.Point clickPosition = e.GetPosition(sender as Button);
                 _isDragging = false;
+                _viewModel.SaveCurrentImageMask();
                 e.Handled = true;
             }
+        }
+
+        /// <summary>
+        /// Handles the pointer entered event on the Canvas.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PointerEntered(object? sender, PointerEventArgs e)
+        {
+            EllipseControl.IsVisible = true;
+        }
+
+        /// <summary>
+        /// Handles the pointer exited event on the Canvas.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PointerExited(object? sender, PointerEventArgs e)
+        {
+            EllipseControl.IsVisible = false;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 using Models;
 using Models.MachineLearning;
 
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.Base;
@@ -22,7 +23,7 @@ namespace SmartData.Lib.Services.MachineLearning
         public InpaintService(IImageProcessorService imageProcessor, string modelPath) : base(modelPath)
         {
             _imageProcessor = imageProcessor;
-            //_useGPU = false;            
+            _useGPU = false;
         }
 
         protected override string[] GetInputColumns()
@@ -139,6 +140,40 @@ namespace SmartData.Lib.Services.MachineLearning
             }
 
             _imageProcessor.SaveInpaintedImage(outputImagePath, inputData, outputs.ToArray());
+        }
+
+        public async Task InpaintImagesAsync(string inputFolderPath, string outputFolderPath)
+        {
+            if (!IsModelLoaded)
+            {
+                await LoadModel();
+            }
+
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _imageSearchPattern)
+                .Where(file => !file.Contains("_mask")).ToArray();
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
+            TotalFilesChanged?.Invoke(this, files.Length);
+
+            foreach (string file in files)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string filenameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                string inputMask = Path.Combine(inputFolderPath, $"{filenameWithoutExtension}_mask.jpeg");
+
+                string outputImagePath = Path.Combine(outputFolderPath, $"{filenameWithoutExtension}.png");
+
+                try
+                {
+                    await InpaintImageTilesAsync(file, inputMask, outputImagePath);
+                }
+                catch (Exception)
+                {
+                    throw new ArgumentException($"An error occured while trying to inpaint the image.");
+                }
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>

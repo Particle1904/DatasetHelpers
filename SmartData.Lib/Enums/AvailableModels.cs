@@ -35,6 +35,9 @@
         LSDIR_x4,
         GTAV5_x4,
         #endregion
+        #region Inpainters
+        LaMa,
+        #endregion
         CLIPTokenizer
     }
 }

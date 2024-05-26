@@ -702,7 +702,6 @@ namespace SmartData.Lib.Services
                 Mode = ResizeMode.BoxPad,
                 Position = AnchorPositionMode.TopLeft,
                 Compand = true,
-                PadColor = new Rgb24(0, 0, 0),
                 Size = new Size(tileSize, tileSize),
             };
 
@@ -742,9 +741,43 @@ namespace SmartData.Lib.Services
                         Image<Rgba32> cloneImage = image.Clone();
                         Rectangle cropArea = new Rectangle(cropX, cropY, cropWidth, cropHeight);
                         cloneImage.Mutate(image => image.Crop(cropArea));
-                        cloneImage.Mutate(image => image.Resize(resizeOptions));
 
-                        imageTiles.Add(new TileImage(cloneImage, x, y));
+                        if (cropWidth < tileSize || cropHeight < tileSize)
+                        {
+                            Image<Rgba32> paddedImage = new Image<Rgba32>(tileSize, tileSize);
+                            paddedImage.Mutate(ctx => ctx.DrawImage(cloneImage, new Point(0, 0), 1f));
+
+                            // Stretch the last column to the right
+                            if (cropWidth < tileSize)
+                            {
+                                for (int stretchX = cropWidth; stretchX < tileSize; stretchX++)
+                                {
+                                    for (int stretchY = 0; stretchY < cropHeight; stretchY++)
+                                    {
+                                        paddedImage[stretchX, stretchY] = paddedImage[cropWidth - 1, stretchY];
+                                    }
+                                }
+                            }
+
+                            // Stretch the last row to the bottom
+                            if (cropHeight < tileSize)
+                            {
+                                for (int stretchY = cropHeight; stretchY < tileSize; stretchY++)
+                                {
+                                    for (int stretchX = 0; stretchX < tileSize; stretchX++)
+                                    {
+                                        paddedImage[stretchX, stretchY] = paddedImage[stretchX, cropHeight - 1];
+                                    }
+                                }
+                            }
+
+                            imageTiles.Add(new TileImage(paddedImage, x, y));
+                        }
+                        else
+                        {
+                            cloneImage.Mutate(img => img.Resize(tileSize, tileSize));
+                            imageTiles.Add(new TileImage(cloneImage, x, y));
+                        }
                     }
                 }
             }
@@ -1042,14 +1075,16 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Creates an image mask of the specified width and height, filled with a black background, and returns it as a PNG image in a memory stream.
+        /// Creates an image mask of the specified width and height, filled with a black background, 
+        /// and returns it as a PNG image in a memory stream.
         /// </summary>
         /// <param name="width">The width of the image mask to be created.</param>
         /// <param name="height">The height of the image mask to be created.</param>
         /// <returns>A <see cref="MemoryStream"/> containing the PNG image of the created black image mask.</returns>
         /// <remarks>
         /// <para>
-        /// This method creates a new image of the specified dimensions using the ImageSharp library, fills it with a black background, and then saves it as a PNG image into a memory stream.
+        /// This method creates a new image of the specified dimensions using the ImageSharp library, 
+        /// fills it with a black background, and then saves it as a PNG image into a memory stream.
         /// </para>
         /// <para>
         /// The resulting memory stream containing the PNG image is returned to the caller.
@@ -1068,6 +1103,23 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Draws a circle on an existing image mask and returns the updated image as a PNG image in a memory stream.
+        /// </summary>
+        /// <param name="maskStream">The memory stream containing the existing image mask.</param>
+        /// <param name="position">The center position of the circle to be drawn.</param>
+        /// <param name="radius">The radius of the circle to be drawn.</param>
+        /// <param name="color">The color of the circle to be drawn.</param>
+        /// <returns>A <see cref="MemoryStream"/> containing the PNG image of the updated image mask with the drawn circle.</returns>
+        /// <remarks>
+        /// <para>
+        /// This method takes an existing image mask from a memory stream, draws a circle at the specified position with the 
+        /// given radius and color, and saves the updated image as a PNG image into a new memory stream.
+        /// </para>
+        /// <para>
+        /// The resulting memory stream containing the PNG image is returned to the caller.
+        /// </para>
+        /// </remarks>
         public MemoryStream DrawCircleOnMask(MemoryStream maskStream, Point position, float radius, Color color)
         {
             maskStream.Seek(0, SeekOrigin.Begin);

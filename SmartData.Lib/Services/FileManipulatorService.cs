@@ -51,6 +51,8 @@ namespace SmartData.Lib.Services
         private readonly string _SPANkendataModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/SPANkendata.onnx?download=true";
         private readonly string _GTAVModelLink = @"https://huggingface.co/Crowlley/DatasetToolsUpscalerModels/resolve/main/GTAV.onnx?download=true";
 
+        private readonly string _LaMaModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/LaMa.onnx?download=true";
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
         public event EventHandler<string> DownloadMessageEvent;
@@ -413,157 +415,163 @@ namespace SmartData.Lib.Services
             switch (model)
             {
                 case AvailableModels.JoyTag:
-                    if (!Path.Exists(FileNames.JoyTagOnnxFileName) || !Path.Exists(FileNames.JoyTagCsvFileName))
+                    if (!Path.Exists(Filenames.JoyTagOnnxFilename) || !Path.Exists(Filenames.JoyTagCsvFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.WD14v2:
-                    if (!Path.Exists(FileNames.WDOnnxFileName) || !Path.Exists(FileNames.WDCsvFileName))
+                    if (!Path.Exists(Filenames.WDOnnxFilename) || !Path.Exists(Filenames.WDCsvFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.WDv3:
-                    if (!Path.Exists(FileNames.WDV3OnnxFileName) || !Path.Exists(FileNames.WDV3CsvFileName))
+                    if (!Path.Exists(Filenames.WDV3OnnxFilename) || !Path.Exists(Filenames.WDV3CsvFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Z3DE621:
-                    if (!Path.Exists(FileNames.E621OnnxFileName) || !Path.Exists(FileNames.E621CsvFileName))
+                    if (!Path.Exists(Filenames.E621OnnxFilename) || !Path.Exists(Filenames.E621CsvFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Yolov4:
-                    if (!Path.Exists(FileNames.YoloV4OnnxFileName))
+                    if (!Path.Exists(Filenames.YoloV4OnnxFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.ParimgCompact_x2:
-                    if (!Path.Exists(FileNames.ParimgCompactFileName))
+                    if (!Path.Exists(Filenames.ParimgCompactFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.HFA2kCompact_x2:
-                    if (!Path.Exists(FileNames.HFA2kCompactFileName))
+                    if (!Path.Exists(Filenames.HFA2kCompactFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.HFA2kAVCSRFormerLight_x2:
-                    if (!Path.Exists(FileNames.HFA2kAVCSRFormerLightFileName))
+                    if (!Path.Exists(Filenames.HFA2kAVCSRFormerLightFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.HFA2k_x4:
-                    if (!Path.Exists(FileNames.HFA2kFileName))
+                    if (!Path.Exists(Filenames.HFA2kFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.SwinIR_x4:
-                    if (!Path.Exists(FileNames.SwinIRFileName))
+                    if (!Path.Exists(Filenames.SwinIRFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Swin2SR_x4:
-                    if (!Path.Exists(FileNames.Swin2SRFileName))
+                    if (!Path.Exists(Filenames.Swin2SRFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Nomos8kSCSRFormer_x4:
-                    if (!Path.Exists(FileNames.Nomos8kSCSRFormerFileName))
+                    if (!Path.Exists(Filenames.Nomos8kSCSRFormerFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Nomos8kSC_x4:
-                    if (!Path.Exists(FileNames.Nomos8kSCFileName))
+                    if (!Path.Exists(Filenames.Nomos8kSCFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.LSDIRplusReal_x4:
-                    if (!Path.Exists(FileNames.LSDIRplusRealFileName))
+                    if (!Path.Exists(Filenames.LSDIRplusRealFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.LSDIRplusNone_x4:
-                    if (!Path.Exists(FileNames.LSDIRplusNoneFileName))
+                    if (!Path.Exists(Filenames.LSDIRplusNoneFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.LSDIRplusCompression_x4:
-                    if (!Path.Exists(FileNames.LSDIRplusCompressionFileName))
+                    if (!Path.Exists(Filenames.LSDIRplusCompressionFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.LSDIRCompact3_x4:
-                    if (!Path.Exists(FileNames.LSDIRCompact3FileName))
+                    if (!Path.Exists(Filenames.LSDIRCompact3Filename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.LSDIR_x4:
-                    if (!Path.Exists(FileNames.LSDIRFileName))
+                    if (!Path.Exists(Filenames.LSDIRFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Nomos8k_x4:
-                    if (!Path.Exists(FileNames.Nomos8kFileName))
+                    if (!Path.Exists(Filenames.Nomos8kFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.Nomos8kDAT_x4:
-                    if (!Path.Exists(FileNames.Nomos8kDATFileName))
+                    if (!Path.Exists(Filenames.Nomos8kDATFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.NomosUni_x4:
-                    if (!Path.Exists(FileNames.NomosUniFileName))
+                    if (!Path.Exists(Filenames.NomosUniFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.RealWebPhoto_x4:
-                    if (!Path.Exists(FileNames.RealWebPhotoFileName))
+                    if (!Path.Exists(Filenames.RealWebPhotoFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.RealWebPhotoDAT_x4:
-                    if (!Path.Exists(FileNames.RealWebPhotoDATFileName))
+                    if (!Path.Exists(Filenames.RealWebPhotoDATFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.SPANkendata_x4:
-                    if (!Path.Exists(FileNames.SPANkendataFileName))
+                    if (!Path.Exists(Filenames.SPANkendataFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.GTAV5_x4:
-                    if (!Path.Exists(FileNames.GTAVFileName))
+                    if (!Path.Exists(Filenames.GTAVFilename))
                     {
                         result = true;
                     }
                     break;
                 case AvailableModels.CLIPTokenizer:
-                    if (!Path.Exists(FileNames.CLIPTokenixerOnnxFileName))
+                    if (!Path.Exists(Filenames.CLIPTokenixerFilename))
+                    {
+                        result = true;
+                    }
+                    break;
+                case AvailableModels.LaMa:
+                    if (!Path.Exists(Filenames.LaMaFilename))
                     {
                         result = true;
                     }
@@ -600,115 +608,119 @@ namespace SmartData.Lib.Services
                 {
                     case AvailableModels.JoyTag:
                         modelUrl = _jtModelLink;
-                        modelFileName = FileNames.JoyTagOnnxFileName;
+                        modelFileName = Filenames.JoyTagOnnxFilename;
                         csvUrl = _jtCsvLink;
-                        csvFileName = FileNames.JoyTagCsvFileName;
+                        csvFileName = Filenames.JoyTagCsvFilename;
                         break;
                     case AvailableModels.WD14v2:
                         modelUrl = _wdModelLink;
-                        modelFileName = FileNames.WDOnnxFileName;
+                        modelFileName = Filenames.WDOnnxFilename;
                         csvUrl = _wdCsvLink;
-                        csvFileName = FileNames.WDCsvFileName;
+                        csvFileName = Filenames.WDCsvFilename;
                         break;
                     case AvailableModels.WDv3:
                         modelUrl = _wdv3ModelLink;
-                        modelFileName = FileNames.WDV3OnnxFileName;
+                        modelFileName = Filenames.WDV3OnnxFilename;
                         csvUrl = _wdv3CsvLink;
-                        csvFileName = FileNames.WDV3CsvFileName;
+                        csvFileName = Filenames.WDV3CsvFilename;
                         break;
                     case AvailableModels.Z3DE621:
                         modelUrl = _e621ModelLink;
-                        modelFileName = FileNames.E621OnnxFileName;
+                        modelFileName = Filenames.E621OnnxFilename;
                         csvUrl = _e621CsvLink;
-                        csvFileName = FileNames.E621CsvFileName;
+                        csvFileName = Filenames.E621CsvFilename;
                         break;
                     case AvailableModels.Yolov4:
                         modelUrl = _yolov4ModelLink;
-                        modelFileName = FileNames.YoloV4OnnxFileName;
+                        modelFileName = Filenames.YoloV4OnnxFilename;
                         break;
                     case AvailableModels.ParimgCompact_x2:
                         modelUrl = _parimgCompactModelLink;
-                        modelFileName = FileNames.ParimgCompactFileName;
+                        modelFileName = Filenames.ParimgCompactFilename;
                         break;
                     case AvailableModels.HFA2kCompact_x2:
                         modelUrl = _HFA2kCompactModelLink;
-                        modelFileName = FileNames.HFA2kCompactFileName;
+                        modelFileName = Filenames.HFA2kCompactFilename;
                         break;
                     case AvailableModels.HFA2kAVCSRFormerLight_x2:
                         modelUrl = _HFA2kAVCSRFormerLightModelLink;
-                        modelFileName = FileNames.HFA2kAVCSRFormerLightFileName;
+                        modelFileName = Filenames.HFA2kAVCSRFormerLightFilename;
                         break;
                     case AvailableModels.HFA2k_x4:
                         modelUrl = _HFA2kx4ModelLink;
-                        modelFileName = FileNames.HFA2kFileName;
+                        modelFileName = Filenames.HFA2kFilename;
                         break;
                     case AvailableModels.SwinIR_x4:
                         modelUrl = _swinIRModelLink;
-                        modelFileName = FileNames.SwinIRFileName;
+                        modelFileName = Filenames.SwinIRFilename;
                         break;
                     case AvailableModels.Swin2SR_x4:
                         modelUrl = _swin2SRModelLink;
-                        modelFileName = FileNames.Swin2SRFileName;
+                        modelFileName = Filenames.Swin2SRFilename;
                         break;
                     case AvailableModels.Nomos8kSCSRFormer_x4:
                         modelUrl = _nomos8kSCSRFormerModelLink;
-                        modelFileName = FileNames.Nomos8kSCSRFormerFileName;
+                        modelFileName = Filenames.Nomos8kSCSRFormerFilename;
                         break;
                     case AvailableModels.Nomos8kSC_x4:
                         modelUrl = _nomos8kSCModelLink;
-                        modelFileName = FileNames.Nomos8kSCFileName;
+                        modelFileName = Filenames.Nomos8kSCFilename;
                         break;
                     case AvailableModels.LSDIRplusReal_x4:
                         modelUrl = _LSDIRplusRealModelLink;
-                        modelFileName = FileNames.LSDIRplusRealFileName;
+                        modelFileName = Filenames.LSDIRplusRealFilename;
                         break;
                     case AvailableModels.LSDIRplusNone_x4:
                         modelUrl = _LSDIRplusNoneModelLink;
-                        modelFileName = FileNames.LSDIRplusNoneFileName;
+                        modelFileName = Filenames.LSDIRplusNoneFilename;
                         break;
                     case AvailableModels.LSDIRplusCompression_x4:
                         modelUrl = _LSDIRplusCompressionModelLink;
-                        modelFileName = FileNames.LSDIRplusCompressionFileName;
+                        modelFileName = Filenames.LSDIRplusCompressionFilename;
                         break;
                     case AvailableModels.LSDIRCompact3_x4:
                         modelUrl = _LSDIRCompact3ModelLink;
-                        modelFileName = FileNames.LSDIRCompact3FileName;
+                        modelFileName = Filenames.LSDIRCompact3Filename;
                         break;
                     case AvailableModels.LSDIR_x4:
                         modelUrl = _LSDIRModelLink;
-                        modelFileName = FileNames.LSDIRFileName;
+                        modelFileName = Filenames.LSDIRFilename;
                         break;
                     case AvailableModels.CLIPTokenizer:
                         modelUrl = _clipTokenizerLink;
-                        modelFileName = FileNames.CLIPTokenixerOnnxFileName;
+                        modelFileName = Filenames.CLIPTokenixerFilename;
                         break;
                     case AvailableModels.Nomos8k_x4:
                         modelUrl = _Nomos8kModelLink;
-                        modelFileName = FileNames.Nomos8kFileName;
+                        modelFileName = Filenames.Nomos8kFilename;
                         break;
                     case AvailableModels.Nomos8kDAT_x4:
                         modelUrl = _Nomos8kDATModelLink;
-                        modelFileName = FileNames.Nomos8kDATFileName;
+                        modelFileName = Filenames.Nomos8kDATFilename;
                         break;
                     case AvailableModels.NomosUni_x4:
                         modelUrl = _NomosUniModelLink;
-                        modelFileName = FileNames.NomosUniFileName;
+                        modelFileName = Filenames.NomosUniFilename;
                         break;
                     case AvailableModels.RealWebPhoto_x4:
                         modelUrl = _RealWebPhotoModelLink;
-                        modelFileName = FileNames.RealWebPhotoFileName;
+                        modelFileName = Filenames.RealWebPhotoFilename;
                         break;
                     case AvailableModels.RealWebPhotoDAT_x4:
                         modelUrl = _RealWebPhotoDATModelLink;
-                        modelFileName = FileNames.RealWebPhotoDATFileName;
+                        modelFileName = Filenames.RealWebPhotoDATFilename;
                         break;
                     case AvailableModels.SPANkendata_x4:
                         modelUrl = _SPANkendataModelLink;
-                        modelFileName = FileNames.SPANkendataFileName;
+                        modelFileName = Filenames.SPANkendataFilename;
                         break;
                     case AvailableModels.GTAV5_x4:
                         modelUrl = _GTAVModelLink;
-                        modelFileName = FileNames.GTAVFileName;
+                        modelFileName = Filenames.GTAVFilename;
+                        break;
+                    case AvailableModels.LaMa:
+                        modelUrl = _LaMaModelLink;
+                        modelFileName = Filenames.LaMaFilename;
                         break;
                     default:
                         break;

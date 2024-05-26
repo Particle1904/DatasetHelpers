@@ -4,11 +4,16 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using DatasetProcessor.src.Enums;
+
 using SmartData.Lib.Enums;
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
+using SmartData.Lib.Interfaces.MachineLearning;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -19,12 +24,15 @@ namespace DatasetProcessor.ViewModels
     public partial class InpaintViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
+        private readonly IInpaintService _inpaint;
         private readonly IFileManipulatorService _fileManipulator;
 
         [ObservableProperty]
         private string _inputFolderPath;
         [ObservableProperty]
         private string _outputFolderPath;
+        [ObservableProperty]
+        private Progress _inpaintingProgress;
         [ObservableProperty]
         private List<string> _imageFiles;
         [ObservableProperty]
@@ -42,34 +50,45 @@ namespace DatasetProcessor.ViewModels
         private string _currentAndTotal;
         [ObservableProperty]
         private Point _imageSize;
+        private double _scaleFactor;
         private bool _imageWasDownscaled;
 
-        [ObservableProperty]
-        private bool _buttonEnabled;
+        private readonly Stopwatch _timer;
+        public TimeSpan ElapsedTime => _timer.Elapsed;
+
         [ObservableProperty]
         private bool _isUiEnabled;
+        [ObservableProperty]
+        private bool _isCancelEnabled;
+        [ObservableProperty]
+        private bool _inpaintCurrentButtonEnabled;
 
         [ObservableProperty]
         private Point _circlePosition;
 
         [ObservableProperty]
-        float _circleRadius;
-        public float CircleWidthHeight
+        private double _circleRadius;
+        public double CircleWidthHeight
         {
-            get => CircleRadius * 2.0f;
+            get => CircleRadius * 2.0d;
         }
 
         [ObservableProperty]
         Color _drawingColor;
 
-        public InpaintViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
-            ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public InpaintViewModel(IImageProcessorService imageProcessor, IInpaintService inpaintService,
+            IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _imageProcessor = imageProcessor;
             _fileManipulator = fileManipulator;
+            _inpaint = inpaintService;
 
-            ButtonEnabled = true;
-            IsUiEnabled = true;
+            (_inpaint as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                InpaintingProgress = ResetProgress(InpaintingProgress);
+                InpaintingProgress.TotalFiles = args;
+            };
+            (_inpaint as INotifyProgress).ProgressUpdated += (sender, args) => InpaintingProgress.UpdateProgress();
 
             SelectedItemIndex = 0;
 
@@ -81,6 +100,16 @@ namespace DatasetProcessor.ViewModels
             TotalImageFiles = string.Empty;
 
             CircleRadius = 15.0f;
+
+            _timer = new Stopwatch();
+            TaskStatus = ProcessingStatus.Idle;
+            IsUiEnabled = true;
+            InpaintCurrentButtonEnabled = true;
+        }
+
+        public void SaveCurrentImageMask()
+        {
+            SelectedImageMask.Save(GetCurrentFileMaskFilename());
         }
 
         [RelayCommand]
@@ -122,6 +151,86 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        [RelayCommand]
+        private async Task InpaintCurrentImageAsync()
+        {
+            IsUiEnabled = false;
+            InpaintCurrentButtonEnabled = false;
+
+            try
+            {
+                Logger.SetLatestLogMessage("Inpaiting current selected image...", LogMessageColor.Informational);
+                await DownloadModelFiles(_fileManipulator, AvailableModels.LaMa);
+
+                string imageFilename = Path.GetFileNameWithoutExtension(ImageFiles[SelectedItemIndex]);
+                await _inpaint.InpaintImageTilesAsync(ImageFiles[SelectedItemIndex], GetCurrentFileMaskFilename(),
+                    Path.Combine(OutputFolderPath, $"{imageFilename}.png"));
+            }
+            catch (Exception exception)
+            {
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
+            }
+            finally
+            {
+                IsUiEnabled = true;
+                InpaintCurrentButtonEnabled = true;
+                Logger.SetLatestLogMessage("Finished inpaiting current selected image! Check output folder for the result.", LogMessageColor.Informational);
+            }
+        }
+
+        [RelayCommand]
+        private async Task InpaintingImagesAsync()
+        {
+            IsUiEnabled = false;
+            InpaintCurrentButtonEnabled = false;
+
+            _timer.Reset();
+            _timer.Start();
+            DispatcherTimer timer = new DispatcherTimer()
+            {
+                Interval = TimeSpan.FromMilliseconds(100)
+            };
+            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            timer.Start();
+
+            InpaintingProgress = ResetProgress(InpaintingProgress);
+            TaskStatus = ProcessingStatus.Running;
+
+            try
+            {
+                IsCancelEnabled = true;
+                await _inpaint.InpaintImagesAsync(InputFolderPath, OutputFolderPath);
+            }
+            catch (OperationCanceledException)
+            {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
+            catch (Exception exception)
+            {
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                        LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
+            }
+            finally
+            {
+                IsCancelEnabled = false;
+                IsUiEnabled = true;
+                InpaintCurrentButtonEnabled = true;
+                TaskStatus = ProcessingStatus.Finished;
+            }
+
+            _timer.Stop();
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_inpaint as ICancellableService)?.CancelCurrentTask();
+        }
+
         /// <summary>
         /// Loads image files from the specified input folder and prepares the view model for editing.
         /// </summary>
@@ -132,7 +241,8 @@ namespace DatasetProcessor.ViewModels
                 ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
                 if (ImageFiles.Count != 0)
                 {
-                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    ImageFiles = ImageFiles.Where(x => !x.Contains("_mask"))
+                        .OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
                     SelectedItemIndex = 0;
                 }
             }
@@ -177,13 +287,14 @@ namespace DatasetProcessor.ViewModels
                 return;
             }
 
-            double widthScale = 1024.0 / value.Size.Width;
+            double widthScale = 512.0 / value.Size.Width;
             double heightScale = 512.0 / value.Size.Height;
-            double scaleFactor = Math.Min(widthScale, heightScale);
+            _scaleFactor = Math.Min(widthScale, heightScale);
 
-            if (scaleFactor < 1.0)
+            if (_scaleFactor < 1.0)
             {
-                ImageSize = new Point((int)(value.Size.Width * scaleFactor), (int)(value.Size.Height * scaleFactor));
+                ImageSize = new Point((int)(value.Size.Width * _scaleFactor),
+                    (int)(value.Size.Height * _scaleFactor));
                 _imageWasDownscaled = true;
             }
             else
@@ -192,10 +303,24 @@ namespace DatasetProcessor.ViewModels
                 _imageWasDownscaled = false;
             }
 
-            _selectedImageMaskBitmap = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width,
-                (int)SelectedImage.Size.Height);
-            _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
-            SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
+            if (File.Exists(GetCurrentFileMaskFilename()))
+            {
+                SelectedImageMask = new Bitmap(GetCurrentFileMaskFilename());
+                if (_selectedImageMaskBitmap != null)
+                {
+                    _selectedImageMaskBitmap.Dispose();
+                }
+                _selectedImageMaskBitmap = new MemoryStream();
+                SelectedImageMask.Save(_selectedImageMaskBitmap);
+                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
+            }
+            else
+            {
+                _selectedImageMaskBitmap = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width, (int)SelectedImage.Size.Height);
+                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
+                SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
+                SelectedImageMask.Save(GetCurrentFileMaskFilename());
+            }
         }
 
         /// <summary>
@@ -206,6 +331,9 @@ namespace DatasetProcessor.ViewModels
             TotalImageFiles = $"Total files found: {ImageFiles.Count.ToString()}.";
         }
 
+        /// <summary>
+        /// Handles changes in the CirclePosition property.
+        /// </summary>
         partial void OnCirclePositionChanged(Point value)
         {
             if (SelectedImage == null)
@@ -242,13 +370,14 @@ namespace DatasetProcessor.ViewModels
                     Point position = new Point((int)(value.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
                         (int)(value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
 
+                    double adjustedRadius = CircleRadius / _scaleFactor;
                     _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
-                        new SixLabors.ImageSharp.Point(position.X, position.Y), CircleRadius, color);
+                        new SixLabors.ImageSharp.Point(position.X, position.Y), (float)adjustedRadius, color);
                 }
                 else
                 {
                     _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
-                        new SixLabors.ImageSharp.Point(value.X, value.Y), CircleRadius, color);
+                        new SixLabors.ImageSharp.Point(value.X, value.Y), (float)CircleRadius, color);
                 }
 
                 _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
@@ -259,6 +388,15 @@ namespace DatasetProcessor.ViewModels
                 Logger.SetLatestLogMessage("An error occured while trying to crop the image. Be sure the crop area is bigger than 0 pixels in both Width and Height!",
                     LogMessageColor.Warning);
             }
+        }
+
+        /// <summary>
+        /// Handles changes in the CircleRadius property.
+        /// </summary>
+        partial void OnCircleRadiusChanged(double value)
+        {
+            CircleRadius = Math.Round(value, 2);
+            OnPropertyChanged(nameof(CircleWidthHeight));
         }
 
         /// <summary>
@@ -273,6 +411,24 @@ namespace DatasetProcessor.ViewModels
             {
                 Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
             }
+        }
+
+        /// <summary>
+        /// Generates the output filename for the current image file with a "_mask" suffix and a ".jpeg" extension.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> representing the full path of the output file, which is the same directory as the current image file
+        /// and has the same name with a "_mask" suffix and a ".jpeg" extension.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the directory and the filename (without extension) of the currently selected image file in the <see cref="ImageFiles"/> collection. 
+        /// It then combines them to create a new filename with a "_mask.jpeg" suffix and returns the full path.
+        /// </remarks>
+        private string GetCurrentFileMaskFilename()
+        {
+            string outputFolder = Path.GetDirectoryName(ImageFiles[SelectedItemIndex]);
+            string filename = Path.GetFileNameWithoutExtension(ImageFiles[SelectedItemIndex]);
+            return Path.Combine(outputFolder, Path.Combine($"{filename}_mask.jpeg"));
         }
     }
 }

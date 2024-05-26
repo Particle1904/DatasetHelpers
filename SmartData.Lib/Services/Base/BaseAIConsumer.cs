@@ -87,6 +87,7 @@ namespace SmartData.Lib.Services.Base
 
             sessionOptions.ApplyConfiguration();
             _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));
+            IsModelLoaded = true;
         }
 
         /// <summary>
