@@ -112,7 +112,8 @@
 				<Button Classes="transparentButton"						
 						MaxHeight="512" MinHeight="512"
 						MaxWidth="512" MinWidth="512"
-						Command="{Binding BlurImageCommand}">
+						Command="{Binding BlurImageCommand}"
+						x:Name="ImagePanel">
 					<Panel Margin="0">
 						<Image HorizontalAlignment="Center"
 							   VerticalAlignment="Center"

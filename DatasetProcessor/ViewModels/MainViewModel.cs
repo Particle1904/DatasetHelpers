@@ -151,9 +151,9 @@ public partial class MainViewModel : BaseViewModel
         {
             DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs)
         });
-        _views.Add(AppPages.Tag_Editor, new TagEditorView()
+        _views.Add(AppPages.Tag_Editor, new TagEditorView(inputHooks)
         {
-            DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, inputHooks, clipTokenizer, logger, configs)
+            DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, clipTokenizer, logger, configs)
         });
         _views.Add(AppPages.Extract_Subset, new ExtractSubsetView()
         {

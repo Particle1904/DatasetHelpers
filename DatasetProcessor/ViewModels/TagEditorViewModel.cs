@@ -25,7 +25,6 @@ namespace DatasetProcessor.ViewModels
     {
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IImageProcessorService _imageProcessor;
-        private readonly IInputHooksService _inputHooks;
         private readonly ICLIPTokenizerService _clipTokenizer;
         private Random _random;
 
@@ -92,12 +91,10 @@ namespace DatasetProcessor.ViewModels
         /// <param name="logger">The logger service for logging messages.</param>
         /// <param name="configs">The configuration service for application settings.</param>
         public TagEditorViewModel(IFileManipulatorService fileManipulator, IImageProcessorService imageProcessor,
-                IInputHooksService inputHooks, ICLIPTokenizerService clipTokenizer, ILoggerService logger,
-                IConfigsService configs) : base(logger, configs)
+            ICLIPTokenizerService clipTokenizer, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
             _imageProcessor = imageProcessor;
-            _inputHooks = inputHooks;
             _clipTokenizer = clipTokenizer;
             _random = new Random();
             _configs = configs;
@@ -110,21 +107,6 @@ namespace DatasetProcessor.ViewModels
 
             SelectedItemIndex = 0;
             CurrentImageTokenCount = string.Empty;
-
-            _inputHooks.ButtonF1 += (sender, args) => OnNavigationButtonDown("-1");
-            _inputHooks.ButtonF2 += (sender, args) => OnNavigationButtonDown("1");
-            _inputHooks.ButtonF3 += (sender, args) => OnNavigationButtonDown("-10");
-            _inputHooks.ButtonF4 += (sender, args) => OnNavigationButtonDown("10");
-            _inputHooks.ButtonF5 += (sender, args) => OnNavigationButtonDown("-100");
-            _inputHooks.ButtonF6 += (sender, args) => OnNavigationButtonDown("100");
-            _inputHooks.ButtonF8 += async (sender, args) => await BlurImageAsync();
-
-            _inputHooks.MouseButton3 += async (sender, args) => await BlurImageAsync();
-            _inputHooks.MouseButton4 += (sender, args) => OnNavigationButtonDown("-1");
-            _inputHooks.MouseButton5 += (sender, args) => OnNavigationButtonDown("1");
-
-            _inputHooks.AltLeftArrowCombo += (sender, args) => OnNavigationButtonDown("-1");
-            _inputHooks.AltRightArrowCombo += (sender, args) => OnNavigationButtonDown("1");
 
             TokenTextColor = new SolidColorBrush(Colors.LightGreen);
         }
@@ -197,7 +179,7 @@ namespace DatasetProcessor.ViewModels
         /// Toggles the display of a blurred image for the currently selected image asynchronously.
         /// </summary>
         [RelayCommand]
-        private async Task BlurImageAsync()
+        public async Task BlurImageAsync()
         {
             _showBlurredImage = !_showBlurredImage;
             try
@@ -304,6 +286,11 @@ namespace DatasetProcessor.ViewModels
             await CopyToClipboard(CurrentImageTags);
         }
 
+        /// <summary>
+        /// Counts the tokens for the current image tags asynchronously.
+        /// Downloads the necessary onnx extension file if it is not present, and updates the token count and text color.
+        /// </summary>
+        /// <returns>A Task representing the asynchronous operation.</returns>
         [RelayCommand]
         private async Task CountTokensForCurrentImage()
         {
@@ -348,20 +335,6 @@ namespace DatasetProcessor.ViewModels
                 {
                     SelectedImage = SelectBitmapInterpolation();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Handles a button down event and navigates to the item with the specified index.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event arguments.</param>
-        /// <param name="index">The index of the item to navigate to.</param>
-        private void OnNavigationButtonDown(string index)
-        {
-            if (IsActive)
-            {
-                Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
             }
         }
 

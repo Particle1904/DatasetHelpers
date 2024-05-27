@@ -21,6 +21,7 @@ namespace DatasetProcessor.Views
         {
             InitializeComponent();
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, 255, 179, 71), 0.5f);
+            EllipseControl.IsVisible = false;
         }
 
         /// <summary>

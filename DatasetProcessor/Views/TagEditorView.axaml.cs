@@ -1,8 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 using DatasetProcessor.src.Classes;
 using DatasetProcessor.ViewModels;
+
+using SmartData.Lib.Interfaces;
 
 using System;
 using System.ComponentModel;
@@ -17,6 +20,8 @@ namespace DatasetProcessor.Views
     /// </summary>
     public partial class TagEditorView : UserControl
     {
+        private readonly IInputHooksService _inputHooks;
+
         private Color _highlightTextColor = Color.FromArgb(255, 255, 179, 71);
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -27,12 +32,13 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="TagEditorView"/> class.
         /// </summary>
-        public TagEditorView()
+        public TagEditorView(IInputHooksService inputHooks)
         {
+            _inputHooks = inputHooks;
             InitializeComponent();
 
             EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged(sender, args));
-            EditorTags.TextChanged += async (sender, args) => await OnTextChangedAsync(sender, args);
+            EditorTags.TextChanged += async (sender, args) => await OnEditorTextChangedAsync(sender, args);
         }
 
         /// <summary>
@@ -57,7 +63,7 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles the TextChanged event of the EditorTags control to process changes in tags.
         /// </summary>
-        private async Task OnTextChangedAsync(object? sender, EventArgs args)
+        private async Task OnEditorTextChangedAsync(object? sender, EventArgs args)
         {
             if (_viewModel != null)
             {
@@ -76,6 +82,21 @@ namespace DatasetProcessor.Views
         {
             _viewModel = DataContext as TagEditorViewModel;
             _viewModel!.PropertyChanged += OnTagsPropertyChanged;
+
+            _inputHooks.ButtonF1 += async (sender, args) => await OnNavigationButtonDown("-1");
+            _inputHooks.ButtonF2 += async (sender, args) => await OnNavigationButtonDown("1");
+            _inputHooks.ButtonF3 += async (sender, args) => await OnNavigationButtonDown("-10");
+            _inputHooks.ButtonF4 += async (sender, args) => await OnNavigationButtonDown("10");
+            _inputHooks.ButtonF5 += async (sender, args) => await OnNavigationButtonDown("-100");
+            _inputHooks.ButtonF6 += async (sender, args) => await OnNavigationButtonDown("100");
+            _inputHooks.ButtonF8 += async (sender, args) => await _viewModel.BlurImageAsync();
+
+            _inputHooks.MouseButton3 += async (sender, args) => await _viewModel.BlurImageAsync();
+            _inputHooks.MouseButton4 += async (sender, args) => await OnNavigationButtonDown("-1");
+            _inputHooks.MouseButton5 += async (sender, args) => await OnNavigationButtonDown("1");
+
+            _inputHooks.AltLeftArrowCombo += async (sender, args) => await OnNavigationButtonDown("-1");
+            _inputHooks.AltRightArrowCombo += async (sender, args) => await OnNavigationButtonDown("1");
 
             base.OnDataContextChanged(e);
         }
@@ -112,6 +133,27 @@ namespace DatasetProcessor.Views
             {
                 EditorTags.Text = _viewModel.CurrentImageTags;
             }
+        }
+
+        /// <summary>
+        /// Handles a button down event and navigates to the item with the specified index.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        /// <param name="index">The index of the item to navigate to.</param>
+        public async Task OnNavigationButtonDown(string index)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                int caretOffset = EditorTags.CaretOffset;
+
+                if (_viewModel.IsActive)
+                {
+                    _viewModel.GoToItemCommand.Execute(index);
+                }
+
+                EditorTags.CaretOffset = Math.Clamp(caretOffset, 0, EditorTags.Text.Length);
+            });
         }
     }
 }
