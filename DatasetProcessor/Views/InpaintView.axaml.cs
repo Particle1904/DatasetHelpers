@@ -93,7 +93,7 @@ namespace DatasetProcessor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PointerEntered(object? sender, PointerEventArgs e)
+        private new void PointerEntered(object? sender, PointerEventArgs e)
         {
             EllipseControl.IsVisible = true;
         }
@@ -103,7 +103,7 @@ namespace DatasetProcessor.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PointerExited(object? sender, PointerEventArgs e)
+        private new void PointerExited(object? sender, PointerEventArgs e)
         {
             EllipseControl.IsVisible = false;
         }

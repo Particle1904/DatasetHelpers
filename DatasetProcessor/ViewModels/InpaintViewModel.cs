@@ -113,9 +113,13 @@ namespace DatasetProcessor.ViewModels
             {
                 SelectedImageMask.Save(GetCurrentFileMaskFilename(), 100);
             }
-            catch (Exception)
+            catch (IOException exception)
             {
-                SaveCurrentImageMask();
+                if (exception.Message.ToLower().Contains("being used by another process"))
+                {
+                    Logger.SetLatestLogMessage("Unable to save mask image because its being used by another process. Trying again...", LogMessageColor.Error);
+                    SaveCurrentImageMask();
+                }
             }
         }
 
