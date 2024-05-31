@@ -728,11 +728,6 @@ namespace SmartData.Lib.Services
 
                 try
                 {
-                    if (modelFileName == Filenames.CLIPTokenixerFilename)
-                    {
-                        return;
-                    }
-
                     if (!string.IsNullOrEmpty(csvUrl))
                     {
                         DownloadMessageEvent?.Invoke(this, $"Downloading {csvFileName} file...");
