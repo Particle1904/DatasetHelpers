@@ -166,6 +166,8 @@ namespace SmartData.Lib.Services.MachineLearning
                 .Where(file => !file.Contains("_mask")).ToArray();
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
+            string masksPath = Path.Combine(inputFolderPath, "masks");
+
             TotalFilesChanged?.Invoke(this, files.Length);
 
             foreach (string file in files)
@@ -173,13 +175,17 @@ namespace SmartData.Lib.Services.MachineLearning
                 cancellationToken.ThrowIfCancellationRequested();
 
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(file);
-                string inputMask = Path.Combine(inputFolderPath, $"{filenameWithoutExtension}_mask.jpeg");
+                string inputMask = Path.Combine(masksPath, $"{filenameWithoutExtension}_mask.jpeg");
 
                 string outputImagePath = Path.Combine(outputFolderPath, $"{filenameWithoutExtension}.png");
 
                 try
                 {
                     await InpaintImageTilesAsync(file, inputMask, outputImagePath);
+                }
+                catch (FileNotFoundException)
+                {
+                    await Task.Run(() => File.Copy(file, outputImagePath), cancellationToken);
                 }
                 catch (Exception)
                 {

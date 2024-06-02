@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
@@ -43,7 +44,7 @@ namespace DatasetProcessor.ViewModels
         private Bitmap? _selectedImage;
         [ObservableProperty]
         private Bitmap? _selectedImageMask;
-        private MemoryStream _selectedImageMaskBitmap;
+        private MemoryStream _selectedImageMaskStream;
         [ObservableProperty]
         private string _selectedImageFilename;
         [ObservableProperty]
@@ -109,17 +110,33 @@ namespace DatasetProcessor.ViewModels
 
         public void SaveCurrentImageMask()
         {
-            try
+            bool savedSuccesfully = false;
+            for (int i = 0; i < 5; i++)
             {
-                SelectedImageMask.Save(GetCurrentFileMaskFilename(), 100);
-            }
-            catch (IOException exception)
-            {
-                if (exception.Message.ToLower().Contains("being used by another process"))
+                try
                 {
-                    Logger.SetLatestLogMessage("Unable to save mask image because its being used by another process. Trying again...", LogMessageColor.Error);
-                    SaveCurrentImageMask();
+                    SelectedImageMask.Save(GetCurrentFileMaskFilename(), 100);
+                    savedSuccesfully = true;
+                    break;
                 }
+                catch (IOException exception)
+                {
+                    if (exception.Message.ToLower().Contains("being used by another process"))
+                    {
+                        Logger.SetLatestLogMessage("Unable to save mask image because its being used by another process. Trying again in 1 second...", LogMessageColor.Error);
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                    }
+                    else
+                    {
+                        Logger.SetLatestLogMessage("Unable to save mask image due to unexpected error. Error log will be saved inside the logs folder.", LogMessageColor.Error);
+                        Logger.SaveExceptionStackTrace(exception);
+                    }
+                }
+            }
+
+            if (!savedSuccesfully)
+            {
+                Logger.SetLatestLogMessage("Unable to save mask image after 10 attempts.", LogMessageColor.Error);
             }
         }
 
@@ -249,11 +266,11 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
+                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                    .Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {
-                    ImageFiles = ImageFiles.Where(x => !x.Contains("_mask"))
-                        .OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
                     SelectedItemIndex = 0;
                 }
             }
@@ -316,21 +333,19 @@ namespace DatasetProcessor.ViewModels
 
             if (File.Exists(GetCurrentFileMaskFilename()))
             {
+                // Load mask if it exists, dispose the old MemoryStream and "save" the bitmap to the MemoryStream
                 SelectedImageMask = new Bitmap(GetCurrentFileMaskFilename());
-                if (_selectedImageMaskBitmap != null)
-                {
-                    _selectedImageMaskBitmap.Dispose();
-                }
-                _selectedImageMaskBitmap = new MemoryStream();
-                SelectedImageMask.Save(_selectedImageMaskBitmap);
-                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
+                _selectedImageMaskStream?.Dispose();
+                _selectedImageMaskStream = new MemoryStream();
+                SelectedImageMask.Save(_selectedImageMaskStream);
+                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
             }
             else
             {
-                _selectedImageMaskBitmap = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width, (int)SelectedImage.Size.Height);
-                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
-                SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
-                SelectedImageMask.Save(GetCurrentFileMaskFilename());
+                _selectedImageMaskStream = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width, (int)SelectedImage.Size.Height);
+                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
+                SelectedImageMask = new Bitmap(_selectedImageMaskStream);
+                SaveCurrentImageMask();
             }
         }
 
@@ -382,17 +397,17 @@ namespace DatasetProcessor.ViewModels
                         (int)(value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
 
                     double adjustedRadius = CircleRadius / _scaleFactor;
-                    _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
+                    _selectedImageMaskStream = _imageProcessor.DrawCircleOnMask(_selectedImageMaskStream,
                         new SixLabors.ImageSharp.Point(position.X, position.Y), (float)adjustedRadius, color);
                 }
                 else
                 {
-                    _selectedImageMaskBitmap = _imageProcessor.DrawCircleOnMask(_selectedImageMaskBitmap,
+                    _selectedImageMaskStream = _imageProcessor.DrawCircleOnMask(_selectedImageMaskStream,
                         new SixLabors.ImageSharp.Point(value.X, value.Y), (float)CircleRadius, color);
                 }
 
-                _selectedImageMaskBitmap.Seek(0, SeekOrigin.Begin);
-                SelectedImageMask = new Bitmap(_selectedImageMaskBitmap);
+                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
+                SelectedImageMask = new Bitmap(_selectedImageMaskStream);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -439,7 +454,14 @@ namespace DatasetProcessor.ViewModels
         {
             string outputFolder = Path.GetDirectoryName(ImageFiles[SelectedItemIndex]);
             string filename = Path.GetFileNameWithoutExtension(ImageFiles[SelectedItemIndex]);
-            return Path.Combine(outputFolder, Path.Combine($"{filename}_mask.jpeg"));
+
+            string masksPath = Path.Combine(outputFolder, "masks");
+
+            if (!Directory.Exists(masksPath))
+            {
+                Directory.CreateDirectory(masksPath);
+            }
+            return Path.Combine(masksPath, Path.Combine($"{filename}_mask.jpeg"));
         }
     }
 }

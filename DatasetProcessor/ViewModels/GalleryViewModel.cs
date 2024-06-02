@@ -31,7 +31,7 @@ namespace DatasetProcessor.ViewModels
         private string _inputFolderPath;
 
         [ObservableProperty]
-        private List<string> _imageFilesPath;
+        private List<string> _imageFiles;
         [ObservableProperty]
         private ObservableCollection<ImageItem> _imageCollection;
         [ObservableProperty]
@@ -113,12 +113,14 @@ namespace DatasetProcessor.ViewModels
             timer.Start();
 
             TaskStatus = ProcessingStatus.Running;
+
             try
             {
                 // Get images with path
-                List<string> imageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
+                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                    .Where(x => !x.Contains("_mask")).ToList();
 
-                if (imageFiles.Count <= 0)
+                if (ImageFiles.Count <= 0)
                 {
                     // Stop dispatcher timer
                     timer.Stop();
@@ -126,13 +128,21 @@ namespace DatasetProcessor.ViewModels
                     _timer.Stop();
                     return;
                 }
-                // Order the list of images with path.
-                ImageFilesPath = imageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
 
+                // Order the list of images with path.
+                ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+            }
+            catch (FormatException)
+            {
+                Logger.SetLatestLogMessage($"Tried to sort the files but one of more images doesn't have a valid file name.", LogMessageColor.Warning);
+            }
+
+            try
+            {
                 int startIndex = CurrentPage * ItemsPerPage;
-                int endIndex = Math.Min(startIndex + ItemsPerPage, imageFiles.Count);
-                List<string> visibleImages = ImageFilesPath.GetRange(Math.Clamp(startIndex, 0, imageFiles.Count),
-                    Math.Clamp(endIndex - startIndex, 0, imageFiles.Count));
+                int endIndex = Math.Min(startIndex + ItemsPerPage, ImageFiles.Count);
+                List<string> visibleImages = ImageFiles.GetRange(Math.Clamp(startIndex, 0, ImageFiles.Count),
+                    Math.Clamp(endIndex - startIndex, 0, ImageFiles.Count));
 
                 GalleryProcessingProgress.TotalFiles = visibleImages.Count;
 
@@ -190,7 +200,7 @@ namespace DatasetProcessor.ViewModels
             {
                 int.TryParse(parameter, out int parameterInt);
 
-                if (ImageFilesPath?.Count != 0 && ImageFilesPath != null)
+                if (ImageFiles?.Count != 0 && ImageFiles != null)
                 {
                     CurrentPage += parameterInt;
                     await LoadImagesFromInputFolder();
@@ -261,7 +271,7 @@ namespace DatasetProcessor.ViewModels
         partial void OnCurrentPageChanged(int value)
         {
             CurrentPageString = $"Current page: {CurrentPage + 1}";
-            CurrentPage = Math.Clamp(CurrentPage, 0, Math.Abs(ImageFilesPath.Count / ItemsPerPage));
+            CurrentPage = Math.Clamp(CurrentPage, 0, Math.Abs(ImageFiles.Count / ItemsPerPage));
         }
 
         partial void OnImageCollectionChanged(ObservableCollection<ImageItem> value)

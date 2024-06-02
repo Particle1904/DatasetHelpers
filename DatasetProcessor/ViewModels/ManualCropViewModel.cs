@@ -130,10 +130,12 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath);
+                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                    .Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {
-                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x)))
+                        .ToList();
                     SelectedItemIndex = 0;
                 }
             }
