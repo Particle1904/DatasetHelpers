@@ -161,7 +161,7 @@
 					   HorizontalAlignment="Stretch"
 					   VerticalAlignment="Stretch"
 					   Margin="0"
-					   Opacity="0.55"
+					   Opacity="0.75"
 					   PointerPressed="CanvasPressed"
 					   PointerMoved="PointerMoving"
 					   PointerReleased="CanvasReleased"
