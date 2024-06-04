@@ -73,6 +73,12 @@ namespace DatasetProcessor.ViewModels
         {
             get => CircleRadius * 2.0d;
         }
+        [ObservableProperty]
+        private double _maskOpacity;
+        public string MaskOpacityString
+        {
+            get => $"{Math.Round(MaskOpacity * 100, 2)}%";
+        }
 
         [ObservableProperty]
         Color _drawingColor;
@@ -101,6 +107,7 @@ namespace DatasetProcessor.ViewModels
             TotalImageFiles = string.Empty;
 
             CircleRadius = 15.0f;
+            MaskOpacity = 0.75f;
 
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
@@ -423,6 +430,16 @@ namespace DatasetProcessor.ViewModels
         {
             CircleRadius = Math.Round(value, 2);
             OnPropertyChanged(nameof(CircleWidthHeight));
+        }
+
+        /// <summary>
+        /// Handles changes in the MaskOpacity property.
+        /// </summary>
+        /// <param name="value"></param>
+        partial void OnMaskOpacityChanged(double value)
+        {
+            MaskOpacity = Math.Round(value, 2);
+            OnPropertyChanged(nameof(MaskOpacityString));
         }
 
         /// <summary>

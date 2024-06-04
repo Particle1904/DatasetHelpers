@@ -87,18 +87,36 @@
 
 		<!-- BRUSH SIZE -->
 		<Grid Classes="gridSecondary" Grid.Row="6"
-			  ColumnDefinitions="auto, 10, auto, 10, auto, 10, *"
+			  ColumnDefinitions="auto, 10, auto, 10, *"
 			  Height="40">
-			<Label Content="Paint brush size:"/>
-			<Slider Grid.Column="2"
-					VerticalAlignment="Center"
-					Minimum="1"
-					Maximum="100"
-					MinWidth="300"
-					Margin="0,-8,0,0"
-					Value="{Binding CircleRadius}"/>
-			<Label Grid.Column="4"
-				   Content="{Binding CircleRadius}"/>
+			<Grid ColumnDefinitions="auto, 10, auto, 10, auto">
+				<Label Grid.Column="0" 
+					   Content="Paint brush size:"/>
+				<Slider Grid.Column="2"
+						VerticalAlignment="Center"
+						Minimum="1"
+						Maximum="100"
+						MinWidth="250"
+						Margin="0,-8,0,0"
+						Value="{Binding CircleRadius}"/>
+				<Label Grid.Column="4"
+					   Content="{Binding CircleRadius}"/>
+			</Grid>
+			<Grid Grid.Column="2" 
+				  ColumnDefinitions="auto, 10, auto, 10, auto">
+				<Label Grid.Column="0"
+					   Content="Mask opacity:"/>
+				<Slider Grid.Column="2"
+						VerticalAlignment="Center"
+						Minimum="0"
+						Maximum="1"
+						MinWidth="250"
+						Margin="0,-8,0,0"
+						Value="{Binding MaskOpacity}"/>
+				<Label Grid.Column="4"
+					   Content="{Binding MaskOpacityString}"/>
+			</Grid>
+
 			<Button Grid.Column="6"
 					Content="Inpaint current image"
 					HorizontalAlignment="Right"
@@ -161,7 +179,7 @@
 					   HorizontalAlignment="Stretch"
 					   VerticalAlignment="Stretch"
 					   Margin="0"
-					   Opacity="0.75"
+					   Opacity="{Binding MaskOpacity}"
 					   PointerPressed="CanvasPressed"
 					   PointerMoved="PointerMoving"
 					   PointerReleased="CanvasReleased"
@@ -181,24 +199,7 @@
 						 VerticalAlignment="Top"
 						 HorizontalAlignment="Left">
 				</Ellipse>
-			</Grid>
-
-			<!-- IMAGE DISPLAY -->
-			<Grid Classes="gridPrimary" Grid.Column="4"
-				  HorizontalAlignment="Stretch"
-				  MinWidth="256"
-				  MinHeight="256">
-				<Panel Width="{Binding ImageSize.X}"
-					   Height="{Binding ImageSize.Y}"
-					   HorizontalAlignment="Stretch"
-					   VerticalAlignment="Stretch"
-					   Margin="0">
-					<Image HorizontalAlignment="Stretch"
-						   VerticalAlignment="Stretch"
-						   Stretch="UniformToFill"
-						   Source="{Binding SelectedImage, Mode=TwoWay}"/>
-				</Panel>
-			</Grid>			
+			</Grid>		
 			
 			<!-- FORWARD BUTTONS -->
 			<Grid Grid.Column="6" RowDefinitions="auto, 10, auto, 10, auto"
