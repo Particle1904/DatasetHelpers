@@ -221,7 +221,15 @@ namespace SmartData.Lib.Services
             FilterSettings filterSettings = ParseFilterString(wordsToFilter);
             List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
 
-            List<string> filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
+            List<string> filteredImageFiles;
+            if (filterSettings.IncludeTags.Length == 0)
+            {
+                filteredImageFiles = imageFiles;
+            }
+            else
+            {
+                filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
+            }
             List<string> filteredImageFilesByAnd = FilterImageFilesByMultiple(txtFileExtension, imageFiles, filterSettings.AndTags);
 
             List<string> resultUnion = filteredImageFiles.Union(filteredImageFilesByAnd).ToList();
@@ -903,7 +911,6 @@ namespace SmartData.Lib.Services
                 if (tagsSplit[i].Contains("!"))
                 {
                     excludeTags.Add(tagsSplit[i].Replace("!", ""));
-
                 }
                 else if (tagsSplit[i].Contains("AND"))
                 {
