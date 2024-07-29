@@ -6,6 +6,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using Microsoft.ML.OnnxRuntime;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -299,14 +301,24 @@ namespace DatasetProcessor.ViewModels
                 await _fileManipulator.DownloadModelFile(AvailableModels.CLIPTokenizer);
             }
 
-            int count = await Task.Run(() => _clipTokenizer.CountTokens(CurrentImageTags));
-            CurrentImageTokenCount = $"Token count: {count}/75";
-            if (count < 75)
+            int count = 0;
+            try
             {
-                TokenTextColor = new SolidColorBrush(Colors.LightGreen);
+                count = await Task.Run(() => _clipTokenizer.CountTokens(CurrentImageTags));
+                CurrentImageTokenCount = $"Token count: {count}/75";
+
+                if (count < 75)
+                {
+                    TokenTextColor = new SolidColorBrush(Colors.LightGreen);
+                }
+                else
+                {
+                    TokenTextColor = new SolidColorBrush(Colors.PaleVioletRed);
+                }
             }
-            else
+            catch (OnnxRuntimeException)
             {
+                CurrentImageTokenCount = "Failed to load CLIP Tokenizer.";
                 TokenTextColor = new SolidColorBrush(Colors.PaleVioletRed);
             }
         }
