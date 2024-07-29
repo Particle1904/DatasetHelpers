@@ -30,6 +30,7 @@ namespace SmartData.Lib.Helpers
                     AvailableModels.JoyTag,
                     AvailableModels.WD14v2,
                     AvailableModels.WDv3,
+                    AvailableModels.WDv3Large,
                     AvailableModels.Z3DE621
                 };
                 return availableModels;

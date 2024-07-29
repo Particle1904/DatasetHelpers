@@ -24,6 +24,7 @@ namespace DatasetProcessor.ViewModels
         private readonly IFileManipulatorService _fileManipulator;
         private readonly IAutoTaggerService _wDautoTagger;
         private readonly IAutoTaggerService _wDv3autoTagger;
+        private readonly IAutoTaggerService _wDv3largeAutoTagger;
         private readonly IAutoTaggerService _joyTagautoTagger;
         private readonly IAutoTaggerService _e621autoTagger;
 
@@ -53,7 +54,7 @@ namespace DatasetProcessor.ViewModels
         private bool _isCancelEnabled;
 
         public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDautoTagger,
-            WDV3AutoTaggerService wDV3autoTagger, JoyTagAutoTaggerService joyTagautoTagger,
+            WDV3AutoTaggerService wDV3autoTagger, JoyTagAutoTaggerService joyTagautoTagger, WDV3LargeAutoTaggerService wDv3largeAutoTagger,
             E621AutoTaggerService e621autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
@@ -75,6 +76,14 @@ namespace DatasetProcessor.ViewModels
                 PredictionProgress.TotalFiles = args;
             };
             (_wDv3autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
+
+            _wDv3largeAutoTagger = wDv3largeAutoTagger;
+            (_wDv3largeAutoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            {
+                PredictionProgress = ResetProgress(PredictionProgress);
+                PredictionProgress.TotalFiles = args;
+            };
+            (_wDv3largeAutoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             _joyTagautoTagger = joyTagautoTagger;
             (_joyTagautoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -159,6 +168,10 @@ namespace DatasetProcessor.ViewModels
                         await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3);
                         await CallautoTaggerService(_wDv3autoTagger);
                         break;
+                    case AvailableModels.WDv3Large:
+                        await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3Large);
+                        await CallautoTaggerService(_wDv3largeAutoTagger);
+                        break;
                     case AvailableModels.Z3DE621:
                         await DownloadModelFiles(_fileManipulator, AvailableModels.Z3DE621);
                         await CallautoTaggerService(_e621autoTagger);
@@ -227,6 +240,7 @@ namespace DatasetProcessor.ViewModels
         {
             (_wDautoTagger as IUnloadModel)?.UnloadAIModel();
             (_wDv3autoTagger as IUnloadModel)?.UnloadAIModel();
+            (_wDv3largeAutoTagger as IUnloadModel)?.UnloadAIModel();
             (_joyTagautoTagger as IUnloadModel)?.UnloadAIModel();
             (_e621autoTagger as IUnloadModel)?.UnloadAIModel();
         }
@@ -242,6 +256,7 @@ namespace DatasetProcessor.ViewModels
             (_fileManipulator as ICancellableService)?.CancelCurrentTask();
             (_wDautoTagger as ICancellableService)?.CancelCurrentTask();
             (_wDv3autoTagger as ICancellableService)?.CancelCurrentTask();
+            (_wDv3largeAutoTagger as ICancellableService)?.CancelCurrentTask();
             (_joyTagautoTagger as ICancellableService)?.CancelCurrentTask();
             (_e621autoTagger as ICancellableService)?.CancelCurrentTask();
         }

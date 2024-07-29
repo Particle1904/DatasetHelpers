@@ -20,6 +20,9 @@ namespace SmartData.Lib.Services
         private readonly string _wdv3ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Model.onnx?download=true";
         private readonly string _wdv3CsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Tags.csv?download=true";
 
+        private readonly string _wdv3LargeModelLink = @"https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/resolve/main/model.onnx?download=true";
+        private readonly string _wdv3LargeCsvLink = @"https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/raw/main/selected_tags.csv?download=true";
+
         private readonly string _jtModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
         private readonly string _jtCsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
 
@@ -440,6 +443,12 @@ namespace SmartData.Lib.Services
                         result = true;
                     }
                     break;
+                case AvailableModels.WDv3Large:
+                    if (!Path.Exists(Filenames.WDV3LargeOnnxFilename) || !Path.Exists(Filenames.WDV3LargeCsvFilename))
+                    {
+                        result = true;
+                    }
+                    break;
                 case AvailableModels.Z3DE621:
                     if (!Path.Exists(Filenames.E621OnnxFilename) || !Path.Exists(Filenames.E621CsvFilename))
                     {
@@ -631,6 +640,12 @@ namespace SmartData.Lib.Services
                         modelFileName = Filenames.WDV3OnnxFilename;
                         csvUrl = _wdv3CsvLink;
                         csvFileName = Filenames.WDV3CsvFilename;
+                        break;
+                    case AvailableModels.WDv3Large:
+                        modelUrl = _wdv3LargeModelLink;
+                        modelFileName = Filenames.WDV3LargeOnnxFilename;
+                        csvUrl = _wdv3LargeCsvLink;
+                        csvFileName = Filenames.WDV3LargeCsvFilename;
                         break;
                     case AvailableModels.Z3DE621:
                         modelUrl = _e621ModelLink;
