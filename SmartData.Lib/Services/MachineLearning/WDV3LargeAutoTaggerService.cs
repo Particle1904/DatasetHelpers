@@ -9,7 +9,7 @@ namespace SmartData.Lib.Services.MachineLearning
         // making it easier to manage the 2 services when calling it
         public WDV3LargeAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService,
             string modelPath, string tagsPath) :
-            base(imageProcessorService, tagProcessorService, modelPath, tagsPath, "input")
+            base(imageProcessorService, tagProcessorService, modelPath, tagsPath)
         {
         }
     }

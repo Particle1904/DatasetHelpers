@@ -52,7 +52,8 @@ namespace SmartData.Lib.Services.Base
         /// <param name="tagProcessor">The service responsible for processing tags.</param>
         /// <param name="modelPath">The path to the machine learning model.</param>
         /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
-        public BaseAutoTaggerService(IImageProcessorService imageProcessor, ITagProcessorService tagProcessor, string modelPath, string tagsPath) : base(modelPath)
+        public BaseAutoTaggerService(IImageProcessorService imageProcessor, ITagProcessorService tagProcessor, string modelPath,
+            string tagsPath) : base(modelPath)
         {
             _imageProcessor = imageProcessor;
             _tagProcessor = tagProcessor;

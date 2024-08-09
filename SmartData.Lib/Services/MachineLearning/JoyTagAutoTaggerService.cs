@@ -29,7 +29,6 @@ namespace SmartData.Lib.Services.MachineLearning
         public override async Task<JoyTagOutputData> GetPredictionAsync(string inputImagePath)
         {
             JoyTagInputData inputData = await _imageProcessor.ProcessImageForJoyTagPredictionAsync(inputImagePath);
-
             List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
             {
                 NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)

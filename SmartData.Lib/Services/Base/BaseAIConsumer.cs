@@ -22,7 +22,7 @@ namespace SmartData.Lib.Services.Base
             }
         }
 
-        protected bool _useGPU = true;
+        protected bool _useGPU = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseAIConsumer{TInput, TOutput}"/> class.
@@ -62,6 +62,8 @@ namespace SmartData.Lib.Services.Base
             if (_useGPU)
             {
                 sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
+                sessionOptions.IntraOpNumThreads = 1;
+                sessionOptions.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
                 sessionOptions.EnableMemoryPattern = false;
                 //sessionOptions.LogVerbosityLevel = 1;
                 //sessionOptions.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;

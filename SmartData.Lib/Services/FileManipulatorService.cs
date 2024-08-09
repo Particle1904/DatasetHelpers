@@ -20,8 +20,8 @@ namespace SmartData.Lib.Services
         private readonly string _wdv3ModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Model.onnx?download=true";
         private readonly string _wdv3CsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3Tags.csv?download=true";
 
-        private readonly string _wdv3LargeModelLink = @"https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/resolve/main/model.onnx?download=true";
-        private readonly string _wdv3LargeCsvLink = @"https://huggingface.co/SmilingWolf/wd-eva02-large-tagger-v3/raw/main/selected_tags.csv?download=true";
+        private readonly string _wdv3LargeModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3LargeModel.onnx?download=true";
+        private readonly string _wdv3LargeCsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/wdV3LargeTags.csv?download=true";
 
         private readonly string _jtModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtModel.onnx?download=true";
         private readonly string _jtCsvLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true";
@@ -783,7 +783,7 @@ namespace SmartData.Lib.Services
                 return;
             }
 
-            using (HttpResponseMessage response = await client.GetAsync(fileUrl))
+            using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 response.EnsureSuccessStatusCode();
                 using (Stream stream = await response.Content.ReadAsStreamAsync())
