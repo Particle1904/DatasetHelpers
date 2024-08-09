@@ -19,9 +19,14 @@ namespace SmartData.Lib.Services.MachineLearning
         /// <param name="tagProcessorService">The service responsible for processing tags.</param>
         /// <param name="modelPath">The path to the machine learning model.</param>
         /// <param name="tagsPath">The path to the directory where tag files are stored.</param>
-        public WDAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, string modelPath, string tagsPath) :
+        
+        private readonly string _inputName; 
+
+        public WDAutoTaggerService(IImageProcessorService imageProcessorService, ITagProcessorService tagProcessorService, 
+            string modelPath, string tagsPath, string inputName = "input_1:0") :
             base(imageProcessorService, tagProcessorService, modelPath, tagsPath)
         {
+            _inputName = inputName;
         }
 
         public override async Task<WDOutputData> GetPredictionAsync(string inputImagePath)
@@ -29,7 +34,7 @@ namespace SmartData.Lib.Services.MachineLearning
             WDInputData inputData = await _imageProcessor.ProcessImageForTagPredictionAsync(inputImagePath);
             List<NamedOnnxValue> inputValues = new List<NamedOnnxValue>
             {
-                NamedOnnxValue.CreateFromTensor<float>(GetInputColumns().FirstOrDefault(), inputData.Input)
+                NamedOnnxValue.CreateFromTensor<float>(_inputName, inputData.Input)
             };
 
             using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))

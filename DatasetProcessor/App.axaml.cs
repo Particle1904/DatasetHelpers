@@ -55,6 +55,7 @@ public partial class App : Application
         var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
         var wDautoTagger = _servicesProvider.GetRequiredService<WDAutoTaggerService>();
         var wDv3autoTagger = _servicesProvider.GetRequiredService<WDV3AutoTaggerService>();
+        var wDv3largeAutoTagger = _servicesProvider.GetRequiredService<WDV3LargeAutoTaggerService>();
         var joyTagautoTagger = _servicesProvider.GetRequiredService<JoyTagAutoTaggerService>();
         var e621autoTagger = _servicesProvider.GetRequiredService<E621AutoTaggerService>();
         var tagProcessor = _servicesProvider.GetRequiredService<ITagProcessorService>();
@@ -72,7 +73,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, joyTagautoTagger,
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
                     inpaint, logger, configs)
             };
@@ -85,7 +86,7 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MainView()
             {
-                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, joyTagautoTagger,
+                DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
                     inpaint, logger, configs)
             };
@@ -119,6 +120,12 @@ public partial class App : Application
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, Filenames.WDV3OnnxFilename),
                 Path.Combine(_modelsPath, Filenames.WDV3CsvFilename)
+        ));
+        services.AddSingleton<WDV3LargeAutoTaggerService>(service =>
+            new WDV3LargeAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<ITagProcessorService>(),
+                Path.Combine(_modelsPath, Filenames.WDV3LargeOnnxFilename),
+                Path.Combine(_modelsPath, Filenames.WDV3LargeCsvFilename)
         ));
         services.AddSingleton<E621AutoTaggerService>(service =>
             new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
