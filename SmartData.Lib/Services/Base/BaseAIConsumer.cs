@@ -22,7 +22,7 @@ namespace SmartData.Lib.Services.Base
             }
         }
 
-        protected bool _useGPU = false;
+        protected bool _useGPU = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseAIConsumer{TInput, TOutput}"/> class.
