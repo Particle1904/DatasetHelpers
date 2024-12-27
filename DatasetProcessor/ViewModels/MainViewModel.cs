@@ -24,7 +24,8 @@ namespace DatasetProcessor.ViewModels;
 /// </summary>
 public partial class MainViewModel : BaseViewModel
 {
-    protected readonly IFileManipulatorService _fileManipulator;
+    [ObservableProperty]
+    protected IFileManipulatorService _fileManipulator;
     protected readonly IImageProcessorService _imageProcessor;
     protected readonly IAutoTaggerService _wDAutoTagger;
     protected readonly IAutoTaggerService _wDv3AutoTagger;

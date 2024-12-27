@@ -56,6 +56,9 @@ namespace SmartData.Lib.Services
 
         private readonly string _LaMaModelLink = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/LaMa.onnx?download=true";
 
+        private bool _isDownloading = false;
+        public bool IsDownloading => _isDownloading;
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
         public event EventHandler<string> DownloadMessageEvent;
@@ -783,6 +786,8 @@ namespace SmartData.Lib.Services
                 return;
             }
 
+            _isDownloading = true;
+
             using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 response.EnsureSuccessStatusCode();
@@ -793,6 +798,8 @@ namespace SmartData.Lib.Services
                     await stream.CopyToAsync(fileStream);
                 }
             }
+
+            _isDownloading = false;
         }
 
         /// <summary>

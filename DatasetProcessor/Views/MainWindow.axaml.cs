@@ -1,13 +1,14 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
 
 using DatasetProcessor.ViewModels;
+
+using System;
 
 namespace DatasetProcessor.Views;
 
 public partial class MainWindow : Window
 {
-    public MainViewModel ViewModel { get; set; }
+    public MainViewModel _viewModel;
 
     public MainWindow()
     {
@@ -18,5 +19,21 @@ public partial class MainWindow : Window
     {
         base.OnInitialized();
         WindowState = WindowState.Maximized;
+    }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        if (_viewModel != null && _viewModel.FileManipulator.IsDownloading)
+        {
+            e.Cancel = true;
+        }
+
+        base.OnClosing(e);
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        _viewModel = DataContext as MainViewModel;
+        base.OnDataContextChanged(e);
     }
 }
