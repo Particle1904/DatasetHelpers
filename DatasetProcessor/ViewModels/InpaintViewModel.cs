@@ -236,6 +236,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 IsCancelEnabled = true;
+                await DownloadModelFiles(_fileManipulator, AvailableModels.LaMa);
                 await _inpaint.InpaintImagesAsync(InputFolderPath, OutputFolderPath);
             }
             catch (OperationCanceledException)
