@@ -92,7 +92,7 @@ namespace DatasetProcessor.ViewModels
             };
             (_imageProcessor as INotifyProgress).ProgressUpdated += (sender, args) => ResizeProgress.UpdateProgress();
 
-            Dimension = SupportedDimensions.Resolution512x512;
+            Dimension = SupportedDimensions.Resolution1024x1024;
 
             InputFolderPath = _configs.Configurations.ResizeImagesConfigs.InputFolder;
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
