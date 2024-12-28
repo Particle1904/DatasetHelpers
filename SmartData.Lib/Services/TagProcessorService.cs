@@ -96,6 +96,11 @@ namespace SmartData.Lib.Services
             "small pen", "medium pen", "large pen", "huge pen" , "gigantic pen"
         };
 
+        private static HashSet<string> _tSizeKeywords = new HashSet<string>()
+        {
+            "small testic", "medium testic", "large testic", "huge testic", "gigantic testic"
+        };
+
         private static HashSet<string> _pStateKeywords = new HashSet<string>()
         {
             "flaccid", "erection"
@@ -389,6 +394,7 @@ namespace SmartData.Lib.Services
 
             bool hasBreastSize = false;
             bool hasMaleGenitaliaSize = false;
+            bool hasMaleTesticSize = false;
             bool hasMaleGenitaliaState = false;
             bool hasHairLength = false;
             bool hasHairColor = false;
@@ -408,6 +414,7 @@ namespace SmartData.Lib.Services
 
                 bool isBreastSize = IsBreastSize(tag);
                 bool isMaleGenitalia = IsMaleGenitaliaSize(tag);
+                bool isMaleTesticSize = IsMaleTesticSize(tag);
                 bool isMaleGenitaliaState = IsMaleGenitaliaState(tag);
                 bool isHairLength = IsHairLength(tag);
                 bool isHairColor = IsHairColor(tag);
@@ -446,6 +453,11 @@ namespace SmartData.Lib.Services
                 {
                     cleanedTags.Add(tag);
                     hasMaleGenitaliaSize = true;
+                }
+                else if (isMaleTesticSize && !hasMaleTesticSize)
+                {
+                    cleanedTags.Add(tag);
+                    hasMaleTesticSize = true;
                 }
                 else if (isMaleGenitaliaState && !hasMaleGenitaliaState)
                 {
@@ -532,7 +544,7 @@ namespace SmartData.Lib.Services
                     cleanedTags.Add(tag);
                     hasEyewear = true;
                 }
-                else if (!isBreastSize && !isMaleGenitalia && !isMaleGenitaliaState && !isHairLength &&
+                else if (!isBreastSize && !isMaleGenitalia && !isMaleTesticSize && !isMaleGenitaliaState && !isHairLength &&
                          !isHairColor && !isEyesColor && !isSkinColor && !isClothingAside && !isClothingLift &&
                          !isClothingPull && !isLipsColor && !isEyewear && !isScleraColor && !isAnimalEars &&
                          !isRedundant)
@@ -637,14 +649,22 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Determines if the given tag represents a male testic size.
+        /// </summary>
+        /// <param name="tag">The tag to check</param>
+        /// <returns>True if the tag represents a male testic size, false otherwise.</returns>
+        private static bool IsMaleTesticSize(string tag)
+        {
+            return _tSizeKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
         /// Determines if the given tag represents a male genitalia state.
         /// </summary>
         /// <param name="tag">The tag to check.</param>
         /// <returns>True if the tag represents a male genitalia state, false otherwise.</returns>
         private static bool IsMaleGenitaliaState(string tag)
         {
-
-
             return _pStateKeywords.Any(x => tag.Contains(x, StringComparison.OrdinalIgnoreCase));
         }
 

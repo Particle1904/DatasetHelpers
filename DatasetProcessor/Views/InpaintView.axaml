@@ -126,7 +126,7 @@
 
 		<!-- IMAGE PANEL -->
 		<Grid Grid.Row="8" Background="Transparent"
-			  ColumnDefinitions="50, 10, *, 10, *, 10, 50"
+			  ColumnDefinitions="50, 10, auto, 10, 50"
 			  HorizontalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
 			<Grid Grid.Column="0" RowDefinitions="auto, 10, auto, 10, auto"
@@ -160,12 +160,11 @@
 					<Panel Width="{Binding ImageSize.X}"
 						   Height="{Binding ImageSize.Y}"
 						   HorizontalAlignment="Stretch"
-						   VerticalAlignment="Stretch"
-						   Margin="0">						
+						   VerticalAlignment="Stretch">						
 						<Image HorizontalAlignment="Stretch"
-								VerticalAlignment="Stretch"
-								Stretch="UniformToFill"
-								Source="{Binding SelectedImage, Mode=TwoWay}"/>						
+							   VerticalAlignment="Stretch"
+							   Stretch="UniformToFill"
+							   Source="{Binding SelectedImage, Mode=TwoWay}"/>						
 					</Panel>
 			</Grid>
 			<Grid Grid.Column="2"
