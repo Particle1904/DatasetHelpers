@@ -19,68 +19,68 @@
 			   PaneBackground="{DynamicResource SurfaceDark}">
 		<SplitView.Pane>
 			<StackPanel x:Name="LeftMenuStackPanel">
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Welcome Page"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Welcome}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Gallery Page"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Gallery}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Sort Images"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Sort_Images}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Content Aware Crop"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Content_Aware_Crop}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Manual Crop"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Manual_Crop}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Inpaint Images"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Inpaint_Images}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Resize Images"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Resize_Images}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Upscale Images"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Upscale_Images}"/>				
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Generate Tags"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Tag_Generation}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Process Captions"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Process_Captions}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Process Tags"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Process_Tags}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Tag/Caption Editor"
 						Command="{Binding NavigateToTagEditorViewCommand}"
 						CommandParameter="{x:Static local:AppPages.Tag_Editor}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Extract Subset"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Extract_Subset}"/>
-				<Button Click="Button_Click"
+				<Button Click="OnNavigationButton"
 						Content="Dataset Prompt Gen"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Prompt_Generator}"/>
 				<Button x:Name="Metadata_ViewerButton"
-						Click="Button_Click"
+						Click="OnNavigationButton"
 						Content="Metadata Viewer"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Metadata_Viewer}"/>
-				<Button Click="Button_Click"	
+				<Button Click="OnNavigationButton"	
 						Content="Settings"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Settings}"/>
@@ -95,47 +95,72 @@
 				   FontWeight="UltraLight"/>
 
 			<!-- MAIN PAGE -->
-			<ScrollViewer Grid.Row="1"
+			<ScrollViewer Name="MainContentScrowViewer"
+						  Grid.Row="1"
 						  Background="{DynamicResource SecondarySurfaceDark}"
 						  HorizontalScrollBarVisibility="Disabled"
-						  VerticalScrollBarVisibility="Auto">
+						  VerticalScrollBarVisibility="Auto"
+						  VerticalAlignment="Stretch"
+						  VerticalContentAlignment="Stretch">
 					<UserControl Margin="16"
-								 Content="{Binding DynamicView}"/>
+								 Content="{Binding DynamicView}"
+								 VerticalAlignment="Stretch"
+								 VerticalContentAlignment="Stretch"/>
 			</ScrollViewer>
 
 			<!-- LOGS PANEL -->
-			<Border Grid.Row="2"
-					Margin="1"
-					BorderBrush="{DynamicResource Primary}" BorderThickness="1">
-				<StackPanel Spacing="5"
-							Margin="8"
-							Background="{DynamicResource SurfaceSecondaryDarK}">				
-					<StackPanel Orientation="Horizontal" Spacing="6">
-						<Button Width="20" Height="20"
-								Command="{Binding OpenFolderInExplorerCommand}"
-								CommandParameter="{Binding Logger.LogsFolder}">
-							<Panel>
-								<Image Width="16" Height="16" 
-									   VerticalAlignment="Center" HorizontalAlignment="Center"
-									   Source="{SvgImage /Assets/Icons/folder_opened.svg}"/>
-							</Panel>
-						</Button>
-						<Label Content="Log messages:"
-							   FontSize="12"/>					
-					</StackPanel>
-					<ScrollViewer Height="40"
-								  MaxHeight="40"
-								  HorizontalScrollBarVisibility="Disabled"
-								  VerticalScrollBarVisibility="Visible">
-						<TextBlock VerticalAlignment="Stretch"
-								   FontSize="11"
-								   Foreground="{Binding LogMessageColor}"
-								   HorizontalAlignment="Left"
-								   Text="{Binding LatestLogMessage}">
-						</TextBlock>
-					</ScrollViewer>
-				</StackPanel>
-			</Border>
+			<Panel Grid.Row="2"
+				   Background="Transparent">
+				<Button Name="FlyoutButton"
+						Width="22" Height="22" HorizontalAlignment="Center">					
+					<Button.Flyout>
+						<Flyout>
+							<Border Margin="1"
+									BorderBrush="{DynamicResource Primary}" BorderThickness="1"
+									VerticalAlignment="Stretch"
+									HorizontalAlignment="Stretch">
+								<StackPanel Spacing="5"
+											Margin="8"
+											Background="{DynamicResource SurfaceSecondaryDarK}"
+											Name="FlyoutPanel">
+									<Grid ColumnDefinitions="auto, 6, *, 6, auto">
+										<Button Grid.Column="0"
+												Width="20" Height="20"
+												Command="{Binding OpenFolderInExplorerCommand}"
+												CommandParameter="{Binding Logger.LogsFolder}">
+											<Panel>
+												<Image Width="16" Height="16"
+													   VerticalAlignment="Center" HorizontalAlignment="Center"
+													   Source="{SvgImage /Assets/Icons/folder_opened.svg}"/>
+											</Panel>
+										</Button>
+										<Label Grid.Column="2"
+											   Content="Log messages:"
+											   FontSize="12"
+											   HorizontalAlignment="Left"/>
+									</Grid>
+									<ScrollViewer Height="40"
+												  MaxHeight="40"
+												  HorizontalScrollBarVisibility="Disabled"
+												  VerticalScrollBarVisibility="Visible">
+										<TextBlock VerticalAlignment="Stretch"
+												   FontSize="11"
+												   Foreground="{Binding LogMessageColor}"
+												   HorizontalAlignment="Left"
+												   Text="{Binding LatestLogMessage}">
+										</TextBlock>
+									</ScrollViewer>
+								</StackPanel>
+							</Border>
+						</Flyout>
+					</Button.Flyout>
+					<Panel>
+						<Image Width="16" Height="16"
+								VerticalAlignment="Center" HorizontalAlignment="Center"
+								Source="{SvgImage /Assets/Icons/console.svg}"/>
+					</Panel>
+				</Button>
+			</Panel>
 		</Grid>
 	</SplitView>		
 </UserControl>

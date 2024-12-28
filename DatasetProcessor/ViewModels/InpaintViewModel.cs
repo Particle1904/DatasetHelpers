@@ -323,8 +323,8 @@ namespace DatasetProcessor.ViewModels
                 return;
             }
 
-            double widthScale = 512.0 / value.Size.Width;
-            double heightScale = 512.0 / value.Size.Height;
+            double widthScale = 768.0 / value.Size.Width;
+            double heightScale = 768.0 / value.Size.Height;
             _scaleFactor = Math.Min(widthScale, heightScale);
 
             if (_scaleFactor < 1.0)

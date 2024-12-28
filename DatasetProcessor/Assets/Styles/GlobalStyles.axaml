@@ -161,4 +161,11 @@
 			<Setter Property="Background" Value="{DynamicResource PrimaryDark}"/>
 		</Style>
 	</Style>
+
+	<!-- FLYOUT -->
+	<Style Selector="FlyoutPresenter">
+		<Setter Property="MaxWidth" Value="2048"/>
+		<Setter Property="Margin" Value="0"/>
+		<Setter Property="Padding" Value="-1"/>
+	</Style>
 </Styles>
