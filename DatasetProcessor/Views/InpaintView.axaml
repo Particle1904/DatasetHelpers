@@ -125,9 +125,11 @@
 		</Grid>
 
 		<!-- IMAGE PANEL -->
-		<Grid Grid.Row="8" Background="Transparent"
+		<Grid Name="ImagePanel" 
+			  Grid.Row="8" Background="Transparent"
 			  ColumnDefinitions="50, 10, auto, 10, 50"
-			  HorizontalAlignment="Center">
+			  HorizontalAlignment="Center"
+			  VerticalAlignment="Center">
 			<!-- BACKWARDS BUTTONS -->
 			<Grid Grid.Column="0" RowDefinitions="auto, 10, auto, 10, auto"
 				  VerticalAlignment="Center"

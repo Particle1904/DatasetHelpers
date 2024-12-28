@@ -1,6 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 using DatasetProcessor.ViewModels;
 
@@ -22,6 +25,27 @@ namespace DatasetProcessor.Views
             InitializeComponent();
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, 255, 179, 71), 0.5f);
             EllipseControl.IsVisible = false;
+        }
+
+        /// <summary>
+        /// Focus the ScrollViewer to the image panel when the image property is changed.
+        /// </summary>
+        /// <param name="sender">The event sender.</param>
+        /// <param name="e">The event arguments.</param>
+        private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SelectedImage"))
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    ImagePanel.BringIntoView();
+                    ScrollViewer scrollViewer = ImagePanel.FindLogicalAncestorOfType<ScrollViewer>();
+                    if (scrollViewer != null)
+                    {
+                        scrollViewer.Offset = new Vector(scrollViewer.Offset.X, scrollViewer.Offset.Y + 16);
+                    }
+                }, DispatcherPriority.Loaded);
+            }
         }
 
         /// <summary>
@@ -114,6 +138,7 @@ namespace DatasetProcessor.Views
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = DataContext as InpaintViewModel;
+            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
             base.OnDataContextChanged(e);
         }
     }
