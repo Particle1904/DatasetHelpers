@@ -761,7 +761,12 @@ namespace SmartData.Lib.Services
                     }
 
                     DownloadMessageEvent?.Invoke(this, $"Downloading {modelFileName} file...");
-                    await DownloadFile(client, modelUrl, Path.Combine(GetModelsFolder(), modelFileName));
+                    IProgress<double> progress = new Progress<double>(percent =>
+                    {
+                        DownloadMessageEvent?.Invoke(this, $"Downloaded {percent:F2}%/100% of the file...");
+                    });
+                    await DownloadFile(client, modelUrl, Path.Combine(GetModelsFolder(), modelFileName), progress);
+
                     DownloadMessageEvent?.Invoke(this, $"Finished downloading {modelFileName} file!");
                 }
                 catch (Exception exception)
@@ -773,15 +778,23 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Downloads a file from the specified URL and saves it to the specified file path.
+        /// Downloads a file from the specified URL and saves it to the specified file path,
+        /// with optional progress reporting.
         /// </summary>
         /// <param name="client">The HttpClient instance used to perform the download.</param>
         /// <param name="fileUrl">The URL of the file to download.</param>
         /// <param name="filePath">The local file path where the downloaded file will be saved.</param>
+        /// <param name="progress">
+        /// An optional progress reporter that receives updates on the download progress as a percentage (0 to 100).
+        /// </param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task DownloadFile(HttpClient client, string fileUrl, string filePath)
+        /// <remarks>
+        /// If the file already exists at the specified path, the method will return without downloading.
+        /// Progress is reported periodically as the file is downloaded.
+        /// </remarks>
+        private async Task DownloadFile(HttpClient client, string fileUrl, string filePath, IProgress<double>? progress = null)
         {
-            if (Path.Exists(filePath))
+            if (File.Exists(filePath))
             {
                 return;
             }
@@ -791,11 +804,27 @@ namespace SmartData.Lib.Services
             using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
             {
                 response.EnsureSuccessStatusCode();
+
+                long totalBytes = response.Content.Headers.ContentLength ?? -1;
+
                 using (Stream stream = await response.Content.ReadAsStreamAsync())
-                using (FileStream fileStream = new FileStream(filePath, FileMode.Create,
-                    FileAccess.Write, FileShare.None))
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    await stream.CopyToAsync(fileStream);
+                    byte[] buffer = new byte[8192];
+                    int downloadedBytes = 0;
+                    int bytesRead = 0;
+
+                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+                        downloadedBytes += bytesRead;
+
+                        if (totalBytes > 0 && progress != null)
+                        {
+                            double percentage = (double)downloadedBytes / totalBytes * 100.0f;
+                            progress.Report(percentage);
+                        }
+                    }
                 }
             }
 

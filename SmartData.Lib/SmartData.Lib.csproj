@@ -46,4 +46,12 @@
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.4" />
 	</ItemGroup>
 	
+	<ItemGroup>
+	  <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="Assets\" />
+	</ItemGroup>
+	
 </Project>
