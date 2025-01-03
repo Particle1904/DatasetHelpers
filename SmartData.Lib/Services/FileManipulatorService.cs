@@ -1,4 +1,6 @@
-﻿using SixLabors.ImageSharp;
+﻿using Models.Configurations;
+
+using SixLabors.ImageSharp;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
@@ -6,6 +8,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models;
 using SmartData.Lib.Services.Base;
 
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace SmartData.Lib.Services
@@ -61,7 +64,7 @@ namespace SmartData.Lib.Services
 
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
-        public event EventHandler<string> DownloadMessageEvent;
+        public event EventHandler<DownloadNotification> DownloadMessageEvent;
 
         public FileManipulatorService() : base()
         {
@@ -754,24 +757,34 @@ namespace SmartData.Lib.Services
 
                 try
                 {
+                    DownloadNotification downloadNotification = new DownloadNotification(string.Empty, true);
+
                     if (!string.IsNullOrEmpty(csvUrl))
                     {
-                        DownloadMessageEvent?.Invoke(this, $"Downloading {csvFileName} file...");
+                        downloadNotification.NotificationMessage = $"Downloading {csvFileName} file...";
+                        downloadNotification.PlayNotificationSound = false;
+                        DownloadMessageEvent?.Invoke(this, downloadNotification);
                         await DownloadFile(client, csvUrl, Path.Combine(GetModelsFolder(), csvFileName));
                     }
 
-                    DownloadMessageEvent?.Invoke(this, $"Downloading {modelFileName} file...");
+                    downloadNotification.NotificationMessage = $"Downloading {modelFileName} file...";
+                    downloadNotification.PlayNotificationSound = true;
+                    DownloadMessageEvent?.Invoke(this, downloadNotification);
                     IProgress<double> progress = new Progress<double>(percent =>
                     {
-                        DownloadMessageEvent?.Invoke(this, $"Downloaded {percent:F2}%/100% of the file...");
+                        downloadNotification.NotificationMessage = $"Downloaded {percent:F2}%/100% of the file...";
+                        downloadNotification.PlayNotificationSound = false;
+                        DownloadMessageEvent?.Invoke(this, downloadNotification);
                     });
                     await DownloadFile(client, modelUrl, Path.Combine(GetModelsFolder(), modelFileName), progress);
 
-                    DownloadMessageEvent?.Invoke(this, $"Finished downloading {modelFileName} file!");
+                    downloadNotification.NotificationMessage = $"Finished downloading {modelFileName} file!";
+                    downloadNotification.PlayNotificationSound = true;
+                    DownloadMessageEvent?.Invoke(this, downloadNotification);
                 }
                 catch (Exception exception)
                 {
-                    DownloadMessageEvent?.Invoke(this, $"Error while trying to download CSV or Model file. {exception.Message}.");
+                    DownloadMessageEvent?.Invoke(this, new DownloadNotification($"Error while trying to download CSV or Model file. {exception.Message}.", true));
                     throw;
                 }
             }
@@ -801,28 +814,32 @@ namespace SmartData.Lib.Services
 
             _isDownloading = true;
 
-            using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
+            using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
             {
+                Stopwatch downloadReportTimer = new Stopwatch();
+                downloadReportTimer.Start();
+
                 response.EnsureSuccessStatusCode();
 
                 long totalBytes = response.Content.Headers.ContentLength ?? -1;
 
-                using (Stream stream = await response.Content.ReadAsStreamAsync())
+                using (Stream stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                 using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
-                    byte[] buffer = new byte[8192];
+                    byte[] buffer = new byte[81920];
                     int downloadedBytes = 0;
                     int bytesRead = 0;
 
-                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
                     {
-                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+                        await fileStream.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
                         downloadedBytes += bytesRead;
 
-                        if (totalBytes > 0 && progress != null)
+                        if (totalBytes > 0 && progress != null && downloadReportTimer.Elapsed.TotalSeconds >= 0.5f)
                         {
                             double percentage = (double)downloadedBytes / totalBytes * 100.0f;
                             progress.Report(percentage);
+                            downloadReportTimer.Restart();
                         }
                     }
                 }

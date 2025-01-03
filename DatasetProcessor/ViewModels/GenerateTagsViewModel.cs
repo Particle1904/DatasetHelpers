@@ -7,6 +7,8 @@ using DatasetProcessor.src.Enums;
 
 using Interfaces.MachineLearning;
 
+using Models.Configurations;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -58,8 +60,13 @@ namespace DatasetProcessor.ViewModels
             E621AutoTaggerService e621autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManipulator = fileManipulator;
-            _fileManipulator.DownloadMessageEvent += (sender, args) => Logger.SetLatestLogMessage(args,
-                LogMessageColor.Informational);
+            _fileManipulator.DownloadMessageEvent += (sender, args) =>
+            {
+                if (args is DownloadNotification notification)
+                {
+                    Logger.SetLatestLogMessage(notification.NotificationMessage, LogMessageColor.Informational, notification.PlayNotificationSound);
+                }
+            };
 
             _wDautoTagger = wDautoTagger;
             (_wDautoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>

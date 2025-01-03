@@ -1,10 +1,12 @@
-﻿using SmartData.Lib.Enums;
+﻿using Models.Configurations;
+
+using SmartData.Lib.Enums;
 
 namespace SmartData.Lib.Interfaces
 {
     public interface IFileManipulatorService
     {
-        public event EventHandler<string> DownloadMessageEvent;
+        public event EventHandler<DownloadNotification> DownloadMessageEvent;
         public bool IsDownloading { get; }
         public Task RenameAllToCrescentAsync(string inputPath, int startingNumberForFileNames = 1);
         public Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512);

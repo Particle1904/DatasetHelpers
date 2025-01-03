@@ -66,10 +66,6 @@ namespace DatasetProcessor.ViewModels
                         Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
                             LogMessageColor.Warning);
                     }
-                    else
-                    {
-                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
-                    }
 
                     _minimumResolutionForSigma = parsedValue;
                     OnPropertyChanged(nameof(MinimumResolutionForSigma));

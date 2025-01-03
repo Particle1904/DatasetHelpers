@@ -11,6 +11,6 @@ namespace SmartData.Lib.Interfaces
         public LogMessageColor MessageColor { get; }
         public Task SaveExceptionStackTrace(Exception exception);
         public Task SaveStringBuilderToLogFile(StringBuilder stringBuilder);
-        public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor);
+        public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor, bool playNotificationSound = true);
     }
 }

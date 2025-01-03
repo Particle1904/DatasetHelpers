@@ -47,11 +47,14 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <PackageReference Include="LibVLCSharp" Version="3.9.1" />
 	  <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.1" />
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <Folder Include="Assets\" />
+	  <None Update="Assets\system_notification.mp3">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 	
 </Project>

@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Enums;
+﻿using LibVLCSharp.Shared;
+
+using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 
 using System.ComponentModel;
@@ -9,6 +11,10 @@ namespace SmartData.Lib.Services
 {
     public class LoggerService : ILoggerService, INotifyPropertyChanged
     {
+        private LibVLC _mainLibVLC;
+        private MediaPlayer _mainMediaPlayer;
+        private Media _notificationSound;
+
         private string _latestLogMessage = string.Empty;
         public string LatestLogMessage
         {
@@ -38,15 +44,28 @@ namespace SmartData.Lib.Services
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public LoggerService()
+        {
+            _mainLibVLC = new LibVLC();
+            _mainMediaPlayer = new MediaPlayer(_mainLibVLC);
+            string _assetsFolder = Path.Combine(AppContext.BaseDirectory, "Assets");
+            _notificationSound = new Media(_mainLibVLC, Path.Combine(_assetsFolder, "system_notification.mp3"));
+        }
+
         /// <summary>
         /// Set the latest Log Message and its color.
         /// </summary>
         /// <param name="logMessage">The Log message.</param>
         /// <param name="messageColor">The message color.</param>
-        public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor)
+        public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor, bool playNotificationSound = true)
         {
             LatestLogMessage = logMessage;
             MessageColor = messageColor;
+
+            if (playNotificationSound)
+            {
+                _mainMediaPlayer.Play(_notificationSound);
+            }
         }
 
         /// <summary>
