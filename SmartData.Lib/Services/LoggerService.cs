@@ -44,6 +44,8 @@ namespace SmartData.Lib.Services
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public event EventHandler? LatestLogChangedEvent;
+
         public LoggerService()
         {
             _mainLibVLC = new LibVLC();
@@ -64,6 +66,7 @@ namespace SmartData.Lib.Services
 
             if (playNotificationSound)
             {
+                LatestLogChangedEvent?.Invoke(this, EventArgs.Empty);
                 _mainMediaPlayer.Play(_notificationSound);
             }
         }

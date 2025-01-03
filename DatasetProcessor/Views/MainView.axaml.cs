@@ -96,6 +96,7 @@ public partial class MainView : UserControl
             Metadata_ViewerButton.IsEnabled = false;
             Metadata_ViewerButton.IsVisible = false;
         }
+
     }
 
     private void OnNavigationButton(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
