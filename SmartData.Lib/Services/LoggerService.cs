@@ -42,9 +42,9 @@ namespace SmartData.Lib.Services
 
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public event EventHandler? LatestLogChangedEvent;
+        public event EventHandler<LogMessageColor>? LatestLogChangedEvent;
 
         public LoggerService()
         {
@@ -66,7 +66,7 @@ namespace SmartData.Lib.Services
 
             if (playNotificationSound)
             {
-                LatestLogChangedEvent?.Invoke(this, EventArgs.Empty);
+                LatestLogChangedEvent?.Invoke(this, messageColor);
                 _mainMediaPlayer.Play(_notificationSound);
             }
         }

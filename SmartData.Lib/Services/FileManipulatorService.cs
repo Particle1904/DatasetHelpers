@@ -759,28 +759,38 @@ namespace SmartData.Lib.Services
                 {
                     DownloadNotification downloadNotification = new DownloadNotification(string.Empty, true);
 
+                    // Download CSV file
                     if (!string.IsNullOrEmpty(csvUrl))
                     {
-                        downloadNotification.NotificationMessage = $"Downloading {csvFileName} file...";
-                        downloadNotification.PlayNotificationSound = false;
-                        DownloadMessageEvent?.Invoke(this, downloadNotification);
-                        await DownloadFile(client, csvUrl, Path.Combine(GetModelsFolder(), csvFileName));
+                        string csvFilePath = Path.Combine(GetModelsFolder(), csvFileName);
+                        if (!File.Exists(csvFilePath))
+                        {
+                            downloadNotification.NotificationMessage = $"Downloading {csvFileName} file...";
+                            downloadNotification.PlayNotificationSound = false;
+                            DownloadMessageEvent?.Invoke(this, downloadNotification);
+                            await DownloadFile(client, csvUrl, csvFilePath);
+                        }
                     }
 
-                    downloadNotification.NotificationMessage = $"Downloading {modelFileName} file...";
-                    downloadNotification.PlayNotificationSound = true;
-                    DownloadMessageEvent?.Invoke(this, downloadNotification);
-                    IProgress<double> progress = new Progress<double>(percent =>
+                    // Download Model file
+                    string modelFilePath = Path.Combine(GetModelsFolder(), modelFileName);
+                    if (!File.Exists(modelFilePath))
                     {
-                        downloadNotification.NotificationMessage = $"Downloaded {percent:F2}%/100% of the file...";
-                        downloadNotification.PlayNotificationSound = false;
+                        downloadNotification.NotificationMessage = $"Downloading {modelFileName} file...";
+                        downloadNotification.PlayNotificationSound = true;
                         DownloadMessageEvent?.Invoke(this, downloadNotification);
-                    });
-                    await DownloadFile(client, modelUrl, Path.Combine(GetModelsFolder(), modelFileName), progress);
+                        IProgress<double> progress = new Progress<double>(percent =>
+                        {
+                            downloadNotification.NotificationMessage = $"Downloaded {percent:F2}%/100% of the file...";
+                            downloadNotification.PlayNotificationSound = false;
+                            DownloadMessageEvent?.Invoke(this, downloadNotification);
+                        });
+                        await DownloadFile(client, modelUrl, modelFilePath, progress);
 
-                    downloadNotification.NotificationMessage = $"Finished downloading {modelFileName} file!";
-                    downloadNotification.PlayNotificationSound = true;
-                    DownloadMessageEvent?.Invoke(this, downloadNotification);
+                        downloadNotification.NotificationMessage = $"Finished downloading {modelFileName} file!";
+                        downloadNotification.PlayNotificationSound = true;
+                        DownloadMessageEvent?.Invoke(this, downloadNotification);
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -807,11 +817,6 @@ namespace SmartData.Lib.Services
         /// </remarks>
         private async Task DownloadFile(HttpClient client, string fileUrl, string filePath, IProgress<double>? progress = null)
         {
-            if (File.Exists(filePath))
-            {
-                return;
-            }
-
             _isDownloading = true;
 
             using (HttpResponseMessage response = await client.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))

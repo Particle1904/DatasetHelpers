@@ -36,6 +36,12 @@ public partial class MainWindow : Window
         _viewModel = DataContext as MainViewModel;
         base.OnDataContextChanged(e);
 
-        _viewModel.Logger.LatestLogChangedEvent += (sender, args) => MainViewControl.FlyoutButton.Flyout.ShowAt(MainViewControl.FlyoutButton);
+        _viewModel.Logger.LatestLogChangedEvent += (sender, args) =>
+        {
+            if (args is SmartData.Lib.Enums.LogMessageColor.Error)
+            {
+                MainViewControl.FlyoutButton.Flyout.ShowAt(MainViewControl.FlyoutButton);
+            }
+        };
     }
 }

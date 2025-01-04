@@ -13,6 +13,6 @@ namespace SmartData.Lib.Interfaces
         public Task SaveStringBuilderToLogFile(StringBuilder stringBuilder);
         public void SetLatestLogMessage(string logMessage, LogMessageColor messageColor, bool playNotificationSound = true);
 
-        public event EventHandler? LatestLogChangedEvent;
+        public event EventHandler<LogMessageColor>? LatestLogChangedEvent;
     }
 }
