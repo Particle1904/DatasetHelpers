@@ -16,7 +16,7 @@ namespace Models.Configurations
         public string DiscardedFolder { get; set; } = string.Empty;
 
         [JsonPropertyName("dimensionSizeForDiscarded")]
-        public SupportedDimensions DimensionSizeForDiscarded { get; set; } = SupportedDimensions.Resolution512x512;
+        public SupportedDimensions DimensionSizeForDiscarded { get; set; } = SupportedDimensions.Resolution1024x1024;
 
         [JsonPropertyName("backupFolder")]
         public string BackupFolder { get; set; } = string.Empty;

@@ -13,7 +13,7 @@ namespace Models.Configurations
         public string OutputFolder { get; set; } = string.Empty;
 
         [JsonPropertyName("outputDimensionSize")]
-        public SupportedDimensions OutputDimensionSize { get; set; } = SupportedDimensions.Resolution512x512;
+        public SupportedDimensions OutputDimensionSize { get; set; } = SupportedDimensions.Resolution1024x1024;
 
         private int _lanczosRadius = 3;
         [JsonPropertyName("lanczosRadius")]
