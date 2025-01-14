@@ -10,6 +10,7 @@ using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -186,6 +187,41 @@ public partial class BaseViewModel : ObservableObject
             await fileManipulator.DownloadModelFile(model);
         }
     }
+
+    [RelayCommand]
+    protected async Task OpenWebPage(string webAddress)
+    {
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = webAddress,
+                    UseShellExecute = true
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", webAddress);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", webAddress);
+            }
+            else
+            {
+                throw new PlatformNotSupportedException("Unsupported operating system");
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                LogMessageColor.Error);
+            await Logger.SaveExceptionStackTrace(exception);
+        }
+    }
+
 
     /// <summary>
     /// Initializes the view model with the clipboard and storage provider.

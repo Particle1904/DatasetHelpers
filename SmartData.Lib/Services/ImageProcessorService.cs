@@ -1226,6 +1226,50 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Converts an image at the specified input path to a Base64-encoded string in JPEG format.
+        /// </summary>
+        /// <param name="inputPath">The file path of the input image.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the Base64-encoded string of the JPEG image.</returns>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// <list type="number">
+        /// <item>Loads the input image from the specified file path.</item>
+        /// <item>Encodes the image into JPEG format with a quality setting of 100.</item>
+        /// <item>Converts the encoded JPEG image into a Base64 string.</item>
+        /// </list>
+        /// Supported image formats depend on the <c>SixLabors.ImageSharp</c> library.
+        /// </remarks>
+        /// <exception cref="FileNotFoundException">Thrown if the specified input file does not exist.</exception>
+        /// <exception cref="ImageFormatException">Thrown if the input file is not a valid image format.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown if the application lacks permissions to access the specified file.</exception>
+        /// <example>
+        /// <code>
+        /// string inputPath = "path/to/image.png";
+        /// string base64Image = await GetBase64ImageAsync(inputPath);
+        /// Console.WriteLine(base64Image);
+        /// </code>
+        /// </example>
+        public async Task<string> GetBase64ImageAsync(string inputPath)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    var jpegEncoder = new JpegEncoder
+                    {
+                        Quality = 100
+                    };
+
+                    await image.SaveAsJpegAsync(memoryStream, jpegEncoder);
+                    byte[] jpegBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(jpegBytes);
+                }
+            }
+        }
+
+        /// <summary>
         /// Calculates the number of blocks assigned to each aspect ratio bucket.
         /// </summary>
         /// <param name="totalBlocks">The total number of blocks to be assigned across all aspect ratio buckets.</param>

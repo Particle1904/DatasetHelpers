@@ -56,6 +56,10 @@
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Tag_Generation}"/>
 				<Button Click="OnNavigationButton"
+						Content="Gemini Captions"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Gemini_Caption}"/>
+				<Button Click="OnNavigationButton"
 						Content="Process Captions"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Process_Captions}"/>

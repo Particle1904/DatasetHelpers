@@ -4,6 +4,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.Configurations;
 
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
@@ -44,6 +45,7 @@ namespace SmartData.Lib.Services
                 ResizeImagesConfigs = new ResizeImagesConfigs(),
                 UpscaleImagesConfigs = new UpscaleImagesConfigs(),
                 GenerateTagsConfigs = new GenerateTagsConfigs(),
+                GeminiCaptionConfigs = new GeminiCaptionConfigs(),
                 ProcessCaptionsConfigs = new ProcessCaptionsConfigs(),
                 ProcessTagsConfigs = new ProcessTagsConfigs(),
                 TagEditorConfigs = new TagEditorConfigs(),
@@ -69,6 +71,18 @@ namespace SmartData.Lib.Services
             await CreateConfigFileIfNotExistAsync();
             string file = await File.ReadAllTextAsync(_configsFilePath);
             Configurations = JsonSerializer.Deserialize<Config>(file);
+
+            foreach (PropertyInfo property in Configurations.GetType().GetProperties())
+            {
+                if (property.GetValue(Configurations) == null)
+                {
+                    if (property.PropertyType.GetConstructor(Type.EmptyTypes) != null)
+                    {
+                        object defaultInstance = Activator.CreateInstance(property.PropertyType);
+                        property.SetValue(Configurations, defaultInstance);
+                    }
+                }
+            }
         }
 
         /// <summary>

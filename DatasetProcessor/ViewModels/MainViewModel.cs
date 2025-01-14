@@ -37,8 +37,9 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IInputHooksService _inputHooks;
     protected readonly IPromptGeneratorService _promptGenerator;
     protected readonly ICLIPTokenizerService _clipTokenizer;
-    protected readonly IUpscalerService _uspcalerService;
-    protected readonly IInpaintService _inpaintService;
+    protected readonly IUpscalerService _uspcaler;
+    protected readonly IInpaintService _inpaint;
+    protected readonly IGeminiService _gemini;
 
     [ObservableProperty]
     private UserControl _dynamicView;
@@ -71,8 +72,9 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="inputHooks">The input hooks service.</param>
     /// <param name="promptGenerator">The prompt generator service.</param>
     /// <param name="clipTokenizer">The clip tokenizer.</param>
-    /// <param name="upscalerService">The upscaler service.</param>
-    /// <param name="inpaintService">The inpaint service.</param>
+    /// <param name="upscaler">The upscaler service.</param>
+    /// <param name="inpaint">The inpaint service.</param>
+    /// <param name="gemini">The gemini service.</param>
     /// <param name="logger">The logger service.</param>
     /// <param name="configs">The configuration service.</param>
     public MainViewModel(IFileManipulatorService fileManipulator,
@@ -87,8 +89,9 @@ public partial class MainViewModel : BaseViewModel
                          IInputHooksService inputHooks,
                          IPromptGeneratorService promptGenerator,
                          ICLIPTokenizerService clipTokenizer,
-                         IUpscalerService upscalerService,
-                         IInpaintService inpaintService,
+                         IUpscalerService upscaler,
+                         IInpaintService inpaint,
+                         IGeminiService gemini,
                          ILoggerService logger,
                          IConfigsService configs) :
         base(logger, configs)
@@ -105,8 +108,8 @@ public partial class MainViewModel : BaseViewModel
         _inputHooks = inputHooks;
         _promptGenerator = promptGenerator;
         _clipTokenizer = clipTokenizer;
-        _uspcalerService = upscalerService;
-        _inpaintService = inpaintService;
+        _uspcaler = upscaler;
+        _inpaint = inpaint;
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
@@ -133,7 +136,7 @@ public partial class MainViewModel : BaseViewModel
         });
         _views.Add(AppPages.Inpaint_Images, new InpaintView()
         {
-            DataContext = new InpaintViewModel(imageProcessor, inpaintService, fileManipulator, logger, configs)
+            DataContext = new InpaintViewModel(imageProcessor, inpaint, fileManipulator, logger, configs)
         });
         _views.Add(AppPages.Resize_Images, new ResizeImagesView()
         {
@@ -141,12 +144,16 @@ public partial class MainViewModel : BaseViewModel
         });
         _views.Add(AppPages.Upscale_Images, new UpscaleView()
         {
-            DataContext = new UpscaleViewModel(fileManipulator, upscalerService, logger, configs)
+            DataContext = new UpscaleViewModel(fileManipulator, upscaler, logger, configs)
         });
         _views.Add(AppPages.Tag_Generation, new GenerateTagsView()
         {
             DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
                 wDv3LargeAutoTagger, e621AutoTagger, logger, configs)
+        });
+        _views.Add(AppPages.Gemini_Caption, new GeminiCaptionView()
+        {
+            DataContext = new GeminiCaptionViewModel(fileManipulator, gemini, logger, configs)
         });
         _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
         {

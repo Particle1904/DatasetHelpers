@@ -27,6 +27,9 @@ namespace SmartData.Lib.Models.Configurations
         [JsonPropertyName("generateTagsConfigs")]
         public GenerateTagsConfigs GenerateTagsConfigs { get; set; }
 
+        [JsonPropertyName("geminiCaptionConfigs")]
+        public GeminiCaptionConfigs GeminiCaptionConfigs { get; set; }
+
         [JsonPropertyName("processCaptionsConfigs")]
         public ProcessCaptionsConfigs ProcessCaptionsConfigs { get; set; }
 

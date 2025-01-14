@@ -11,6 +11,7 @@
         Resize_Images,
         Upscale_Images,
         Tag_Generation,
+        Gemini_Caption,
         Process_Captions,
         Process_Tags,
         Tag_Editor,

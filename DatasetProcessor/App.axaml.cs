@@ -10,6 +10,8 @@ using DatasetProcessor.Views;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Services;
+
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -65,6 +67,7 @@ public partial class App : Application
         var clipTokenizer = _servicesProvider.GetRequiredService<ICLIPTokenizerService>();
         var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
         var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
+        var gemini = _servicesProvider.GetRequiredService<IGeminiService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
@@ -75,7 +78,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, logger, configs)
+                    inpaint, gemini, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -88,7 +91,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, logger, configs)
+                    inpaint, gemini, logger, configs)
             };
         }
 
@@ -152,8 +155,11 @@ public partial class App : Application
             new InpaintService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, Filenames.LaMaFilename)
         ));
+        services.AddSingleton<IGeminiService>(service =>
+            new GeminiService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<IFileManipulatorService>()
+        ));
     }
-
     /// <summary>
     /// Resolves the OnnxRuntime library import based on the current platform and process architecture.
     /// </summary>
