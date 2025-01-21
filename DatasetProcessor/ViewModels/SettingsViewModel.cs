@@ -165,6 +165,16 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private string _processTagsInputFolder;
         [ObservableProperty]
+        private string _processTagsTagsToAdd;
+        [ObservableProperty]
+        private string _processTagsTagsToEmphasize;
+        [ObservableProperty]
+        private string _processTagsTagsToRemove;
+        [ObservableProperty]
+        private string _processTagsTagsToUpdate;
+        [ObservableProperty]
+        private string _processTagsNewTags;
+        [ObservableProperty]
         private bool _processTagsRandomizeTags;
         [ObservableProperty]
         private bool _processTagsRenameFiles;
@@ -293,6 +303,11 @@ namespace DatasetProcessor.ViewModels
             ProcessCaptionsInputFolder = Configs.Configurations.ProcessCaptionsConfigs.InputFolder;
 
             ProcessTagsInputFolder = Configs.Configurations.ProcessTagsConfigs.InputFolder;
+            ProcessTagsTagsToAdd = Configs.Configurations.ProcessTagsConfigs.TagsToAdd;
+            ProcessTagsTagsToEmphasize = Configs.Configurations.ProcessTagsConfigs.TagsToEmphasize;
+            ProcessTagsTagsToRemove = Configs.Configurations.ProcessTagsConfigs.TagsToRemove;
+            ProcessTagsTagsToUpdate = Configs.Configurations.ProcessTagsConfigs.TagsToUpdate;
+            ProcessTagsNewTags = Configs.Configurations.ProcessTagsConfigs.NewTags;
             ProcessTagsRandomizeTags = Configs.Configurations.ProcessTagsConfigs.RandomizeTags;
             ProcessTagsRenameFiles = Configs.Configurations.ProcessTagsConfigs.RenameFiles;
             ProcessTagsApplyRedudancyRemoval = Configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval;
@@ -634,6 +649,11 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.ProcessCaptionsConfigs.InputFolder = ProcessCaptionsInputFolder;
 
             Configs.Configurations.ProcessTagsConfigs.InputFolder = ProcessTagsInputFolder;
+            Configs.Configurations.ProcessTagsConfigs.TagsToAdd = ProcessTagsTagsToAdd;
+            Configs.Configurations.ProcessTagsConfigs.TagsToEmphasize = ProcessTagsTagsToEmphasize;
+            Configs.Configurations.ProcessTagsConfigs.TagsToRemove = ProcessTagsTagsToRemove;
+            Configs.Configurations.ProcessTagsConfigs.TagsToUpdate = ProcessTagsTagsToUpdate;
+            Configs.Configurations.ProcessTagsConfigs.NewTags = ProcessTagsNewTags;
             Configs.Configurations.ProcessTagsConfigs.RandomizeTags = ProcessTagsRandomizeTags;
             Configs.Configurations.ProcessTagsConfigs.RenameFiles = ProcessTagsRenameFiles;
             Configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval = ProcessTagsApplyRedudancyRemoval;
