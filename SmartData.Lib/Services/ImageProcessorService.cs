@@ -1257,12 +1257,9 @@ namespace SmartData.Lib.Services
             {
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    var jpegEncoder = new JpegEncoder
-                    {
-                        Quality = 100
-                    };
+                    PngEncoder pngEncoder = new PngEncoder();
 
-                    await image.SaveAsJpegAsync(memoryStream, jpegEncoder);
+                    await image.SaveAsPngAsync(memoryStream, pngEncoder);
                     byte[] jpegBytes = memoryStream.ToArray();
                     return Convert.ToBase64String(jpegBytes);
                 }

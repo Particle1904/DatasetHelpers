@@ -13,7 +13,6 @@ using SmartData.Lib.Interfaces;
 
 using System;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
@@ -27,6 +26,8 @@ namespace DatasetProcessor.ViewModels
         private string _inputFolderPath;
         [ObservableProperty]
         private string _outputFolderPath;
+        [ObservableProperty]
+        private string _failedFolderPath;
         [ObservableProperty]
         private string _geminiApi;
         [ObservableProperty]
@@ -59,6 +60,8 @@ namespace DatasetProcessor.ViewModels
             _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.GeminiCaptionConfigs.OutputFolder;
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            FailedFolderPath = _configs.Configurations.GeminiCaptionConfigs.FailedFolder;
+            _fileManipulator.CreateFolderIfNotExist(FailedFolderPath);
 
             FreeApi = true;
             GeminiPrompt = GeminiService.BASE_PROMPT;
@@ -97,6 +100,16 @@ namespace DatasetProcessor.ViewModels
         }
 
         [RelayCommand]
+        private async Task SelectFailedFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                FailedFolderPath = result;
+            }
+        }
+
+        [RelayCommand]
         private async Task CaptionWithGeminiAsync()
         {
             IsUiEnabled = false;
@@ -116,17 +129,17 @@ namespace DatasetProcessor.ViewModels
             {
                 _gemini.ApiKey = GeminiApi;
                 _gemini.SystemInstructions = GeminiSystemInstruction;
+                _gemini.FreeApi = FreeApi;
 
-                await _gemini.CaptionImagesAsync(InputFolderPath, OutputFolderPath, GeminiPrompt);
+                await _gemini.CaptionImagesAsync(InputFolderPath, OutputFolderPath, FailedFolderPath, GeminiPrompt);
 
                 timer.Stop();
             }
-            catch (HttpRequestException exception)
+            catch (Exception exception)
             {
-                if (exception.Message.Contains("unregistered callers"))
-                {
-                    Logger.SetLatestLogMessage("A valid API key is required to use Gemini!", LogMessageColor.Error);
-                }
+                Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
+                    LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
             }
             finally
             {

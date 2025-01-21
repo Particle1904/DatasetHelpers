@@ -38,6 +38,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IPromptGeneratorService _promptGenerator;
     protected readonly ICLIPTokenizerService _clipTokenizer;
     protected readonly IUpscalerService _uspcaler;
+    protected readonly IPythonService _python;
     protected readonly IInpaintService _inpaint;
     protected readonly IGeminiService _gemini;
 
@@ -92,6 +93,7 @@ public partial class MainViewModel : BaseViewModel
                          IUpscalerService upscaler,
                          IInpaintService inpaint,
                          IGeminiService gemini,
+                         IPythonService python,
                          ILoggerService logger,
                          IConfigsService configs) :
         base(logger, configs)
@@ -110,6 +112,7 @@ public partial class MainViewModel : BaseViewModel
         _clipTokenizer = clipTokenizer;
         _uspcaler = upscaler;
         _inpaint = inpaint;
+        _python = python;
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 

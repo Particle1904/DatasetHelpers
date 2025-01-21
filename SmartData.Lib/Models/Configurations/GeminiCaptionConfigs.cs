@@ -9,5 +9,8 @@ namespace Models.Configurations
 
         [JsonPropertyName("outputFolder")]
         public string OutputFolder { get; set; } = string.Empty;
+
+        [JsonPropertyName("failedFolder")]
+        public string FailedFolder { get; set; } = string.Empty;
     }
 }

@@ -8,6 +8,8 @@ using Avalonia.Platform.Storage;
 using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
 
+using Interfaces;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using Services;
@@ -68,6 +70,7 @@ public partial class App : Application
         var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
         var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
         var gemini = _servicesProvider.GetRequiredService<IGeminiService>();
+        var python = _servicesProvider.GetRequiredService<IPythonService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
@@ -78,7 +81,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, logger, configs)
+                    inpaint, gemini, python, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -91,7 +94,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManipulator, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, logger, configs)
+                    inpaint, gemini, python, logger, configs)
             };
         }
 
@@ -108,6 +111,7 @@ public partial class App : Application
         services.AddSingleton<ITagProcessorService, TagProcessorService>();
         services.AddSingleton<ILoggerService, LoggerService>();
         services.AddSingleton<IConfigsService, ConfigurationsService>();
+        services.AddSingleton<IPythonService, PythonService>();
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, Filenames.YoloV4OnnxFilename)
@@ -157,7 +161,8 @@ public partial class App : Application
         ));
         services.AddSingleton<IGeminiService>(service =>
             new GeminiService(service.GetRequiredService<IImageProcessorService>(),
-                service.GetRequiredService<IFileManipulatorService>()
+                service.GetRequiredService<IFileManipulatorService>(),
+                service.GetRequiredService<IPythonService>()
         ));
     }
     /// <summary>

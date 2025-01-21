@@ -141,7 +141,8 @@
 					 Grid.Column="2"
 					 Grid.ColumnSpan="5"
 					 Watermark="Enter your System Instruction."
-					 Text="{Binding GeminiSystemInstruction}"/>
+					 Text="{Binding GeminiSystemInstruction}"
+					 MaxHeight="300"/>
 		</Grid>
 
 		<Separator Grid.Row="7"/>

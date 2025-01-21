@@ -1,10 +1,8 @@
 ﻿using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Models.Json.Responses.Gemini;
 using SmartData.Lib.Services.Base;
 
 using System.Text;
-using System.Text.Json;
 
 namespace Services
 {
@@ -12,10 +10,7 @@ namespace Services
     {
         private readonly IImageProcessorService _imageProcessor;
         private readonly IFileManipulatorService _fileManipulator;
-
-        //private const string _model = "gemini-1.5-flash";
-        private const string _model = "gemini-2.0-flash-exp";
-        private readonly string _baseUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{_model}:generateContent?key=";
+        private readonly IPythonService _python;
 
         public static string BASE_PROMPT = "Create a detailed caption for the image";
 
@@ -24,11 +19,13 @@ namespace Services
 
         public string ApiKey { get; set; } = string.Empty;
         public string SystemInstructions { get; set; } = string.Empty;
+        public bool FreeApi { get; set; } = true;
 
-        public GeminiService(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator)
+        public GeminiService(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator, IPythonService python)
         {
             _imageProcessor = imageProcessor;
             _fileManipulator = fileManipulator;
+            _python = python;
         }
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace Services
         /// </remarks>
         /// <exception cref="OperationCanceledException">Thrown when the operation is canceled via the cancellation token.</exception>
         /// <exception cref="HttpRequestException">Thrown if an HTTP request error occurs during the API call.</exception>
-        public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, string prompt)
+        public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, string failedOutputFolderPath, string prompt)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
@@ -56,6 +53,10 @@ namespace Services
             TotalFilesChanged?.Invoke(this, files.Length);
 
             int imagesThatFailed = 0;
+
+            await Task.Run(() => _python.DownloadPythonPackages());
+            _python.InitializePython();
+
             foreach (string file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -86,16 +87,28 @@ namespace Services
 
                     string base64Image = await _imageProcessor.GetBase64ImageAsync(file);
                     string result = await MakeRequestAsync(base64Image, finalPrompt, SystemInstructions);
-                    GeminiResponse resultObj = JsonSerializer.Deserialize<GeminiResponse>(result);
 
-                    string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
-                    File.Move(file, resultPath);
-                    _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")),
-                        resultObj.Candidates.FirstOrDefault().Content.Parts.FirstOrDefault().Text);
+                    if (!result.Contains("blocked content"))
+                    {
+                        string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
+                        File.Move(file, resultPath);
+                        _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result);
+                    }
+                    else
+                    {
+                        File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file)));
+                        imagesThatFailed++;
+                    }
+
+                    // Sleep for 4.1 seconds since Gemini API have a 15 requests per minute limitation for free users.
+                    if (FreeApi == true)
+                    {
+                        await Task.Delay(4100);
+                    }
                 }
-                catch (HttpRequestException exception)
+                catch (Exception)
                 {
-                    throw exception;
+                    throw;
                 }
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
@@ -118,60 +131,9 @@ namespace Services
         /// </exception>
         private async Task<string> MakeRequestAsync(string base64image, string prompt, string systemInstructions)
         {
-            var payload = new
-            {
-                system_instruction = new
-                {
-                    parts = new[]
-                    {
-                        new { text = $"{systemInstructions}\nDo NOT include names of real-world people or personalities, or any references to children or teenagers.\nOutput Format: Output a string containing a caption (without double quotes), like:\n<Best caption goes here>" }
-                    }
-                },
-                contents = new[]
-                {
-                    new
-                    {
-                        parts = new object[]
-                        {
-                            new { text = prompt },
-                            new
-                            {
-                                inline_data = new
-                                {
-                                    mime_type = "image/jpeg",
-                                    data = base64image
-                                }
-                            }
-                        }
-                    }
-                },
-                safetySettings = new[]
-                {
-                    new { category = "HARM_CATEGORY_HARASSMENT", threshold = "BLOCK_NONE" },
-                    new { category = "HARM_CATEGORY_HATE_SPEECH", threshold = "BLOCK_NONE" },
-                    new { category = "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold = "BLOCK_NONE" },
-                    new { category = "HARM_CATEGORY_DANGEROUS_CONTENT", threshold = "BLOCK_NONE" },
-                    new { category = "HARM_CATEGORY_CIVIC_INTEGRITY", threshold = "BLOCK_NONE" },
-                }
-            };
+            string fullSystemInstructions = $"{systemInstructions}\nDo NOT include names of real-world people or personalities, or any references to children or teenagers.\nOutput Format: Output a string containing a caption (without double quotes), like:\n<Best caption goes here>";
 
-            string jsonPayload = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
-
-            using (HttpClient client = new HttpClient())
-            {
-                HttpContent content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.PostAsync($"{_baseUrl}{ApiKey}", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    string errorResponse = await response.Content.ReadAsStringAsync();
-                    throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {errorResponse}");
-                }
-            }
+            return await _python.GenerateContent(base64image, prompt, ApiKey, systemInstructions);
         }
 
         /// <summary>
