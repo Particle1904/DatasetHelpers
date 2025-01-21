@@ -116,7 +116,18 @@ response_text = response.text
                 }
                 catch (Exception exception)
                 {
-                    throw new Exception("Failed to generate content in Python.", exception);
+                    if (exception.Message.Contains("API_KEY_INVALID"))
+                    {
+                        return "Invalid API Key!";
+                    }
+                    else if (exception.Message.Contains("429"))
+                    {
+                        return "Check quota";
+                    }
+                    else
+                    {
+                        return "BLOCKED CONTENT";
+                    }
                 }
                 finally
                 {

@@ -168,7 +168,7 @@
 		</Grid>
 		<!-- PROGRESS BAR -->
 		<ProgressBar Grid.Row="14"
-					 Value="{Binding FilterProgress.PercentComplete}"/>
+					 Value="{Binding CaptionProcessingProgress.PercentComplete}"/>
 		<!-- TASK STATUS -->
 		<Label Grid.Row="16"
 			   FontSize="22"

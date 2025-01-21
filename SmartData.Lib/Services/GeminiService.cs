@@ -1,4 +1,6 @@
-﻿using SmartData.Lib.Helpers;
+﻿using Exceptions;
+
+using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Services.Base;
 
@@ -88,22 +90,27 @@ namespace Services
                     string base64Image = await _imageProcessor.GetBase64ImageAsync(file);
                     string result = await MakeRequestAsync(base64Image, finalPrompt, SystemInstructions);
 
-                    if (!result.Contains("blocked content"))
+                    if (result.Equals("Invalid API Key!"))
+                    {
+                        throw new InvalidGeminiAPIKeyException();
+                    }
+
+                    if (result.Contains("BLOCKED CONTENT"))
+                    {
+                        File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file)));
+                        imagesThatFailed++;
+                    }
+                    else
                     {
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
                         _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result);
                     }
-                    else
-                    {
-                        File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file)));
-                        imagesThatFailed++;
-                    }
 
                     // Sleep for 4.1 seconds since Gemini API have a 15 requests per minute limitation for free users.
                     if (FreeApi == true)
                     {
-                        await Task.Delay(4100);
+                        await Task.Delay(TimeSpan.FromSeconds(5));
                     }
                 }
                 catch (Exception)

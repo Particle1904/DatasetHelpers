@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Exceptions;
+
 using Services;
 
 using SmartData.Lib.Enums;
@@ -135,6 +137,13 @@ namespace DatasetProcessor.ViewModels
 
                 timer.Stop();
             }
+            catch (InvalidGeminiAPIKeyException)
+            {
+                Logger.SetLatestLogMessage("Invalid AIStudio API Key! Please verify the API Key.", LogMessageColor.Error);
+            }
+            catch (OperationCanceledException)
+            {
+            }
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
@@ -149,6 +158,25 @@ namespace DatasetProcessor.ViewModels
 
             // Stop elapsed timer
             _timer.Stop();
+        }
+
+        [RelayCommand]
+        private void CancelTask()
+        {
+            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_gemini as ICancellableService)?.CancelCurrentTask();
+        }
+
+        partial void OnIsUiEnabledChanged(bool value)
+        {
+            if (value == true)
+            {
+                IsCancelEnabled = false;
+            }
+            else
+            {
+                IsCancelEnabled = true;
+            }
         }
     }
 }
