@@ -1,5 +1,7 @@
 ﻿using Models.Configurations;
 
+using Services;
+
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.Configurations;
 
@@ -45,7 +47,11 @@ namespace SmartData.Lib.Services
                 ResizeImagesConfigs = new ResizeImagesConfigs(),
                 UpscaleImagesConfigs = new UpscaleImagesConfigs(),
                 GenerateTagsConfigs = new GenerateTagsConfigs(),
-                GeminiCaptionConfigs = new GeminiCaptionConfigs(),
+                GeminiCaptionConfigs = new GeminiCaptionConfigs()
+                {
+                    Prompt = GeminiService.BASE_PROMPT,
+                    SystemInstructions = GeminiService.CreateBaseSystemInstruction()
+                },
                 ProcessCaptionsConfigs = new ProcessCaptionsConfigs(),
                 ProcessTagsConfigs = new ProcessTagsConfigs(),
                 TagEditorConfigs = new TagEditorConfigs(),

@@ -2,7 +2,7 @@
 
 namespace Models.Configurations
 {
-    public class GeminiCaptionConfigs
+    public class GeminiCaptionsConfigs
     {
         [JsonPropertyName("inputFolder")]
         public string InputFolder { get; set; } = string.Empty;
@@ -13,8 +13,8 @@ namespace Models.Configurations
         [JsonPropertyName("failedFolder")]
         public string FailedFolder { get; set; } = string.Empty;
 
-        [JsonPropertyName("apiKey")]
-        public string ApiKey { get; set; } = string.Empty;
+        [JsonPropertyName("geminiApiKey")]
+        public string GeminiApiKey { get; set; } = string.Empty;
 
         [JsonPropertyName("freeApi")]
         public bool FreeApi { get; set; } = true;

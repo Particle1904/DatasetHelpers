@@ -184,6 +184,23 @@ namespace DatasetProcessor.ViewModels
         private bool _processTagsConsolidateTags;
 
         [ObservableProperty]
+        private bool _showGeminiCaptionSettings;
+        [ObservableProperty]
+        private string _geminiCaptionInputFolder;
+        [ObservableProperty]
+        private string _geminiCaptionOutputFolder;
+        [ObservableProperty]
+        private string _geminiCaptionFailedFolder;
+        [ObservableProperty]
+        private string _geminiCaptionAPIKey;
+        [ObservableProperty]
+        private bool _geminiCaptionFreeAPI;
+        [ObservableProperty]
+        private string _geminiCaptionPrompt;
+        [ObservableProperty]
+        private string _geminiCaptionSystemInstructions;
+
+        [ObservableProperty]
         private bool _showEditorSettings;
         [ObservableProperty]
         private string _editorInputFolder;
@@ -299,6 +316,14 @@ namespace DatasetProcessor.ViewModels
             GenerateTagsApplyRedudancyRemoval = Configs.Configurations.GenerateTagsConfigs.ApplyRedudancyRemoval;
             GenerateTagsAppendGeneratedTags = Configs.Configurations.GenerateTagsConfigs.AppendToExistingFile;
             GenerateTagsWeighted = Configs.Configurations.GenerateTagsConfigs.WeightedCaptions;
+
+            GeminiCaptionInputFolder = Configs.Configurations.GeminiCaptionConfigs.InputFolder;
+            GeminiCaptionOutputFolder = Configs.Configurations.GeminiCaptionConfigs.OutputFolder;
+            GeminiCaptionFailedFolder = Configs.Configurations.GeminiCaptionConfigs.FailedFolder;
+            GeminiCaptionAPIKey = Configs.Configurations.GeminiCaptionConfigs.ApiKey;
+            GeminiCaptionFreeAPI = Configs.Configurations.GeminiCaptionConfigs.FreeApi;
+            GeminiCaptionPrompt = Configs.Configurations.GeminiCaptionConfigs.Prompt;
+            GeminiCaptionSystemInstructions = Configs.Configurations.GeminiCaptionConfigs.SystemInstructions;
 
             ProcessCaptionsInputFolder = Configs.Configurations.ProcessCaptionsConfigs.InputFolder;
 
@@ -481,6 +506,36 @@ namespace DatasetProcessor.ViewModels
         }
 
         [RelayCommand]
+        private async Task SelectGeminiCaptionInputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                GeminiCaptionInputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectGeminiCaptionOutputFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                GeminiCaptionOutputFolder = result;
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectGeminiCaptionFailedFolderAsync()
+        {
+            string result = await SelectFolderPath();
+            if (!string.IsNullOrEmpty(result))
+            {
+                GeminiCaptionFailedFolder = result;
+            }
+        }
+
+        [RelayCommand]
         private async Task SelectProcessCaptionsInputFolderAsync()
         {
             string result = await SelectFolderPath();
@@ -576,6 +631,9 @@ namespace DatasetProcessor.ViewModels
                 case "ShowGenerateTagsSettings":
                     ShowGenerateTagsSettings = !ShowGenerateTagsSettings;
                     break;
+                case "ShowGeminiCaptionSettings":
+                    ShowGeminiCaptionSettings = !ShowGeminiCaptionSettings;
+                    break;
                 case "ShowProcessCaptionsSettings":
                     ShowProcessCaptionsSettings = !ShowProcessCaptionsSettings;
                     break;
@@ -658,6 +716,14 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.ProcessTagsConfigs.RenameFiles = ProcessTagsRenameFiles;
             Configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval = ProcessTagsApplyRedudancyRemoval;
             Configs.Configurations.ProcessTagsConfigs.ConsolidateTags = ProcessTagsConsolidateTags;
+
+            Configs.Configurations.GeminiCaptionConfigs.InputFolder = GeminiCaptionInputFolder;
+            Configs.Configurations.GeminiCaptionConfigs.OutputFolder = GeminiCaptionOutputFolder;
+            Configs.Configurations.GeminiCaptionConfigs.FailedFolder = GeminiCaptionFailedFolder;
+            Configs.Configurations.GeminiCaptionConfigs.ApiKey = GeminiCaptionAPIKey;
+            Configs.Configurations.GeminiCaptionConfigs.FreeApi = GeminiCaptionFreeAPI;
+            Configs.Configurations.GeminiCaptionConfigs.Prompt = GeminiCaptionPrompt;
+            Configs.Configurations.GeminiCaptionConfigs.SystemInstructions = GeminiCaptionSystemInstructions;
 
             Configs.Configurations.TagEditorConfigs.InputFolder = EditorInputFolder;
             Configs.Configurations.TagEditorConfigs.ExactMatchesFiltering = EditorExactMatches;

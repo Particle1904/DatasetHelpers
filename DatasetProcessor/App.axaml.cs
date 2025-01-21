@@ -8,8 +8,6 @@ using Avalonia.Platform.Storage;
 using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
 
-using Interfaces;
-
 using Microsoft.Extensions.DependencyInjection;
 
 using Services;
@@ -165,6 +163,7 @@ public partial class App : Application
                 service.GetRequiredService<IPythonService>()
         ));
     }
+
     /// <summary>
     /// Resolves the OnnxRuntime library import based on the current platform and process architecture.
     /// </summary>

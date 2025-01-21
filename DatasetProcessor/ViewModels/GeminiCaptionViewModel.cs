@@ -7,8 +7,6 @@ using DatasetProcessor.src.Enums;
 
 using Exceptions;
 
-using Services;
-
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -64,10 +62,10 @@ namespace DatasetProcessor.ViewModels
             _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
             FailedFolderPath = _configs.Configurations.GeminiCaptionConfigs.FailedFolder;
             _fileManipulator.CreateFolderIfNotExist(FailedFolderPath);
-
-            FreeApi = true;
-            GeminiPrompt = GeminiService.BASE_PROMPT;
-            GeminiSystemInstruction = GeminiService.CreateBaseSystemInstruction();
+            GeminiApi = _configs.Configurations.GeminiCaptionConfigs.ApiKey;
+            FreeApi = _configs.Configurations.GeminiCaptionConfigs.FreeApi;
+            GeminiPrompt = _configs.Configurations.GeminiCaptionConfigs.Prompt;
+            GeminiSystemInstruction = _configs.Configurations.GeminiCaptionConfigs.SystemInstructions;
 
             (_gemini as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {

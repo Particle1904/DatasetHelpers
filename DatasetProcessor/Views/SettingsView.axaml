@@ -12,7 +12,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
-	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 30, auto">
+	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 30, auto">
 		<Grid Classes="gridSecondary" Grid.Row="0"
 			  RowDefinitions="auto, 10, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
@@ -805,6 +805,120 @@
 						   Margin="0, 10, 0, 10"/>
 
 		<Grid Classes="gridSecondary" Grid.Row="14"
+			  RowDefinitions="auto, 10, auto"
+			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
+			<Label Grid.Row="0"
+				   Grid.Column="0"
+				   Grid.ColumnSpan="4"
+				   Content="Gemini Captions Page Settings"
+				   FontSize="20"
+				   HorizontalAlignment="Left"
+				   Margin="10,0,0,0"/>
+			<Button Grid.Row="0"
+					Grid.Column="4"
+					BorderThickness="0"
+					Width="45"
+					Height="40"
+					Command="{Binding ToggleBoolCommand}"
+					CommandParameter="ShowGeminiCaptionSettings"
+					HorizontalAlignment="Right"
+					Margin="0,0,12,0">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/hide.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+			<Separator Grid.Row="1"
+					   Grid.Column="0"
+					   Grid.ColumnSpan="5"/>
+			<Border Grid.Row="3"
+					Grid.Column="0"
+					Grid.ColumnSpan="5"
+					Margin="12, 0, 12, 0"
+					IsVisible="{Binding ShowGeminiCaptionSettings}"
+					BorderBrush="{DynamicResource PrimaryDark}"
+					BorderThickness="1">
+				<Grid Classes="gridPrimary"
+					  RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
+					  ColumnDefinitions="auto, 10, *">
+					<Button Grid.Row="0"
+							Grid.Column="0"
+							Content="Select input folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGeminiCaptionInputFolderCommand}"/>
+					<Label Grid.Row="0"
+						   Grid.Column="2"
+						   Content="{Binding GeminiCaptionInputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="2"
+							Grid.Column="0"
+							Content="Select output folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGeminiCaptionOutputFolderCommand}"/>
+					<Label Grid.Row="2"
+						   Grid.Column="2"
+						   Content="{Binding GeminiCaptionOutputFolder}"
+						   HorizontalAlignment="Left"/>
+					<Button Grid.Row="4"
+							Grid.Column="0"
+							Content="Select failed folder"
+							Width="180"
+							HorizontalAlignment="Left"
+							Command="{Binding SelectGeminiCaptionFailedFolderCommand}"/>
+					<Label Grid.Row="4"
+						   Grid.Column="2"
+						   Content="{Binding GeminiCaptionFailedFolder}"
+						   HorizontalAlignment="Left"/>
+					<Label Grid.Row="6"
+						   Grid.Column="0"
+						   Content="Gemini API Key:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="6"
+							 Grid.Column="2"
+							 Text="{Binding GeminiCaptionAPIKey}"
+							 Watermark="Enter here your Gemini API Key."/>
+					<Grid Grid.Row="8"
+						  Grid.Column="0"
+						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
+						<CheckBox Grid.Column="0"
+								  HorizontalAlignment="Left"
+								  Margin="10, 0, 0, 0"
+								  IsChecked="{Binding GeminiCaptionFreeAPI}"/>
+						<Label Grid.Column="1"
+							   HorizontalAlignment="Left"
+							   Content="Free API?"/>
+					</Grid>
+					<Label Grid.Row="10"
+						   Grid.Column="0"
+						   Content="Prompt:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="10"
+							 Grid.Column="2"
+							 Text="{Binding GeminiCaptionPrompt}"
+							 Watermark="Enter here the prompt for Gemini."/>
+					<Label Grid.Row="12"
+						   Grid.Column="0"
+						   Content="System Instructions:"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Center"/>
+					<TextBox Grid.Row="12"
+							 Grid.Column="2"
+							 Text="{Binding GeminiCaptionSystemInstructions}"
+							 Watermark="Enter here the system instructions for Gemini."/>
+				</Grid>
+			</Border>
+		</Grid>
+
+		<Separator Grid.Row="15"
+						   Margin="0, 10, 0, 10"/>
+		
+		<Grid Classes="gridSecondary" Grid.Row="16"
 			  RowDefinitions="auto, 12, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
@@ -857,10 +971,10 @@
 			</Border>
 		</Grid>
 
-		<Separator Grid.Row="15"
+		<Separator Grid.Row="17"
 						   Margin="0, 10, 0, 10"/>
 
-		<Grid Classes="gridSecondary" Grid.Row="16"
+		<Grid Classes="gridSecondary" Grid.Row="18"
 			  RowDefinitions="auto, 12, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
@@ -1002,10 +1116,10 @@
 			</Border>			
 		</Grid>
 
-		<Separator Grid.Row="17"
+		<Separator Grid.Row="19"
 						   Margin="0, 10, 0, 10"/>
 
-		<Grid Classes="gridSecondary" Grid.Row="18"
+		<Grid Classes="gridSecondary" Grid.Row="20"
 			  RowDefinitions="auto, 12, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
@@ -1069,10 +1183,10 @@
 			</Border>
 		</Grid>
 
-		<Separator Grid.Row="19"
+		<Separator Grid.Row="21"
 						   Margin="0, 10, 0, 10"/>
 
-		<Grid Classes="gridSecondary" Grid.Row="20"
+		<Grid Classes="gridSecondary" Grid.Row="22"
 			  RowDefinitions="auto, 12, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
@@ -1168,10 +1282,10 @@
 			</Border>
 		</Grid>
 
-		<Separator Grid.Row="21"
+		<Separator Grid.Row="23"
 						   Margin="0, 10, 0, 10"/>
 
-		<Grid Classes="gridSecondary" Grid.Row="22"
+		<Grid Classes="gridSecondary" Grid.Row="24"
 			  RowDefinitions="auto, 12, auto"
 			  ColumnDefinitions="1*, 1*, 1*, 1*, 1*">
 			<Label Grid.Row="0"
@@ -1270,9 +1384,9 @@
 			</Border>
 		</Grid>
 
-		<Separator Grid.Row="23"
+		<Separator Grid.Row="25"
 				   Margin="0, 10, 0, 10"/>
-		<Button Grid.Row="24"
+		<Button Grid.Row="26"
 				MaxWidth="200"
 			    Content="Save settings"
 				Command="{Binding SaveSettingsCommand}"/>
