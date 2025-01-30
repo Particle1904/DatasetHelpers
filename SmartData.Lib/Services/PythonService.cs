@@ -122,7 +122,7 @@ response_text = response.text
                     }
                     else if (exception.Message.Contains("429"))
                     {
-                        return "Check quota";
+                        return "CHECK QUOTA";
                     }
                     else
                     {

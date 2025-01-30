@@ -95,7 +95,7 @@ namespace Services
                         throw new InvalidGeminiAPIKeyException();
                     }
 
-                    if (result.Contains("BLOCKED CONTENT"))
+                    if (result.Contains("BLOCKED CONTENT") || result.Contains("CHECK QUOTA"))
                     {
                         File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file)));
                         imagesThatFailed++;
@@ -107,7 +107,7 @@ namespace Services
                         _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result);
                     }
 
-                    // Sleep for 4.1 seconds since Gemini API have a 15 requests per minute limitation for free users.
+                    // Sleep for 5 seconds since Gemini API have a 15 requests per minute limitation for free users.
                     if (FreeApi == true)
                     {
                         await Task.Delay(TimeSpan.FromSeconds(5));
