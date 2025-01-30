@@ -104,7 +104,7 @@ namespace Services
                     {
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
-                        _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result);
+                        _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
                     }
 
                     // Sleep for 5 seconds since Gemini API have a 15 requests per minute limitation for free users.
