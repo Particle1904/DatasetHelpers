@@ -57,7 +57,10 @@ namespace Services
             int imagesThatFailed = 0;
 
             await Task.Run(() => _python.DownloadPythonPackages());
-            _python.InitializePython();
+            if (!_python.IsInitialized)
+            {
+                _python.InitializePython();
+            }
 
             foreach (string file in files)
             {
