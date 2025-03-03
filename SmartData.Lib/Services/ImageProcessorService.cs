@@ -52,6 +52,12 @@ namespace SmartData.Lib.Services
             SkipMetadata = false
         };
 
+        private readonly PngEncoder _pngEncoder = new PngEncoder()
+        {
+            ColorType = PngColorType.RgbWithAlpha,
+            SkipMetadata = false
+        };
+
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
         private CubicResampler _cubicResampler;
@@ -217,7 +223,7 @@ namespace SmartData.Lib.Services
 
                 image.Mutate(image => image.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
+                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
             }
         }
 
@@ -1065,7 +1071,7 @@ namespace SmartData.Lib.Services
 
                 image.Mutate(image => image.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
+                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
             }
         }
 
@@ -1145,7 +1151,7 @@ namespace SmartData.Lib.Services
                 image.Mutate(image => image.BackgroundColor(Color.Black));
 
                 MemoryStream imageMaskStream = new MemoryStream();
-                image.SaveAsJpeg(imageMaskStream, _jpegEncoder);
+                image.SaveAsPng(imageMaskStream, _pngEncoder);
 
                 return imageMaskStream;
             }
@@ -1179,7 +1185,7 @@ namespace SmartData.Lib.Services
                 image.Mutate(image => image.Fill(brush, circle));
 
                 MemoryStream imageMaskStream = new MemoryStream();
-                image.SaveAsJpeg(imageMaskStream, _jpegEncoder);
+                image.SaveAsPng(imageMaskStream, _pngEncoder);
 
                 return imageMaskStream;
             }
@@ -1269,7 +1275,7 @@ namespace SmartData.Lib.Services
                 }
 
                 image.Mutate(image => image.BackgroundColor(Color.White));
-                await image.SaveAsJpegAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".jpeg"), _jpegEncoder);
+                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
             }
         }
 
