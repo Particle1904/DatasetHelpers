@@ -46,7 +46,7 @@ namespace DatasetProcessor.ViewModels
                     if (parsedValue < 10 || parsedValue > ushort.MaxValue)
                     {
                         Logger.SetLatestLogMessage($"{_invalidMinPromptsNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
-                            LogMessageColor.Warning);
+                            LogMessageColor.Warning, false);
                     }
 
                     _amountOfGeneratedPrompts = parsedValue;
@@ -73,7 +73,7 @@ namespace DatasetProcessor.ViewModels
                     if (parsedValue < 10 || parsedValue > 50)
                     {
                         Logger.SetLatestLogMessage($"Amount of tags needs to be a number between 1 and 50.",
-                            LogMessageColor.Warning);
+                            LogMessageColor.Warning, false);
                     }
 
                     _amountOfTags = parsedValue;

@@ -190,7 +190,7 @@
 			  HorizontalAlignment="Center">
 			<Button Grid.Column="0"
 					Width="200"
-					Content="auto crop images"
+					Content="Automatically crop images"
 					IsEnabled="{Binding IsUiEnabled}"
 					Command="{Binding CropImagesCommand}"/>
 			<Button Grid.Column="2"

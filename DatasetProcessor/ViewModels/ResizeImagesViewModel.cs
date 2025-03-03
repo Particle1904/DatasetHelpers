@@ -49,7 +49,7 @@ namespace DatasetProcessor.ViewModels
                     if (parsedValue < byte.MaxValue + 1 || parsedValue > ushort.MaxValue)
                     {
                         Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
-                            LogMessageColor.Warning);
+                            LogMessageColor.Warning, false);
                     }
 
                     _minimumResolutionForSigma = parsedValue;

@@ -24,6 +24,7 @@ using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning;
+using SmartData.Lib.Models.MachineLearning.SAM2;
 using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services
@@ -511,13 +512,13 @@ namespace SmartData.Lib.Services
         /// <summary>
         /// Asynchronously processes an image and its corresponding mask for inpainting by converting them to float arrays.
         /// </summary>
-        /// <param name="inputImagePath">The path of the image to be processed.</param>
+        /// <param name="inputPath">The path of the image to be processed.</param>
         /// <param name="inputMaskPath">The path of the mask to be processed.</param>
         /// <returns>An <see cref="LaMaInputData"/> object containing the processed image and mask as float arrays.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputImagePath"/> or <paramref name="inputMaskPath"/> does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputImagePath"/> or <paramref name="inputMaskPath"/>.</exception>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> or <paramref name="inputMaskPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/> or <paramref name="inputMaskPath"/>.</exception>
         /// <exception cref="ArgumentException">The dimensions of the mask do not match the dimensions of the image.</exception>
-        public async Task<LaMaInputData> ProcessImageForInpaintAsync(string inputImagePath, string inputMaskPath)
+        public async Task<LaMaInputData> ProcessImageForInpaintAsync(string inputPath, string inputMaskPath)
         {
             LaMaInputData inputData = new LaMaInputData()
             {
@@ -537,7 +538,7 @@ namespace SmartData.Lib.Services
 
             // Process input image
             Point imageSize;
-            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputImagePath))
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
                 inputData.OriginalSize = new Point(image.Width, image.Height);
 
@@ -599,7 +600,7 @@ namespace SmartData.Lib.Services
         /// <summary>
         /// Processes the input image and mask for tile-based inpainting, and returns an array of <see cref="TileData"/>.
         /// </summary>
-        /// <param name="inputImagePath">The file path to the input image.</param>
+        /// <param name="inputPath">The file path to the input image.</param>
         /// <param name="inputMaskPath">The file path to the input mask.</param>
         /// <param name="tileSize">The size of each tile in pixels. Default is 512.</param>
         /// <returns>An array of <see cref="TileData"/> containing the processed image and mask data for each tile.</returns>
@@ -608,16 +609,16 @@ namespace SmartData.Lib.Services
         /// This method splits the input image and mask into tiles of the specified size, processes each tile to extract the pixel data,
         /// and creates an array of <see cref="TileData"/> containing the processed data for each tile. The tiles are then returned as an array.
         /// </remarks>
-        public async Task<TileData[]> ProcessImageForTileInpaintAsync(string inputImagePath, string inputMaskPath, int tileSize = 512)
+        public async Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512)
         {
-            System.Drawing.Size imageSize = await GetImageSizeAsync(inputImagePath);
+            System.Drawing.Size imageSize = await GetImageSizeAsync(inputPath);
             System.Drawing.Size maskSize = await GetImageSizeAsync(inputMaskPath);
             if (!imageSize.Equals(maskSize))
             {
                 throw new ArgumentException("Image and Mask must be same size!");
             }
 
-            TileImage[] imageTiles = await ExtractTilesFromImage(inputImagePath, tileSize);
+            TileImage[] imageTiles = await ExtractTilesFromImage(inputPath, tileSize);
             TileImage[] maskTiles = await ExtractTilesFromImage(inputMaskPath, tileSize);
             if (imageTiles.Length != maskTiles.Length)
             {
@@ -686,16 +687,63 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously processes an image for SAM2 encoding by resizing it and converting its pixel values into a normalized float tensor.
+        /// </summary>
+        /// <param name="inputPath">The path of the image to be processed.</param>
+        /// <returns>An <see cref="SAM2EncoderInputData"/> object containing the processed image as a normalized float tensor.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
+        public async Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath)
+        {
+            SAM2EncoderInputData inputData = new SAM2EncoderInputData()
+            {
+                InputImage = new DenseTensor<float>(new int[] { 1, 3, 1024, 1024 })
+            };
+
+            using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Mode = ResizeMode.BoxPad,
+                    Position = AnchorPositionMode.Center,
+                    Sampler = _lanczosResampler,
+                    Compand = true,
+                    PadColor = new Rgb24(0, 0, 0),
+                    Size = new Size(1024, 1024)
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+                image.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            ref Rgb24 pixel = ref pixelRow[x];
+
+                            inputData.InputImage[0, 0, y, x] = pixel.R / 255f;
+                            inputData.InputImage[0, 1, y, x] = pixel.G / 255f;
+                            inputData.InputImage[0, 2, y, x] = pixel.B / 255f;
+                        }
+                    }
+                });
+            }
+
+            return inputData;
+        }
+
+        /// <summary>
         /// Extracts tiles from the input image with the specified tile size.
         /// </summary>
-        /// <param name="inputImagePath">The file path to the input image.</param>
+        /// <param name="inputPath">The file path to the input image.</param>
         /// <param name="tileSize">The size of each tile in pixels.</param>
         /// <returns>An array of <see cref="TileImage"/> containing the extracted image tiles.</returns>
         /// <remarks>
         /// This method splits the input image into tiles of the specified size and resizes each tile to the specified tile size.
         /// Each tile is then returned as a <see cref="TileImage"/> object containing the image data and tile indices.
         /// </remarks>
-        private async Task<TileImage[]> ExtractTilesFromImage(string inputImagePath, int tileSize)
+        private async Task<TileImage[]> ExtractTilesFromImage(string inputPath, int tileSize)
         {
             ResizeOptions resizeOptions = new ResizeOptions()
             {
@@ -708,7 +756,7 @@ namespace SmartData.Lib.Services
             int rows;
             int columns;
             List<TileImage> imageTiles = new List<TileImage>();
-            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputImagePath))
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
                 rows = (int)Math.Ceiling(image.Height / (float)tileSize);
                 columns = (int)Math.Ceiling(image.Width / (float)tileSize);

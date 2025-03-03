@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Models.MachineLearning;
+using SmartData.Lib.Models.MachineLearning.SAM2;
 
 namespace SmartData.Lib.Interfaces
 {
@@ -24,8 +25,9 @@ namespace SmartData.Lib.Interfaces
         public Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath);
         public Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath);
         public Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath);
-        public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputImagePath, string inputMaskPath);
-        public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputImagePath, string inputMaskPath, int tileSize = 512);
+        public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputPath, string inputMaskPath);
+        public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512);
+        public Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath);
         public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData);
         public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData);
         public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);
