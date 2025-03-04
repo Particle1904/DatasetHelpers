@@ -1191,91 +1191,82 @@ namespace SmartData.Lib.Services
             }
         }
 
-        /// <summary>
-        /// Resizes an image to a target aspect ratio and saves it as a JPEG file in the output directory.
-        /// </summary>
-        /// <param name="outputPath">The full path of the directory to save the resized image file in.</param>
-        /// <param name="inputPath">The full path of the image file to resize.</param>
-        /// <param name="dimension">The maximum dimension (width or height) of the resized image. Defaults to 512.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation of resizing and saving the image file.</returns>
-        /// <remarks>
-        /// <para>
-        /// This method resizes the input image file to a target aspect ratio based on a predetermined set of aspect ratio buckets. The target aspect ratio is calculated based on the number of blocks assigned to each aspect ratio bucket.
-        /// </para>
-        /// <para>
-        /// The resized image is saved as a JPEG file in the output directory with the same name as the original file, but with the extension changed to ".jpeg".
-        /// </para>
-        /// <para>
-        /// The maximum dimension (width or height) of the resized image can be specified using the optional dimension parameter. If both width and height of the image are less than the specified dimension, then the image is not resized. The default value of dimension is 512.
-        /// </para>
-        /// <para>
-        /// This method uses a Lanczos resampling algorithm for high-quality image resizing. The JPEG encoding quality is set to 100 and metadata is not skipped.
-        /// </para>
-        /// </remarks>
         private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
             using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
-                int originalWidth = image.Width;
-                int originalHeight = image.Height;
+                double aspectRatio = image.Width / (double)image.Height;
 
-                double aspectRatio = Math.Round(image.Width / (double)image.Height, 2);
+                int canvasWidth, canvasHeight;
+                int computedWidth, computedHeight;
 
-                int bucket = FindAspectRatioBucket(aspectRatio);
-
-                int blocks = _aspectRatioToBlocks.Values.Sum();
-
-                int targetWidth;
-                int targetHeight;
-
-                if (image.Width < (int)dimension && image.Height < (int)dimension)
+                if (image.Width >= image.Height)
                 {
-                    if (image.Width > image.Height)
-                    {
-                        targetWidth = (int)dimension;
-                        targetHeight = (int)Math.Round(targetWidth / aspectRatio);
-                    }
-                    else
-                    {
-                        targetHeight = (int)dimension;
-                        targetWidth = (int)Math.Round(targetHeight * aspectRatio);
-                    }
+                    computedWidth = (int)dimension;
+                    computedHeight = (int)Math.Round(computedWidth / aspectRatio);
+                    canvasWidth = computedWidth;
+                    canvasHeight = RoundToNearestMultiple(computedHeight, 16);
                 }
                 else
                 {
-                    if (image.Width > image.Height)
-                    {
-                        targetWidth = Math.Min(image.Width, (int)dimension);
-                        targetHeight = (int)Math.Round(targetWidth / aspectRatio);
-                    }
-                    else
-                    {
-                        targetHeight = Math.Min(image.Height, (int)dimension);
-                        targetWidth = (int)Math.Round(targetHeight * aspectRatio);
-                    }
+                    computedHeight = (int)dimension;
+                    computedWidth = (int)Math.Round(computedHeight * aspectRatio);
+                    canvasHeight = computedHeight;
+                    canvasWidth = RoundToNearestMultiple(computedWidth, 16);
                 }
 
-                ResizeOptions resizeOptions = new ResizeOptions()
+                var resizeOptions = new ResizeOptions
                 {
-                    Mode = ResizeMode.Stretch,
+                    Size = new Size(canvasWidth, canvasHeight),
+                    Mode = ResizeMode.Crop,
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
-                    Compand = true,
-                    PadColor = Color.White,
-                    Size = new Size(targetWidth, targetHeight)
+                    Compand = true
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(x => x.Resize(resizeOptions));
 
-                if (ApplySharpen && (originalWidth >= MinimumResolutionForSigma || originalHeight >= MinimumResolutionForSigma))
+                if (ApplySharpen && (image.Width >= MinimumResolutionForSigma || image.Height >= MinimumResolutionForSigma))
                 {
-                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                    image.Mutate(x => x.GaussianSharpen(_sharpenSigma));
                 }
 
-                image.Mutate(image => image.BackgroundColor(Color.White));
-                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
+                string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
+                await image.SaveAsPngAsync(outputFilePath, _pngEncoder);
+            }
+        }
+
+        /// <summary>
+        /// Rounds the provided value to the nearest multiple of the specified number.
+        /// </summary>
+        /// <param name="value">The value to round.</param>
+        /// <param name="multiple">The multiple to round to.</param>
+        /// <returns>The rounded value.</returns>
+        private int RoundToNearestMultiple(int value, int multiple)
+        {
+            if (multiple == 0)
+            {
+                return value;
+            }
+
+            int remainder = value % multiple;
+            if (remainder == 0)
+            {
+                return value;
+            }
+
+            int lowerMultiple = value - remainder;
+            int upperMultiple = lowerMultiple + multiple;
+
+            if (value - lowerMultiple < upperMultiple - value)
+            {
+                return lowerMultiple;
+            }
+            else
+            {
+                return upperMultiple;
             }
         }
 
