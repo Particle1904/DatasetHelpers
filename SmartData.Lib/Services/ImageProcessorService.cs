@@ -577,7 +577,12 @@ namespace SmartData.Lib.Services
                     throw new ArgumentException("The mask and the image must have the same Width and Height!");
                 }
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(image =>
+                {
+                    image.Resize(resizeOptions);
+                    image.GaussianBlur(6.0f);
+                });
+
 
                 image.ProcessPixelRows(accessor =>
                 {
