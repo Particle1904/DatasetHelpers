@@ -64,7 +64,7 @@ namespace DatasetProcessor.ViewModels
                     }
                     else
                     {
-                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error);
+                        Logger.SetLatestLogMessage(string.Empty, LogMessageColor.Error, false);
                     }
 
                     _startingNumberForFileNames = parsedValue;
