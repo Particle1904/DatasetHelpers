@@ -138,7 +138,7 @@
 					  Grid.Row="2"
 					  HorizontalAlignment="Left"
 					  Margin="10"
-					  IsChecked="{Binding WeightedCaptions}"
+					  IsChecked="{Binding BackupImages}"
 					  Content="Would you like to backup images before processing?">
 			</CheckBox>
 		</Grid>

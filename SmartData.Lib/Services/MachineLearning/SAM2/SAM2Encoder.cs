@@ -1,10 +1,12 @@
-﻿using SmartData.Lib.Interfaces;
+﻿using Interfaces.MachineLearning.SAM2;
+
+using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning.SAM2;
 using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services.MachineLearning.SAM2
 {
-    class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>
+    class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>, ISAM2Encoder
     {
         private readonly IImageProcessorService _imageProcessor;
 

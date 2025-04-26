@@ -126,8 +126,16 @@ namespace DatasetProcessor.ViewModels
 
             if (BackupImages)
             {
-                TaskStatus = ProcessingStatus.BackingUp;
-                await _fileManipulator.BackupFilesAsync(InputFolderPath, BackupFolderPath);
+                if (string.IsNullOrEmpty(BackupFolderPath))
+                {
+                    Logger.SetLatestLogMessage($"Please select the backup folder. Otherwise, uncheck the back box! Backup will be skipped at this time.",
+                        LogMessageColor.Warning);
+                }
+                else
+                {
+                    TaskStatus = ProcessingStatus.BackingUp;
+                    await _fileManipulator.BackupFilesAsync(InputFolderPath, BackupFolderPath);
+                }
             }
 
             TaskStatus = ProcessingStatus.Running;
@@ -135,6 +143,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, Dimension);
+
             }
             catch (ArgumentNullException)
             {

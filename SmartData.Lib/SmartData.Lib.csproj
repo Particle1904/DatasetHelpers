@@ -58,8 +58,4 @@
 	  </None>
 	</ItemGroup>
 	
-	<ItemGroup>
-	  <Folder Include="Models\Json\Requests\" />
-	</ItemGroup>
-	
 </Project>
