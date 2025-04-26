@@ -49,6 +49,12 @@ This software requires two runtimes:
 - [.NET Desktop Runtime 8 or newer](https://dotnet.microsoft.com/pt-br/download/dotnet/8.0)
 - [Visual C++ Redistributable for Visual Studio 2019 for running the Model](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
 
+### Linux specific requirements: ###
+Follow [this installation guide](https://github.com/videolan/libvlcsharp/blob/3.x/docs/linux-setup.md) from the LibVLCSharp github documentation:
+- `sudo apt update`
+- `sudo apt install vlc libvlc-dev`
+- `sudo apt install vlc`
+
 ## Technologies
 - Dataset Processor Tools is built using Avalonia in its second version, an open-source and cross-platform UI framework for building native cross platform applications.
 - ML.NET to run the WD 1.4 SwinV2 v2, WD SwinV2 v3, JoyTag, Z3DE621 AI Models.
