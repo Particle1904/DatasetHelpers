@@ -60,7 +60,7 @@ namespace DatasetProcessor.ViewModels
                     if (parsedValue <= 0 || parsedValue > int.MaxValue)
                     {
                         Logger.SetLatestLogMessage($"{_invalidMinSharpenNumberMessage}{Environment.NewLine}This value will be clampled to a valid number before processing!",
-                            LogMessageColor.Warning);
+                            LogMessageColor.Warning, false);
                     }
                     else
                     {
