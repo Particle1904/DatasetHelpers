@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.22.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
   </ItemGroup>
 
   <ItemGroup>
