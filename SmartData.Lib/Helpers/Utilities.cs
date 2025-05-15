@@ -110,7 +110,7 @@ namespace SmartData.Lib.Helpers
         /// <returns>The sigmoid value of the input.</returns>
         public static float Sigmoid(float x)
         {
-            return 1f / (1f + (float)Math.Exp(-x));
+            return 1.0f / (1.0f + (float)Math.Exp(-x));
         }
     }
 }

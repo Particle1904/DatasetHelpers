@@ -32,9 +32,5 @@ namespace SmartData.Lib.Models.MachineLearning.SAM2
         [ColumnName("has_mask_input")]
         [VectorType(0)]
         public DenseTensor<float>? HasMaskInput { get; set; }
-
-        [ColumnName("orig_im_size")]
-        [VectorType(2)]
-        public DenseTensor<int>? OriginalImageSize { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.ML.Data;
 using Microsoft.ML.OnnxRuntime.Tensors;
 
+using System.Drawing;
+
 namespace SmartData.Lib.Models.MachineLearning.SAM2
 {
     public class SAM2DecoderOutputData
@@ -12,5 +14,7 @@ namespace SmartData.Lib.Models.MachineLearning.SAM2
         [ColumnName("iou_predictions")]
         [VectorType(0, 0)]
         public DenseTensor<float>? IouPredictions { get; set; }
+
+        public Size OriginalResolution { get; set; }
     }
 }

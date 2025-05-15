@@ -38,5 +38,6 @@ namespace SmartData.Lib.Interfaces
         public Task<List<string>> ReadImageMetadataAsync(Stream imageStream);
         public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
         public Task<string> GetBase64ImageAsync(string inputPath);
+        public Task SaveSAM2MaskAsync(SAM2DecoderOutputData SAM2masks, string outputPath, int dilationSizeInPixels = 2);
     }
 }

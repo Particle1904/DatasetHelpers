@@ -61,6 +61,7 @@ namespace SmartData.Lib.Services
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
         private CubicResampler _cubicResampler;
+        private NearestNeighborResampler _nearestNeighborResampler;
 
         private const ushort _semaphoreConcurrent = 6;
 
@@ -111,6 +112,9 @@ namespace SmartData.Lib.Services
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
+        private static readonly float[] PixelMean = { 123.675f, 116.28f, 103.53f };
+        private static readonly float[] PixelStd = { 58.395f, 57.12f, 57.375f };
+
         public ImageProcessorService() : base()
         {
             BlocksPerRow = _baseResolution / _divisor;
@@ -119,6 +123,7 @@ namespace SmartData.Lib.Services
             _bicubicResampler = new BicubicResampler();
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
             _cubicResampler = CubicResampler.MitchellNetravali;
+            _nearestNeighborResampler = new NearestNeighborResampler();
             MinimumResolutionForSigma = 512;
         }
 
@@ -698,12 +703,21 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Asynchronously processes an image for SAM2 encoding by resizing it and converting its pixel values into a normalized float tensor.
+        /// Asynchronously processes an image for SAM2 encoding by resizing (with black padding to 1024×1024),
+        /// then converting its pixels from the 0–255 range into a mean–std–normalized float tensor
+        /// of shape [1, 3, 1024, 1024].
         /// </summary>
-        /// <param name="inputPath">The path of the image to be processed.</param>
-        /// <returns>An <see cref="SAM2EncoderInputData"/> object containing the processed image as a normalized float tensor.</returns>
-        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
-        /// <exception cref="System.IO.IOException">An I/O error occurred while opening the file specified by <paramref name="inputPath"/>.</exception>
+        /// <param name="inputPath">The file path of the image to be processed.</param>
+        /// <returns>
+        /// A <see cref="SAM2EncoderInputData"/> containing the image as a float tensor,
+        /// normalized using the SAM2 model’s pixel mean and standard deviation.
+        /// </returns>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// Thrown if the file specified by <paramref name="inputPath"/> does not exist.
+        /// </exception>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if an I/O error occurs while loading or reading the image file.
+        /// </exception>
         public async Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath)
         {
             SAM2EncoderInputData inputData = new SAM2EncoderInputData()
@@ -724,124 +738,31 @@ namespace SmartData.Lib.Services
                 };
 
                 image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(image => image.GaussianSharpen(0.5f));
+
                 image.ProcessPixelRows(accessor =>
                 {
                     for (int y = 0; y < accessor.Height; y++)
                     {
-                        Span<Rgb24> pixelRow = accessor.GetRowSpan(y);
-                        for (int x = 0; x < pixelRow.Length; x++)
+                        var row = accessor.GetRowSpan(y);
+                        for (int x = 0; x < row.Length; x++)
                         {
-                            ref Rgb24 pixel = ref pixelRow[x];
+                            ref Rgb24 px = ref row[x];
 
-                            inputData.InputImage[0, 0, y, x] = pixel.R / 255f;
-                            inputData.InputImage[0, 1, y, x] = pixel.G / 255f;
-                            inputData.InputImage[0, 2, y, x] = pixel.B / 255f;
+                            // Keep 0..255 range, then normalize
+                            float r = (px.R - PixelMean[0]) / PixelStd[0];
+                            float g = (px.G - PixelMean[1]) / PixelStd[1];
+                            float b = (px.B - PixelMean[2]) / PixelStd[2];
+
+                            inputData.InputImage[0, 0, y, x] = r;
+                            inputData.InputImage[0, 1, y, x] = g;
+                            inputData.InputImage[0, 2, y, x] = b;
                         }
                     }
                 });
             }
 
             return inputData;
-        }
-
-        /// <summary>
-        /// Extracts tiles from the input image with the specified tile size.
-        /// </summary>
-        /// <param name="inputPath">The file path to the input image.</param>
-        /// <param name="tileSize">The size of each tile in pixels.</param>
-        /// <returns>An array of <see cref="TileImage"/> containing the extracted image tiles.</returns>
-        /// <remarks>
-        /// This method splits the input image into tiles of the specified size and resizes each tile to the specified tile size.
-        /// Each tile is then returned as a <see cref="TileImage"/> object containing the image data and tile indices.
-        /// </remarks>
-        private async Task<TileImage[]> ExtractTilesFromImage(string inputPath, int tileSize)
-        {
-            ResizeOptions resizeOptions = new ResizeOptions()
-            {
-                Mode = ResizeMode.BoxPad,
-                Position = AnchorPositionMode.TopLeft,
-                Compand = true,
-                Size = new Size(tileSize, tileSize),
-            };
-
-            int rows;
-            int columns;
-            List<TileImage> imageTiles = new List<TileImage>();
-            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
-            {
-                rows = (int)Math.Ceiling(image.Height / (float)tileSize);
-                columns = (int)Math.Ceiling(image.Width / (float)tileSize);
-
-                for (int y = 0; y < rows; y++)
-                {
-                    for (int x = 0; x < columns; x++)
-                    {
-                        int cropX = x * tileSize;
-                        int cropY = y * tileSize;
-                        int cropWidth;
-                        if (x == columns - 1)
-                        {
-                            cropWidth = image.Width - cropX;
-                        }
-                        else
-                        {
-                            cropWidth = tileSize;
-                        }
-                        int cropHeight;
-                        if (y == rows - 1)
-                        {
-                            cropHeight = image.Height - cropY;
-                        }
-                        else
-                        {
-                            cropHeight = tileSize;
-                        }
-
-                        Image<Rgba32> cloneImage = image.Clone();
-                        Rectangle cropArea = new Rectangle(cropX, cropY, cropWidth, cropHeight);
-                        cloneImage.Mutate(image => image.Crop(cropArea));
-
-                        if (cropWidth < tileSize || cropHeight < tileSize)
-                        {
-                            Image<Rgba32> paddedImage = new Image<Rgba32>(tileSize, tileSize);
-                            paddedImage.Mutate(ctx => ctx.DrawImage(cloneImage, new Point(0, 0), 1f));
-
-                            // Stretch the last column to the right
-                            if (cropWidth < tileSize)
-                            {
-                                for (int stretchX = cropWidth; stretchX < tileSize; stretchX++)
-                                {
-                                    for (int stretchY = 0; stretchY < cropHeight; stretchY++)
-                                    {
-                                        paddedImage[stretchX, stretchY] = paddedImage[cropWidth - 1, stretchY];
-                                    }
-                                }
-                            }
-
-                            // Stretch the last row to the bottom
-                            if (cropHeight < tileSize)
-                            {
-                                for (int stretchY = cropHeight; stretchY < tileSize; stretchY++)
-                                {
-                                    for (int stretchX = 0; stretchX < tileSize; stretchX++)
-                                    {
-                                        paddedImage[stretchX, stretchY] = paddedImage[stretchX, cropHeight - 1];
-                                    }
-                                }
-                            }
-
-                            imageTiles.Add(new TileImage(paddedImage, x, y));
-                        }
-                        else
-                        {
-                            cloneImage.Mutate(img => img.Resize(tileSize, tileSize));
-                            imageTiles.Add(new TileImage(cloneImage, x, y));
-                        }
-                    }
-                }
-            }
-
-            return imageTiles.ToArray();
         }
 
         /// <summary>
@@ -1196,6 +1117,180 @@ namespace SmartData.Lib.Services
             }
         }
 
+        /// <summary>
+        /// Converts an image at the specified input path to a Base64-encoded string in JPEG format.
+        /// </summary>
+        /// <param name="inputPath">The file path of the input image.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the Base64-encoded string of the JPEG image.</returns>
+        /// <remarks>
+        /// This method performs the following steps:
+        /// <list type="number">
+        /// <item>Loads the input image from the specified file path.</item>
+        /// <item>Encodes the image into JPEG format with a quality setting of 100.</item>
+        /// <item>Converts the encoded JPEG image into a Base64 string.</item>
+        /// </list>
+        /// Supported image formats depend on the <c>SixLabors.ImageSharp</c> library.
+        /// </remarks>
+        /// <exception cref="FileNotFoundException">Thrown if the specified input file does not exist.</exception>
+        /// <exception cref="ImageFormatException">Thrown if the input file is not a valid image format.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown if the application lacks permissions to access the specified file.</exception>
+        /// <example>
+        /// <code>
+        /// string inputPath = "path/to/image.png";
+        /// string base64Image = await GetBase64ImageAsync(inputPath);
+        /// Console.WriteLine(base64Image);
+        /// </code>
+        /// </example>
+        public async Task<string> GetBase64ImageAsync(string inputPath)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    PngEncoder pngEncoder = new PngEncoder();
+
+                    await image.SaveAsPngAsync(memoryStream, pngEncoder);
+                    byte[] jpegBytes = memoryStream.ToArray();
+                    return Convert.ToBase64String(jpegBytes);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously selects the highest‐confidence mask from the SAM2 decoder output, processes it
+        /// (resizing, cropping, thresholding, dilation, and blurring), and saves the resulting binary PNG mask
+        /// to the specified output path.
+        /// </summary>
+        /// <param name="SAM2masks">
+        /// The <see cref="SAM2DecoderOutputData"/> containing raw mask logits, IoU predictions, and the original
+        /// image resolution. Must have a non‐null <c>Masks</c> tensor and valid <c>OriginalResolution</c>.
+        /// </param>
+        /// <param name="outputPath">
+        /// The file path where the final binary mask PNG will be written. The directory must exist and the path
+        /// must be writable.
+        /// </param>
+        /// <param name="dilationSizeInPixels">
+        /// The radius, in pixels, by which to dilate the binary mask before applying median and Gaussian blurs.
+        /// Defaults to <c>2</c>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous image‐processing and file‐save operation.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown if <paramref name="SAM2masks"/> is null, its <c>Masks</c> tensor is null, or if
+        /// <paramref name="outputPath"/> is null or empty.
+        /// </exception>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if an I/O error occurs while writing the output PNG file to <paramref name="outputPath"/>.
+        /// </exception>
+        public async Task SaveSAM2MaskAsync(SAM2DecoderOutputData SAM2masks, string outputPath, int dilationSizeInPixels = 2)
+        {
+            const int maskResolution = 256;
+            const int encoderInputSize = 1024;
+
+            int originalWidth = SAM2masks.OriginalResolution.Width;
+            int originalHeight = SAM2masks.OriginalResolution.Height;
+
+            DenseTensor<float> maskTensor = SAM2masks.Masks!;
+
+            // Select the best mask based on IoU
+            int bestIndex = 0;
+            float bestIoU = SAM2masks.IouPredictions[0, 0];
+            for (int i = 1; i < SAM2masks.IouPredictions.Length; i++)
+            {
+                if (SAM2masks.IouPredictions[0, i] > bestIoU)
+                {
+                    bestIoU = SAM2masks.IouPredictions[0, i];
+                    bestIndex = i;
+                }
+            }
+
+            using (Image<L16> floatMask = new Image<L16>(maskResolution, maskResolution))
+            {
+                // Fill the low-res float mask
+                for (int y = 0; y < maskResolution; y++)
+                {
+                    for (int x = 0; x < maskResolution; x++)
+                    {
+                        float logit = maskTensor[0, bestIndex, y, x];
+                        float probability = Utilities.Sigmoid(logit);
+                        ushort value = (ushort)(probability * ushort.MaxValue);
+                        floatMask[x, y] = new L16(value);
+                    }
+                }
+
+                // Resize to 1024x1024
+                ResizeOptions upscaleResizeOptions = new ResizeOptions
+                {
+                    Size = new Size(encoderInputSize, encoderInputSize),
+                    Mode = ResizeMode.Stretch,
+                    Sampler = _lanczosResampler
+                };
+
+                using (Image<L16> upscaledMask = floatMask.Clone(image => image.Resize(upscaleResizeOptions)))
+                {
+                    // Crop padding (BoxPad logic)
+                    float originalAspect = (float)originalWidth / originalHeight;
+                    int paddedWidth, paddedHeight, offsetX, offsetY;
+
+                    if (originalAspect > 1)
+                    {
+                        paddedWidth = encoderInputSize;
+                        paddedHeight = (int)(encoderInputSize / originalAspect);
+                        offsetX = 0;
+                        offsetY = (encoderInputSize - paddedHeight) / 2;
+                    }
+                    else
+                    {
+                        paddedWidth = (int)(encoderInputSize * originalAspect);
+                        paddedHeight = encoderInputSize;
+                        offsetX = (encoderInputSize - paddedWidth) / 2;
+                        offsetY = 0;
+                    }
+
+                    using (Image<L16> croppedMask = upscaledMask.Clone(image => image.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight))))
+                    {
+                        // Resize to original image size
+                        using (Image<L16> finalFloatMask = croppedMask.Clone(image => image.Resize(originalWidth, originalHeight, _lanczosResampler)))
+                        {
+                            // Threshold to binary mask
+                            using (Image<L8> binaryMask = new Image<L8>(originalWidth, originalHeight))
+                            {
+                                for (int y = 0; y < finalFloatMask.Height; y++)
+                                {
+                                    for (int x = 0; x < finalFloatMask.Width; x++)
+                                    {
+                                        float probability = finalFloatMask[x, y].PackedValue / (float)ushort.MaxValue;
+                                        byte value = probability > 0.5f ? (byte)255 : (byte)0;
+                                        binaryMask[x, y] = new L8(value);
+                                    }
+                                }
+
+                                // Blur the mask a bit for a better inpaint result
+                                Image<L8> dilatedMask = DilateMask(binaryMask, dilationSizeInPixels);
+                                dilatedMask.Mutate(image => image.MedianBlur(3, true));
+                                dilatedMask.Mutate(image => image.GaussianBlur(5.0f));
+                                await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
+                                dilatedMask.Dispose();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously resizes an image to fit within the specified dimensions, 
+        /// maintaining aspect ratio and applying optional sharpening.
+        /// </summary>
+        /// <param name="inputPath">The file path of the source image to be resized.</param>
+        /// <param name="outputPath">The directory where the resized image will be saved.</param>
+        /// <param name="dimension">The target dimension to resize the longest side of the image to.</param>
+        /// <returns>A task representing the asynchronous image resizing operation.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An error occurred while reading or writing image files.</exception>
         private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
@@ -1276,47 +1371,6 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Converts an image at the specified input path to a Base64-encoded string in JPEG format.
-        /// </summary>
-        /// <param name="inputPath">The file path of the input image.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains the Base64-encoded string of the JPEG image.</returns>
-        /// <remarks>
-        /// This method performs the following steps:
-        /// <list type="number">
-        /// <item>Loads the input image from the specified file path.</item>
-        /// <item>Encodes the image into JPEG format with a quality setting of 100.</item>
-        /// <item>Converts the encoded JPEG image into a Base64 string.</item>
-        /// </list>
-        /// Supported image formats depend on the <c>SixLabors.ImageSharp</c> library.
-        /// </remarks>
-        /// <exception cref="FileNotFoundException">Thrown if the specified input file does not exist.</exception>
-        /// <exception cref="ImageFormatException">Thrown if the input file is not a valid image format.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown if the application lacks permissions to access the specified file.</exception>
-        /// <example>
-        /// <code>
-        /// string inputPath = "path/to/image.png";
-        /// string base64Image = await GetBase64ImageAsync(inputPath);
-        /// Console.WriteLine(base64Image);
-        /// </code>
-        /// </example>
-        public async Task<string> GetBase64ImageAsync(string inputPath)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-
-            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    PngEncoder pngEncoder = new PngEncoder();
-
-                    await image.SaveAsPngAsync(memoryStream, pngEncoder);
-                    byte[] jpegBytes = memoryStream.ToArray();
-                    return Convert.ToBase64String(jpegBytes);
-                }
-            }
-        }
-
-        /// <summary>
         /// Calculates the number of blocks assigned to each aspect ratio bucket.
         /// </summary>
         /// <param name="totalBlocks">The total number of blocks to be assigned across all aspect ratio buckets.</param>
@@ -1379,6 +1433,151 @@ namespace SmartData.Lib.Services
             }
 
             return _totalBlocks;
+        }
+
+        /// <summary>
+        /// Extracts tiles from the input image with the specified tile size.
+        /// </summary>
+        /// <param name="inputPath">The file path to the input image.</param>
+        /// <param name="tileSize">The size of each tile in pixels.</param>
+        /// <returns>An array of <see cref="TileImage"/> containing the extracted image tiles.</returns>
+        /// <remarks>
+        /// This method splits the input image into tiles of the specified size and resizes each tile to the specified tile size.
+        /// Each tile is then returned as a <see cref="TileImage"/> object containing the image data and tile indices.
+        /// </remarks>
+        private async Task<TileImage[]> ExtractTilesFromImage(string inputPath, int tileSize)
+        {
+            ResizeOptions resizeOptions = new ResizeOptions()
+            {
+                Mode = ResizeMode.BoxPad,
+                Position = AnchorPositionMode.TopLeft,
+                Compand = true,
+                Size = new Size(tileSize, tileSize),
+            };
+
+            int rows;
+            int columns;
+            List<TileImage> imageTiles = new List<TileImage>();
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
+            {
+                rows = (int)Math.Ceiling(image.Height / (float)tileSize);
+                columns = (int)Math.Ceiling(image.Width / (float)tileSize);
+
+                for (int y = 0; y < rows; y++)
+                {
+                    for (int x = 0; x < columns; x++)
+                    {
+                        int cropX = x * tileSize;
+                        int cropY = y * tileSize;
+                        int cropWidth;
+                        if (x == columns - 1)
+                        {
+                            cropWidth = image.Width - cropX;
+                        }
+                        else
+                        {
+                            cropWidth = tileSize;
+                        }
+                        int cropHeight;
+                        if (y == rows - 1)
+                        {
+                            cropHeight = image.Height - cropY;
+                        }
+                        else
+                        {
+                            cropHeight = tileSize;
+                        }
+
+                        Image<Rgba32> cloneImage = image.Clone();
+                        Rectangle cropArea = new Rectangle(cropX, cropY, cropWidth, cropHeight);
+                        cloneImage.Mutate(image => image.Crop(cropArea));
+
+                        if (cropWidth < tileSize || cropHeight < tileSize)
+                        {
+                            Image<Rgba32> paddedImage = new Image<Rgba32>(tileSize, tileSize);
+                            paddedImage.Mutate(ctx => ctx.DrawImage(cloneImage, new Point(0, 0), 1f));
+
+                            // Stretch the last column to the right
+                            if (cropWidth < tileSize)
+                            {
+                                for (int stretchX = cropWidth; stretchX < tileSize; stretchX++)
+                                {
+                                    for (int stretchY = 0; stretchY < cropHeight; stretchY++)
+                                    {
+                                        paddedImage[stretchX, stretchY] = paddedImage[cropWidth - 1, stretchY];
+                                    }
+                                }
+                            }
+
+                            // Stretch the last row to the bottom
+                            if (cropHeight < tileSize)
+                            {
+                                for (int stretchY = cropHeight; stretchY < tileSize; stretchY++)
+                                {
+                                    for (int stretchX = 0; stretchX < tileSize; stretchX++)
+                                    {
+                                        paddedImage[stretchX, stretchY] = paddedImage[stretchX, cropHeight - 1];
+                                    }
+                                }
+                            }
+
+                            imageTiles.Add(new TileImage(paddedImage, x, y));
+                        }
+                        else
+                        {
+                            cloneImage.Mutate(img => img.Resize(tileSize, tileSize));
+                            imageTiles.Add(new TileImage(cloneImage, x, y));
+                        }
+                    }
+                }
+            }
+
+            return imageTiles.ToArray();
+        }
+
+        /// <summary>
+        /// Dilates the given binary mask by the specified radius (in pixels).
+        /// That is, any pixel within <paramref name="radius"/> of a foreground pixel
+        /// becomes foreground.
+        /// </summary>
+        private Image<L8> DilateMask(Image<L8> mask, int radius)
+        {
+            int w = mask.Width, h = mask.Height;
+
+            byte[] src = new byte[w * h];
+            mask.ProcessPixelRows(accessor =>
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    var row = accessor.GetRowSpan(y);
+                    for (int x = 0; x < w; x++)
+                        src[y * w + x] = row[x].PackedValue;
+                }
+            });
+
+            var dilated = new Image<L8>(w, h);
+            dilated.ProcessPixelRows(accessor =>
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    var row = accessor.GetRowSpan(y);
+                    for (int x = 0; x < w; x++)
+                    {
+                        byte maxVal = 0;
+
+                        for (int dy = -radius; dy <= radius; dy++)
+                            for (int dx = -radius; dx <= radius; dx++)
+                            {
+                                int nx = x + dx, ny = y + dy;
+                                if (nx >= 0 && nx < w && ny >= 0 && ny < h)
+                                    maxVal = Math.Max(maxVal, src[ny * w + nx]);
+                            }
+                        row[x] = new L8(maxVal);
+                    }
+                }
+            });
+
+            return dilated;
         }
     }
 }
