@@ -1,4 +1,7 @@
-﻿using Microsoft.ML.OnnxRuntime;
+﻿using Interfaces.MachineLearning;
+using Interfaces.MachineLearning.SAM2;
+
+using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 
 using SmartData.Lib.Interfaces;
@@ -10,7 +13,7 @@ using System.Numerics;
 
 namespace SmartData.Lib.Services.MachineLearning.SAM2
 {
-    class SAM2Decoder : BaseAIConsumer<SAM2DecoderInputData, SAM2DecoderOutputData>
+    class SAM2Decoder : BaseAIConsumer<SAM2DecoderInputData, SAM2DecoderOutputData>, ISAM2Decoder, IUnloadModel
     {
         private readonly IImageProcessorService _imageProcessor;
 
@@ -208,6 +211,11 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
             float scaledY = originalPoint.Y * scale + padY;
 
             return new Vector2(scaledX, scaledY);
+        }
+
+        public void UnloadAIModel()
+        {
+            UnloadModel();
         }
     }
 }

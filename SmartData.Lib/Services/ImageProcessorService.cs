@@ -112,8 +112,8 @@ namespace SmartData.Lib.Services
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
-        private static readonly float[] PixelMean = { 123.675f, 116.28f, 103.53f };
-        private static readonly float[] PixelStd = { 58.395f, 57.12f, 57.375f };
+        private static readonly float[] SAM2PixelMean = { 123.675f, 116.28f, 103.53f };
+        private static readonly float[] SAM2PixelStd = { 58.395f, 57.12f, 57.375f };
 
         public ImageProcessorService() : base()
         {
@@ -750,9 +750,9 @@ namespace SmartData.Lib.Services
                             ref Rgb24 px = ref row[x];
 
                             // Keep 0..255 range, then normalize
-                            float r = (px.R - PixelMean[0]) / PixelStd[0];
-                            float g = (px.G - PixelMean[1]) / PixelStd[1];
-                            float b = (px.B - PixelMean[2]) / PixelStd[2];
+                            float r = (px.R - SAM2PixelMean[0]) / SAM2PixelStd[0];
+                            float g = (px.G - SAM2PixelMean[1]) / SAM2PixelStd[1];
+                            float b = (px.B - SAM2PixelMean[2]) / SAM2PixelStd[2];
 
                             inputData.InputImage[0, 0, y, x] = r;
                             inputData.InputImage[0, 1, y, x] = g;

@@ -1,4 +1,5 @@
-﻿using Interfaces.MachineLearning.SAM2;
+﻿using Interfaces.MachineLearning;
+using Interfaces.MachineLearning.SAM2;
 
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
@@ -9,7 +10,7 @@ using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services.MachineLearning.SAM2
 {
-    class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>, ISAM2Encoder
+    class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>, ISAM2Encoder, IUnloadModel
     {
         private readonly IImageProcessorService _imageProcessor;
 
@@ -69,6 +70,11 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
 
                 return outputData;
             }
+        }
+
+        public void UnloadAIModel()
+        {
+            UnloadModel();
         }
     }
 }

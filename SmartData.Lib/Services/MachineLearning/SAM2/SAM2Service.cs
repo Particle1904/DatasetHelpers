@@ -69,9 +69,13 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
             await _imageProcessor.SaveSAM2MaskAsync(result, outputPath);
         }
 
+        /// <summary>
+        /// Unloads SAM2 Pipeline (encoder and decoder models)
+        /// </summary>
         public void UnloadAIModel()
         {
-            throw new NotImplementedException();
+            _decoder.UnloadAIModel();
+            _encoder.UnloadAIModel();
         }
     }
 }
