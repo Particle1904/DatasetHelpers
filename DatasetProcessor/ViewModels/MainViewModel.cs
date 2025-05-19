@@ -9,6 +9,8 @@ using CommunityToolkit.Mvvm.Input;
 using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
+using Interfaces;
+
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.MachineLearning;
@@ -25,7 +27,9 @@ namespace DatasetProcessor.ViewModels;
 public partial class MainViewModel : BaseViewModel
 {
     [ObservableProperty]
-    protected IFileManipulatorService _fileManipulator;
+    protected IFileManagerService _fileManager;
+    [ObservableProperty]
+    protected IModelManagerService _modelManager;
     protected readonly IImageProcessorService _imageProcessor;
     protected readonly IAutoTaggerService _wDAutoTagger;
     protected readonly IAutoTaggerService _wDv3AutoTagger;
@@ -61,13 +65,14 @@ public partial class MainViewModel : BaseViewModel
     /// <summary>
     /// Initializes a new instance of the MainViewModel class.
     /// </summary>
-    /// <param name="fileManipulator">The file manipulation service.</param>
+    /// <param name="fileManager">The file manager service.</param>
+    /// <param name="modelManager">The model manager service.</param>
     /// <param name="imageProcessor">The image processing service.</param>
-    /// <param name="wDautoTagger">The WD 1.4 auto-tagging service.</param>
-    /// <param name="wDv3autoTagger">The WD 3 auto-tagging service.</param>
-    /// <param name="wDv3largeAutoTagger">The WD 3 Large auto-tagging service.</param>
-    /// <param name="joyTagautoTagger">The JoyTag auto-tagging service.</param>
-    /// <param name="e621autoTagger">The E621 auto-tagging service.</param>
+    /// <param name="wDAutoTagger">The WD 1.4 auto-tagging service.</param>
+    /// <param name="wDv3AutoTagger">The WD 3 auto-tagging service.</param>
+    /// <param name="wDv3LargeAutoTagger">The WD 3 Large auto-tagging service.</param>
+    /// <param name="joyTagAutoTagger">The JoyTag auto-tagging service.</param>
+    /// <param name="e621AutoTagger">The E621 auto-tagging service.</param>
     /// <param name="tagProcessor">The tag processing service.</param>
     /// <param name="contentAwareCrop">The content-aware crop service.</param>
     /// <param name="inputHooks">The input hooks service.</param>
@@ -78,7 +83,8 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="gemini">The gemini service.</param>
     /// <param name="logger">The logger service.</param>
     /// <param name="configs">The configuration service.</param>
-    public MainViewModel(IFileManipulatorService fileManipulator,
+    public MainViewModel(IFileManagerService fileManager,
+                         IModelManagerService modelManager,
                          IImageProcessorService imageProcessor,
                          WDAutoTaggerService wDAutoTagger,
                          WDV3AutoTaggerService wDv3AutoTagger,
@@ -98,7 +104,8 @@ public partial class MainViewModel : BaseViewModel
                          IConfigsService configs) :
         base(logger, configs)
     {
-        _fileManipulator = fileManipulator;
+        _fileManager = fileManager;
+        _modelManager = modelManager;
         _imageProcessor = imageProcessor;
         _wDAutoTagger = wDAutoTagger;
         _wDv3AutoTagger = wDv3AutoTagger;
@@ -123,60 +130,60 @@ public partial class MainViewModel : BaseViewModel
         });
         _views.Add(AppPages.Gallery, new GalleryView()
         {
-            DataContext = new GalleryViewModel(fileManipulator, logger, configs)
+            DataContext = new GalleryViewModel(fileManager, logger, configs)
         });
         _views.Add(AppPages.Sort_Images, new SortImagesView()
         {
-            DataContext = new SortImagesViewModel(fileManipulator, logger, configs)
+            DataContext = new SortImagesViewModel(fileManager, logger, configs)
         });
         _views.Add(AppPages.Content_Aware_Crop, new ContentAwareCropView()
         {
-            DataContext = new ContentAwareCropViewModel(fileManipulator, contentAwareCrop, logger, configs)
+            DataContext = new ContentAwareCropViewModel(fileManager, modelManager, contentAwareCrop, logger, configs)
         });
         _views.Add(AppPages.Manual_Crop, new ManualCropView()
         {
-            DataContext = new ManualCropViewModel(imageProcessor, fileManipulator, logger, configs)
+            DataContext = new ManualCropViewModel(imageProcessor, fileManager, logger, configs)
         });
         _views.Add(AppPages.Inpaint_Images, new InpaintView()
         {
-            DataContext = new InpaintViewModel(imageProcessor, inpaint, fileManipulator, logger, configs)
+            DataContext = new InpaintViewModel(imageProcessor, inpaint, modelManager, fileManager, logger, configs)
         });
         _views.Add(AppPages.Resize_Images, new ResizeImagesView()
         {
-            DataContext = new ResizeImagesViewModel(imageProcessor, fileManipulator, logger, configs)
+            DataContext = new ResizeImagesViewModel(imageProcessor, fileManager, logger, configs)
         });
         _views.Add(AppPages.Upscale_Images, new UpscaleView()
         {
-            DataContext = new UpscaleViewModel(fileManipulator, upscaler, logger, configs)
+            DataContext = new UpscaleViewModel(fileManager, modelManager, upscaler, logger, configs)
         });
         _views.Add(AppPages.Tag_Generation, new GenerateTagsView()
         {
-            DataContext = new GenerateTagsViewModel(fileManipulator, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
+            DataContext = new GenerateTagsViewModel(fileManager, modelManager, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
                 wDv3LargeAutoTagger, e621AutoTagger, logger, configs)
         });
         _views.Add(AppPages.Gemini_Caption, new GeminiCaptionView()
         {
-            DataContext = new GeminiCaptionViewModel(fileManipulator, gemini, logger, configs)
+            DataContext = new GeminiCaptionViewModel(fileManager, gemini, logger, configs)
         });
         _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
         {
-            DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManipulator, logger, configs)
+            DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManager, logger, configs)
         });
         _views.Add(AppPages.Process_Tags, new ProcessTagsView()
         {
-            DataContext = new ProcessTagsViewModel(tagProcessor, fileManipulator, logger, configs)
+            DataContext = new ProcessTagsViewModel(tagProcessor, fileManager, logger, configs)
         });
         _views.Add(AppPages.Tag_Editor, new TagEditorView(inputHooks)
         {
-            DataContext = new TagEditorViewModel(fileManipulator, imageProcessor, clipTokenizer, logger, configs)
+            DataContext = new TagEditorViewModel(fileManager, modelManager, imageProcessor, clipTokenizer, logger, configs)
         });
         _views.Add(AppPages.Extract_Subset, new ExtractSubsetView()
         {
-            DataContext = new ExtractSubsetViewModel(fileManipulator, logger, configs)
+            DataContext = new ExtractSubsetViewModel(fileManager, logger, configs)
         });
         _views.Add(AppPages.Prompt_Generator, new DatasetPromptGeneratorView()
         {
-            DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, fileManipulator, logger, configs)
+            DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, fileManager, logger, configs)
         });
         _views.Add(AppPages.Settings, new SettingsView()
         {
@@ -187,7 +194,7 @@ public partial class MainViewModel : BaseViewModel
         {
             _views.Add(AppPages.Metadata_Viewer, new MetadataView()
             {
-                DataContext = new MetadataViewModel(fileManipulator, imageProcessor, wDAutoTagger, logger, configs)
+                DataContext = new MetadataViewModel(fileManager, modelManager, imageProcessor, wDAutoTagger, logger, configs)
             });
         }
 

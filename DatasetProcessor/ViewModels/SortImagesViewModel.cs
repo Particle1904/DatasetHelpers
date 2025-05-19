@@ -17,7 +17,7 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class SortImagesViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -41,25 +41,25 @@ namespace DatasetProcessor.ViewModels
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
 
-        public SortImagesViewModel(IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public SortImagesViewModel(IFileManagerService fileManager, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
-            (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            (_fileManager as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 SortProgress = ResetProgress(SortProgress);
                 SortProgress.TotalFiles = args;
             };
-            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => SortProgress.UpdateProgress();
+            (_fileManager as INotifyProgress).ProgressUpdated += (sender, args) => SortProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.SortImagesConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.SortImagesConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             BackupFolderPath = _configs.Configurations.SortImagesConfigs.BackupFolder;
-            _fileManipulator.CreateFolderIfNotExist(BackupFolderPath);
+            _fileManager.CreateFolderIfNotExist(BackupFolderPath);
             DiscardedFolderPath = _configs.Configurations.SortImagesConfigs.DiscardedFolder;
-            _fileManipulator.CreateFolderIfNotExist(DiscardedFolderPath);
+            _fileManager.CreateFolderIfNotExist(DiscardedFolderPath);
             Dimension = _configs.Configurations.SortImagesConfigs.DimensionSizeForDiscarded;
             BackupImages = _configs.Configurations.SortImagesConfigs.BackupBeforeProcessing;
 
@@ -134,7 +134,7 @@ namespace DatasetProcessor.ViewModels
                 else
                 {
                     TaskStatus = ProcessingStatus.BackingUp;
-                    await _fileManipulator.BackupFilesAsync(InputFolderPath, BackupFolderPath);
+                    await _fileManager.BackupFilesAsync(InputFolderPath, BackupFolderPath);
                 }
             }
 
@@ -142,7 +142,7 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                await _fileManipulator.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, Dimension);
+                await _fileManager.SortImagesAsync(InputFolderPath, DiscardedFolderPath, OutputFolderPath, Dimension);
 
             }
             catch (ArgumentNullException)
@@ -174,7 +174,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
         }
 
         partial void OnIsUiEnabledChanged(bool value)

@@ -6,6 +6,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using Interfaces;
+
 using Microsoft.ML.OnnxRuntime;
 
 using SmartData.Lib.Enums;
@@ -25,7 +27,8 @@ namespace DatasetProcessor.ViewModels
     /// </summary>
     public partial class TagEditorViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IImageProcessorService _imageProcessor;
         private readonly ICLIPTokenizerService _clipTokenizer;
         private Random _random;
@@ -86,23 +89,24 @@ namespace DatasetProcessor.ViewModels
         /// <summary>
         /// Initializes a new instance of the TagEditorViewModel class.
         /// </summary>
-        /// <param name="fileManipulator">The file manipulation service for file operations.</param>
+        /// <param name="fileManager">The file manipulation service for file operations.</param>
         /// <param name="imageProcessor">The image processing service for image-related operations.</param>
         /// <param name="inputHooks">The input hooks service for managing user input.</param>
         /// <param name="clipTokenizer">The clip tokenizer service for token operations.</param>
         /// <param name="logger">The logger service for logging messages.</param>
         /// <param name="configs">The configuration service for application settings.</param>
-        public TagEditorViewModel(IFileManipulatorService fileManipulator, IImageProcessorService imageProcessor,
+        public TagEditorViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IImageProcessorService imageProcessor,
             ICLIPTokenizerService clipTokenizer, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
+            _modelManager = modelManager;
             _imageProcessor = imageProcessor;
             _clipTokenizer = clipTokenizer;
             _random = new Random();
             _configs = configs;
 
             InputFolderPath = _configs.Configurations.TagEditorConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             IsExactFilter = _configs.Configurations.TagEditorConfigs.ExactMatchesFiltering;
             ButtonEnabled = true;
             EditingTxt = true;
@@ -122,7 +126,7 @@ namespace DatasetProcessor.ViewModels
             {
                 try
                 {
-                    CurrentImageTags = _fileManipulator.GetTextFromFile(ImageFiles[SelectedItemIndex], CurrentType);
+                    CurrentImageTags = _fileManager.GetTextFromFile(ImageFiles[SelectedItemIndex], CurrentType);
                 }
                 catch
                 {
@@ -221,7 +225,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 ButtonEnabled = false;
-                List<string> searchResult = await Task.Run(() => _fileManipulator.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter, IsExactFilter));
+                List<string> searchResult = await Task.Run(() => _fileManager.GetFilteredImageFiles(InputFolderPath, CurrentType, WordsToFilter, IsExactFilter));
                 if (searchResult.Count > 0)
                 {
                     SelectedItemIndex = 0;
@@ -296,9 +300,9 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private async Task CountTokensForCurrentImage()
         {
-            if (_fileManipulator.FileNeedsToBeDownloaded(AvailableModels.CLIPTokenizer))
+            if (_modelManager.FileNeedsToBeDownloaded(AvailableModels.CLIPTokenizer))
             {
-                await _fileManipulator.DownloadModelFile(AvailableModels.CLIPTokenizer);
+                await _modelManager.DownloadModelFileAsync(AvailableModels.CLIPTokenizer);
             }
 
             int count = 0;
@@ -330,7 +334,7 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
                     .Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {
@@ -413,7 +417,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
-                _fileManipulator.SaveTextToFile(txtFile, CurrentImageTags);
+                _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
             }
             catch (NullReferenceException)
             {

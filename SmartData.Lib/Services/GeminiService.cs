@@ -11,7 +11,7 @@ namespace Services
     public class GeminiService : CancellableServiceBase, IGeminiService, INotifyProgress
     {
         private readonly IImageProcessorService _imageProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
         private readonly IPythonService _python;
 
         public static string BASE_PROMPT = "Create a detailed caption for the image";
@@ -23,10 +23,10 @@ namespace Services
         public string SystemInstructions { get; set; } = string.Empty;
         public bool FreeApi { get; set; } = true;
 
-        public GeminiService(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator, IPythonService python)
+        public GeminiService(IImageProcessorService imageProcessor, IFileManagerService fileManager, IPythonService python)
         {
             _imageProcessor = imageProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
             _python = python;
         }
 
@@ -79,7 +79,7 @@ namespace Services
                     // Read tags from file for guided captioning.
                     if (File.Exists(file))
                     {
-                        finalPrompt = _fileManipulator.GetTextFromFile(tagsFilePath, ".txt");
+                        finalPrompt = _fileManager.GetTextFromFile(tagsFilePath, ".txt");
                     }
                     else
                     {
@@ -107,7 +107,7 @@ namespace Services
                     {
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
-                        _fileManipulator.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
+                        _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
                     }
 
                     // Sleep for 5 seconds since Gemini API have a 15 requests per minute limitation for free users.

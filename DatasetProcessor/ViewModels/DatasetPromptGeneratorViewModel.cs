@@ -19,7 +19,7 @@ namespace DatasetProcessor.ViewModels
 
         private readonly IPromptGeneratorService _promptGenerator;
         private readonly ITagProcessorService _tagProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -94,11 +94,11 @@ namespace DatasetProcessor.ViewModels
         private bool _isUiEnabled;
 
         public DatasetPromptGeneratorViewModel(IPromptGeneratorService promptGenerator, ITagProcessorService tagProcessor,
-            IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+            IFileManagerService fileManager, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _promptGenerator = promptGenerator;
             _tagProcessor = tagProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
             (_promptGenerator as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -108,9 +108,9 @@ namespace DatasetProcessor.ViewModels
             (_promptGenerator as INotifyProgress).ProgressUpdated += (sender, args) => GenerationProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.PromptGeneratorConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.PromptGeneratorConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             TagsToPrepend = _configs.Configurations.PromptGeneratorConfigs.TagsToPrepend;
             TagsToAppend = _configs.Configurations.PromptGeneratorConfigs.TagsToAppend;
             AmountOfTags = _configs.Configurations.PromptGeneratorConfigs.AmountOfTags.ToString();

@@ -15,7 +15,7 @@ namespace DatasetProcessor.ViewModels
     public partial class ProcessCaptionsViewModel : BaseViewModel
     {
         private readonly ITagProcessorService _tagProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -30,11 +30,11 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public ProcessCaptionsViewModel(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator,
+        public ProcessCaptionsViewModel(ITagProcessorService tagProcessor, IFileManagerService fileManager,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _tagProcessor = tagProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
             (_tagProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -44,7 +44,7 @@ namespace DatasetProcessor.ViewModels
             (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => CaptionProcessingProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ProcessCaptionsConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
 
             IsUiEnabled = true;
             TaskStatus = ProcessingStatus.Idle;

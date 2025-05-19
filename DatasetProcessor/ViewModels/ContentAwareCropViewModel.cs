@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
 using Interfaces.MachineLearning;
 
 using SmartData.Lib.Enums;
@@ -20,7 +21,8 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class ContentAwareCropViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IContentAwareCropService _contentAwareCrop;
 
         private const string _invalidMinSharpenNumberMessage = "Minimum resolution for sigma needs to be a number between 256 and 65535.";
@@ -84,10 +86,11 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public ContentAwareCropViewModel(IFileManipulatorService fileManipulator, IContentAwareCropService contentAwareCrop,
+        public ContentAwareCropViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IContentAwareCropService contentAwareCrop,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
+            _modelManager = modelManager;
             _contentAwareCrop = contentAwareCrop;
 
             (_contentAwareCrop as INotifyProgress).TotalFilesChanged += (sender, args) =>
@@ -98,9 +101,9 @@ namespace DatasetProcessor.ViewModels
             (_contentAwareCrop as INotifyProgress).ProgressUpdated += (sender, args) => CropProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ContentAwareCropConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.ContentAwareCropConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             ScoreThreshold = _configs.Configurations.ContentAwareCropConfigs.PredictionsCertaintyThreshold;
             IouThreshold = _configs.Configurations.ContentAwareCropConfigs.IouThreshold;
             ExpansionPercentage = _configs.Configurations.ContentAwareCropConfigs.ExpansionPercentage;
@@ -191,9 +194,9 @@ namespace DatasetProcessor.ViewModels
 
         private async Task DownloadModelFiles(AvailableModels model)
         {
-            if (_fileManipulator.FileNeedsToBeDownloaded(model))
+            if (_modelManager.FileNeedsToBeDownloaded(model))
             {
-                await _fileManipulator.DownloadModelFile(model);
+                await _modelManager.DownloadModelFileAsync(model);
             }
         }
 
@@ -226,7 +229,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
             (_contentAwareCrop as ICancellableService)?.CancelCurrentTask();
         }
 

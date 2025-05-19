@@ -4,6 +4,8 @@ using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using Interfaces;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -19,7 +21,8 @@ namespace DatasetProcessor.ViewModels
     public partial class MetadataViewModel : BaseViewModel
     {
         private const string _dragAndDropPath = @"avares://DatasetProcessor/Assets/Images/drag_and_drop.png";
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IImageProcessorService _imageProcessor;
         private readonly IAutoTaggerService _autoTagger;
 
@@ -52,10 +55,11 @@ namespace DatasetProcessor.ViewModels
 
         public bool IsGenerating { get; private set; } = false;
 
-        public MetadataViewModel(IFileManipulatorService fileManipulator, IImageProcessorService imageProcessor,
+        public MetadataViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IImageProcessorService imageProcessor,
             IAutoTaggerService autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
+            _modelManager = modelManager;
             _imageProcessor = imageProcessor;
             _autoTagger = autoTagger;
 
@@ -102,9 +106,9 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                if (_fileManipulator.FileNeedsToBeDownloaded(GeneratorModel))
+                if (_modelManager.FileNeedsToBeDownloaded(GeneratorModel))
                 {
-                    await _fileManipulator.DownloadModelFile(GeneratorModel);
+                    await _modelManager.DownloadModelFileAsync(GeneratorModel);
                 }
 
                 PredictedTags = "Generating tags...";

@@ -18,7 +18,7 @@ namespace DatasetProcessor.Views;
 
 public partial class MainView : UserControl
 {
-    private readonly IFileManipulatorService _fileManipulator;
+    private readonly IFileManagerService _fileManager;
     private readonly IImageProcessorService _imageProcessor;
     private readonly IAutoTaggerService _autoTagger;
     private readonly ITagProcessorService _tagProcessor;
@@ -31,7 +31,7 @@ public partial class MainView : UserControl
     private IClipboard _clipboard;
     private IStorageProvider _storageProvider;
 
-    public MainView(IFileManipulatorService fileManipulator,
+    public MainView(IFileManagerService fileManager,
                     IImageProcessorService imageProcessor,
                     IAutoTaggerService autoTagger,
                     ITagProcessorService tagProcessor,
@@ -41,7 +41,7 @@ public partial class MainView : UserControl
                     ILoggerService logger,
                     IConfigsService configs)
     {
-        _fileManipulator = fileManipulator;
+        _fileManager = fileManager;
         _imageProcessor = imageProcessor;
         _autoTagger = autoTagger;
         _tagProcessor = tagProcessor;
@@ -67,7 +67,7 @@ public partial class MainView : UserControl
 
             string YoloV4OnnxFilename = "yolov4.onnx";
 
-            _fileManipulator = new FileManipulatorService();
+            _fileManager = new FileManagerService();
             _imageProcessor = new ImageProcessorService();
             _tagProcessor = new TagProcessorService();
             _inputHooks = new InputHooksService();
@@ -75,7 +75,7 @@ public partial class MainView : UserControl
             _configs = new ConfigurationsService();
             _contentAwareCrop = new ContentAwareCropService(_imageProcessor,
                 Path.Combine(modelsPath, YoloV4OnnxFilename));
-            _promptGenerator = new PromptGeneratorService(_tagProcessor, _fileManipulator);
+            _promptGenerator = new PromptGeneratorService(_tagProcessor, _fileManager);
             _autoTagger = new WDAutoTaggerService(_imageProcessor, _tagProcessor,
                 Path.Combine(modelsPath, WDOnnxFilename), Path.Combine(modelsPath, csvFilename));
         }

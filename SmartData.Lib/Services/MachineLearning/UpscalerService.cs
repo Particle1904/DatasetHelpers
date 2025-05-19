@@ -3,6 +3,8 @@
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 
+using Models.ModelManager;
+
 using SixLabors.ImageSharp;
 
 using SmartData.Lib.Enums;
@@ -144,64 +146,64 @@ namespace SmartData.Lib.Services.MachineLearning
             switch (model)
             {
                 case AvailableModels.ParimgCompact_x2:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.ParimgCompactFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.ParimgCompact_x2].Model.Filename);
                     break;
                 case AvailableModels.HFA2kCompact_x2:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.HFA2kCompactFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.HFA2kCompact_x2].Model.Filename);
                     break;
                 case AvailableModels.HFA2kAVCSRFormerLight_x2:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.HFA2kAVCSRFormerLightFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.HFA2kAVCSRFormerLight_x2].Model.Filename);
                     break;
                 case AvailableModels.HFA2k_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.HFA2kFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.HFA2k_x4].Model.Filename);
                     break;
                 case AvailableModels.SwinIR_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.SwinIRFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.SwinIR_x4].Model.Filename);
                     break;
                 case AvailableModels.Swin2SR_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.Swin2SRFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Swin2SR_x4].Model.Filename);
                     break;
                 case AvailableModels.Nomos8kSCSRFormer_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.Nomos8kSCSRFormerFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Nomos8kSCSRFormer_x4].Model.Filename);
                     break;
                 case AvailableModels.Nomos8kSC_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.Nomos8kSCFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Nomos8kSC_x4].Model.Filename);
                     break;
                 case AvailableModels.LSDIRplusReal_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.LSDIRplusRealFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LSDIRplusReal_x4].Model.Filename);
                     break;
                 case AvailableModels.LSDIRplusNone_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.LSDIRplusNoneFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LSDIRplusNone_x4].Model.Filename);
                     break;
                 case AvailableModels.LSDIRplusCompression_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.LSDIRplusCompressionFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LSDIRplusCompression_x4].Model.Filename);
                     break;
                 case AvailableModels.LSDIRCompact3_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.LSDIRCompact3Filename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LSDIRCompact3_x4].Model.Filename);
                     break;
                 case AvailableModels.LSDIR_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.LSDIRFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LSDIR_x4].Model.Filename);
                     break;
                 case AvailableModels.Nomos8k_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.Nomos8kFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Nomos8k_x4].Model.Filename);
                     break;
                 case AvailableModels.Nomos8kDAT_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.Nomos8kDATFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Nomos8kDAT_x4].Model.Filename);
                     break;
                 case AvailableModels.NomosUni_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.NomosUniFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.NomosUni_x4].Model.Filename);
                     break;
                 case AvailableModels.RealWebPhoto_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.RealWebPhotoFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.RealWebPhoto_x4].Model.Filename);
                     break;
                 case AvailableModels.RealWebPhotoDAT_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.RealWebPhotoDATFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.RealWebPhotoDAT_x4].Model.Filename);
                     break;
                 case AvailableModels.SPANkendata_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.SPANkendataFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.SPANkendata_x4].Model.Filename);
                     break;
                 case AvailableModels.GTAV5_x4:
-                    ModelPath = Path.Combine(_modelsPath, Filenames.GTAVFilename);
+                    ModelPath = Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.GTAV5_x4].Model.Filename);
                     break;
                 case AvailableModels.JoyTag:
                 case AvailableModels.WD14v2:

@@ -19,7 +19,7 @@ namespace DatasetProcessor.ViewModels
     public partial class ProcessTagsViewModel : BaseViewModel
     {
         private readonly ITagProcessorService _tagProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         private const string _invalidMinSharpenNumberMessage = "File names must be a number between 1 and 2147483647.";
 
@@ -87,11 +87,11 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public ProcessTagsViewModel(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator,
+        public ProcessTagsViewModel(ITagProcessorService tagProcessor, IFileManagerService fileManager,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _tagProcessor = tagProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
             (_tagProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -101,7 +101,7 @@ namespace DatasetProcessor.ViewModels
             (_tagProcessor as INotifyProgress).ProgressUpdated += (sender, args) => TagProcessingProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ProcessTagsConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             RandomizeTags = _configs.Configurations.ProcessTagsConfigs.RandomizeTags;
             RenameFilesToCrescent = _configs.Configurations.ProcessTagsConfigs.RenameFiles;
             ApplyRedundancyRemoval = _configs.Configurations.ProcessTagsConfigs.ApplyRedudancyRemoval;
@@ -156,7 +156,7 @@ namespace DatasetProcessor.ViewModels
                     {
                         _startingNumberForFileNames = 1;
                     }
-                    await _fileManipulator.RenameAllToCrescentAsync(InputFolderPath, (int)_startingNumberForFileNames);
+                    await _fileManager.RenameAllToCrescentAsync(InputFolderPath, (int)_startingNumberForFileNames);
                     IsCancelEnabled = true;
                 }
                 if (ApplyConsolidateTags)
@@ -241,7 +241,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
             (_tagProcessor as ICancellableService)?.CancelCurrentTask();
         }
 

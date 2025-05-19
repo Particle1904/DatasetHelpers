@@ -18,7 +18,7 @@ namespace DatasetProcessor.ViewModels
     public partial class ResizeImagesViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         private const string _invalidMinSharpenNumberMessage = "Minimum resolution for sigma needs to be a number between 256 and 65535.";
 
@@ -75,11 +75,11 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public ResizeImagesViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
+        public ResizeImagesViewModel(IImageProcessorService imageProcessor, IFileManagerService fileManager,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _imageProcessor = imageProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
             (_imageProcessor as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -91,9 +91,9 @@ namespace DatasetProcessor.ViewModels
             Dimension = SupportedDimensions.Resolution1024x1024;
 
             InputFolderPath = _configs.Configurations.ResizeImagesConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.ResizeImagesConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             Dimension = _configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
             LanczosRadius = _configs.Configurations.ResizeImagesConfigs.LanczosRadius;
             ApplySharpen = _configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
@@ -187,7 +187,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
             (_imageProcessor as ICancellableService)?.CancelCurrentTask();
         }
 

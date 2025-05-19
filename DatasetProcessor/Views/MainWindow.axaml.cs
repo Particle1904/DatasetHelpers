@@ -23,7 +23,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
-        if (_viewModel != null && _viewModel.FileManipulator.IsDownloading)
+        if (_viewModel != null && _viewModel.ModelManager.IsDownloading)
         {
             e.Cancel = true;
         }

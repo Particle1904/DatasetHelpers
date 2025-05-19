@@ -17,7 +17,7 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class ExtractSubsetViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -39,22 +39,22 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public ExtractSubsetViewModel(IFileManipulatorService fileManipulator, ILoggerService logger,
+        public ExtractSubsetViewModel(IFileManagerService fileManager, ILoggerService logger,
             IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
-            (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            (_fileManager as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 FilterProgress = ResetProgress(FilterProgress);
                 FilterProgress.TotalFiles = args;
             };
-            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => FilterProgress.UpdateProgress();
+            (_fileManager as INotifyProgress).ProgressUpdated += (sender, args) => FilterProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.ExtractSubsetConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.ExtractSubsetConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             SearchTags = _configs.Configurations.ExtractSubsetConfigs.SearchTxt;
             SearchCaptions = _configs.Configurations.ExtractSubsetConfigs.SearchCaption;
             IsExactFilter = _configs.Configurations.ExtractSubsetConfigs.ExactMatchesFiltering;
@@ -94,20 +94,20 @@ namespace DatasetProcessor.ViewModels
 
                 if (SearchTags)
                 {
-                    tagsResult = await Task.Run(() => _fileManipulator.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, IsExactFilter));
+                    tagsResult = await Task.Run(() => _fileManager.GetFilteredImageFiles(InputFolderPath, ".txt", TagsToFilter, IsExactFilter));
                 }
 
                 List<string> captionsResult = new List<string>();
                 if (SearchCaptions)
                 {
                     FilterProgress.Reset();
-                    captionsResult = await Task.Run(() => _fileManipulator.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter));
+                    captionsResult = await Task.Run(() => _fileManager.GetFilteredImageFiles(InputFolderPath, ".caption", TagsToFilter));
                 }
 
                 List<string> result = captionsResult.Union(tagsResult).ToList();
 
                 FilterProgress.Reset();
-                await _fileManipulator.CreateSubsetAsync(result, OutputFolderPath);
+                await _fileManager.CreateSubsetAsync(result, OutputFolderPath);
             }
             catch (OperationCanceledException)
             {
@@ -138,7 +138,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
         }
 
         partial void OnIsUiEnabledChanged(bool value)

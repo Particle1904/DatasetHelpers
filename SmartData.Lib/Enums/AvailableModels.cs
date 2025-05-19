@@ -3,10 +3,10 @@
     public enum AvailableModels : byte
     {
         #region Tag Generators
-        JoyTag,
         WD14v2,
         WDv3,
         WDv3Large,
+        JoyTag,
         Z3DE621,
         #endregion
         #region Yolo models
@@ -39,6 +39,16 @@
         #region Inpainters
         LaMa,
         #endregion
-        CLIPTokenizer
+        CLIPTokenizer,
+        #region SAM2 models
+        SAM2Encoder,
+        SAM2Decoder,
+        #endregion
+        #region Florence2 models
+        Florence2VisionEncoder,
+        Florence2Encoder,
+        Florence2Decoder,
+        Florence2EmbedTokens,
+        #endregion
     }
 }

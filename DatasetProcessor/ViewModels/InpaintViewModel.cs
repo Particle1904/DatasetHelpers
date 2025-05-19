@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -26,7 +28,8 @@ namespace DatasetProcessor.ViewModels
     {
         private readonly IImageProcessorService _imageProcessor;
         private readonly IInpaintService _inpaint;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -83,12 +86,13 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         Color _drawingColor;
 
-        public InpaintViewModel(IImageProcessorService imageProcessor, IInpaintService inpaintService,
-            IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public InpaintViewModel(IImageProcessorService imageProcessor, IInpaintService inpaintService, IModelManagerService modelManager,
+            IFileManagerService fileManager, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _imageProcessor = imageProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
             _inpaint = inpaintService;
+            _modelManager = modelManager;
 
             (_inpaint as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -195,7 +199,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 Logger.SetLatestLogMessage("Inpaiting current selected image...", LogMessageColor.Informational);
-                await DownloadModelFiles(_fileManipulator, AvailableModels.LaMa);
+                await DownloadModelFiles(_modelManager, AvailableModels.LaMa);
 
                 string imageFilename = Path.GetFileNameWithoutExtension(ImageFiles[SelectedItemIndex]);
                 await _inpaint.InpaintImageTilesAsync(ImageFiles[SelectedItemIndex], GetCurrentFileMaskFilename(),
@@ -236,7 +240,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 IsCancelEnabled = true;
-                await DownloadModelFiles(_fileManipulator, AvailableModels.LaMa);
+                await DownloadModelFiles(_modelManager, AvailableModels.LaMa);
                 await _inpaint.InpaintImagesAsync(InputFolderPath, OutputFolderPath);
             }
             catch (OperationCanceledException)
@@ -274,7 +278,7 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
                     .Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {

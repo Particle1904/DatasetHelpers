@@ -10,7 +10,7 @@ using SmartData.Lib.Services.Base;
 
 namespace SmartData.Lib.Services.MachineLearning.SAM2
 {
-    class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>, ISAM2Encoder, IUnloadModel
+    public class SAM2Encoder : BaseAIConsumer<SAM2EncoderInputData, SAM2EncoderOutputData>, ISAM2Encoder, IUnloadModel
     {
         private readonly IImageProcessorService _imageProcessor;
 

@@ -19,7 +19,7 @@ namespace DatasetProcessor.ViewModels
     public partial class ManualCropViewModel : BaseViewModel
     {
         private readonly IImageProcessorService _imageProcessor;
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -51,11 +51,11 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private Point _endingPosition;
 
-        public ManualCropViewModel(IImageProcessorService imageProcessor, IFileManipulatorService fileManipulator,
+        public ManualCropViewModel(IImageProcessorService imageProcessor, IFileManagerService fileManager,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _imageProcessor = imageProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
             ButtonEnabled = true;
             IsUiEnabled = true;
@@ -130,7 +130,7 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
                     .Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {

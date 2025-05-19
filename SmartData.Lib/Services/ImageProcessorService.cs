@@ -115,6 +115,9 @@ namespace SmartData.Lib.Services
         private static readonly float[] SAM2PixelMean = { 123.675f, 116.28f, 103.53f };
         private static readonly float[] SAM2PixelStd = { 58.395f, 57.12f, 57.375f };
 
+        private static readonly float[] Florence2VisionEncoderPixelMean = { 0.485f, 0.456f, 0.406f };
+        private static readonly float[] Florence2VisionEncoderPixelStd = { 0.229f, 0.224f, 0.225f };
+
         public ImageProcessorService() : base()
         {
             BlocksPerRow = _baseResolution / _divisor;
@@ -720,9 +723,11 @@ namespace SmartData.Lib.Services
         /// </exception>
         public async Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath)
         {
+            int sam2ImageInputSize = 1024;
+
             SAM2EncoderInputData inputData = new SAM2EncoderInputData()
             {
-                InputImage = new DenseTensor<float>(new int[] { 1, 3, 1024, 1024 })
+                InputImage = new DenseTensor<float>(new int[] { 1, 3, sam2ImageInputSize, sam2ImageInputSize })
             };
 
             using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
@@ -734,7 +739,7 @@ namespace SmartData.Lib.Services
                     Sampler = _lanczosResampler,
                     Compand = true,
                     PadColor = new Rgb24(0, 0, 0),
-                    Size = new Size(1024, 1024)
+                    Size = new Size(sam2ImageInputSize, sam2ImageInputSize)
                 };
 
                 image.Mutate(image => image.Resize(resizeOptions));
@@ -764,6 +769,69 @@ namespace SmartData.Lib.Services
 
             return inputData;
         }
+
+        /// <summary>
+        /// Asynchronously processes an image for Florence-2 vision encoding by resizing it (with black padding to 768×768),
+        /// then converting its pixels from the 0–255 range into a mean–std–normalized float tensor
+        /// of shape [1, 3, 768, 768].
+        /// </summary>
+        /// <param name="inputPath">The file path of the image to be processed.</param>
+        /// <returns>
+        /// A <see cref="Florence2VisionEncoderInputData"/> containing the image as a float tensor,
+        /// normalized using the Florence-2 model’s pixel mean and standard deviation.
+        /// </returns>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// Thrown if the file specified by <paramref name="inputPath"/> does not exist.
+        /// </exception>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if an I/O error occurs while loading or reading the image file.
+        /// </exception>
+        //public async Task<Florence2VisionEncoderInputData> ProcessImageForFlorence2VisionEncodingAsync(string inputPath)
+        //{
+        //    int florence2ImageInputSize = 768;
+
+        //    Florence2VisionEncoderInputData inputData = new Florence2VisionEncoderInputData()
+        //    {
+        //        PixelValues = new DenseTensor<float>(new int[] { 1, 3, florence2ImageInputSize, florence2ImageInputSize })
+        //    };
+
+        //    using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
+        //    {
+        //        ResizeOptions resizeOptions = new ResizeOptions()
+        //        {
+        //            Mode = ResizeMode.BoxPad,
+        //            Position = AnchorPositionMode.Center,
+        //            Sampler = _lanczosResampler,
+        //            Compand = true,
+        //            PadColor = new Rgb24(0, 0, 0),
+        //            Size = new Size(florence2ImageInputSize, florence2ImageInputSize)
+        //        };
+
+        //        image.Mutate(image => image.Resize(resizeOptions));
+
+        //        image.ProcessPixelRows(accessor =>
+        //        {
+        //            for (int y = 0; y < accessor.Height; y++)
+        //            {
+        //                var row = accessor.GetRowSpan(y);
+        //                for (int x = 0; x < row.Length; x++)
+        //                {
+        //                    ref Rgb24 px = ref row[x];
+
+        //                    float r = (px.R * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[0]) / Florence2VisionEncoderPixelStd[0];
+        //                    float g = (px.G * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[1]) / Florence2VisionEncoderPixelStd[1];
+        //                    float b = (px.B * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[2]) / Florence2VisionEncoderPixelStd[2];
+
+        //                    inputData.PixelValues[0, 0, y, x] = r;
+        //                    inputData.PixelValues[0, 1, y, x] = g;
+        //                    inputData.PixelValues[0, 2, y, x] = b;
+        //                }
+        //            }
+        //        });
+        //    }
+
+        //    return inputData;
+        //}
 
         /// <summary>
         /// Saves the upscaled image data to the specified output path.

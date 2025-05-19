@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
+
 using Models.Configurations;
 
 using SmartData.Lib.Enums;
@@ -20,7 +22,8 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class UpscaleViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IUpscalerService _upscaler;
 
         [ObservableProperty]
@@ -40,11 +43,12 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public UpscaleViewModel(IFileManipulatorService fileManipulator, IUpscalerService upscalerService, ILoggerService logger,
+        public UpscaleViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IUpscalerService upscalerService, ILoggerService logger,
             IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
-            _fileManipulator.DownloadMessageEvent += (sender, args) =>
+            _fileManager = fileManager;
+            _modelManager = modelManager;
+            _modelManager.DownloadMessageEvent += (sender, args) =>
             {
                 if (args is DownloadNotification notification)
                 {
@@ -61,9 +65,9 @@ namespace DatasetProcessor.ViewModels
             (_upscaler as INotifyProgress).ProgressUpdated += (sender, args) => UpscalingProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.UpscaleImagesConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.UpscaleImagesConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             UpscalerModel = _configs.Configurations.UpscaleImagesConfigs.UpscalerModel;
 
             _timer = new Stopwatch();
@@ -114,83 +118,83 @@ namespace DatasetProcessor.ViewModels
                 switch (UpscalerModel)
                 {
                     case AvailableModels.ParimgCompact_x2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.ParimgCompact_x2);
+                        await DownloadModelFiles(_modelManager, AvailableModels.ParimgCompact_x2);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.ParimgCompact_x2);
                         break;
                     case AvailableModels.HFA2kCompact_x2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kCompact_x2);
+                        await DownloadModelFiles(_modelManager, AvailableModels.HFA2kCompact_x2);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kCompact_x2);
                         break;
                     case AvailableModels.HFA2kAVCSRFormerLight_x2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2kAVCSRFormerLight_x2);
+                        await DownloadModelFiles(_modelManager, AvailableModels.HFA2kAVCSRFormerLight_x2);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2kAVCSRFormerLight_x2);
                         break;
                     case AvailableModels.HFA2k_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.HFA2k_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.HFA2k_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.HFA2k_x4);
                         break;
                     case AvailableModels.SwinIR_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.SwinIR_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.SwinIR_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SwinIR_x4);
                         break;
                     case AvailableModels.Swin2SR_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Swin2SR_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Swin2SR_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Swin2SR_x4);
                         break;
                     case AvailableModels.Nomos8kSCSRFormer_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSCSRFormer_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Nomos8kSCSRFormer_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSCSRFormer_x4);
                         break;
                     case AvailableModels.Nomos8kSC_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kSC_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Nomos8kSC_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kSC_x4);
                         break;
                     case AvailableModels.LSDIRplusReal_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusReal_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.LSDIRplusReal_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusReal_x4);
                         break;
                     case AvailableModels.LSDIRplusNone_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusNone_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.LSDIRplusNone_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusNone_x4);
                         break;
                     case AvailableModels.LSDIRplusCompression_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRplusCompression_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.LSDIRplusCompression_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRplusCompression_x4);
                         break;
                     case AvailableModels.LSDIRCompact3_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIRCompact3_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.LSDIRCompact3_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIRCompact3_x4);
                         break;
                     case AvailableModels.LSDIR_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.LSDIR_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.LSDIR_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.LSDIR_x4);
                         break;
                     case AvailableModels.Nomos8k_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8k_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Nomos8k_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8k_x4);
                         break;
                     case AvailableModels.Nomos8kDAT_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Nomos8kDAT_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Nomos8kDAT_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.Nomos8kDAT_x4);
                         break;
                     case AvailableModels.NomosUni_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.NomosUni_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.NomosUni_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.NomosUni_x4);
                         break;
                     case AvailableModels.RealWebPhoto_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.RealWebPhoto_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.RealWebPhoto_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.RealWebPhoto_x4);
                         break;
                     case AvailableModels.RealWebPhotoDAT_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.RealWebPhotoDAT_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.RealWebPhotoDAT_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.RealWebPhotoDAT_x4);
                         break;
                     case AvailableModels.SPANkendata_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.SPANkendata_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.SPANkendata_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.SPANkendata_x4);
                         break;
                     case AvailableModels.GTAV5_x4:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.GTAV5_x4);
+                        await DownloadModelFiles(_modelManager, AvailableModels.GTAV5_x4);
                         await _upscaler.UpscaleImagesAsync(InputFolderPath, OutputFolderPath, AvailableModels.GTAV5_x4);
                         break;
                     default:

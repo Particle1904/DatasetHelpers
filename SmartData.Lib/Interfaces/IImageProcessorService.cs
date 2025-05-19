@@ -28,6 +28,7 @@ namespace SmartData.Lib.Interfaces
         public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputPath, string inputMaskPath);
         public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512);
         public Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath);
+        //public Task<Florence2VisionEncoderInputData> ProcessImageForFlorence2VisionEncodingAsync(string inputPath);
         public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData);
         public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData);
         public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);

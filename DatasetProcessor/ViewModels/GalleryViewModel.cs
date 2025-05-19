@@ -23,7 +23,7 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class GalleryViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
 
         private const int ItemsPerPage = 200;
 
@@ -57,20 +57,20 @@ namespace DatasetProcessor.ViewModels
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
 
-        public GalleryViewModel(IFileManipulatorService fileManipulator, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public GalleryViewModel(IFileManagerService fileManager, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
 
-            (_fileManipulator as INotifyProgress).TotalFilesChanged += (sender, args) =>
+            (_fileManager as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 GalleryProcessingProgress = ResetProgress(GalleryProcessingProgress);
                 GalleryProcessingProgress.TotalFiles = args;
             };
-            (_fileManipulator as INotifyProgress).ProgressUpdated += (sender, args) => GalleryProcessingProgress.UpdateProgress();
+            (_fileManager as INotifyProgress).ProgressUpdated += (sender, args) => GalleryProcessingProgress.UpdateProgress();
 
 
             InputFolderPath = Configs.Configurations.GalleryConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             MaxImageSize = Configs.Configurations.GalleryConfigs.ImageDisplaySize;
 
             IsUiEnabled = true;
@@ -117,7 +117,7 @@ namespace DatasetProcessor.ViewModels
             try
             {
                 // Get images with path
-                ImageFiles = _fileManipulator.GetImageFiles(InputFolderPath)
+                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
                     .Where(x => !x.Contains("_mask")).ToList();
 
                 if (ImageFiles.Count <= 0)
@@ -235,7 +235,7 @@ namespace DatasetProcessor.ViewModels
             {
                 List<string> filesForDeletion = SelectedImageItems.Select(x => x.FileName).ToList();
 
-                await _fileManipulator.DeleteFilesAsync(InputFolderPath, filesForDeletion);
+                await _fileManager.DeleteFilesAsync(InputFolderPath, filesForDeletion);
             }
             catch (OperationCanceledException)
             {
@@ -282,7 +282,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
         }
 
         partial void OnIsUiEnabledChanged(bool value)

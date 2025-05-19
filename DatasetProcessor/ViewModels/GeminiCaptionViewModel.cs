@@ -19,7 +19,7 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class GeminiCaptionViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
         private readonly IGeminiService _gemini;
 
         [ObservableProperty]
@@ -51,17 +51,17 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public GeminiCaptionViewModel(IFileManipulatorService fileManipulator, IGeminiService gemini, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public GeminiCaptionViewModel(IFileManagerService fileManager, IGeminiService gemini, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
             _gemini = gemini;
 
             InputFolderPath = _configs.Configurations.GeminiCaptionConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.GeminiCaptionConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             FailedFolderPath = _configs.Configurations.GeminiCaptionConfigs.FailedFolder;
-            _fileManipulator.CreateFolderIfNotExist(FailedFolderPath);
+            _fileManager.CreateFolderIfNotExist(FailedFolderPath);
             GeminiApi = _configs.Configurations.GeminiCaptionConfigs.ApiKey;
             FreeApi = _configs.Configurations.GeminiCaptionConfigs.FreeApi;
             GeminiPrompt = _configs.Configurations.GeminiCaptionConfigs.Prompt;
@@ -161,7 +161,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
             (_gemini as ICancellableService)?.CancelCurrentTask();
         }
 

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
 using Interfaces.MachineLearning;
 
 using Models.Configurations;
@@ -23,7 +24,8 @@ namespace DatasetProcessor.ViewModels
 {
     public partial class GenerateTagsViewModel : BaseViewModel
     {
-        private readonly IFileManipulatorService _fileManipulator;
+        private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IAutoTaggerService _wDautoTagger;
         private readonly IAutoTaggerService _wDv3autoTagger;
         private readonly IAutoTaggerService _wDv3largeAutoTagger;
@@ -55,12 +57,14 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public GenerateTagsViewModel(IFileManipulatorService fileManipulator, WDAutoTaggerService wDautoTagger,
+        public GenerateTagsViewModel(IFileManagerService fileManager, IModelManagerService modelManager, WDAutoTaggerService wDautoTagger,
             WDV3AutoTaggerService wDV3autoTagger, JoyTagAutoTaggerService joyTagautoTagger, WDV3LargeAutoTaggerService wDv3largeAutoTagger,
             E621AutoTaggerService e621autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManipulator = fileManipulator;
-            _fileManipulator.DownloadMessageEvent += (sender, args) =>
+            _fileManager = fileManager;
+
+            _modelManager = modelManager;
+            _modelManager.DownloadMessageEvent += (sender, args) =>
             {
                 if (args is DownloadNotification notification)
                 {
@@ -109,9 +113,9 @@ namespace DatasetProcessor.ViewModels
             (_e621autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.GenerateTagsConfigs.InputFolder;
-            _fileManipulator.CreateFolderIfNotExist(InputFolderPath);
+            _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.UpscaleImagesConfigs.OutputFolder;
-            _fileManipulator.CreateFolderIfNotExist(OutputFolderPath);
+            _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             GeneratorModel = _configs.Configurations.GenerateTagsConfigs.AutoTaggerModel;
             Threshold = _configs.Configurations.GenerateTagsConfigs.PredictionsThreshold;
             WeightedCaptions = _configs.Configurations.GenerateTagsConfigs.WeightedCaptions;
@@ -164,23 +168,23 @@ namespace DatasetProcessor.ViewModels
                 switch (GeneratorModel)
                 {
                     case AvailableModels.JoyTag:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.JoyTag);
+                        await DownloadModelFiles(_modelManager, AvailableModels.JoyTag);
                         await CallautoTaggerService(_joyTagautoTagger);
                         break;
                     case AvailableModels.WD14v2:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.WD14v2);
+                        await DownloadModelFiles(_modelManager, AvailableModels.WD14v2);
                         await CallautoTaggerService(_wDautoTagger);
                         break;
                     case AvailableModels.WDv3:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3);
+                        await DownloadModelFiles(_modelManager, AvailableModels.WDv3);
                         await CallautoTaggerService(_wDv3autoTagger);
                         break;
                     case AvailableModels.WDv3Large:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.WDv3Large);
+                        await DownloadModelFiles(_modelManager, AvailableModels.WDv3Large);
                         await CallautoTaggerService(_wDv3largeAutoTagger);
                         break;
                     case AvailableModels.Z3DE621:
-                        await DownloadModelFiles(_fileManipulator, AvailableModels.Z3DE621);
+                        await DownloadModelFiles(_modelManager, AvailableModels.Z3DE621);
                         await CallautoTaggerService(_e621autoTagger);
                         break;
                     default:
@@ -260,7 +264,7 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void CancelTask()
         {
-            (_fileManipulator as ICancellableService)?.CancelCurrentTask();
+            (_fileManager as ICancellableService)?.CancelCurrentTask();
             (_wDautoTagger as ICancellableService)?.CancelCurrentTask();
             (_wDv3autoTagger as ICancellableService)?.CancelCurrentTask();
             (_wDv3largeAutoTagger as ICancellableService)?.CancelCurrentTask();

@@ -9,15 +9,15 @@ namespace SmartData.Lib.Services
     public class PromptGeneratorService : IPromptGeneratorService, INotifyProgress
     {
         protected readonly ITagProcessorService _tagProcessor;
-        protected readonly IFileManipulatorService _fileManipulator;
+        protected readonly IFileManagerService _fileManager;
 
         StringBuilder _stringBuilder;
         Random _random;
 
-        public PromptGeneratorService(ITagProcessorService tagProcessor, IFileManipulatorService fileManipulator)
+        public PromptGeneratorService(ITagProcessorService tagProcessor, IFileManagerService fileManager)
         {
             _tagProcessor = tagProcessor;
-            _fileManipulator = fileManipulator;
+            _fileManager = fileManager;
             _stringBuilder = new StringBuilder();
             _random = new Random();
         }

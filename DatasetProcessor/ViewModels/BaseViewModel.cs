@@ -6,6 +6,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -180,11 +182,11 @@ public partial class BaseViewModel : ObservableObject
     /// Download model files if necessary.
     /// </summary>
     /// <param name="model">The model to be downloaded.</param>
-    protected async Task DownloadModelFiles(IFileManipulatorService fileManipulator, AvailableModels model)
+    protected async Task DownloadModelFiles(IModelManagerService modelManager, AvailableModels model)
     {
-        if (fileManipulator.FileNeedsToBeDownloaded(model))
+        if (modelManager.FileNeedsToBeDownloaded(model))
         {
-            await fileManipulator.DownloadModelFile(model);
+            await modelManager.DownloadModelFileAsync(model);
         }
     }
 
