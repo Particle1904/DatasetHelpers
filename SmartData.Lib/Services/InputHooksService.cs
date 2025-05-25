@@ -1,6 +1,7 @@
 ﻿using SharpHook;
+using SharpHook.Data;
+
 #if !DEBUG
-using SharpHook.Native;
 #endif
 
 using SmartData.Lib.Interfaces;
@@ -37,7 +38,7 @@ namespace SmartData.Lib.Services
             _keyboardTimer = new Stopwatch();
             _keyboardTimer.Start();
 
-            _keyboardHook = new SimpleGlobalHook(true);
+            _keyboardHook = new SimpleGlobalHook(runAsyncOnBackgroundThread: true);
             _keyboardHook.RunAsync();
 #endif
         }
