@@ -9,6 +9,7 @@ using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
 
 using Interfaces;
+using Interfaces.MachineLearning.SAM2;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +22,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services;
 using SmartData.Lib.Services.MachineLearning;
+using SmartData.Lib.Services.MachineLearning.SAM2;
 
 using System;
 using System.IO;
@@ -73,6 +75,7 @@ public partial class App : Application
         var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
         var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
         var gemini = _servicesProvider.GetRequiredService<IGeminiService>();
+        var textRemover = _servicesProvider.GetRequiredService<ITextRemoverService>();
         var python = _servicesProvider.GetRequiredService<IPythonService>();
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
@@ -84,7 +87,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, python, logger, configs)
+                    inpaint, gemini, textRemover, python, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -97,7 +100,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, python, logger, configs)
+                    inpaint, gemini, textRemover, python, logger, configs)
             };
         }
 
@@ -109,64 +112,87 @@ public partial class App : Application
         string _modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
 
         services.AddSingleton<ILoggerService, LoggerService>();
+        services.AddSingleton<IConfigsService, ConfigurationsService>();
         services.AddSingleton<IFileManagerService, FileManagerService>();
         services.AddSingleton<IModelManagerService, ModelManagerService>();
         services.AddSingleton<IImageProcessorService, ImageProcessorService>();
         services.AddSingleton<ITagProcessorService, TagProcessorService>();
-        services.AddSingleton<ILoggerService, LoggerService>();
-        services.AddSingleton<IConfigsService, ConfigurationsService>();
         services.AddSingleton<IPythonService, PythonService>();
+        services.AddSingleton<IInputHooksService, InputHooksService>();
+
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Yolov4].Model.Filename)
         ));
+
         services.AddSingleton<WDAutoTaggerService>(service =>
             new WDAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WD14v2].Model.Filename),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WD14v2].Csv.Filename)
         ));
+
         services.AddSingleton<WDV3AutoTaggerService>(service =>
             new WDV3AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WDv3].Model.Filename),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WDv3].Csv.Filename)
         ));
+
         services.AddSingleton<WDV3LargeAutoTaggerService>(service =>
             new WDV3LargeAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WDv3Large].Model.Filename),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WDv3Large].Csv.Filename)
         ));
+
         services.AddSingleton<E621AutoTaggerService>(service =>
             new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Z3DE621].Model.Filename),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Z3DE621].Csv.Filename)
         ));
+
         services.AddSingleton<JoyTagAutoTaggerService>(service =>
             new JoyTagAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.JoyTag].Model.Filename),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.JoyTag].Csv.Filename)
         ));
+
         services.AddSingleton<ICLIPTokenizerService>(service =>
             new CLIPTokenizerService(Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.CLIPTokenizer].Model.Filename)
         ));
-        services.AddSingleton<IInputHooksService, InputHooksService>();
+
         services.AddSingleton<IPromptGeneratorService>(service => new
             PromptGeneratorService(service.GetRequiredService<ITagProcessorService>(),
                 service.GetRequiredService<IFileManagerService>()));
+
         services.AddSingleton<IUpscalerService>(service =>
             new UpscalerService(service.GetRequiredService<IImageProcessorService>(), string.Empty));
+
         services.AddSingleton<IInpaintService>(service =>
             new InpaintService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.LaMa].Model.Filename)
         ));
+
         services.AddSingleton<IGeminiService>(service =>
             new GeminiService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<IFileManagerService>(),
                 service.GetRequiredService<IPythonService>()
+        ));
+
+        services.AddSingleton<ISAM2Service>(service =>
+            new SAM2Service(service.GetRequiredService<IImageProcessorService>(),
+                Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.SAM2Encoder].Model.Filename),
+                Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.SAM2Decoder].Model.Filename)
+        ));
+
+        services.AddSingleton<ITextRemoverService>(service =>
+            new TextRemoverService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<ISAM2Service>(),
+                service.GetRequiredService<IInpaintService>(),
+                _modelsPath
         ));
     }
 

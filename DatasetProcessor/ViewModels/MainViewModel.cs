@@ -45,6 +45,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IPythonService _python;
     protected readonly IInpaintService _inpaint;
     protected readonly IGeminiService _gemini;
+    protected readonly ITextRemoverService _textRemover;
 
     [ObservableProperty]
     private UserControl _dynamicView;
@@ -99,6 +100,7 @@ public partial class MainViewModel : BaseViewModel
                          IUpscalerService upscaler,
                          IInpaintService inpaint,
                          IGeminiService gemini,
+                         ITextRemoverService textRemover,
                          IPythonService python,
                          ILoggerService logger,
                          IConfigsService configs) :
@@ -116,6 +118,8 @@ public partial class MainViewModel : BaseViewModel
         _contentAwareCrop = contentAwareCrop;
         _inputHooks = inputHooks;
         _promptGenerator = promptGenerator;
+        _gemini = gemini;
+        _textRemover = textRemover;
         _clipTokenizer = clipTokenizer;
         _uspcaler = upscaler;
         _inpaint = inpaint;
@@ -135,6 +139,10 @@ public partial class MainViewModel : BaseViewModel
         _views.Add(AppPages.Sort_Images, new SortImagesView()
         {
             DataContext = new SortImagesViewModel(fileManager, logger, configs)
+        });
+        _views.Add(AppPages.Text_Remover, new TextRemoverView()
+        {
+            DataContext = new TextRemoverViewModel(fileManager, modelManager, textRemover, logger, configs)
         });
         _views.Add(AppPages.Content_Aware_Crop, new ContentAwareCropView()
         {

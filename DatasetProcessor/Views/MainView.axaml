@@ -32,6 +32,10 @@
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Sort_Images}"/>
 				<Button Click="OnNavigationButton"
+						Content="Text Remover"
+						Command="{Binding NavigateToPageCommand}"
+						CommandParameter="{x:Static local:AppPages.Text_Remover}"/>
+				<Button Click="OnNavigationButton"
 						Content="Content Aware Crop"
 						Command="{Binding NavigateToPageCommand}"
 						CommandParameter="{x:Static local:AppPages.Content_Aware_Crop}"/>

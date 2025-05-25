@@ -169,23 +169,23 @@ namespace DatasetProcessor.ViewModels
                 {
                     case AvailableModels.JoyTag:
                         await DownloadModelFiles(_modelManager, AvailableModels.JoyTag);
-                        await CallautoTaggerService(_joyTagautoTagger);
+                        await CallAutoTaggerService(_joyTagautoTagger);
                         break;
                     case AvailableModels.WD14v2:
                         await DownloadModelFiles(_modelManager, AvailableModels.WD14v2);
-                        await CallautoTaggerService(_wDautoTagger);
+                        await CallAutoTaggerService(_wDautoTagger);
                         break;
                     case AvailableModels.WDv3:
                         await DownloadModelFiles(_modelManager, AvailableModels.WDv3);
-                        await CallautoTaggerService(_wDv3autoTagger);
+                        await CallAutoTaggerService(_wDv3autoTagger);
                         break;
                     case AvailableModels.WDv3Large:
                         await DownloadModelFiles(_modelManager, AvailableModels.WDv3Large);
-                        await CallautoTaggerService(_wDv3largeAutoTagger);
+                        await CallAutoTaggerService(_wDv3largeAutoTagger);
                         break;
                     case AvailableModels.Z3DE621:
                         await DownloadModelFiles(_modelManager, AvailableModels.Z3DE621);
-                        await CallautoTaggerService(_e621autoTagger);
+                        await CallAutoTaggerService(_e621autoTagger);
                         break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the auto tagger models!",
@@ -223,7 +223,7 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         /// <param name="autoTagger">The instance of the autoTagger service to use.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        private async Task CallautoTaggerService(IAutoTaggerService autoTagger)
+        private async Task CallAutoTaggerService(IAutoTaggerService autoTagger)
         {
             autoTagger.Threshold = (float)Threshold;
 

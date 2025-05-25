@@ -12,6 +12,9 @@ namespace SmartData.Lib.Models.Configurations
         [JsonPropertyName("sortImagesConfigs")]
         public SortImagesConfigs SortImagesConfigs { get; set; }
 
+        [JsonPropertyName("textRemoverConfigs")]
+        public TextRemoverConfigs TextRemoverConfigs { get; set; }
+
         [JsonPropertyName("contentAwareCropConfigs")]
         public ContentAwareCropConfigs ContentAwareCropConfigs { get; set; }
 

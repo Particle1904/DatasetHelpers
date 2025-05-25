@@ -42,6 +42,7 @@ namespace SmartData.Lib.Services
             {
                 GalleryConfigs = new GalleryConfigs(),
                 SortImagesConfigs = new SortImagesConfigs(),
+                TextRemoverConfigs = new TextRemoverConfigs(),
                 ContentAwareCropConfigs = new ContentAwareCropConfigs(),
                 ManualCropConfigs = new ManualCropConfigs(),
                 ResizeImagesConfigs = new ResizeImagesConfigs(),

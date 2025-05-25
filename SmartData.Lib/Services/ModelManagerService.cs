@@ -109,7 +109,7 @@ namespace SmartData.Lib.Services
                         DownloadMessageEvent?.Invoke(this, downloadNotification);
                         IProgress<double> progress = new Progress<double>(percent =>
                         {
-                            downloadNotification.NotificationMessage = $"Downloaded {percent:F2}% of the file...";
+                            downloadNotification.NotificationMessage = $"Downloaded {percent:F2}% of the file {modelFilename}...";
                             downloadNotification.PlayNotificationSound = false;
                             DownloadMessageEvent?.Invoke(this, downloadNotification);
                         });
