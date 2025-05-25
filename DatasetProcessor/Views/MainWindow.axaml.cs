@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 
 using DatasetProcessor.ViewModels;
 
@@ -13,6 +14,39 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        this.PropertyChanged += OnWindowPropertyChanged;
+        this.Activated += OnWindowActivated;
+        this.Deactivated += OnWindowDeactivated;
+    }
+
+    private void OnWindowPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == WindowStateProperty)
+        {
+            WindowState newState = (WindowState)e.NewValue!;
+            switch (newState)
+            {
+                // Disable/Enable InputEvents based on WindowState
+                case WindowState.Minimized:
+                    _viewModel.UnsubscribeFromInputEvents();
+                    break;
+                case WindowState.Normal:
+                case WindowState.Maximized:
+                    _viewModel.SubscribeToInputEvents();
+                    break;
+            }
+        }
+    }
+
+    private void OnWindowActivated(object? sender, EventArgs e)
+    {
+        _viewModel.SubscribeToInputEvents();
+    }
+
+    private void OnWindowDeactivated(object? sender, EventArgs e)
+    {
+        _viewModel.UnsubscribeFromInputEvents();
     }
 
     protected override void OnInitialized()

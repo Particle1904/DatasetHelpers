@@ -249,6 +249,22 @@ public partial class MainViewModel : BaseViewModel
     }
 
     /// <summary>
+    /// Unsubscribe from Input Events.
+    /// </summary>
+    public void UnsubscribeFromInputEvents()
+    {
+        _inputHooks.UnsubscribeFromInputEvents();
+    }
+
+    /// <summary>
+    /// Subscribe to Input Events.
+    /// </summary>
+    public void SubscribeToInputEvents()
+    {
+        _inputHooks.SubscribeToInputEvents();
+    }
+
+    /// <summary>
     /// Sets all views as inactive by updating their IsActive properties to false.
     /// </summary>
     private void SetAllViewsAsInactive()
