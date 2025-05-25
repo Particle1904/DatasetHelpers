@@ -44,7 +44,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             await LoadUpscalerModelAsync(model);
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);

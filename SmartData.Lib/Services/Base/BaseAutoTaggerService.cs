@@ -101,7 +101,7 @@ namespace SmartData.Lib.Services.Base
                 _isModelLoaded = true;
             }
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
@@ -131,7 +131,7 @@ namespace SmartData.Lib.Services.Base
                 _isModelLoaded = true;
             }
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
@@ -162,7 +162,7 @@ namespace SmartData.Lib.Services.Base
                 _isModelLoaded = true;
             }
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);

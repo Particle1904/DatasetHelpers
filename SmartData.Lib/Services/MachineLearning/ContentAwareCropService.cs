@@ -173,7 +173,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 _isModelLoaded = true;
             }
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             List<string> filesList = new List<string>();
             try
             {

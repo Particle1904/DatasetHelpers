@@ -70,6 +70,37 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
         }
 
         /// <summary>
+        /// Asynchronously segments an object in the image specified by a bounding‐box prompt,
+        /// then returns the resulting binary mask as an <see cref="Image{L8}"/>.
+        /// </summary>
+        /// <param name="inputPath">
+        /// The path to the source image file to be segmented.
+        /// </param>
+        /// <param name="topLeftPoint">
+        /// The top‐left corner of the bounding box, in pixel coordinates.
+        /// </param>
+        /// <param name="bottomRightPoint">
+        /// The bottom‐right corner of the bounding box, in pixel coordinates.
+        /// </param>
+        /// <returns>
+        /// A task representing the asynchronous operation that returns a binary <see cref="Image{L8}"/> mask
+        /// corresponding to the segmented object.
+        /// </returns>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// Thrown if the file specified by <paramref name="inputPath"/> does not exist.
+        /// </exception>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if an I/O error occurs while reading the source image.
+        /// </exception>
+        public async Task<SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.L8>> SegmentObjectFromBoundingBoxAsync(string inputPath,
+            Point topLeftPoint, Point bottomRightPoint)
+        {
+            SAM2EncoderOutputData encoderOutput = await _encoder.EncodeImageEmbeds(inputPath);
+            SAM2DecoderOutputData result = await _decoder.GenerateImageMasksAsync(inputPath, encoderOutput, topLeftPoint, bottomRightPoint);
+            return _imageProcessor.CreateSAM2Mask(result);
+        }
+
+        /// <summary>
         /// Unloads SAM2 Pipeline (encoder and decoder models)
         /// </summary>
         public void UnloadAIModel()

@@ -6,8 +6,6 @@ namespace SmartData.Lib.Services.Base
         where TInput : class
         where TOutput : class, new()
     {
-        protected string _imageSearchPattern = "*.jpg,*.jpeg,*.png,*.gif,*.webp,";
-
         protected InferenceSession _session;
 
         public string ModelPath { get; set; }

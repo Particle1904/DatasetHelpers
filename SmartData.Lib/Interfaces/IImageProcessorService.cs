@@ -4,6 +4,7 @@ using Models;
 using Models.MachineLearning;
 
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Models.MachineLearning;
@@ -28,7 +29,6 @@ namespace SmartData.Lib.Interfaces
         public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputPath, string inputMaskPath);
         public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512);
         public Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath);
-        //public Task<Florence2VisionEncoderInputData> ProcessImageForFlorence2VisionEncodingAsync(string inputPath);
         public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData);
         public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData);
         public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);
@@ -40,5 +40,7 @@ namespace SmartData.Lib.Interfaces
         public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
         public Task<string> GetBase64ImageAsync(string inputPath);
         public Task SaveSAM2MaskAsync(SAM2DecoderOutputData SAM2masks, string outputPath, int dilationSizeInPixels = 2);
+        public Image<L8> CreateSAM2Mask(SAM2DecoderOutputData SAM2masks);
+        public Task CombineListOfMasksAsync(List<Image<L8>> masks, string outputPath, int dilationSizeInPixels = 2);
     }
 }

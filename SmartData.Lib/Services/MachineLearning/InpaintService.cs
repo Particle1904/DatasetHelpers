@@ -162,7 +162,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 await LoadModel();
             }
 
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, _imageSearchPattern)
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension)
                 .Where(file => !file.Contains("_mask")).ToArray();
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 

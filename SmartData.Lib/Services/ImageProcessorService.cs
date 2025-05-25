@@ -771,69 +771,6 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Asynchronously processes an image for Florence-2 vision encoding by resizing it (with black padding to 768×768),
-        /// then converting its pixels from the 0–255 range into a mean–std–normalized float tensor
-        /// of shape [1, 3, 768, 768].
-        /// </summary>
-        /// <param name="inputPath">The file path of the image to be processed.</param>
-        /// <returns>
-        /// A <see cref="Florence2VisionEncoderInputData"/> containing the image as a float tensor,
-        /// normalized using the Florence-2 model’s pixel mean and standard deviation.
-        /// </returns>
-        /// <exception cref="System.IO.FileNotFoundException">
-        /// Thrown if the file specified by <paramref name="inputPath"/> does not exist.
-        /// </exception>
-        /// <exception cref="System.IO.IOException">
-        /// Thrown if an I/O error occurs while loading or reading the image file.
-        /// </exception>
-        //public async Task<Florence2VisionEncoderInputData> ProcessImageForFlorence2VisionEncodingAsync(string inputPath)
-        //{
-        //    int florence2ImageInputSize = 768;
-
-        //    Florence2VisionEncoderInputData inputData = new Florence2VisionEncoderInputData()
-        //    {
-        //        PixelValues = new DenseTensor<float>(new int[] { 1, 3, florence2ImageInputSize, florence2ImageInputSize })
-        //    };
-
-        //    using (Image<Rgb24> image = await Image.LoadAsync<Rgb24>(_decoderOptions, inputPath))
-        //    {
-        //        ResizeOptions resizeOptions = new ResizeOptions()
-        //        {
-        //            Mode = ResizeMode.BoxPad,
-        //            Position = AnchorPositionMode.Center,
-        //            Sampler = _lanczosResampler,
-        //            Compand = true,
-        //            PadColor = new Rgb24(0, 0, 0),
-        //            Size = new Size(florence2ImageInputSize, florence2ImageInputSize)
-        //        };
-
-        //        image.Mutate(image => image.Resize(resizeOptions));
-
-        //        image.ProcessPixelRows(accessor =>
-        //        {
-        //            for (int y = 0; y < accessor.Height; y++)
-        //            {
-        //                var row = accessor.GetRowSpan(y);
-        //                for (int x = 0; x < row.Length; x++)
-        //                {
-        //                    ref Rgb24 px = ref row[x];
-
-        //                    float r = (px.R * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[0]) / Florence2VisionEncoderPixelStd[0];
-        //                    float g = (px.G * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[1]) / Florence2VisionEncoderPixelStd[1];
-        //                    float b = (px.B * (1.0f / 255.0f) - Florence2VisionEncoderPixelMean[2]) / Florence2VisionEncoderPixelStd[2];
-
-        //                    inputData.PixelValues[0, 0, y, x] = r;
-        //                    inputData.PixelValues[0, 1, y, x] = g;
-        //                    inputData.PixelValues[0, 2, y, x] = b;
-        //                }
-        //            }
-        //        });
-        //    }
-
-        //    return inputData;
-        //}
-
-        /// <summary>
         /// Saves the upscaled image data to the specified output path.
         /// </summary>
         /// <param name="outputPath">The path where the upscaled image will be saved.</param>
@@ -1350,6 +1287,173 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Asynchronously selects the highest‐confidence mask from the SAM2 decoder output, processes it
+        /// (resizing, cropping, thresholding), and returns the resulting binary mask as an <see cref="Image{L8}"/>.
+        /// </summary>
+        /// <param name="SAM2masks">
+        /// The <see cref="SAM2DecoderOutputData"/> containing raw mask logits, IoU predictions, and the original
+        /// image resolution. Must have a non‐null <c>Masks</c> tensor and valid <c>OriginalResolution</c>.
+        /// </param>
+        /// <returns>
+        /// A task representing the asynchronous operation that returns a binary <see cref="Image{L8}"/> mask
+        /// corresponding to the highest-confidence prediction.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown if <paramref name="SAM2masks"/> is null or its <c>Masks</c> tensor is null.
+        /// </exception>
+        public Image<L8> CreateSAM2Mask(SAM2DecoderOutputData SAM2masks)
+        {
+            const int maskResolution = 256;
+            const int encoderInputSize = 1024;
+
+            int originalWidth = SAM2masks.OriginalResolution.Width;
+            int originalHeight = SAM2masks.OriginalResolution.Height;
+
+            DenseTensor<float> maskTensor = SAM2masks.Masks!;
+
+            // Select the best mask based on IoU
+            int bestIndex = 0;
+            float bestIoU = SAM2masks.IouPredictions[0, 0];
+            for (int i = 1; i < SAM2masks.IouPredictions.Length; i++)
+            {
+                if (SAM2masks.IouPredictions[0, i] > bestIoU)
+                {
+                    bestIoU = SAM2masks.IouPredictions[0, i];
+                    bestIndex = i;
+                }
+            }
+
+            // Build the low-res float mask
+            using Image<L16> floatMask = new Image<L16>(maskResolution, maskResolution);
+            for (int y = 0; y < maskResolution; y++)
+            {
+                for (int x = 0; x < maskResolution; x++)
+                {
+                    float logit = maskTensor[0, bestIndex, y, x];
+                    float probability = Utilities.Sigmoid(logit);
+                    ushort value = (ushort)(probability * ushort.MaxValue);
+                    floatMask[x, y] = new L16(value);
+                }
+            }
+
+            // Resize to 1024x1024
+            ResizeOptions upscaleResizeOptions = new ResizeOptions
+            {
+                Size = new Size(encoderInputSize, encoderInputSize),
+                Mode = ResizeMode.Stretch,
+                Sampler = _lanczosResampler
+            };
+
+            using Image<L16> upscaledMask = floatMask.Clone(image => image.Resize(upscaleResizeOptions));
+
+            // Crop padding (BoxPad logic)
+            float originalAspect = (float)originalWidth / originalHeight;
+            int paddedWidth, paddedHeight, offsetX, offsetY;
+
+            if (originalAspect > 1)
+            {
+                paddedWidth = encoderInputSize;
+                paddedHeight = (int)(encoderInputSize / originalAspect);
+                offsetX = 0;
+                offsetY = (encoderInputSize - paddedHeight) / 2;
+            }
+            else
+            {
+                paddedWidth = (int)(encoderInputSize * originalAspect);
+                paddedHeight = encoderInputSize;
+                offsetX = (encoderInputSize - paddedWidth) / 2;
+                offsetY = 0;
+            }
+
+            using Image<L16> croppedMask = upscaledMask.Clone(image => image.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight)));
+
+            // Resize to original image size
+            using Image<L16> finalFloatMask = croppedMask.Clone(image => image.Resize(originalWidth, originalHeight, _lanczosResampler));
+
+            // Threshold to binary mask
+            Image<L8> binaryMask = new Image<L8>(originalWidth, originalHeight);
+            for (int y = 0; y < finalFloatMask.Height; y++)
+            {
+                for (int x = 0; x < finalFloatMask.Width; x++)
+                {
+                    float probability = finalFloatMask[x, y].PackedValue / (float)ushort.MaxValue;
+                    byte value = probability > 0.5f ? (byte)255 : (byte)0;
+                    binaryMask[x, y] = new L8(value);
+                }
+            }
+
+            return binaryMask;
+        }
+
+        /// <summary>
+        /// Asynchronously combines a list of binary masks into a single union mask, applies dilation and blurring,
+        /// and saves the resulting mask as a PNG file to the specified output path.
+        /// </summary>
+        /// <param name="masks">
+        /// A list of binary <see cref="Image{L8}"/> masks to be combined. Each mask must have identical dimensions.
+        /// Non-zero pixels in any input mask will be set to 255 in the final combined mask.
+        /// </param>
+        /// <param name="outputPath">
+        /// The file path where the final combined binary mask PNG will be saved. The directory must exist and the path
+        /// must be writable.
+        /// </param>
+        /// <param name="dilationSizeInPixels">
+        /// The radius, in pixels, by which to dilate the combined mask before applying median and Gaussian blurs.
+        /// Defaults to <c>2</c>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous mask-combination and file-save operation.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if <paramref name="masks"/> is null or empty.
+        /// </exception>
+        /// <exception cref="System.InvalidOperationException">
+        /// Thrown if any mask in <paramref name="masks"/> does not match the dimensions of the first mask.
+        /// </exception>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if an I/O error occurs while writing the output PNG file to <paramref name="outputPath"/>.
+        /// </exception>
+        public async Task CombineListOfMasksAsync(List<Image<L8>> masks, string outputPath, int dilationSizeInPixels = 2)
+        {
+            if (masks == null || masks.Count == 0)
+            {
+                throw new ArgumentException("Mask list is empty.", nameof(masks));
+            }
+
+            int width = masks[0].Width;
+            int height = masks[0].Height;
+
+            using (Image<L8> combinedMask = new Image<L8>(width, height))
+            {
+                foreach (Image<L8> mask in masks)
+                {
+                    if (mask.Width != width || mask.Height != height)
+                    {
+                        throw new InvalidOperationException("All masks must have the same dimensions.");
+                    }
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        for (int x = 0; x < width; x++)
+                        {
+                            if (mask[x, y].PackedValue > 0)
+                            {
+                                combinedMask[x, y] = new L8(255);
+                            }
+                        }
+                    }
+                }
+
+                using (Image<L8> dilatedMask = DilateMask(combinedMask, dilationSizeInPixels))
+                {
+                    dilatedMask.Mutate(image => image.MedianBlur(3, true));
+                    dilatedMask.Mutate(image => image.GaussianBlur(5.0f));
+                    await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
+                }
+            }
+        }
+
+        /// <summary>
         /// Asynchronously resizes an image to fit within the specified dimensions, 
         /// maintaining aspect ratio and applying optional sharpening.
         /// </summary>
@@ -1483,24 +1587,6 @@ namespace SmartData.Lib.Services
 
             int blocks = (int)Math.Ceiling(targetWidth * targetHeight / (double)_baseResolution);
             return blocks;
-        }
-
-        /// <summary>
-        /// Finds the aspect ratio bucket for the given aspect ratio.
-        /// </summary>
-        /// <param name="aspectRatio">The aspect ratio to find the bucket for.</param>
-        /// <returns>The bucket number that corresponds to the given aspect ratio. If no bucket is found, returns the total number of blocks.</returns>
-        private int FindAspectRatioBucket(double aspectRatio)
-        {
-            foreach (var aspectRatioRange in _aspectRatioToBlocks.Keys.OrderByDescending(k => k))
-            {
-                if (aspectRatio >= aspectRatioRange)
-                {
-                    return _aspectRatioToBlocks[aspectRatioRange];
-                }
-            }
-
-            return _totalBlocks;
         }
 
         /// <summary>

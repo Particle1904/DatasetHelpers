@@ -53,6 +53,10 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <ProjectReference Include="..\Florence2Lab.Core\Florence2Lab.Core.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
 	  <None Update="Assets\system_notification.mp3">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

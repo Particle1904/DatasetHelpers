@@ -262,21 +262,33 @@ namespace Models.ModelManager
                         Filename = "florence2VisionEncoder.onnx",
                         DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2VisionEncoder.onnx?download=true"
                     },
-                    null),
+                    new ModelFileInfo
+                    {
+                        Filename = "added_tokens.json",
+                        DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2/added_tokens.json?download=true"
+                    }),
                 [AvailableModels.Florence2Encoder] = (
                     new ModelFileInfo
                     {
                         Filename = "florence2Encoder.onnx",
                         DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2Encoder.onnx?download=true"
                     },
-                    null),
+                    new ModelFileInfo
+                    {
+                        Filename = "merges.txt",
+                        DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2/merges.txt?download=true"
+                    }),
                 [AvailableModels.Florence2Decoder] = (
                     new ModelFileInfo
                     {
                         Filename = "florence2Decoder.onnx",
                         DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2Decoder.onnx?download=true"
                     },
-                    null),
+                    new ModelFileInfo
+                    {
+                        Filename = "vocab.json",
+                        DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/florence2/vocab.json?download=true"
+                    }),
                 [AvailableModels.Florence2EmbedTokens] = (
                     new ModelFileInfo
                     {
