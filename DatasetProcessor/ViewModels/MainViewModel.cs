@@ -179,7 +179,7 @@ public partial class MainViewModel : BaseViewModel
         });
         _views.Add(AppPages.Florence_2_Caption, new FlorenceCaptionView()
         {
-            DataContext = new FlorenceCaptionViewModel(fileManager, florence2, logger, configs)
+            DataContext = new FlorenceCaptionViewModel(fileManager, modelManager, florence2, logger, configs)
         });
         _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
         {

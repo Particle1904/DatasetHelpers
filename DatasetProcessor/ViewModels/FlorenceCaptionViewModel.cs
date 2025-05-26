@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
+using Interfaces;
 using Interfaces.MachineLearning;
 
 using SmartData.Lib.Enums;
@@ -20,6 +21,7 @@ namespace DatasetProcessor.ViewModels
     public partial class FlorenceCaptionViewModel : BaseViewModel
     {
         private readonly IFileManagerService _fileManager;
+        private readonly IModelManagerService _modelManager;
         private readonly IFlorence2Service _florence2;
 
         [ObservableProperty]
@@ -42,9 +44,10 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _isCancelEnabled;
 
-        public FlorenceCaptionViewModel(IFileManagerService fileManager, IFlorence2Service florence2, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public FlorenceCaptionViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IFlorence2Service florence2, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManager = fileManager;
+            _modelManager = modelManager;
             _florence2 = florence2;
 
             CaptionTask = Florence2CaptionTask.Caption;
@@ -104,6 +107,8 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
+
+
                 await _florence2.CaptionImagesAsync(InputFolderPath, OutputFolderPath, CaptionTask);
 
                 timer.Stop();
@@ -143,6 +148,16 @@ namespace DatasetProcessor.ViewModels
             {
                 IsCancelEnabled = true;
             }
+        }
+
+        private async Task DownloadRequiredModels()
+        {
+            Logger.SetLatestLogMessage("Downloading required models...", LogMessageColor.Informational);
+            await DownloadModelFiles(_modelManager, AvailableModels.Florence2Decoder);
+            await DownloadModelFiles(_modelManager, AvailableModels.Florence2Encoder);
+            await DownloadModelFiles(_modelManager, AvailableModels.Florence2EmbedTokens);
+            await DownloadModelFiles(_modelManager, AvailableModels.Florence2VisionEncoder);
+            Logger.SetLatestLogMessage("All required models are downloaded!", LogMessageColor.Informational);
         }
     }
 }
