@@ -30,7 +30,7 @@ internal sealed class ModelRunner : IDisposable
 
             try
             {
-                sessionOptions.AppendExecutionProvider_DML(1);
+                sessionOptions.AppendExecutionProvider_DML(0);
             }
             catch (Exception) { /* DML Failed */ }
 
