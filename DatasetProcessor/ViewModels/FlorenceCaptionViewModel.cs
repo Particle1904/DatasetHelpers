@@ -107,7 +107,7 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-
+                await DownloadRequiredModels();
 
                 await _florence2.CaptionImagesAsync(InputFolderPath, OutputFolderPath, CaptionTask);
 
