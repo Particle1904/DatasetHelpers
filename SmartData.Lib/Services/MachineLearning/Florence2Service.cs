@@ -83,6 +83,7 @@ namespace Services.MachineLearning
                 }
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
+            UnloadAIModel();
         }
 
         public async Task<Florence2Result> ProcessAsync(Image image, Florence2Query query)
