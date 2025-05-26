@@ -53,6 +53,7 @@ namespace SmartData.Lib.Services
                     Prompt = GeminiService.BASE_PROMPT,
                     SystemInstructions = GeminiService.CreateBaseSystemInstruction()
                 },
+                Florence2CaptionConfigs = new Florence2CaptionConfigs(),
                 ProcessCaptionsConfigs = new ProcessCaptionsConfigs(),
                 ProcessTagsConfigs = new ProcessTagsConfigs(),
                 TagEditorConfigs = new TagEditorConfigs(),

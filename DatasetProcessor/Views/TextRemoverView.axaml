@@ -15,7 +15,7 @@
 	<Grid RowDefinitions="auto, 10, auto, 10, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, * 10, auto">
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select input folder"
 					Width="180"
@@ -40,7 +40,7 @@
 			</Button>
 		</Grid>
 	    <!-- OUTPUT FOLDER -->
-		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, * 10, auto">
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
 			<Button Grid.Column="0"
 					Content="Select output folder"
 					Width="180"
@@ -88,7 +88,7 @@
 			  ColumnDefinitions="auto, 10, auto"
 			  HorizontalAlignment="Center">
 			<Button Width="200"
-					Content="Process text removal"
+					Content="Remove images text"
 					IsEnabled="{Binding IsUiEnabled}"
 					Command="{Binding RemoveTextFromFilesCommand}"/>
 			<Button Grid.Column="2"

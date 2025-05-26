@@ -72,6 +72,11 @@ namespace SmartData.Lib.Helpers
         }
 
         /// <summary>
+        /// Gets an array of supported Florence2 captioning tasks.
+        /// </summary>
+        public static Florence2CaptionTask[] Florence2CaptionTasksValues => (Florence2CaptionTask[])Enum.GetValues(typeof(Florence2CaptionTask));
+
+        /// <summary>
         /// Gets the supported images file extensions.
         /// </summary>
         /// <returns>The string representing a search pattern for the supported images.</returns>

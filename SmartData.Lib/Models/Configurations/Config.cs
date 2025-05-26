@@ -33,6 +33,9 @@ namespace SmartData.Lib.Models.Configurations
         [JsonPropertyName("geminiCaptionConfigs")]
         public GeminiCaptionConfigs GeminiCaptionConfigs { get; set; }
 
+        [JsonPropertyName("florence2CaptionConfigs")]
+        public Florence2CaptionConfigs Florence2CaptionConfigs { get; set; }
+
         [JsonPropertyName("processCaptionsConfigs")]
         public ProcessCaptionsConfigs ProcessCaptionsConfigs { get; set; }
 

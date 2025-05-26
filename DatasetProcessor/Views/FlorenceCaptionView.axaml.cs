@@ -1,13 +1,12 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
-namespace DatasetProcessor;
-
-public partial class FlorenceCaptionView : UserControl
+namespace DatasetProcessor.Views
 {
-    public FlorenceCaptionView()
+    public partial class FlorenceCaptionView : UserControl
     {
-        InitializeComponent();
+        public FlorenceCaptionView()
+        {
+            InitializeComponent();
+        }
     }
 }

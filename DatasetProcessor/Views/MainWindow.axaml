@@ -8,7 +8,7 @@
         x:Class="DatasetProcessor.Views.MainWindow"
         Icon="/Assets/Icons/icon.png"
 		WindowStartupLocation="CenterScreen"
-        Title="Dataset Processor All-in-one Tools - v2.9.4"
+        Title="Dataset Processor All-in-one Tools - v2.9.5"
 		Background="{DynamicResource SurfaceDark}"
 		MinWidth="1320"
 		MinHeight="600"

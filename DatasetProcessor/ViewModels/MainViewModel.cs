@@ -10,6 +10,7 @@ using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
 using Interfaces;
+using Interfaces.MachineLearning;
 
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
@@ -45,6 +46,7 @@ public partial class MainViewModel : BaseViewModel
     protected readonly IPythonService _python;
     protected readonly IInpaintService _inpaint;
     protected readonly IGeminiService _gemini;
+    protected readonly IFlorence2Service _florence2;
     protected readonly ITextRemoverService _textRemover;
 
     [ObservableProperty]
@@ -100,6 +102,7 @@ public partial class MainViewModel : BaseViewModel
                          IUpscalerService upscaler,
                          IInpaintService inpaint,
                          IGeminiService gemini,
+                         IFlorence2Service florence2,
                          ITextRemoverService textRemover,
                          IPythonService python,
                          ILoggerService logger,
@@ -119,6 +122,7 @@ public partial class MainViewModel : BaseViewModel
         _inputHooks = inputHooks;
         _promptGenerator = promptGenerator;
         _gemini = gemini;
+        _florence2 = florence2;
         _textRemover = textRemover;
         _clipTokenizer = clipTokenizer;
         _uspcaler = upscaler;
@@ -172,6 +176,10 @@ public partial class MainViewModel : BaseViewModel
         _views.Add(AppPages.Gemini_Caption, new GeminiCaptionView()
         {
             DataContext = new GeminiCaptionViewModel(fileManager, gemini, logger, configs)
+        });
+        _views.Add(AppPages.Florence_2_Caption, new FlorenceCaptionView()
+        {
+            DataContext = new FlorenceCaptionViewModel(fileManager, florence2, logger, configs)
         });
         _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
         {

@@ -2,13 +2,112 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:Class="DatasetProcessor.FlorenceCaptionView"			 
+			 xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+			 xmlns:controls="clr-namespace:DatasetProcessor.UserControls"
+			 xmlns:local="clr-namespace:SmartData.Lib.Helpers;assembly=SmartData.Lib"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+             x:Class="DatasetProcessor.Views.FlorenceCaptionView"
+			 x:DataType="vm:FlorenceCaptionViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
 	<Grid RowDefinitions="auto, 10, auto, 10, auto, 30, auto, 10, auto, 10, auto, 10, auto, 10, auto, 10, auto"
 		  Background="Transparent">
+		<!-- INPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="0" ColumnDefinitions="auto, 10, *, 10, auto">
+			<Button Grid.Column="0"
+					Content="Select input folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectInputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding InputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding InputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- OUTPUT FOLDER -->
+		<Grid Classes="gridSecondary" Grid.Row="2" ColumnDefinitions="auto, 10, *, 10, auto">
+			<Button Grid.Column="0"
+					Content="Select output folder"
+					Width="180"
+					Height="40"
+					Command="{Binding SelectOutputFolderCommand}"/>
+			<Label Grid.Column="2"
+				   Content="{Binding OutputFolderPath}"
+				   HorizontalAlignment="Left"
+				   VerticalAlignment="Center"/>
+			<Button Grid.Column="4"
+					BorderThickness="0"
+					Width="40"
+					Height="40"
+					Command="{Binding OpenFolderInExplorerCommand}"
+					CommandParameter="{Binding OutputFolderPath}">
+				<Panel>
+					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
+						   HorizontalAlignment="Stretch"
+						   VerticalAlignment="Stretch"
+						   Margin="1"/>
+				</Panel>
+			</Button>
+		</Grid>
+		<!-- CAPTION CONFIGS -->
+		<Grid Classes="gridSecondary"
+			  Grid.Row="4"
+			  ColumnDefinitions="auto, 10, *, 10, auto">
+			<Label Grid.Column="0"
+				   Content="Select the captioning task:"
+				   HorizontalAlignment="Left"/>
+			<ComboBox Grid.Column="2" Grid.ColumnSpan="3"
+					  HorizontalAlignment="Right"
+					  MinWidth="200"
+					  MaxWidth="200"
+					  SelectedItem="{Binding CaptionTask}"
+				  ItemsSource="{Binding Source={x:Static local:Utilities.Florence2CaptionTasksValues}}">		
+			</ComboBox>
+		</Grid>
+		<Separator Grid.Row="5"/>
+		<!-- CURRENTLY PROCESSING -->
+		<Label Grid.Row="6"
+			   Content="{Binding CaptionProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+		<!-- ELAPSED TIME -->
+		<Label Grid.Row="8"
+			   Content="{Binding ElapsedTime, StringFormat='Florence2 captioning elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>
+		<!-- PROGRESS BAR -->
+		<Grid Grid.Row="10"
+			  ColumnDefinitions="auto, 10, auto"
+			  HorizontalAlignment="Center">
+			<Button Width="200"
+					Content="Caption images"
+					IsEnabled="{Binding IsUiEnabled}"
+					Command="{Binding CaptionWithFlorence2Command}"/>
+			<Button Grid.Column="2"
+					Width="120"
+					Content="Cancel"
+					IsEnabled="{Binding IsCancelEnabled}"
+					Command="{Binding CancelTaskCommand}"/>
+		</Grid>
+		<!-- PROGRESS BAR -->
+		<ProgressBar Grid.Row="12"
+					 Value="{Binding CaptionProcessingProgress.PercentComplete}"/>
+		<!-- TASk STATUS -->
+		<Label Grid.Row="14"
+			   FontSize="22"
+			   Foreground="{DynamicResource Secondary}"
+			   Content="{Binding TaskStatusString}"/>
 	</Grid>
 </UserControl>

@@ -77,6 +77,7 @@ public partial class App : Application
         var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
         var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
         var gemini = _servicesProvider.GetRequiredService<IGeminiService>();
+        var florence2 = _servicesProvider.GetRequiredService<IFlorence2Service>();
         var textRemover = _servicesProvider.GetRequiredService<ITextRemoverService>();
         var python = _servicesProvider.GetRequiredService<IPythonService>();
 
@@ -89,7 +90,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, textRemover, python, logger, configs)
+                    inpaint, gemini, florence2, textRemover, python, logger, configs)
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -102,7 +103,7 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
                     e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, textRemover, python, logger, configs)
+                    inpaint, gemini, florence2, textRemover, python, logger, configs)
             };
         }
 
@@ -121,8 +122,6 @@ public partial class App : Application
         services.AddSingleton<ITagProcessorService, TagProcessorService>();
         services.AddSingleton<IPythonService, PythonService>();
         services.AddSingleton<IInputHooksService, InputHooksService>();
-
-        services.AddSingleton<IFlorence2Service>(service => new Florence2Service(_modelsPath));
 
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
@@ -185,6 +184,9 @@ public partial class App : Application
                 service.GetRequiredService<IFileManagerService>(),
                 service.GetRequiredService<IPythonService>()
         ));
+
+        services.AddSingleton<IFlorence2Service>(service => new Florence2Service(service.GetRequiredService<IFileManagerService>(),
+            _modelsPath));
 
         services.AddSingleton<ISAM2Service>(service =>
             new SAM2Service(service.GetRequiredService<IImageProcessorService>(),

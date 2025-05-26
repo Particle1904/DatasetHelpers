@@ -12,6 +12,7 @@
         Upscale_Images,
         Tag_Generation,
         Gemini_Caption,
+        Florence_2_Caption,
         Text_Remover,
         Process_Captions,
         Process_Tags,
