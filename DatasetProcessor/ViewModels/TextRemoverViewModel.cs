@@ -44,15 +44,16 @@ namespace DatasetProcessor.ViewModels
         {
             _fileManager = fileManager;
             _modelManager = modelManager;
-            _textRemover = textRemover;
             _logger = logger;
             _configs = configs;
 
+            _textRemover = textRemover;
             (_textRemover as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
                 TextRemoverProgress = ResetProgress(TextRemoverProgress);
                 TextRemoverProgress.TotalFiles = args;
             };
+            (_textRemover as INotifyProgress).ProgressUpdated += (sender, args) => TextRemoverProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.TextRemoverConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);

@@ -9,6 +9,7 @@ using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
 
 using Interfaces;
+using Interfaces.MachineLearning;
 using Interfaces.MachineLearning.SAM2;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Models.ModelManager;
 
 using Services;
+using Services.MachineLearning;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
@@ -120,6 +122,8 @@ public partial class App : Application
         services.AddSingleton<IPythonService, PythonService>();
         services.AddSingleton<IInputHooksService, InputHooksService>();
 
+        services.AddSingleton<IFlorence2Service>(service => new Florence2Service(_modelsPath));
+
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Yolov4].Model.Filename)
@@ -190,9 +194,9 @@ public partial class App : Application
 
         services.AddSingleton<ITextRemoverService>(service =>
             new TextRemoverService(service.GetRequiredService<IImageProcessorService>(),
+                service.GetRequiredService<IFlorence2Service>(),
                 service.GetRequiredService<ISAM2Service>(),
-                service.GetRequiredService<IInpaintService>(),
-                _modelsPath
+                service.GetRequiredService<IInpaintService>()
         ));
     }
 

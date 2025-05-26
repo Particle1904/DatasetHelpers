@@ -13,28 +13,22 @@ using SmartData.Lib.Services.Base;
 
 namespace Services
 {
-    public class TextRemoverService : CancellableServiceBase, ITextRemoverService, INotifyProgress, IUnloadModel
+    public class TextRemoverService : CancellableServiceBase, ITextRemoverService, INotifyProgress
     {
         private readonly IImageProcessorService _imageProcessor;
+        private readonly IFlorence2Service _florence2;
         private readonly ISAM2Service _sam2;
         private readonly IInpaintService _inpaint;
-        private readonly Florence2Config _florence2Config;
-        private Florence2Pipeline _florence2Pipeline;
 
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
-        public TextRemoverService(IImageProcessorService imageProcessor, ISAM2Service sam2, IInpaintService inpaint, string modelsPath)
+        public TextRemoverService(IImageProcessorService imageProcessor, IFlorence2Service florence2, ISAM2Service sam2, IInpaintService inpaint)
         {
             _imageProcessor = imageProcessor;
+            _florence2 = florence2;
             _sam2 = sam2;
             _inpaint = inpaint;
-
-            _florence2Config = new Florence2Config()
-            {
-                MetadataDirectory = modelsPath,
-                OnnxModelDirectory = modelsPath
-            };
         }
 
         /// <summary>
@@ -59,8 +53,6 @@ namespace Services
         /// </exception>
         public async Task RemoveTextFromImagesAsync(string inputFolderPath, string outputFolderPath)
         {
-            await LoadFlorence2Pipeline();
-
             // Get the folder path for masks
             string masksPath = Path.Combine(inputFolderPath, "masks");
             if (!Directory.Exists(masksPath))
@@ -95,25 +87,27 @@ namespace Services
             }
 
             // Unload Florence2 Pipeline to free up resources.
-            UnloadAIModel();
+            (_florence2 as IUnloadModel).UnloadAIModel();
         }
 
         /// <summary>
-        /// Asynchronously removes detected text regions from a single image using OCR, SAM2-based segmentation, and inpainting,
-        /// then saves the result to the specified output path.
+        /// Asynchronously detects and removes visible text, watermarks, and logos from an image using Florence2-based grounding,
+        /// SAM2 segmentation, and inpainting. If text-like regions are found, the image is processed and saved as PNG.
+        /// Otherwise, the original image is copied to the output path, preserving its format.
         /// </summary>
         /// <param name="inputImagePath">
-        /// The full file path of the input image from which text will be removed.
+        /// Full path to the input image from which text-like regions will be detected and removed.
         /// </param>
         /// <param name="outputImagePath">
-        /// The file path where the final inpainted image will be saved. The parent directory must be writable.
+        /// Full path (including desired filename) where the result will be saved. If processing occurs, the output format will be PNG,
+        /// regardless of the extension provided.
         /// </param>
         /// <returns>
-        /// A <see cref="Task"/> representing the asynchronous operation of OCR-based detection, mask generation,
-        /// inpainting, and file-saving.
+        /// A <see cref="Task"/> representing the asynchronous workflow of region detection, segmentation, inpainting,
+        /// and image saving.
         /// </returns>
         /// <exception cref="System.Exception">
-        /// Thrown if an error occurs during text region detection, mask generation, or image saving.
+        /// Thrown if an error occurs during detection, mask generation, inpainting, or saving the output image.
         /// </exception>
         private async Task RemoveTextFromImageAndSaveAsync(string inputImagePath, string outputImagePath)
         {
@@ -126,15 +120,15 @@ namespace Services
 
             using (Image inputImage = Image.Load(inputImagePath))
             {
-                // Optical Character Recognition (OCR) with Regions
-                Florence2Query query = Florence2Tasks.CreateQuery(Florence2TaskType.OcrWithRegions);
-                //Florence2Query query = new Florence2Query(Florence2TaskType.RegionProposal, "Locate the text regions in the image");
-                Florence2Result result = await _florence2Pipeline.ProcessAsync(inputImage, query);
+                // CaptionToGrounding best performance so far in actually finding text, logos and other types of watermarks.
+                Florence2Query query = Florence2Tasks.CreateQuery(Florence2TaskType.CaptionToGrounding, "text, watermark, logo, website, patreon, twitter, artist signature");
+                Florence2Result result = await _florence2.ProcessAsync(inputImage, query);
 
-                if (result.BoundingBoxes.Count <= 0)
+                if (result.BoundingBoxes == null || result.BoundingBoxes.Count <= 0)
                 {
-                    // If no bounding box is found, copy the original image
-                    File.Copy(inputImagePath, outputImagePath);
+                    // If no bounding box is found, copy the original image and return
+                    File.Copy(inputImagePath, Path.ChangeExtension(outputImagePath, Path.GetExtension(inputImagePath)));
+                    return;
                 }
 
                 List<Image<L8>> imageMasks = new List<Image<L8>>();
@@ -158,26 +152,6 @@ namespace Services
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Asynchronously initializes and loads the Florence2 pipeline if it has not already been loaded.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="Task"/> representing the asynchronous model-loading operation.
-        /// </returns>
-        private async Task LoadFlorence2Pipeline()
-        {
-            if (_florence2Pipeline is null)
-            {
-                _florence2Pipeline = await Florence2Pipeline.CreateAsync(_florence2Config);
-            }
-        }
-
-        public void UnloadAIModel()
-        {
-            _florence2Pipeline?.Dispose();
-            _florence2Pipeline = null;
         }
     }
 }
