@@ -3,8 +3,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
-			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="1024"
-             x:Class="DatasetProcessor.GeminiCaptionView"
+			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+             x:Class="DatasetProcessor.Views.GeminiCaptionView"
 			 x:DataType="vm:GeminiCaptionViewModel"
 			 Background="{DynamicResource SecondarySurfaceDark}">
 	<Design.DesignStyle>

@@ -1,13 +1,12 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 
-namespace DatasetProcessor;
-
-public partial class GeminiCaptionView : UserControl
+namespace DatasetProcessor.Views
 {
-    public GeminiCaptionView()
+    public partial class GeminiCaptionView : UserControl
     {
-        InitializeComponent();
+        public GeminiCaptionView()
+        {
+            InitializeComponent();
+        }
     }
 }
