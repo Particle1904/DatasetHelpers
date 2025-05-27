@@ -33,7 +33,14 @@ namespace Services.MachineLearning
 
         public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, Florence2CaptionTask captionTask)
         {
-            await LoadFlorence2Pipeline();
+            try
+            {
+                await LoadFlorence2Pipeline();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;

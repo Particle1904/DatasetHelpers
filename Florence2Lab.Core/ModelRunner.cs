@@ -10,7 +10,7 @@ internal sealed class ModelRunner : IDisposable
     private readonly InferenceSession _encoder;
     private readonly InferenceSession _visionEncoder;
 
-    private bool _useGPU = true;
+    private bool _useGPU = false;
 
     public ModelRunner(IOnnxModelPathProvider pathProvider)
     {
@@ -20,14 +20,13 @@ internal sealed class ModelRunner : IDisposable
         int[] gpuIdsToTry = { 0, 1 };
 
         SessionOptions sessionOptions = new SessionOptions();
+        sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
+        sessionOptions.IntraOpNumThreads = 1;
+        sessionOptions.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
+        sessionOptions.EnableMemoryPattern = false;
 
         if (_useGPU)
         {
-            sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
-            sessionOptions.IntraOpNumThreads = 1;
-            sessionOptions.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
-            sessionOptions.EnableMemoryPattern = false;
-
             try
             {
                 sessionOptions.AppendExecutionProvider_DML(0);
