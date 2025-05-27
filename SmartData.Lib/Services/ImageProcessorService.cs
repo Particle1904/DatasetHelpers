@@ -3,6 +3,8 @@
 using HeyRed.ImageSharp.Heif.Formats.Avif;
 using HeyRed.ImageSharp.Heif.Formats.Heif;
 
+using ImageMagick;
+
 using Microsoft.ML.OnnxRuntime.Tensors;
 
 using Models;
@@ -1498,15 +1500,16 @@ namespace SmartData.Lib.Services
                     Compand = true
                 };
 
-                image.Mutate(x => x.Resize(resizeOptions));
+                image.Mutate(image => image.Resize(resizeOptions));
 
                 if (ApplySharpen && (image.Width >= MinimumResolutionForSigma || image.Height >= MinimumResolutionForSigma))
                 {
-                    image.Mutate(x => x.GaussianSharpen(_sharpenSigma));
+                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
                 }
 
                 string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
                 await image.SaveAsPngAsync(outputFilePath, _pngEncoder);
+
             }
         }
 
@@ -1649,7 +1652,7 @@ namespace SmartData.Lib.Services
                         if (cropWidth < tileSize || cropHeight < tileSize)
                         {
                             Image<Rgba32> paddedImage = new Image<Rgba32>(tileSize, tileSize);
-                            paddedImage.Mutate(ctx => ctx.DrawImage(cloneImage, new Point(0, 0), 1f));
+                            paddedImage.Mutate(image => image.DrawImage(cloneImage, new Point(0, 0), 1f));
 
                             // Stretch the last column to the right
                             if (cropWidth < tileSize)
@@ -1679,7 +1682,7 @@ namespace SmartData.Lib.Services
                         }
                         else
                         {
-                            cloneImage.Mutate(img => img.Resize(tileSize, tileSize));
+                            cloneImage.Mutate(image => image.Resize(tileSize, tileSize));
                             imageTiles.Add(new TileImage(cloneImage, x, y));
                         }
                     }
@@ -1733,5 +1736,39 @@ namespace SmartData.Lib.Services
 
             return dilated;
         }
+
+        #region Magick.NET
+        private async Task<MagickImage> ConvertToMagickImageAsync(Image<Rgba32> image)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await image.SaveAsPngAsync(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return new MagickImage(memoryStream);
+            }
+        }
+
+        private async Task<Image<Rgba32>> ConvertToImageSharpAsync(MagickImage magickImage)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                await magickImage.WriteAsync(memoryStream, MagickFormat.Bmp);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return await Image.LoadAsync<Rgba32>(memoryStream);
+            }
+        }
+
+        private void ApplyAutoCorrections(MagickImage magickImage, bool autoLevel, bool autoGamma)
+        {
+            if (autoLevel)
+            {
+                magickImage.AutoLevel();
+            }
+            if (autoGamma)
+            {
+                magickImage.AutoGamma();
+            }
+        }
+        #endregion
     }
 }
