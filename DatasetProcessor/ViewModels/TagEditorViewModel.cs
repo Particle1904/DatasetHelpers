@@ -122,6 +122,11 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         public void UpdateCurrentSelectedTags()
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             if (SelectedImage != null)
             {
                 try
@@ -144,6 +149,11 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void GoToItem(string parameter)
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             try
             {
                 int.TryParse(parameter, out int parameterInt);
@@ -187,6 +197,11 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         public async Task BlurImageAsync()
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             _showBlurredImage = !_showBlurredImage;
             try
             {
@@ -222,6 +237,11 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private async Task FilterFilesAsync()
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             try
             {
                 ButtonEnabled = false;
@@ -332,6 +352,11 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         private void LoadImagesFromInputFolder()
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             try
             {
                 ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
@@ -376,6 +401,16 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnSelectedItemIndexChanged(int value)
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
+            if (!IsActive)
+            {
+                return;
+            }
+
             if (ImageFiles?.Count > 0)
             {
                 SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
@@ -392,6 +427,11 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnSelectedImageChanged(Bitmap value)
         {
+            if (!IsActive)
+            {
+                return;
+            }
+
             try
             {
                 UpdateCurrentSelectedTags();

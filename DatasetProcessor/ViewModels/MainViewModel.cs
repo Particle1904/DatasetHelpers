@@ -16,7 +16,6 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.MachineLearning;
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -326,38 +325,32 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="args">The property change event arguments.</param>
     private void OnLoggerServicePropertyChanged(object sender, PropertyChangedEventArgs args)
     {
-        try
+        if (args.PropertyName == nameof(ILoggerService.LatestLogMessage))
         {
-            if (args.PropertyName == nameof(ILoggerService.LatestLogMessage))
-            {
-                OnPropertyChanged(nameof(LatestLogMessage));
-            }
-
-            if (args.PropertyName == nameof(ILoggerService.MessageColor))
-            {
-                ILoggerService logger = (sender as ILoggerService);
-
-                switch (logger.MessageColor)
-                {
-                    case SmartData.Lib.Enums.LogMessageColor.Error:
-                        LogMessageColor = new SolidColorBrush(Colors.IndianRed);
-                        break;
-                    case SmartData.Lib.Enums.LogMessageColor.Warning:
-                        LogMessageColor = new SolidColorBrush(Colors.Yellow);
-                        break;
-                    case SmartData.Lib.Enums.LogMessageColor.Informational:
-                        LogMessageColor = new SolidColorBrush(Colors.LightGreen);
-                        break;
-                    default:
-                        LogMessageColor = new SolidColorBrush(Colors.IndianRed);
-                        break;
-                }
-
-                OnPropertyChanged(nameof(LogMessageColor));
-            }
+            OnPropertyChanged(nameof(LatestLogMessage));
         }
-        catch (Exception exception)
+
+        if (args.PropertyName == nameof(ILoggerService.MessageColor))
         {
+            ILoggerService logger = (sender as ILoggerService);
+
+            switch (logger.MessageColor)
+            {
+                case SmartData.Lib.Enums.LogMessageColor.Error:
+                    LogMessageColor = new SolidColorBrush(Colors.IndianRed);
+                    break;
+                case SmartData.Lib.Enums.LogMessageColor.Warning:
+                    LogMessageColor = new SolidColorBrush(Colors.Yellow);
+                    break;
+                case SmartData.Lib.Enums.LogMessageColor.Informational:
+                    LogMessageColor = new SolidColorBrush(Colors.LightGreen);
+                    break;
+                default:
+                    LogMessageColor = new SolidColorBrush(Colors.IndianRed);
+                    break;
+            }
+
+            OnPropertyChanged(nameof(LogMessageColor));
         }
     }
 }
