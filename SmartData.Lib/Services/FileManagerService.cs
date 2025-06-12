@@ -12,8 +12,6 @@ namespace SmartData.Lib.Services
 {
     public class FileManagerService : CancellableServiceBase, IFileManagerService, INotifyProgress
     {
-        private readonly string _imageSearchPattern = Utilities.GetSupportedImagesExtension;
-
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
@@ -33,7 +31,7 @@ namespace SmartData.Lib.Services
         /// </remarks>
         public async Task RenameAllToCrescentAsync(string inputPath, int startingNumberForFileNames = 1)
         {
-            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
 
             if (imageFiles.Length > 0)
             {
@@ -47,7 +45,7 @@ namespace SmartData.Lib.Services
 
                 TotalFilesChanged?.Invoke(this, imageFiles.Length);
 
-                imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+                imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
 
                 for (int i = 0; i < imageFiles.Length; i++)
                 {
@@ -68,7 +66,7 @@ namespace SmartData.Lib.Services
         /// <param name="minimumSize">The minimum size (in pixels) for images to be considered for the selected output directory. Defaults to 512.</param>
         public async Task SortImagesAsync(string inputPath, string discardedOutputPath, string selectedOutputPath, SupportedDimensions dimension = SupportedDimensions.Resolution512x512)
         {
-            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
@@ -100,7 +98,7 @@ namespace SmartData.Lib.Services
         /// <exception cref="System.IO.IOException">Thrown when an I/O error occurs during file copying.</exception>
         public async Task BackupFilesAsync(string inputPath, string backupPath)
         {
-            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
+            string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             foreach (var image in imageFiles)
@@ -154,7 +152,7 @@ namespace SmartData.Lib.Services
         /// <returns>An array of image file names.</returns>
         public List<string> GetImageFiles(string inputPath)
         {
-            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension).ToList();
             if (imageFiles.Count > 0)
             {
                 TotalFilesChanged?.Invoke(this, imageFiles.Count);
@@ -179,7 +177,10 @@ namespace SmartData.Lib.Services
             }
 
             FilterSettings filterSettings = ParseFilterString(wordsToFilter);
-            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension).ToList();
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
+            TotalFilesChanged?.Invoke(this, imageFiles.Count);
 
             List<string> filteredImageFiles;
             if (filterSettings.IncludeTags.Length == 0)
@@ -188,13 +189,13 @@ namespace SmartData.Lib.Services
             }
             else
             {
-                filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly);
+                filteredImageFiles = FilterImageFiles(txtFileExtension, imageFiles, filterSettings.IncludeTags, exactMatchesOnly, cancellationToken);
             }
             List<string> filteredImageFilesByAnd = FilterImageFilesByMultiple(txtFileExtension, imageFiles, filterSettings.AndTags);
 
             List<string> resultUnion = filteredImageFiles.Union(filteredImageFilesByAnd).ToList();
 
-            List<string> unwantedImageFiles = FilterImageFiles(txtFileExtension, resultUnion, filterSettings.ExcludeTags, true);
+            List<string> unwantedImageFiles = FilterImageFiles(txtFileExtension, resultUnion, filterSettings.ExcludeTags, true, cancellationToken);
 
             return resultUnion.Except(unwantedImageFiles).ToList();
         }
@@ -252,12 +253,14 @@ namespace SmartData.Lib.Services
         /// <param name="wordsSplit">An array of tags or keywords to filter by.</param>
         /// <param name="exactMatch">A flag indicating whether to perform an exact tag match or partial match.</param>
         /// <returns>A list of filtered image file paths that match the specified criteria.</returns>
-        private List<string> FilterImageFiles(string txtFileExtension, List<string> imageFiles, string[] wordsSplit, bool exactMatch)
+        private List<string> FilterImageFiles(string txtFileExtension, List<string> imageFiles, string[] wordsSplit, bool exactMatch, CancellationToken cancellationToken)
         {
             List<string> filteredImageFiles = new List<string>();
 
             foreach (string image in imageFiles)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     string caption = GetTextFromFile(image, txtFileExtension);
@@ -290,6 +293,7 @@ namespace SmartData.Lib.Services
                 {
                     continue;
                 }
+                ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
 
             return filteredImageFiles;
@@ -310,7 +314,7 @@ namespace SmartData.Lib.Services
                 throw new ArgumentException("File extension must be either .txt or .caption.");
             }
 
-            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern).ToList();
+            List<string> imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension).ToList();
 
             TotalFilesChanged?.Invoke(this, imageFiles.Count);
 
