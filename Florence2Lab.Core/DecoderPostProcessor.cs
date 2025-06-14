@@ -86,7 +86,7 @@ public partial class DecoderPostProcessor
     /// <param name="imageWidth">The original width of the input image.</param>
     /// <param name="imageHeight">The original height of the input image.</param>
     /// <returns>A task containing the result with extracted labels and bounding boxes.</returns>
-    private async Task<Florence2Result> ProcessPointsAsBoundingBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
+    private Task<Florence2Result> ProcessPointsAsBoundingBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
     {
         // NOTE: "wheel" has two bounding boxes, "door" has one
         // example data: car<loc_54><loc_375><loc_906><loc_707>door<loc_710><loc_276><loc_908><loc_537>wheel<loc_708><loc_557><loc_865><loc_704><loc_147><loc_563><loc_305><loc_705>
@@ -122,7 +122,7 @@ public partial class DecoderPostProcessor
             match = match.NextMatch();
         }
 
-        return new Florence2Result { TaskType = taskType, BoundingBoxes = boundingBoxes, Labels = labels };
+        return Task.FromResult(new Florence2Result { TaskType = taskType, BoundingBoxes = boundingBoxes, Labels = labels });
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public partial class DecoderPostProcessor
     /// <param name="imageWidth">The original width of the input image.</param>
     /// <param name="imageHeight">The original height of the input image.</param>
     /// <returns>A task containing the result with extracted labels, quad boxes, and corresponding bounding rectangles.</returns>
-    private async Task<Florence2Result> ProcessPointsAsQuadBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
+    private Task<Florence2Result> ProcessPointsAsQuadBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
     {
         // Regex to match text followed by 8 location coordinates
         Regex regex = CategoryAndQuadBoxRegex();
@@ -180,13 +180,13 @@ public partial class DecoderPostProcessor
             return new Rectangle(minX, minY, maxX - minX, maxY - minY);
         }).ToList();
 
-        return new Florence2Result
+        return Task.FromResult(new Florence2Result
         {
             TaskType = taskType,
             BoundingBoxes = boundingBoxes,
             Labels = labels,
             Polygons = quadBoxes
-        };
+        });
     }
 
     /// <summary>

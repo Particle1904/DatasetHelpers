@@ -176,7 +176,8 @@ internal sealed class ModelRunner : IDisposable
             [
                 NamedOnnxValue.CreateFromTensor("encoder_hidden_states", encoderHiddenStates),
                 NamedOnnxValue.CreateFromTensor("encoder_attention_mask", encoderAttentionMask),
-                NamedOnnxValue.CreateFromTensor("inputs_embeds", decoderEmbeddings)
+                NamedOnnxValue.CreateFromTensor("inputs_embeds", decoderEmbeddings),
+                NamedOnnxValue.CreateFromTensor("use_cache_branch", new DenseTensor<bool>(new bool[] { false }, new int[] { 1 }))
             ];
 
             _ = await RunInferenceAsync(_decoder, decoderInputs);
@@ -194,7 +195,8 @@ internal sealed class ModelRunner : IDisposable
             [
                 NamedOnnxValue.CreateFromTensor("encoder_hidden_states", encoderHiddenStates),
                 NamedOnnxValue.CreateFromTensor("encoder_attention_mask", encoderAttentionMask),
-                NamedOnnxValue.CreateFromTensor("inputs_embeds", decoderEmbeddings)
+                NamedOnnxValue.CreateFromTensor("inputs_embeds", decoderEmbeddings),
+                NamedOnnxValue.CreateFromTensor("use_cache_branch", new DenseTensor<bool>(new bool[] { false }, new int[] { 1 }))
             ];
 
             IDisposableReadOnlyCollection<DisposableNamedOnnxValue> outputs = await RunInferenceAsync(_decoder, decoderInputs);
