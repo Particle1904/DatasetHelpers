@@ -29,6 +29,11 @@ namespace DatasetProcessor.Views
 
         private TagEditorViewModel? _viewModel;
 
+        public TagEditorView()
+        {
+            InitializeComponent();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TagEditorView"/> class.
         /// </summary>
