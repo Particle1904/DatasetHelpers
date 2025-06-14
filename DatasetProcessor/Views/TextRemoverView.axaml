@@ -72,8 +72,7 @@
 					   TextAlignment="Center"
 					   FontWeight="Light"
 					   Foreground="{DynamicResource Secondary}"
-					   Text="Note: This process will use Florence2 (Optical	Character Recognition), SAM2 (Object Segmentation) and LaMa (Inpainting) AI Models.&#10;It could take a long time to process a large dataset, so keep that in mind!&#10;This is ideal for removing watermarks, logos and other forms of texts. Avoid using it for images without any text or logos or with a large corpses of text!&#10;The process will process all the images in the input folder in 3 stages: Florence2 Object Detection -> SAM2 Mask Creation -> LaMa Inpaint."/>
-			
+					   Text="Note: This process uses three AI models in sequential stages — Florence2 (Optical Character Recognition), SAM2 (Object Segmentation), and LaMa (Inpainting).&#10;Each stage is completed for all images before moving on to the next.&#10;Processing large datasets may take a significant amount of time.&#10;This workflow is ideal for removing watermarks, logos, and similar text-based elements. It is not recommended for images without text/logos or those containing large bodies of text.&#10;Stages: Florence2 OCR -> SAM2 Mask Generation -> LaMa Inpainting."/>			
 		
 		</Panel>
 		<Separator Grid.Row="5"/>
