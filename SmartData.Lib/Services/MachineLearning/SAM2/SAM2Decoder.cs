@@ -171,19 +171,19 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
                 NamedOnnxValue.CreateFromTensor<float>(GetInputColumns()[6], inputData.HasMaskInput),
             };
 
-            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediciton = await Task.Run(() => _session.Run(inputValues)))
+            using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> prediction = await Task.Run(() => _session.Run(inputValues)))
             {
                 // Extract predicted values into arrays.
-                Tensor<float> masksPrediction = prediciton[0].AsTensor<float>();
+                Tensor<float> masksPrediction = prediction[0].AsTensor<float>();
                 float[] masks = masksPrediction.ToArray();
 
-                Tensor<float> iouPredictions = prediciton[1].AsTensor<float>();
+                Tensor<float> iouPredictions = prediction[1].AsTensor<float>();
                 float[] iou = iouPredictions.ToArray();
 
                 SAM2DecoderOutputData outputData = new SAM2DecoderOutputData()
                 {
-                    Masks = (DenseTensor<float>)prediciton[0].AsTensor<float>(),
-                    IouPredictions = (DenseTensor<float>)prediciton[1].AsTensor<float>(),
+                    Masks = (DenseTensor<float>)prediction[0].AsTensor<float>(),
+                    IouPredictions = (DenseTensor<float>)prediction[1].AsTensor<float>(),
                     OriginalResolution = originalImageSize
                 };
 

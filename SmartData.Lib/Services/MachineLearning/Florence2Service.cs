@@ -35,9 +35,9 @@ namespace Services.MachineLearning
         {
             try
             {
-                await LoadFlorence2Pipeline();
+                await LoadFlorence2PipelineAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -75,7 +75,7 @@ namespace Services.MachineLearning
                 {
                     using (Image inputImage = Image.Load(file))
                     {
-                        Florence2Result result = await _florence2Pipeline.ProcessAsync(inputImage, query);
+                        Florence2Result result = await Task.Run(() => _florence2Pipeline.Process(inputImage, query));
 
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
@@ -95,15 +95,14 @@ namespace Services.MachineLearning
 
         public async Task<Florence2Result> ProcessAsync(Image image, Florence2Query query)
         {
-            await LoadFlorence2Pipeline();
+            await LoadFlorence2PipelineAsync();
 
-            return await _florence2Pipeline.ProcessAsync(image, query);
+            return await Task.Run(() => _florence2Pipeline.Process(image, query));
         }
 
         public void UnloadAIModel()
         {
-            _florence2Pipeline?.Dispose();
-            _florence2Pipeline = null;
+            _florence2Pipeline.Dispose();
         }
 
         /// <summary>
@@ -112,7 +111,7 @@ namespace Services.MachineLearning
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous model-loading operation.
         /// </returns>
-        private async Task LoadFlorence2Pipeline()
+        private async Task LoadFlorence2PipelineAsync()
         {
             if (_florence2Pipeline is null)
             {

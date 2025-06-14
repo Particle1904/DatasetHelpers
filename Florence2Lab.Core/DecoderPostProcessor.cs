@@ -1,6 +1,6 @@
-using System.Text.RegularExpressions;
-
 using SixLabors.ImageSharp;
+
+using System.Text.RegularExpressions;
 
 namespace FlorenceTwoLab.Core;
 
@@ -54,10 +54,10 @@ public partial class DecoderPostProcessor
         return taskConfig switch
         {
             // Advanced detection tasks, returns quad boxes.
-            { ReturnsLabels: true, ReturnsBoundingBoxes: true, ReturnsPolygons: true } => await ProcessPointsAsQuadBoxesAsync(taskType, modelOutput, imageWasPadded, imageWidth, imageHeight),
+            { ReturnsLabels: true, ReturnsBoundingBoxes: true, ReturnsPolygons: true } => ProcessPointsAsQuadBoxes(taskType, modelOutput, imageWasPadded, imageWidth, imageHeight),
 
             // Detection tasks
-            { ReturnsLabels: true, ReturnsBoundingBoxes: true } => await ProcessPointsAsBoundingBoxesAsync(taskType, modelOutput, imageWasPadded, imageWidth, imageHeight),
+            { ReturnsLabels: true, ReturnsBoundingBoxes: true } => ProcessPointsAsBoundingBoxes(taskType, modelOutput, imageWasPadded, imageWidth, imageHeight),
 
             // Complex tasks
             { ReturnsLabels: true, ReturnsPolygons: true } => await ProcessLabeledPolygonsAsync(taskType, modelOutput, imageWasPadded, imageWidth, imageHeight),
@@ -86,7 +86,7 @@ public partial class DecoderPostProcessor
     /// <param name="imageWidth">The original width of the input image.</param>
     /// <param name="imageHeight">The original height of the input image.</param>
     /// <returns>A task containing the result with extracted labels and bounding boxes.</returns>
-    private async Task<Florence2Result> ProcessPointsAsBoundingBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
+    private Florence2Result ProcessPointsAsBoundingBoxes(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
     {
         // NOTE: "wheel" has two bounding boxes, "door" has one
         // example data: car<loc_54><loc_375><loc_906><loc_707>door<loc_710><loc_276><loc_908><loc_537>wheel<loc_708><loc_557><loc_865><loc_704><loc_147><loc_563><loc_305><loc_705>
@@ -134,7 +134,7 @@ public partial class DecoderPostProcessor
     /// <param name="imageWidth">The original width of the input image.</param>
     /// <param name="imageHeight">The original height of the input image.</param>
     /// <returns>A task containing the result with extracted labels, quad boxes, and corresponding bounding rectangles.</returns>
-    private async Task<Florence2Result> ProcessPointsAsQuadBoxesAsync(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
+    private Florence2Result ProcessPointsAsQuadBoxes(Florence2TaskType taskType, string modelOutput, bool imageWasPadded, int imageWidth, int imageHeight)
     {
         // Regex to match text followed by 8 location coordinates
         Regex regex = CategoryAndQuadBoxRegex();

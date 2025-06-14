@@ -2,8 +2,6 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 
 using SixLabors.ImageSharp;
 
-using System.Diagnostics;
-
 namespace FlorenceTwoLab.Core;
 
 public partial class Florence2Pipeline : IDisposable
@@ -61,7 +59,7 @@ public partial class Florence2Pipeline : IDisposable
     /// The pipeline performs image preprocessing, tokenization, multimodal feature fusion, encoder-decoder inference,
     /// and output post-processing. The final result is shaped by the specified task type in the query.
     /// </remarks>
-    public async Task<Florence2Result> ProcessAsync(Image image, Florence2Query query)
+    public Florence2Result Process(Image image, Florence2Query query)
     {
         (Florence2TaskType taskType, string prompt) = query;
 
@@ -71,32 +69,35 @@ public partial class Florence2Pipeline : IDisposable
         }
 
         // 1. Vision
-        DenseTensor<float> processedImage = await _imageProcessor.ProcessImageAsync(image, false);
-        Tensor<float> visionFeatures = await _modelRunner.RunVisionEncoderAsync(processedImage);
+        DenseTensor<float> processedImage = _imageProcessor.ProcessImage(image, false);
+        Tensor<float> visionFeatures = _modelRunner.RunVisionEncoder(processedImage);
 
         // 2. Text
         List<string> tokenized = _tokenizer.Tokenize(prompt);
-        Debug.WriteLine($"Input tokens: '{string.Join("', '", tokenized)}'");
+        //Debug.WriteLine($"Input tokens: '{string.Join("', '", tokenized)}'");
 
         DenseTensor<long> inputIds = new DenseTensor<long>(_tokenizer.ConvertTokensToIds(tokenized).Select(i => (long)i).ToArray(), [1, tokenized.Count]);
-        Tensor<float> textFeatures = await _modelRunner.EmbedTokensAsync(inputIds);
+        Tensor<float> textFeatures = _modelRunner.EmbedTokens(inputIds);
 
         // 3. Concatenate vision and text features
         (DenseTensor<float> projectedFeatures, DenseTensor<long> projectedAttentionMask) = _encoderPreprocessor.Process(visionFeatures, textFeatures, tokenized);
 
         // 4. Run encoder to get hidden states for decoder
-        Tensor<float> encoderHiddenStates = await _modelRunner.RunEncoderAsync(projectedFeatures, projectedAttentionMask);
+        Tensor<float> encoderHiddenStates = _modelRunner.RunEncoder(projectedFeatures, projectedAttentionMask);
 
         // 5. Decoder in autoregressive mode to generate output text
-        IReadOnlyCollection<long> decoderOutput = await _modelRunner.RunDecoderAsync(encoderHiddenStates, projectedAttentionMask);
+        IReadOnlyCollection<long> decoderOutput = _modelRunner.RunDecoder(encoderHiddenStates, projectedAttentionMask);
 
         string text = _tokenizer.Decode(decoderOutput.Select(f => (int)f).ToList());
 
         // 6. Post-processing
-        return await _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height);
+        return _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height).GetAwaiter().GetResult();
     }
 
-
+    /// <summary>
+    /// Disposes of the <see cref="Florence2Pipeline"/> instance, releasing any resources it holds.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
     public void Dispose()
     {
         _modelRunner.Dispose();

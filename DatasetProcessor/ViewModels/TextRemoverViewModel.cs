@@ -106,7 +106,6 @@ namespace DatasetProcessor.ViewModels
                 await DownloadRequiredModels();
 
                 await _textRemover.RemoveTextFromImagesAsync(InputFolderPath, OutputFolderPath);
-
                 timer.Stop();
             }
             catch (OperationCanceledException)
@@ -126,6 +125,9 @@ namespace DatasetProcessor.ViewModels
                 TaskStatus = ProcessingStatus.Finished;
                 UnloadAllModels();
             }
+
+            // Stop elapsed timer
+            _timer.Stop();
         }
 
         [RelayCommand]

@@ -63,9 +63,9 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
 
                 SAM2EncoderOutputData outputData = new SAM2EncoderOutputData()
                 {
-                    HighResFeats0 = (DenseTensor<float>)prediction[0].AsTensor<float>(),
-                    HighResFeats1 = (DenseTensor<float>)prediction[1].AsTensor<float>(),
-                    ImageEmbed = (DenseTensor<float>)prediction[2].AsTensor<float>()
+                    HighResFeats0 = (DenseTensor<float>)prediction[0].AsTensor<float>().Clone(),
+                    HighResFeats1 = (DenseTensor<float>)prediction[1].AsTensor<float>().Clone(),
+                    ImageEmbed = (DenseTensor<float>)prediction[2].AsTensor<float>().Clone()
                 };
 
                 return outputData;
