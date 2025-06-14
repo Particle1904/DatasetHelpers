@@ -103,14 +103,12 @@ internal sealed class ModelRunner : IDisposable
         int batchSize = (int)encoderHiddenStates.Dimensions[0];
         if (batchSize > 1) throw new NotSupportedException("This example is simplified for batch size 1.");
 
-        const int decoderStartTokenId = 2; // Should get from tokenizer
-        const int eosTokenId = 2; // Should get from tokenizer
+        const int decoderStartTokenId = 2;
+        const int eosTokenId = 2;
 
         List<long> generatedTokens = new List<long>();
-        // This will hold the cache state between loop iterations. We will manage its lifecycle manually.
         NamedOnnxValue[]? pastKeyValues = null;
 
-        // Start with only the decoder_start_token.
         DenseTensor<long> decoderInputIds = new DenseTensor<long>(new long[] { decoderStartTokenId }, new[] { batchSize, 1 });
 
         string[] decoderOutputNames = new[] {
@@ -127,7 +125,6 @@ internal sealed class ModelRunner : IDisposable
             Tensor<float> decoderEmbeddings;
             using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> embedOutput = EmbedTokensInternal(decoderInputIds))
             {
-                // Clone the embedding tensor because the source will be disposed.
                 decoderEmbeddings = embedOutput.First().AsTensor<float>().Clone();
             }
 
@@ -139,35 +136,28 @@ internal sealed class ModelRunner : IDisposable
             decoderFeeds.Add(NamedOnnxValue.CreateFromTensor("encoder_attention_mask", encoderAttentionMask));
             decoderFeeds.Add(NamedOnnxValue.CreateFromTensor("use_cache_branch", new DenseTensor<bool>(new[] { useCache }, new[] { 1 })));
 
-            // Initialize or add the existing cache.
             if (!useCache)
             {
                 pastKeyValues = InitPastKeyValues(batchSize);
             }
-            decoderFeeds.AddRange(pastKeyValues);
+            decoderFeeds.AddRange(pastKeyValues!);
 
             NamedOnnxValue[] nextPastKeyValues;
             long nextToken;
 
-            // This using block ensures the raw output from Run() is disposed.
             using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> outputs = _decoder.Run(decoderFeeds, decoderOutputNames))
             {
                 Tensor<float> logits = outputs.First(o => o.Name == "logits").AsTensor<float>();
                 nextToken = GetNextToken(logits);
 
-                // This method now handles creating the *new* cache state from the outputs.
-                nextPastKeyValues = UpdatePastKeyValues(outputs, useCache, pastKeyValues);
+                nextPastKeyValues = UpdatePastKeyValues(outputs, useCache, pastKeyValues!);
             }
 
-            // *** THE CRITICAL FIX FOR MEMORY STABILITY ***
-            // Manually dispose the tensors from the PREVIOUS iteration's cache.
-            // This immediately frees the large unmanaged memory blocks.
-            foreach (NamedOnnxValue kv in pastKeyValues)
+            foreach (NamedOnnxValue kv in pastKeyValues!)
             {
                 (kv.Value as IDisposable)?.Dispose();
             }
 
-            // Point to the new cache for the next iteration.
             pastKeyValues = nextPastKeyValues;
 
             generatedTokens.Add(nextToken);
@@ -177,11 +167,9 @@ internal sealed class ModelRunner : IDisposable
                 break;
             }
 
-            // Prepare the input for the next loop.
             decoderInputIds = new DenseTensor<long>(new[] { nextToken }, new[] { batchSize, 1 });
         }
 
-        // Final cleanup of the last cache state
         if (pastKeyValues != null)
         {
             foreach (NamedOnnxValue kv in pastKeyValues)
@@ -216,10 +204,6 @@ internal sealed class ModelRunner : IDisposable
 
         List<NamedOnnxValue> cache = new List<NamedOnnxValue>();
 
-        // CRITICAL FIX: The sequence length dimension for ALL past_key_values
-        // must be initialized to 0 to signal an empty cache.
-        // The model will then correctly populate the encoder cache from encoder_hidden_states
-        // on the first run.
         int[] initialEncoderDims = new[] { batchSize, numDecoderHeads, 0, decoderDimKv };
         int[] initialDecoderDims = new[] { batchSize, numDecoderHeads, 0, decoderDimKv };
 
@@ -249,17 +233,14 @@ internal sealed class ModelRunner : IDisposable
         {
             string presentName = oldKv.Name.Replace("past_key_values", "present");
 
-            // If we are using the cache AND it's an encoder key/value, we can reuse the old one.
-            // But we must CLONE it because the old one will be disposed by the calling loop.
             if (useCache && presentName.Contains("encoder"))
             {
-                newPastKeyValues.Add(NamedOnnxValue.CreateFromTensor(oldKv.Name, (oldKv.Value as Tensor<float>).Clone()));
+                newPastKeyValues.Add(NamedOnnxValue.CreateFromTensor(oldKv.Name, (oldKv.Value as Tensor<float>)!.Clone()));
             }
             else
             {
-                // Otherwise, we take the new value from the model output and clone it.
                 DisposableNamedOnnxValue presentValue = decoderOutputs.First(o => o.Name == presentName);
-                newPastKeyValues.Add(NamedOnnxValue.CreateFromTensor(oldKv.Name, (presentValue.Value as Tensor<float>).Clone()));
+                newPastKeyValues.Add(NamedOnnxValue.CreateFromTensor(oldKv.Name, (presentValue.Value as Tensor<float>)!.Clone()));
             }
         }
         return newPastKeyValues.ToArray();
@@ -272,20 +253,14 @@ internal sealed class ModelRunner : IDisposable
     /// <returns>The token ID with the highest score.</returns>
     private long GetNextToken(Tensor<float> logits)
     {
-        // The logits tensor in the generation loop has a shape of [batch_size, sequence_length, vocab_size].
-        // For our case, batch_size is 1 and sequence_length is always 1.
-        // So the shape is [1, 1, vocab_size].
         int vocabSize = logits.Dimensions[2];
 
         float maxProb = float.MinValue;
         long maxToken = 0;
 
-        // We iterate through the last dimension (the vocabulary) to find the highest logit value.
-        // The indexer logits[batch, sequence, vocab_id] is the correct way to access values
-        // from the abstract Tensor<T> class.
         for (int i = 0; i < vocabSize; i++)
         {
-            float prob = logits[0, 0, i]; // Accessing the value at the specific index
+            float prob = logits[0, 0, i];
             if (prob > maxProb)
             {
                 maxProb = prob;
@@ -303,7 +278,6 @@ internal sealed class ModelRunner : IDisposable
     /// <returns>A configured <see cref="SessionOptions"/> instance.</returns>
     private SessionOptions CreateSessionOptions(bool useGPU)
     {
-        // Create separate inference sessions for each model component
         int[] gpuIdsToTry = { 0, 1 };
 
         SessionOptions sessionOptions = new SessionOptions();
