@@ -27,7 +27,7 @@
 		<PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
 		<PackageReference Include="Microsoft.ML" Version="4.0.0-preview.24271.1" />
 		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.11.0-dev-20240524-2333-8d8670f7" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
 	</ItemGroup>
 	
@@ -39,7 +39,7 @@
 		<PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
 		<PackageReference Include="Microsoft.ML" Version="4.0.0-preview.24271.1" />
 		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.11.0-dev-20240524-2333-8d8670f7" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.6" />
 	</ItemGroup>
 	
