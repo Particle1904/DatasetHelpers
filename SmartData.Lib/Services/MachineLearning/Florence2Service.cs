@@ -17,6 +17,8 @@ namespace Services.MachineLearning
         private readonly IFileManagerService _fileManager;
         private Florence2Pipeline _florence2Pipeline;
 
+        private const string _eosToken = "</s>";
+
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
@@ -79,7 +81,14 @@ namespace Services.MachineLearning
 
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
-                        _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.Text.TrimEnd());
+
+                        string caption = result.Text.Trim();
+                        // Make sure to remove EOS token, if its present.
+                        if (caption.EndsWith(_eosToken))
+                        {
+                            caption = caption.Substring(0, caption.Length - _eosToken.Length);
+                        }
+                        _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), caption.TrimEnd());
                     }
                 }
                 catch (Exception)

@@ -91,7 +91,7 @@ public partial class Florence2Pipeline : IDisposable
         string text = _tokenizer.Decode(decoderOutput.Select(f => (int)f).ToList());
 
         // 6. Post-processing
-        return _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height).GetAwaiter().GetResult();
+        return _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height).Result;
     }
 
     /// <summary>
