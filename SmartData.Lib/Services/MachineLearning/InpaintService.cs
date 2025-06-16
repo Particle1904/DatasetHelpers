@@ -218,6 +218,9 @@ namespace SmartData.Lib.Services.MachineLearning
             return isMaskValid;
         }
 
+        /// <summary>
+        /// Unloads the Inpaint model and disposes of its resources.
+        /// </summary>
         public void UnloadAIModel()
         {
             UnloadModel();

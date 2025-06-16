@@ -33,6 +33,15 @@ namespace Services.MachineLearning
             };
         }
 
+        /// <summary>
+        /// Asynchronously captions images from the specified input folder and saves the results to the output folder.
+        /// </summary>
+        /// <param name="inputFolderPath">The path to the folder containing input images.</param>
+        /// <param name="outputFolderPath">The path to the folder where captioned images and text files will be saved.</param>
+        /// <param name="captionTask">The captioning task type to apply to the images.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="OperationCanceledException">Thrown if the operation is cancelled.</exception>
+        /// <exception cref="Exception">Propagates any exception that occurs during processing.</exception>
         public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, Florence2CaptionTask captionTask)
         {
             try
@@ -102,6 +111,12 @@ namespace Services.MachineLearning
             UnloadAIModel();
         }
 
+        /// <summary>
+        /// Processes a single image with the specified Florence2 query and returns the result.
+        /// </summary>
+        /// <param name="image">The image to process.</param>
+        /// <param name="query">The Florence2 query configuration to use.</param>
+        /// <returns>A task that represents the asynchronous operation, containing the result.</returns>
         public async Task<Florence2Result> ProcessAsync(Image image, Florence2Query query)
         {
             await LoadFlorence2PipelineAsync();
@@ -109,6 +124,9 @@ namespace Services.MachineLearning
             return await Task.Run(() => _florence2Pipeline.Process(image, query));
         }
 
+        /// <summary>
+        /// Unloads the Florence2 pipeline and disposes of its resources.
+        /// </summary>
         public void UnloadAIModel()
         {
             _florence2Pipeline.Dispose();
