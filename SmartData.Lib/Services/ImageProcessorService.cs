@@ -46,14 +46,6 @@ namespace SmartData.Lib.Services
                 new HeifConfigurationModule())
         };
 
-        private readonly JpegEncoder _jpegEncoder = new JpegEncoder()
-        {
-            ColorType = JpegEncodingColor.Rgb,
-            Interleaved = true,
-            Quality = 100,
-            SkipMetadata = false
-        };
-
         private readonly PngEncoder _pngEncoder = new PngEncoder()
         {
             ColorType = PngColorType.RgbWithAlpha,
@@ -63,7 +55,6 @@ namespace SmartData.Lib.Services
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
         private CubicResampler _cubicResampler;
-        private NearestNeighborResampler _nearestNeighborResampler;
 
         private const ushort _semaphoreConcurrent = 6;
 
@@ -128,7 +119,6 @@ namespace SmartData.Lib.Services
             _bicubicResampler = new BicubicResampler();
             _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
             _cubicResampler = CubicResampler.MitchellNetravali;
-            _nearestNeighborResampler = new NearestNeighborResampler();
             MinimumResolutionForSigma = 512;
         }
 
@@ -208,7 +198,7 @@ namespace SmartData.Lib.Services
                 cropWidth = Math.Min(cropWidth, image.Width - cropX);
                 cropHeight = Math.Min(cropHeight, image.Height - cropY);
 
-                image.Mutate(image => image.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
+                image.Mutate(context => context.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
 
                 double resizeFactor = Math.Min(targetWidth / (double)cropWidth, targetHeight / (double)cropHeight);
                 int resizedWidth = (int)(cropWidth * resizeFactor);
@@ -224,14 +214,14 @@ namespace SmartData.Lib.Services
                     Compand = true
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 if (ApplySharpen)
                 {
-                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                    image.Mutate(context => context.GaussianSharpen(_sharpenSigma));
                 }
 
-                image.Mutate(image => image.BackgroundColor(Color.White));
+                image.Mutate(context => context.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
                 await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
             }
@@ -255,7 +245,7 @@ namespace SmartData.Lib.Services
             TotalFilesChanged?.Invoke(this, files.Length);
 
             SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
-            foreach (var file in files)
+            foreach (string file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 await semaphore.WaitAsync();
@@ -298,7 +288,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(448, 448),
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -346,7 +336,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(448, 448),
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -397,7 +387,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(448, 448),
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -445,7 +435,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(416, 416),
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -503,7 +493,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(width, height),
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -560,7 +550,7 @@ namespace SmartData.Lib.Services
 
                 imageSize = new Point(image.Width, image.Height);
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 image.ProcessPixelRows(accessor =>
                 {
@@ -619,18 +609,20 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Processes the input image and mask for tile-based inpainting, and returns an array of <see cref="TileData"/>.
+        /// Prepares an image and its mask for tile-based inpainting by splitting them into overlapping tiles.
         /// </summary>
         /// <param name="inputPath">The file path to the input image.</param>
         /// <param name="inputMaskPath">The file path to the input mask.</param>
-        /// <param name="tileSize">The size of each tile in pixels. Default is 512.</param>
-        /// <returns>An array of <see cref="TileData"/> containing the processed image and mask data for each tile.</returns>
-        /// <exception cref="ArgumentException">Thrown when the input image and mask do not have the same size or the number of tiles do not match.</exception>
+        /// <param name="tileSize">The size of each square tile for processing. Defaults to 512.</param>
+        /// <param name="overlap">The number of pixels that adjacent tiles will overlap. Defaults to 126.</param>
+        /// <returns>An array of <see cref="TileData"/> containing the processed image and mask data for each tile, ready for inference.</returns>
+        /// <exception cref="ArgumentException">Thrown when the input image and mask do not have the same dimensions.</exception>
         /// <remarks>
-        /// This method splits the input image and mask into tiles of the specified size, processes each tile to extract the pixel data,
-        /// and creates an array of <see cref="TileData"/> containing the processed data for each tile. The tiles are then returned as an array.
+        /// This method splits both the input image and mask into tiles of the specified size with a given overlap. 
+        /// Edge tiles that are smaller than the target size are padded using a mirror of their content.
+        /// It then converts each pair of tiles into normalized tensors for the inpainting model.
         /// </remarks>
-        public async Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512)
+        public async Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512, int overlap = 126)
         {
             System.Drawing.Size imageSize = await GetImageSizeAsync(inputPath);
             System.Drawing.Size maskSize = await GetImageSizeAsync(inputMaskPath);
@@ -639,11 +631,12 @@ namespace SmartData.Lib.Services
                 throw new ArgumentException("Image and Mask must be same size!");
             }
 
-            TileImage[] imageTiles = await ExtractTilesFromImage(inputPath, tileSize);
-            TileImage[] maskTiles = await ExtractTilesFromImage(inputMaskPath, tileSize);
+            TileImage[] imageTiles = await ExtractTilesFromImage(inputPath, tileSize, overlap);
+            TileImage[] maskTiles = await ExtractTilesFromImage(inputMaskPath, tileSize, overlap);
+
             if (imageTiles.Length != maskTiles.Length)
             {
-                throw new ArgumentException("The number of Image Tiles and Mask Tiles isn't the same! The number of tiles must be the same!");
+                throw new ArgumentException("The number of Image Tiles and Mask Tiles isn't the same!");
             }
 
             List<TileData> tiles = new List<TileData>(imageTiles.Length);
@@ -651,12 +644,11 @@ namespace SmartData.Lib.Services
             {
                 LaMaInputData inputData = new LaMaInputData()
                 {
-                    InputImage = new DenseTensor<float>(new[] { 1, 3, 512, 512 }),
-                    InputMask = new DenseTensor<float>(new[] { 1, 1, 512, 512 }),
+                    InputImage = new DenseTensor<float>(new[] { 1, 3, tileSize, tileSize }),
+                    InputMask = new DenseTensor<float>(new[] { 1, 1, tileSize, tileSize }),
                     OriginalSize = new Point(imageSize.Width, imageSize.Height)
                 };
 
-                // Process image data
                 using (Image<Rgba32> image = imageTiles[i].Image.CloneAs<Rgba32>())
                 {
                     image.ProcessPixelRows(accessor =>
@@ -667,7 +659,6 @@ namespace SmartData.Lib.Services
                             for (int x = 0; x < pixelRow.Length; x++)
                             {
                                 ref Rgba32 pixel = ref pixelRow[x];
-
                                 inputData.InputImage[0, 0, y, x] = pixel.R / 255f;
                                 inputData.InputImage[0, 1, y, x] = pixel.G / 255f;
                                 inputData.InputImage[0, 2, y, x] = pixel.B / 255f;
@@ -676,7 +667,6 @@ namespace SmartData.Lib.Services
                     });
                 }
 
-                // Process mask data
                 using (Image<Rgba32> mask = maskTiles[i].Image.CloneAs<Rgba32>())
                 {
                     mask.ProcessPixelRows(accessor =>
@@ -687,20 +677,22 @@ namespace SmartData.Lib.Services
                             for (int x = 0; x < pixelRow.Length; x++)
                             {
                                 ref Rgba32 pixel = ref pixelRow[x];
-
-                                float color = 0.0f;
+                                float color;
                                 if ((pixel.R + pixel.G + pixel.B) > 0)
                                 {
                                     color = 1.0f;
                                 }
-
+                                else
+                                {
+                                    color = 0.0f;
+                                }
                                 inputData.InputMask[0, 0, y, x] = color;
                             }
                         }
                     });
                 }
 
-                TileData tile = new TileData(inputData, imageTiles[i].RowIndex, imageTiles[i].ColumnIndex);
+                TileData tile = new TileData(inputData, imageTiles[i].RowIndex, imageTiles[i].ColumnIndex, imageTiles[i].X, imageTiles[i].Y);
                 tiles.Add(tile);
             }
 
@@ -744,14 +736,14 @@ namespace SmartData.Lib.Services
                     Size = new Size(sam2ImageInputSize, sam2ImageInputSize)
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
-                image.Mutate(image => image.GaussianSharpen(0.5f));
+                image.Mutate(context => context.Resize(resizeOptions));
+                image.Mutate(context => context.GaussianSharpen(0.5f));
 
                 image.ProcessPixelRows(accessor =>
                 {
                     for (int y = 0; y < accessor.Height; y++)
                     {
-                        var row = accessor.GetRowSpan(y);
+                        Span<Rgb24> row = accessor.GetRowSpan(y);
                         for (int x = 0; x < row.Length; x++)
                         {
                             ref Rgb24 px = ref row[x];
@@ -854,57 +846,124 @@ namespace SmartData.Lib.Services
                 int cropX = (width - cropWidth) / 2;
                 int cropY = (height - cropHeight) / 2;
 
-                image.Mutate(image => image.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
-                image.Mutate(image => image.Resize(inputData.OriginalSize.X, inputData.OriginalSize.Y, KnownResamplers.Lanczos3));
+                image.Mutate(context => context.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
+                image.Mutate(context => context.Resize(inputData.OriginalSize.X, inputData.OriginalSize.Y, KnownResamplers.Lanczos3));
 
                 image.SaveAsPng(outputPath);
             }
         }
 
         /// <summary>
-        /// Saves the inpainted image to the specified output path by combining the processed image tiles.
+        /// Saves an inpainted image by seamlessly blending an array of processed tiles.
         /// </summary>
-        /// <param name="outputPath">The file path where the resulting inpainted image will be saved.</param>
-        /// <param name="inputData">An array of <see cref="TileData"/> representing the input data of the image tiles.</param>
-        /// <param name="outputData">An array of <see cref="LaMaOutputData"/> containing the output data of the inpainted image tiles.</param>
-        /// <param name="tileSize">The size of each tile in pixels. Default is 512.</param>
+        /// <param name="outputPath">The file path where the final inpainted image will be saved.</param>
+        /// <param name="outputData">An array of <see cref="LaMaOutputData"/> containing the processed output for each tile.</param>
+        /// <param name="originalSize">The original dimensions of the complete image.</param>
+        /// <param name="tileSize">The size of each tile that was processed. Defaults to 512.</param>
+        /// <param name="overlap">The pixel overlap that was used to generate the tiles. Defaults to 126.</param>
         /// <remarks>
-        /// This method creates a new image by assembling the inpainted tiles from the <paramref name="outputData"/> array.
-        /// Each tile's pixel data is processed and placed in the appropriate position in the resulting image based on the row and column indices.
-        /// The assembled image is then saved as a PNG file at the specified <paramref name="outputPath"/>.
+        /// This method reconstructs the full image from individual tiles. It uses a weighted-blending (feathering) algorithm 
+        /// in the overlapping regions to eliminate visible seams and create a smooth, continuous result.
         /// </remarks>
-        public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512)
+        public void SaveInpaintedImage(string outputPath, LaMaOutputData[] outputData, System.Drawing.Size originalSize, int tileSize = 512, int overlap = 126)
         {
-            using (Image<Rgba32> resultImage = new Image<Rgba32>(inputData[0].LaMaInputData.OriginalSize.X,
-                inputData[0].LaMaInputData.OriginalSize.Y))
+            if (outputData.Length == 0)
             {
-                for (int i = 0; i < outputData.Length; i++)
+                return;
+            }
+
+            int imageWidth = originalSize.Width;
+            int imageHeight = originalSize.Height;
+
+            System.Numerics.Vector3[] colorSum = new System.Numerics.Vector3[imageWidth * imageHeight];
+            float[] weightSum = new float[imageWidth * imageHeight];
+
+            float[] weightMap = new float[tileSize * tileSize];
+            int feather = overlap / 2;
+            for (int y = 0; y < tileSize; y++)
+            {
+                for (int x = 0; x < tileSize; x++)
                 {
-                    int width = outputData[i].OutputImage.Dimensions[2];
-                    int height = outputData[i].OutputImage.Dimensions[3];
-
-                    byte[] imageByte = new byte[3 * width * height];
-                    for (int row = 0; row < height; row++)
+                    float weightX = 1.0f;
+                    if (x < feather)
                     {
-                        for (int col = 0; col < width; col++)
-                        {
-                            int baseIndex = (row * width + col) * 3;
-                            byte r = (byte)Math.Clamp(outputData[i].OutputImage[0, 2, row, col], 0, 255);
-                            byte g = (byte)Math.Clamp(outputData[i].OutputImage[0, 1, row, col], 0, 255);
-                            byte b = (byte)Math.Clamp(outputData[i].OutputImage[0, 0, row, col], 0, 255);
-
-                            imageByte[baseIndex] = b;
-                            imageByte[baseIndex + 1] = g;
-                            imageByte[baseIndex + 2] = r;
-                        }
+                        weightX = (float)x / feather;
+                    }
+                    else if (x >= tileSize - feather)
+                    {
+                        weightX = (float)(tileSize - 1 - x) / feather;
                     }
 
-                    ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
+                    float weightY = 1.0f;
+                    if (y < feather)
+                    {
+                        weightY = (float)y / feather;
+                    }
+                    else if (y >= tileSize - feather)
+                    {
+                        weightY = (float)(tileSize - 1 - y) / feather;
+                    }
 
-                    Image<Rgb24> tile = Image.LoadPixelData<Rgb24>(bytes, width, height);
-                    Point location = new Point(tileSize * outputData[i].RowIndex, tileSize * outputData[i].ColumnIndex);
-                    resultImage.Mutate(image => image.DrawImage(tile, location, 1));
+                    weightMap[y * tileSize + x] = Math.Min(weightX, weightY);
                 }
+            }
+
+            foreach (LaMaOutputData tileData in outputData)
+            {
+                DenseTensor<float> outputTensor = tileData.OutputImage;
+                int tileStartX = tileData.X;
+                int tileStartY = tileData.Y;
+
+                for (int y = 0; y < tileSize; y++)
+                {
+                    int globalY = tileStartY + y;
+                    if (globalY >= imageHeight) continue;
+
+                    for (int x = 0; x < tileSize; x++)
+                    {
+                        int globalX = tileStartX + x;
+                        if (globalX >= imageWidth) continue;
+
+                        float weight = weightMap[y * tileSize + x];
+                        if (weight <= 0) continue;
+
+                        float r = outputTensor[0, 0, y, x];
+                        float g = outputTensor[0, 1, y, x];
+                        float b = outputTensor[0, 2, y, x];
+
+                        int globalIndex = globalY * imageWidth + globalX;
+
+                        colorSum[globalIndex] += new System.Numerics.Vector3(r, g, b) * weight;
+                        weightSum[globalIndex] += weight;
+                    }
+                }
+            }
+
+            using (Image<Rgba32> resultImage = new Image<Rgba32>(imageWidth, imageHeight))
+            {
+                resultImage.ProcessPixelRows(accessor =>
+                {
+                    for (int y = 0; y < accessor.Height; y++)
+                    {
+                        Span<Rgba32> pixelRow = accessor.GetRowSpan(y);
+                        for (int x = 0; x < pixelRow.Length; x++)
+                        {
+                            int index = y * imageWidth + x;
+                            float totalWeight = weightSum[index];
+
+                            if (totalWeight > 0)
+                            {
+                                System.Numerics.Vector3 finalColor = colorSum[index] / totalWeight;
+
+                                pixelRow[x] = new Rgba32(
+                                    (byte)Math.Clamp(finalColor.X, 0, 255),
+                                    (byte)Math.Clamp(finalColor.Y, 0, 255),
+                                    (byte)Math.Clamp(finalColor.Z, 0, 255),
+                                    255);
+                            }
+                        }
+                    }
+                });
 
                 resultImage.SaveAsPng(outputPath);
             }
@@ -960,10 +1019,10 @@ namespace SmartData.Lib.Services
         {
             using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
             {
-                image.Mutate(image => image.GaussianBlur(_blurRadius));
+                image.Mutate(context => context.GaussianBlur(_blurRadius));
 
                 MemoryStream blurredImageStream = new MemoryStream();
-                image.Mutate(image => image.BackgroundColor(Color.White));
+                image.Mutate(context => context.BackgroundColor(Color.White));
                 image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
 
                 return blurredImageStream;
@@ -1000,9 +1059,9 @@ namespace SmartData.Lib.Services
                     Height = Math.Clamp(height, 0, image.Height - y)
                 };
 
-                image.Mutate(image => image.Crop(cropArea));
+                image.Mutate(context => context.Crop(cropArea));
 
-                image.Mutate(image => image.BackgroundColor(Color.White));
+                image.Mutate(context => context.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
                 await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
             }
@@ -1081,7 +1140,7 @@ namespace SmartData.Lib.Services
         {
             using (Image<Rgba32> image = new Image<Rgba32>(width, height))
             {
-                image.Mutate(image => image.BackgroundColor(Color.Black));
+                image.Mutate(context => context.BackgroundColor(Color.Black));
 
                 MemoryStream imageMaskStream = new MemoryStream();
                 image.SaveAsPng(imageMaskStream, _pngEncoder);
@@ -1115,7 +1174,7 @@ namespace SmartData.Lib.Services
                 SolidBrush brush = new SolidBrush(color);
                 SixLabors.ImageSharp.Drawing.EllipsePolygon circle = new SixLabors.ImageSharp.Drawing.EllipsePolygon(position.X,
                     position.Y, radius);
-                image.Mutate(image => image.Fill(brush, circle));
+                image.Mutate(context => context.Fill(brush, circle));
 
                 MemoryStream imageMaskStream = new MemoryStream();
                 image.SaveAsPng(imageMaskStream, _pngEncoder);
@@ -1236,7 +1295,7 @@ namespace SmartData.Lib.Services
                     Sampler = _lanczosResampler
                 };
 
-                using (Image<L16> upscaledMask = floatMask.Clone(image => image.Resize(upscaleResizeOptions)))
+                using (Image<L16> upscaledMask = floatMask.Clone(context => context.Resize(upscaleResizeOptions)))
                 {
                     // Crop padding (BoxPad logic)
                     float originalAspect = (float)originalWidth / originalHeight;
@@ -1257,10 +1316,10 @@ namespace SmartData.Lib.Services
                         offsetY = 0;
                     }
 
-                    using (Image<L16> croppedMask = upscaledMask.Clone(image => image.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight))))
+                    using (Image<L16> croppedMask = upscaledMask.Clone(context => context.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight))))
                     {
                         // Resize to original image size
-                        using (Image<L16> finalFloatMask = croppedMask.Clone(image => image.Resize(originalWidth, originalHeight, _lanczosResampler)))
+                        using (Image<L16> finalFloatMask = croppedMask.Clone(context => context.Resize(originalWidth, originalHeight, _lanczosResampler)))
                         {
                             // Threshold to binary mask
                             using (Image<L8> binaryMask = new Image<L8>(originalWidth, originalHeight))
@@ -1277,8 +1336,8 @@ namespace SmartData.Lib.Services
 
                                 // Blur the mask a bit for a better inpaint result
                                 Image<L8> dilatedMask = DilateMask(binaryMask, dilationSizeInPixels);
-                                dilatedMask.Mutate(image => image.MedianBlur(3, true));
-                                dilatedMask.Mutate(image => image.GaussianBlur(5.0f));
+                                dilatedMask.Mutate(context => context.MedianBlur(3, true));
+                                dilatedMask.Mutate(context => context.GaussianBlur(5.0f));
                                 await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
                                 dilatedMask.Dispose();
                             }
@@ -1346,7 +1405,7 @@ namespace SmartData.Lib.Services
                 Sampler = _lanczosResampler
             };
 
-            using Image<L16> upscaledMask = floatMask.Clone(image => image.Resize(upscaleResizeOptions));
+            using Image<L16> upscaledMask = floatMask.Clone(context => context.Resize(upscaleResizeOptions));
 
             // Crop padding (BoxPad logic)
             float originalAspect = (float)originalWidth / originalHeight;
@@ -1367,10 +1426,10 @@ namespace SmartData.Lib.Services
                 offsetY = 0;
             }
 
-            using Image<L16> croppedMask = upscaledMask.Clone(image => image.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight)));
+            using Image<L16> croppedMask = upscaledMask.Clone(context => context.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight)));
 
             // Resize to original image size
-            using Image<L16> finalFloatMask = croppedMask.Clone(image => image.Resize(originalWidth, originalHeight, _lanczosResampler));
+            using Image<L16> finalFloatMask = croppedMask.Clone(context => context.Resize(originalWidth, originalHeight, _lanczosResampler));
 
             // Threshold to binary mask
             Image<L8> binaryMask = new Image<L8>(originalWidth, originalHeight);
@@ -1448,8 +1507,8 @@ namespace SmartData.Lib.Services
 
                 using (Image<L8> dilatedMask = DilateMask(combinedMask, dilationSizeInPixels))
                 {
-                    dilatedMask.Mutate(image => image.MedianBlur(3, true));
-                    dilatedMask.Mutate(image => image.GaussianBlur(5.0f));
+                    dilatedMask.Mutate(context => context.MedianBlur(3, true));
+                    dilatedMask.Mutate(context => context.GaussianBlur(5.0f));
                     await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
                 }
             }
@@ -1491,7 +1550,7 @@ namespace SmartData.Lib.Services
                     canvasWidth = RoundToNearestMultiple(computedWidth, 16);
                 }
 
-                var resizeOptions = new ResizeOptions
+                ResizeOptions resizeOptions = new ResizeOptions
                 {
                     Size = new Size(canvasWidth, canvasHeight),
                     Mode = ResizeMode.Crop,
@@ -1500,11 +1559,11 @@ namespace SmartData.Lib.Services
                     Compand = true
                 };
 
-                image.Mutate(image => image.Resize(resizeOptions));
+                image.Mutate(context => context.Resize(resizeOptions));
 
                 if (ApplySharpen && (image.Width >= MinimumResolutionForSigma || image.Height >= MinimumResolutionForSigma))
                 {
-                    image.Mutate(image => image.GaussianSharpen(_sharpenSigma));
+                    image.Mutate(context => context.GaussianSharpen(_sharpenSigma));
                 }
 
                 string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
@@ -1593,97 +1652,80 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Extracts tiles from the input image with the specified tile size.
+        /// Extracts overlapping tiles from an image, using mirror padding for edge tiles.
         /// </summary>
         /// <param name="inputPath">The file path to the input image.</param>
-        /// <param name="tileSize">The size of each tile in pixels.</param>
-        /// <returns>An array of <see cref="TileImage"/> containing the extracted image tiles.</returns>
+        /// <param name="tileSize">The target size of each square tile. Defaults to 512.</param>
+        /// <param name="overlap">The number of pixels that adjacent tiles should overlap. Defaults to 126.</param>
+        /// <returns>An array of <see cref="TileImage"/> objects, each representing a tile ready for processing.</returns>
         /// <remarks>
-        /// This method splits the input image into tiles of the specified size and resizes each tile to the specified tile size.
-        /// Each tile is then returned as a <see cref="TileImage"/> object containing the image data and tile indices.
+        /// This method divides the source image into a grid of overlapping tiles. If a tile at an edge or corner is smaller 
+        /// than the target <paramref name="tileSize"/>, it is padded by mirroring its own content to fill the remaining space.
         /// </remarks>
-        private async Task<TileImage[]> ExtractTilesFromImage(string inputPath, int tileSize)
+        private async Task<TileImage[]> ExtractTilesFromImage(string inputPath, int tileSize = 512, int overlap = 126)
         {
-            ResizeOptions resizeOptions = new ResizeOptions()
-            {
-                Mode = ResizeMode.BoxPad,
-                Position = AnchorPositionMode.TopLeft,
-                Compand = true,
-                Size = new Size(tileSize, tileSize),
-            };
-
-            int rows;
-            int columns;
             List<TileImage> imageTiles = new List<TileImage>();
-            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
+            using (Image<Rgba32> sourceImage = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
-                rows = (int)Math.Ceiling(image.Height / (float)tileSize);
-                columns = (int)Math.Ceiling(image.Width / (float)tileSize);
+                int step = tileSize - overlap;
+                int imageWidth = sourceImage.Width;
+                int imageHeight = sourceImage.Height;
 
-                for (int y = 0; y < rows; y++)
+                int numTilesX = (imageWidth <= tileSize) ? 1 : (int)Math.Ceiling((double)(imageWidth - tileSize) / step) + 1;
+                int numTilesY = (imageHeight <= tileSize) ? 1 : (int)Math.Ceiling((double)(imageHeight - tileSize) / step) + 1;
+
+                for (int yIdx = 0; yIdx < numTilesY; yIdx++)
                 {
-                    for (int x = 0; x < columns; x++)
+                    for (int xIdx = 0; xIdx < numTilesX; xIdx++)
                     {
-                        int cropX = x * tileSize;
-                        int cropY = y * tileSize;
-                        int cropWidth;
-                        if (x == columns - 1)
+                        int cropX = xIdx * step;
+                        int cropY = yIdx * step;
+
+                        if (xIdx == numTilesX - 1 && imageWidth > tileSize)
                         {
-                            cropWidth = image.Width - cropX;
+                            cropX = imageWidth - tileSize;
                         }
-                        else
+                        if (yIdx == numTilesY - 1 && imageHeight > tileSize)
                         {
-                            cropWidth = tileSize;
-                        }
-                        int cropHeight;
-                        if (y == rows - 1)
-                        {
-                            cropHeight = image.Height - cropY;
-                        }
-                        else
-                        {
-                            cropHeight = tileSize;
+                            cropY = imageHeight - tileSize;
                         }
 
-                        Image<Rgba32> cloneImage = image.Clone();
-                        Rectangle cropArea = new Rectangle(cropX, cropY, cropWidth, cropHeight);
-                        cloneImage.Mutate(image => image.Crop(cropArea));
+                        Rectangle sourceCropArea = new Rectangle(cropX, cropY, Math.Min(tileSize, imageWidth - cropX), Math.Min(tileSize, imageHeight - cropY));
 
-                        if (cropWidth < tileSize || cropHeight < tileSize)
+                        Image<Rgba32> tile = new Image<Rgba32>(sourceCropArea.Width, sourceCropArea.Height);
+                        tile.Mutate(context => context.DrawImage(sourceImage, new Point(0, 0), sourceCropArea, 1f));
+
+                        if (tile.Width < tileSize || tile.Height < tileSize)
                         {
                             Image<Rgba32> paddedImage = new Image<Rgba32>(tileSize, tileSize);
-                            paddedImage.Mutate(image => image.DrawImage(cloneImage, new Point(0, 0), 1f));
+                            paddedImage.Mutate(context => context.DrawImage(tile, new Point(0, 0), 1f));
 
-                            // Stretch the last column to the right
-                            if (cropWidth < tileSize)
+                            if (tile.Width < tileSize)
                             {
-                                for (int stretchX = cropWidth; stretchX < tileSize; stretchX++)
+                                int padWidth = tileSize - tile.Width;
+                                Rectangle mirrorRegion = new Rectangle(tile.Width - padWidth, 0, padWidth, tile.Height);
+                                using (Image<Rgba32> mirrorX = tile.Clone(context => context.Crop(mirrorRegion).Flip(FlipMode.Horizontal)))
                                 {
-                                    for (int stretchY = 0; stretchY < cropHeight; stretchY++)
-                                    {
-                                        paddedImage[stretchX, stretchY] = paddedImage[cropWidth - 1, stretchY];
-                                    }
+                                    paddedImage.Mutate(context => context.DrawImage(mirrorX, new Point(tile.Width, 0), 1f));
                                 }
                             }
 
-                            // Stretch the last row to the bottom
-                            if (cropHeight < tileSize)
+                            if (tile.Height < tileSize)
                             {
-                                for (int stretchY = cropHeight; stretchY < tileSize; stretchY++)
+                                int padHeight = tileSize - tile.Height;
+                                Rectangle regionToMirrorY = new Rectangle(0, tile.Height - padHeight, tileSize, padHeight);
+                                using (Image<Rgba32> mirrorY = paddedImage.Clone(context => context.Crop(regionToMirrorY).Flip(FlipMode.Vertical)))
                                 {
-                                    for (int stretchX = 0; stretchX < tileSize; stretchX++)
-                                    {
-                                        paddedImage[stretchX, stretchY] = paddedImage[stretchX, cropHeight - 1];
-                                    }
+                                    paddedImage.Mutate(context => context.DrawImage(mirrorY, new Point(0, tile.Height), 1f));
                                 }
                             }
 
-                            imageTiles.Add(new TileImage(paddedImage, x, y));
+                            tile.Dispose();
+                            imageTiles.Add(new TileImage(paddedImage, yIdx, xIdx, sourceCropArea.X, sourceCropArea.Y));
                         }
                         else
                         {
-                            cloneImage.Mutate(image => image.Resize(tileSize, tileSize));
-                            imageTiles.Add(new TileImage(cloneImage, x, y));
+                            imageTiles.Add(new TileImage(tile, yIdx, xIdx, sourceCropArea.X, sourceCropArea.Y));
                         }
                     }
                 }
@@ -1706,18 +1748,20 @@ namespace SmartData.Lib.Services
             {
                 for (int y = 0; y < h; y++)
                 {
-                    var row = accessor.GetRowSpan(y);
+                    Span<L8> row = accessor.GetRowSpan(y);
                     for (int x = 0; x < w; x++)
+                    {
                         src[y * w + x] = row[x].PackedValue;
+                    }
                 }
             });
 
-            var dilated = new Image<L8>(w, h);
+            Image<L8> dilated = new Image<L8>(w, h);
             dilated.ProcessPixelRows(accessor =>
             {
                 for (int y = 0; y < h; y++)
                 {
-                    var row = accessor.GetRowSpan(y);
+                    Span<L8> row = accessor.GetRowSpan(y);
                     for (int x = 0; x < w; x++)
                     {
                         byte maxVal = 0;

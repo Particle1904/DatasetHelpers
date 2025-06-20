@@ -27,11 +27,11 @@ namespace SmartData.Lib.Interfaces
         public Task<Yolov4InputData> ProcessImageForBoundingBoxPredictionAsync(string inputPath);
         public Task<UpscalerInputData> ProcessImageForUpscalingAsync(string inputPath);
         public Task<LaMaInputData> ProcessImageForInpaintAsync(string inputPath, string inputMaskPath);
-        public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512);
+        public Task<TileData[]> ProcessImageForTileInpaintAsync(string inputPath, string inputMaskPath, int tileSize = 512, int overlap = 126);
         public Task<SAM2EncoderInputData> ProcessImageForSAM2EncodingAsync(string inputPath);
         public void SaveUpscaledImage(string outputPath, UpscalerOutputData outputData);
         public void SaveInpaintedImage(string outputPath, LaMaInputData inputData, LaMaOutputData outputData);
-        public void SaveInpaintedImage(string outputPath, TileData[] inputData, LaMaOutputData[] outputData, int tileSize = 512);
+        public void SaveInpaintedImage(string outputPath, LaMaOutputData[] outputData, System.Drawing.Size originalSize, int tileSize = 512, int overlap = 126);
         public Image GetUpscaledImage(UpscalerOutputData outputData);
         public Task<MemoryStream> GetBlurredImageAsync(string inputPath);
         public MemoryStream CreateImageMask(int width, int height);

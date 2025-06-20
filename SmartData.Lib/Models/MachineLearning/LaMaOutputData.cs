@@ -11,5 +11,8 @@ namespace Models.MachineLearning
 
         public int RowIndex { get; set; }
         public int ColumnIndex { get; set; }
+
+        public int X { get; set; }
+        public int Y { get; set; }
     }
 }
