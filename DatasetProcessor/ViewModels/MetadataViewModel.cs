@@ -9,6 +9,7 @@ using Interfaces;
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Interfaces.MachineLearning;
+using SmartData.Lib.Services.MachineLearning;
 
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace DatasetProcessor.ViewModels
         public bool IsGenerating { get; private set; } = false;
 
         public MetadataViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IImageProcessorService imageProcessor,
-            IAutoTaggerService autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+            WDAutoTaggerService autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManager = fileManager;
             _modelManager = modelManager;

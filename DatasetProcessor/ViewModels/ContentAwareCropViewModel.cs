@@ -235,7 +235,7 @@ namespace DatasetProcessor.ViewModels
 
         partial void OnIsUiEnabledChanged(bool value)
         {
-            if (value == true)
+            if (value)
             {
                 IsCancelEnabled = false;
             }

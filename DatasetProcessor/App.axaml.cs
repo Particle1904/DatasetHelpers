@@ -35,12 +35,13 @@ namespace DatasetProcessor;
 
 public partial class App : Application
 {
-    private IServiceProvider _servicesProvider;
+    private readonly IServiceProvider _servicesProvider;
 
     public App()
     {
         ServiceCollection services = new ServiceCollection();
         ConfigureServices(services);
+        ConfigureViewModels(services);
         _servicesProvider = services.BuildServiceProvider(new ServiceProviderOptions()
         {
             ValidateOnBuild = true,
@@ -60,7 +61,7 @@ public partial class App : Application
         // Line below is needed to remove Avalonia data validation.
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
-
+        #region SERVICES
         var fileManager = _servicesProvider.GetRequiredService<IFileManagerService>();
         var modelManager = _servicesProvider.GetRequiredService<IModelManagerService>();
         var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
@@ -83,14 +84,17 @@ public partial class App : Application
 
         var logger = _servicesProvider.GetRequiredService<ILoggerService>();
         var configs = _servicesProvider.GetRequiredService<IConfigsService>();
+        #endregion
+
+        #region VIEW MODELS
+
+        #endregion
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow()
             {
-                DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
-                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, florence2, textRemover, python, logger, configs)
+                DataContext = _servicesProvider.GetRequiredService<MainViewModel>()
             };
 
             IClipboard clipboard = desktop.MainWindow.Clipboard;
@@ -101,16 +105,56 @@ public partial class App : Application
         {
             singleViewPlatform.MainView = new MainView()
             {
-                DataContext = new MainViewModel(fileManager, modelManager, imageProcessor, wDautoTagger, wDv3autoTagger, wDv3largeAutoTagger, joyTagautoTagger,
-                    e621autoTagger, tagProcessor, contentAwareCrop, inputHooks, promptGenerator, clipTokenizer, upscaler,
-                    inpaint, gemini, florence2, textRemover, python, logger, configs)
+                DataContext = _servicesProvider.GetRequiredService<MainViewModel>()
             };
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    /// <summary>
+    /// Resolves the OnnxRuntime library import based on the current platform and process architecture.
+    /// </summary>
+    /// <param name="libraryName">The name of the library to resolve. This should be "onnxruntime".</param>
+    /// <param name="assembly">The assembly requesting the import. This parameter is not used in this method.</param>
+    /// <param name="searchPath">The search path for the library. This parameter is not used in this method.</param>
+    /// <returns>
+    /// A handle to the loaded library if the libraryName is "onnxruntime" and the library is successfully loaded;
+    /// otherwise, returns <see cref="IntPtr.Zero"/>.
+    /// </returns>
+    /// <remarks>
+    /// The method determines the current platform (Windows, Linux, or macOS) and process architecture (x86 or x64),
+    /// and constructs the appropriate path to the OnnxRuntime library. It then attempts to load the library from this path.
+    /// </remarks>
+    private static IntPtr OnnxRuntimeImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    {
+        if (libraryName != "onnxruntime")
+        {
+            return IntPtr.Zero;
+        }
+
+        string location = AppContext.BaseDirectory;
+        string libFileName;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            libFileName = "onnxruntime.dll";
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            libFileName = "libonnxruntime.so";
+        }
+        else
+        {
+            libFileName = "libonnxruntime.dylib";
+        }
+
+        NativeLibrary.TryLoad(Path.Combine(location, libFileName), out IntPtr libHandle);
+
+        return libHandle;
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
     {
         string _modelsPath = Path.Combine(AppContext.BaseDirectory, "models");
 
@@ -202,54 +246,27 @@ public partial class App : Application
         ));
     }
 
-    /// <summary>
-    /// Resolves the OnnxRuntime library import based on the current platform and process architecture.
-    /// </summary>
-    /// <param name="libraryName">The name of the library to resolve. This should be "onnxruntime".</param>
-    /// <param name="assembly">The assembly requesting the import. This parameter is not used in this method.</param>
-    /// <param name="searchPath">The search path for the library. This parameter is not used in this method.</param>
-    /// <returns>
-    /// A handle to the loaded library if the libraryName is "onnxruntime" and the library is successfully loaded;
-    /// otherwise, returns <see cref="IntPtr.Zero"/>.
-    /// </returns>
-    /// <remarks>
-    /// The method determines the current platform (Windows, Linux, or macOS) and process architecture (x86 or x64),
-    /// and constructs the appropriate path to the OnnxRuntime library. It then attempts to load the library from this path.
-    /// </remarks>
-    private IntPtr OnnxRuntimeImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+    private static void ConfigureViewModels(IServiceCollection services)
     {
-        if (libraryName != "onnxruntime")
-        {
-            return IntPtr.Zero;
-        }
-
-        string location = Path.Combine(Environment.CurrentDirectory, "runtimes");
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            string processArchitecture = string.Empty;
-            if (Environment.Is64BitProcess)
-            {
-                processArchitecture = "x64";
-            }
-            else
-            {
-                processArchitecture = "x86";
-            }
-            location = Path.Combine(location, $"win-{processArchitecture}");
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            location = Path.Combine(location, "linux-x64");
-        }
-        else
-        {
-            location = Path.Combine(location, "osx-x64");
-        }
-
-        IntPtr libHandle = IntPtr.Zero;
-        NativeLibrary.TryLoad(Path.Combine(location, "native", "onnxruntime.dll"), out libHandle);
-
-        return libHandle;
+        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<WelcomeViewModel>();
+        services.AddSingleton<GalleryViewModel>();
+        services.AddSingleton<SortImagesViewModel>();
+        services.AddSingleton<TextRemoverViewModel>();
+        services.AddSingleton<ContentAwareCropViewModel>();
+        services.AddSingleton<ManualCropViewModel>();
+        services.AddSingleton<InpaintViewModel>();
+        services.AddSingleton<ResizeImagesViewModel>();
+        services.AddSingleton<UpscaleViewModel>();
+        services.AddSingleton<GenerateTagsViewModel>();
+        services.AddSingleton<GeminiCaptionViewModel>();
+        services.AddSingleton<FlorenceCaptionViewModel>();
+        services.AddSingleton<ProcessCaptionsViewModel>();
+        services.AddSingleton<ProcessTagsViewModel>();
+        services.AddSingleton<TagEditorViewModel>();
+        services.AddSingleton<ExtractSubsetViewModel>();
+        services.AddSingleton<DatasetPromptGeneratorViewModel>();
+        services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<MetadataViewModel>();
     }
 }

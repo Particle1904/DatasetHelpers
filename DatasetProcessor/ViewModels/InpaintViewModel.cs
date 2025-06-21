@@ -132,7 +132,7 @@ namespace DatasetProcessor.ViewModels
                 }
                 catch (IOException exception)
                 {
-                    if (exception.Message.ToLower().Contains("being used by another process"))
+                    if (exception.Message.Contains("being used by another process", StringComparison.OrdinalIgnoreCase))
                     {
                         Logger.SetLatestLogMessage("Unable to save mask image because its being used by another process. Trying again in 1 second...", LogMessageColor.Error);
                         Thread.Sleep(TimeSpan.FromSeconds(1));
@@ -175,18 +175,23 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void GoToItem(string parameter)
         {
+            if (!int.TryParse(parameter, out int parameterInt))
+            {
+                return;
+            }
+
+            if (ImageFiles?.Count == 0)
+            {
+                return;
+            }
+
             try
             {
-                int.TryParse(parameter, out int parameterInt);
-
-                if (ImageFiles?.Count != 0)
-                {
-                    SelectedItemIndex += parameterInt;
-                }
+                SelectedItemIndex += parameterInt;
             }
             catch
             {
-                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
+                Logger.SetLatestLogMessage("An error occurred while loading the image.", LogMessageColor.Error);
             }
         }
 
@@ -445,20 +450,6 @@ namespace DatasetProcessor.ViewModels
         {
             MaskOpacity = Math.Round(value, 2);
             OnPropertyChanged(nameof(MaskOpacityString));
-        }
-
-        /// <summary>
-        /// Handles a button down event and navigates to the item with the specified index.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event arguments.</param>
-        /// <param name="index">The index of the item to navigate to.</param>
-        private void OnNavigationButtonDown(string index)
-        {
-            if (IsActive)
-            {
-                Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
-            }
         }
 
         /// <summary>

@@ -170,7 +170,9 @@ public partial class BaseViewModel : ObservableObject
         {
             return new Progress();
         }
-        if (progress.PercentFloat != 0f)
+
+        const float epsilon = 0.0001f;
+        if (Math.Abs(progress.PercentFloat) > epsilon)
         {
             progress.Reset();
         }
@@ -182,7 +184,7 @@ public partial class BaseViewModel : ObservableObject
     /// Download model files if necessary.
     /// </summary>
     /// <param name="model">The model to be downloaded.</param>
-    protected async Task DownloadModelFiles(IModelManagerService modelManager, AvailableModels model)
+    protected static async Task DownloadModelFiles(IModelManagerService modelManager, AvailableModels model)
     {
         if (modelManager.FileNeedsToBeDownloaded(model))
         {

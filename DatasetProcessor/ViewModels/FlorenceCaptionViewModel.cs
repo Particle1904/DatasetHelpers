@@ -113,9 +113,6 @@ namespace DatasetProcessor.ViewModels
 
                 timer.Stop();
             }
-            catch (OperationCanceledException)
-            {
-            }
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
@@ -140,7 +137,7 @@ namespace DatasetProcessor.ViewModels
 
         partial void OnIsUiEnabledChanged(bool value)
         {
-            if (value == true)
+            if (value)
             {
                 IsCancelEnabled = false;
             }

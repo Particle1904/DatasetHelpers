@@ -116,20 +116,16 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                // Get images with path
                 ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
                     .Where(x => !x.Contains("_mask")).ToList();
 
                 if (ImageFiles.Count <= 0)
                 {
-                    // Stop dispatcher timer
                     timer.Stop();
-                    // Stop elapsed timer
                     _timer.Stop();
                     return;
                 }
 
-                // Order the list of images with path.
                 ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
             }
             catch (FormatException)
@@ -146,7 +142,7 @@ namespace DatasetProcessor.ViewModels
 
                 GalleryProcessingProgress.TotalFiles = visibleImages.Count;
 
-                // Load the images into a temporary List<ImageItem> so we can sort it.
+                // Load the images into a temporary List<ImageItem> so we can sort it
                 List<ImageItem> imageItems = new List<ImageItem>(visibleImages.Count);
                 Logger.SetLatestLogMessage("Loading image files...", LogMessageColor.Informational);
                 await Task.Run(() =>
@@ -183,9 +179,7 @@ namespace DatasetProcessor.ViewModels
                 IsCancelEnabled = false;
             }
 
-            // Stop dispatcher timer
             timer.Stop();
-            // Stop elapsed timer
             _timer.Stop();
         }
 
@@ -196,19 +190,24 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private async Task GoToItem(string parameter)
         {
+            if (!int.TryParse(parameter, out int parameterInt))
+            {
+                return;
+            }
+
+            if (ImageFiles?.Count == 0)
+            {
+                return;
+            }
+
             try
             {
-                int.TryParse(parameter, out int parameterInt);
-
-                if (ImageFiles?.Count != 0 && ImageFiles != null)
-                {
-                    CurrentPage += parameterInt;
-                    await LoadImagesFromInputFolder();
-                }
+                CurrentPage += parameterInt;
+                await LoadImagesFromInputFolder();
             }
             catch
             {
-                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
+                Logger.SetLatestLogMessage("An error occurred while loading the image.", LogMessageColor.Error);
             }
         }
 
@@ -287,7 +286,7 @@ namespace DatasetProcessor.ViewModels
 
         partial void OnIsUiEnabledChanged(bool value)
         {
-            if (value == true)
+            if (value)
             {
                 IsCancelEnabled = false;
             }

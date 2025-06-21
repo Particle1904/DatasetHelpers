@@ -57,7 +57,7 @@ namespace DatasetProcessor.Views
 
         protected override void OnClosing(WindowClosingEventArgs e)
         {
-            if (_viewModel != null && _viewModel.ModelManager.IsDownloading)
+            if (_viewModel != null && _viewModel.IsDownloading())
             {
                 e.Cancel = true;
             }

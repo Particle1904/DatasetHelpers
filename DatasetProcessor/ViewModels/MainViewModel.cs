@@ -10,12 +10,12 @@ using DatasetProcessor.src.Enums;
 using DatasetProcessor.Views;
 
 using Interfaces;
-using Interfaces.MachineLearning;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Interfaces.MachineLearning;
-using SmartData.Lib.Services.MachineLearning;
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -27,32 +27,15 @@ namespace DatasetProcessor.ViewModels;
 /// </summary>
 public partial class MainViewModel : BaseViewModel
 {
-    [ObservableProperty]
-    protected IFileManagerService _fileManager;
-    [ObservableProperty]
-    protected IModelManagerService _modelManager;
-    protected readonly IImageProcessorService _imageProcessor;
-    protected readonly IAutoTaggerService _wDAutoTagger;
-    protected readonly IAutoTaggerService _wDv3AutoTagger;
-    protected readonly IAutoTaggerService _wDv3LargeAutoTagger;
-    protected readonly IAutoTaggerService _joyTagAutoTagger;
-    protected readonly IAutoTaggerService _e621AutoTagger;
-    protected readonly ITagProcessorService _tagProcessor;
-    protected readonly IContentAwareCropService _contentAwareCrop;
-    protected readonly IInputHooksService _inputHooks;
-    protected readonly IPromptGeneratorService _promptGenerator;
-    protected readonly ICLIPTokenizerService _clipTokenizer;
-    protected readonly IUpscalerService _uspcaler;
-    protected readonly IPythonService _python;
-    protected readonly IInpaintService _inpaint;
-    protected readonly IGeminiService _gemini;
-    protected readonly IFlorence2Service _florence2;
-    protected readonly ITextRemoverService _textRemover;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IInputHooksService _inputHooks;
+    private readonly IModelManagerService _modelManager;
 
     [ObservableProperty]
     private UserControl _dynamicView;
 
-    private Dictionary<AppPages, UserControl> _views;
+    private readonly Dictionary<AppPages, UserControl> _viewCache;
+    private readonly Dictionary<AppPages, (Type, Type)> _pageRegistry;
 
     [ObservableProperty]
     private string _pageName;
@@ -86,136 +69,42 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="gemini">The gemini service.</param>
     /// <param name="logger">The logger service.</param>
     /// <param name="configs">The configuration service.</param>
-    public MainViewModel(IFileManagerService fileManager,
-                         IModelManagerService modelManager,
-                         IImageProcessorService imageProcessor,
-                         WDAutoTaggerService wDAutoTagger,
-                         WDV3AutoTaggerService wDv3AutoTagger,
-                         WDV3LargeAutoTaggerService wDv3LargeAutoTagger,
-                         JoyTagAutoTaggerService joyTagAutoTagger,
-                         E621AutoTaggerService e621AutoTagger,
-                         ITagProcessorService tagProcessor,
-                         IContentAwareCropService contentAwareCrop,
-                         IInputHooksService inputHooks,
-                         IPromptGeneratorService promptGenerator,
-                         ICLIPTokenizerService clipTokenizer,
-                         IUpscalerService upscaler,
-                         IInpaintService inpaint,
-                         IGeminiService gemini,
-                         IFlorence2Service florence2,
-                         ITextRemoverService textRemover,
-                         IPythonService python,
-                         ILoggerService logger,
-                         IConfigsService configs) :
-        base(logger, configs)
+    public MainViewModel(IServiceProvider serviceProvider, ILoggerService logger, IConfigsService configs) : base(logger, configs)
     {
-        _fileManager = fileManager;
-        _modelManager = modelManager;
-        _imageProcessor = imageProcessor;
-        _wDAutoTagger = wDAutoTagger;
-        _wDv3AutoTagger = wDv3AutoTagger;
-        _wDv3LargeAutoTagger = wDv3LargeAutoTagger;
-        _joyTagAutoTagger = joyTagAutoTagger;
-        _e621AutoTagger = e621AutoTagger;
-        _tagProcessor = tagProcessor;
-        _contentAwareCrop = contentAwareCrop;
-        _inputHooks = inputHooks;
-        _promptGenerator = promptGenerator;
-        _gemini = gemini;
-        _florence2 = florence2;
-        _textRemover = textRemover;
-        _clipTokenizer = clipTokenizer;
-        _uspcaler = upscaler;
-        _inpaint = inpaint;
-        _python = python;
+        _serviceProvider = serviceProvider;
+        _inputHooks = serviceProvider.GetRequiredService<IInputHooksService>();
+        _modelManager = serviceProvider.GetRequiredService<IModelManagerService>();
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
 
-        _views = new Dictionary<AppPages, UserControl>();
-        _views.Add(AppPages.Welcome, new WelcomeView()
+        _viewCache = new Dictionary<AppPages, UserControl>();
+        _pageRegistry = new Dictionary<AppPages, (Type, Type)>
         {
-            DataContext = new WelcomeViewModel(logger, configs)
-        });
-        _views.Add(AppPages.Gallery, new GalleryView()
-        {
-            DataContext = new GalleryViewModel(fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Sort_Images, new SortImagesView()
-        {
-            DataContext = new SortImagesViewModel(fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Text_Remover, new TextRemoverView()
-        {
-            DataContext = new TextRemoverViewModel(fileManager, modelManager, textRemover, logger, configs)
-        });
-        _views.Add(AppPages.Content_Aware_Crop, new ContentAwareCropView()
-        {
-            DataContext = new ContentAwareCropViewModel(fileManager, modelManager, contentAwareCrop, logger, configs)
-        });
-        _views.Add(AppPages.Manual_Crop, new ManualCropView()
-        {
-            DataContext = new ManualCropViewModel(imageProcessor, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Inpaint_Images, new InpaintView()
-        {
-            DataContext = new InpaintViewModel(imageProcessor, inpaint, modelManager, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Resize_Images, new ResizeImagesView()
-        {
-            DataContext = new ResizeImagesViewModel(imageProcessor, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Upscale_Images, new UpscaleView()
-        {
-            DataContext = new UpscaleViewModel(fileManager, modelManager, upscaler, logger, configs)
-        });
-        _views.Add(AppPages.Tag_Generation, new GenerateTagsView()
-        {
-            DataContext = new GenerateTagsViewModel(fileManager, modelManager, wDAutoTagger, wDv3AutoTagger, joyTagAutoTagger,
-                wDv3LargeAutoTagger, e621AutoTagger, logger, configs)
-        });
-        _views.Add(AppPages.Gemini_Caption, new GeminiCaptionView()
-        {
-            DataContext = new GeminiCaptionViewModel(fileManager, gemini, logger, configs)
-        });
-        _views.Add(AppPages.Florence_2_Caption, new FlorenceCaptionView()
-        {
-            DataContext = new FlorenceCaptionViewModel(fileManager, modelManager, florence2, logger, configs)
-        });
-        _views.Add(AppPages.Process_Captions, new ProcessCaptionsView()
-        {
-            DataContext = new ProcessCaptionsViewModel(tagProcessor, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Process_Tags, new ProcessTagsView()
-        {
-            DataContext = new ProcessTagsViewModel(tagProcessor, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Tag_Editor, new TagEditorView(inputHooks)
-        {
-            DataContext = new TagEditorViewModel(fileManager, modelManager, imageProcessor, clipTokenizer, logger, configs)
-        });
-        _views.Add(AppPages.Extract_Subset, new ExtractSubsetView()
-        {
-            DataContext = new ExtractSubsetViewModel(fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Prompt_Generator, new DatasetPromptGeneratorView()
-        {
-            DataContext = new DatasetPromptGeneratorViewModel(promptGenerator, tagProcessor, fileManager, logger, configs)
-        });
-        _views.Add(AppPages.Settings, new SettingsView()
-        {
-            DataContext = new SettingsViewModel(logger, configs)
-        });
+            { AppPages.Welcome, (typeof(WelcomeView), typeof(WelcomeViewModel)) },
+            { AppPages.Gallery, (typeof(GalleryView), typeof(GalleryViewModel)) },
+            { AppPages.Sort_Images, (typeof(SortImagesView), typeof(SortImagesViewModel)) },
+            { AppPages.Text_Remover, (typeof(TextRemoverView), typeof(TextRemoverViewModel)) },
+            { AppPages.Content_Aware_Crop, (typeof(ContentAwareCropView), typeof(ContentAwareCropViewModel)) },
+            { AppPages.Manual_Crop, (typeof(ManualCropView), typeof(ManualCropViewModel)) },
+            { AppPages.Inpaint_Images, (typeof(InpaintView), typeof(InpaintViewModel)) },
+            { AppPages.Resize_Images, (typeof(ResizeImagesView), typeof(ResizeImagesViewModel)) },
+            { AppPages.Upscale_Images, (typeof(UpscaleView), typeof(UpscaleViewModel)) },
+            { AppPages.Tag_Generation, (typeof(GenerateTagsView), typeof(GenerateTagsViewModel)) },
+            { AppPages.Gemini_Caption, (typeof(GeminiCaptionView), typeof(GeminiCaptionViewModel)) },
+            { AppPages.Florence_2_Caption, (typeof(FlorenceCaptionView), typeof(FlorenceCaptionViewModel)) },
+            { AppPages.Process_Captions, (typeof(ProcessCaptionsView), typeof(ProcessCaptionsViewModel)) },
+            { AppPages.Process_Tags, (typeof(ProcessTagsView), typeof(ProcessTagsViewModel)) },
+            { AppPages.Tag_Editor, (typeof(TagEditorView), typeof(TagEditorViewModel)) },
+            { AppPages.Extract_Subset, (typeof(ExtractSubsetView), typeof(ExtractSubsetViewModel)) },
+            { AppPages.Prompt_Generator, (typeof(DatasetPromptGeneratorView), typeof(DatasetPromptGeneratorViewModel)) },
+            { AppPages.Settings, (typeof(SettingsView), typeof(SettingsViewModel)) }
+        };
 
+        // Add Metadata on if the OS is Windows or macOS
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            _views.Add(AppPages.Metadata_Viewer, new MetadataView()
-            {
-                DataContext = new MetadataViewModel(fileManager, modelManager, imageProcessor, wDAutoTagger, logger, configs)
-            });
+            _pageRegistry.Add(AppPages.Metadata_Viewer, (typeof(MetadataView), typeof(MetadataViewModel)));
         }
-
-        _dynamicView = _views[AppPages.Welcome];
-        SetPageName(AppPages.Welcome);
     }
 
     /// <summary>
@@ -227,9 +116,20 @@ public partial class MainViewModel : BaseViewModel
     {
         _inputHooks.UnsubscribeFromInputEvents();
         SetAllViewsAsInactive();
+
+        if (!_viewCache.TryGetValue(parameter, out UserControl targetView))
+        {
+            (Type viewType, Type viewModelType) = _pageRegistry[parameter];
+            targetView = (UserControl)Activator.CreateInstance(viewType);
+            BaseViewModel viewModel = (BaseViewModel)_serviceProvider.GetRequiredService(viewModelType);
+            viewModel.Initialize(_clipboard, _storageProvider);
+            targetView.DataContext = viewModel;
+            _viewCache[parameter] = targetView;
+        }
+
+        DynamicView = targetView;
         SetViewAsActive(parameter);
         SetPageName(parameter);
-        DynamicView = _views[parameter];
     }
 
     /// <summary>
@@ -238,8 +138,10 @@ public partial class MainViewModel : BaseViewModel
     [RelayCommand]
     public void NavigateToTagEditorView()
     {
-        TagEditorViewModel tagEditorViewModel = (TagEditorViewModel)_views[AppPages.Tag_Editor].DataContext;
+        TagEditorViewModel tagEditorViewModel = _serviceProvider.GetRequiredService<TagEditorViewModel>();
+        tagEditorViewModel.Initialize(_clipboard, _storageProvider);
         tagEditorViewModel.UpdateCurrentSelectedTags();
+
         NavigateToPage(AppPages.Tag_Editor);
         _inputHooks.SubscribeToInputEvents();
     }
@@ -258,9 +160,17 @@ public partial class MainViewModel : BaseViewModel
     public void InitializeClipboardAndStorageProvider(IClipboard clipboard, IStorageProvider storageProvider)
     {
         Initialize(clipboard, storageProvider);
-        foreach (KeyValuePair<AppPages, UserControl> view in _views)
+        foreach (UserControl view in _viewCache.Values)
         {
-            (view.Value.DataContext as BaseViewModel).Initialize(clipboard, storageProvider);
+            if (view.DataContext is BaseViewModel viewModel)
+            {
+                viewModel.Initialize(clipboard, storageProvider);
+            }
+        }
+
+        if (DynamicView == null)
+        {
+            NavigateToPage(AppPages.Welcome);
         }
     }
 
@@ -281,16 +191,24 @@ public partial class MainViewModel : BaseViewModel
     }
 
     /// <summary>
+    /// Checks if the model manager is currently downloading models.
+    /// </summary>
+    /// <returns></returns>
+    public bool IsDownloading()
+    {
+        return _modelManager.IsDownloading;
+    }
+
+    /// <summary>
     /// Sets all views as inactive by updating their IsActive properties to false.
     /// </summary>
     private void SetAllViewsAsInactive()
     {
-        foreach (var item in _views)
+        foreach (UserControl viewInstance in _viewCache.Values)
         {
-            BaseViewModel bindingContext = (BaseViewModel)item.Value.DataContext;
-            if (bindingContext != null)
+            if (viewInstance.DataContext is BaseViewModel viewModel)
             {
-                bindingContext.IsActive = false;
+                viewModel.IsActive = false;
             }
         }
     }
@@ -301,10 +219,12 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="view">The target view to set as active.</param>
     private void SetViewAsActive(AppPages view)
     {
-        BaseViewModel bindingContext = (BaseViewModel)_views[view].DataContext;
-        if (bindingContext != null)
+        if (_viewCache.TryGetValue(view, out UserControl viewInstance))
         {
-            bindingContext.IsActive = true;
+            if (viewInstance.DataContext is BaseViewModel viewModel)
+            {
+                viewModel.IsActive = true;
+            }
         }
     }
 

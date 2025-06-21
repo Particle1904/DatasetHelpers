@@ -30,6 +30,7 @@ namespace DatasetProcessor.ViewModels
         private readonly IFileManagerService _fileManager;
         private readonly IModelManagerService _modelManager;
         private readonly IImageProcessorService _imageProcessor;
+        private readonly IInputHooksService _inputHooks;
         private readonly ICLIPTokenizerService _clipTokenizer;
         private Random _random;
 
@@ -95,15 +96,32 @@ namespace DatasetProcessor.ViewModels
         /// <param name="clipTokenizer">The clip tokenizer service for token operations.</param>
         /// <param name="logger">The logger service for logging messages.</param>
         /// <param name="configs">The configuration service for application settings.</param>
-        public TagEditorViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IImageProcessorService imageProcessor,
-            ICLIPTokenizerService clipTokenizer, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public TagEditorViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IInputHooksService inputHooks,
+            IImageProcessorService imageProcessor, ICLIPTokenizerService clipTokenizer, ILoggerService logger, IConfigsService configs) :
+            base(logger, configs)
         {
             _fileManager = fileManager;
             _modelManager = modelManager;
+            _inputHooks = inputHooks;
             _imageProcessor = imageProcessor;
             _clipTokenizer = clipTokenizer;
             _random = new Random();
             _configs = configs;
+
+            _inputHooks.ButtonF1 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("-1"));
+            _inputHooks.ButtonF2 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("1"));
+            _inputHooks.ButtonF3 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("-10"));
+            _inputHooks.ButtonF4 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("10"));
+            _inputHooks.ButtonF5 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("-100"));
+            _inputHooks.ButtonF6 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("100"));
+            _inputHooks.ButtonF8 += async (sender, args) => await Dispatcher.UIThread.InvokeAsync(BlurImageAsync);
+
+            _inputHooks.MouseButton3 += async (sender, args) => await Dispatcher.UIThread.InvokeAsync(BlurImageAsync);
+            _inputHooks.MouseButton4 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("-1"));
+            _inputHooks.MouseButton5 += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("1"));
+
+            _inputHooks.AltLeftArrowCombo += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("-1"));
+            _inputHooks.AltRightArrowCombo += (sender, args) => Dispatcher.UIThread.InvokeAsync(() => GoToItemCommand.Execute("1"));
 
             InputFolderPath = _configs.Configurations.TagEditorConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);

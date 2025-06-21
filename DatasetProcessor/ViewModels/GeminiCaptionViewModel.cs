@@ -141,6 +141,8 @@ namespace DatasetProcessor.ViewModels
             }
             catch (OperationCanceledException)
             {
+                IsCancelEnabled = false;
+                Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
             }
             catch (Exception exception)
             {
@@ -167,7 +169,7 @@ namespace DatasetProcessor.ViewModels
 
         partial void OnIsUiEnabledChanged(bool value)
         {
-            if (value == true)
+            if (value)
             {
                 IsCancelEnabled = false;
             }

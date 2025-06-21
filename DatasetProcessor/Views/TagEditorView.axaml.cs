@@ -5,8 +5,6 @@ using Avalonia.Threading;
 using DatasetProcessor.src.Classes;
 using DatasetProcessor.ViewModels;
 
-using SmartData.Lib.Interfaces;
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -20,8 +18,6 @@ namespace DatasetProcessor.Views
     /// </summary>
     public partial class TagEditorView : UserControl
     {
-        private readonly IInputHooksService _inputHooks;
-
         private Color _highlightTextColor = Color.FromArgb(255, 255, 179, 71);
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -29,17 +25,11 @@ namespace DatasetProcessor.Views
 
         private TagEditorViewModel? _viewModel;
 
-        public TagEditorView()
-        {
-            InitializeComponent();
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TagEditorView"/> class.
         /// </summary>
-        public TagEditorView(IInputHooksService inputHooks)
+        public TagEditorView()
         {
-            _inputHooks = inputHooks;
             InitializeComponent();
 
             EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged(sender, args));
@@ -85,23 +75,19 @@ namespace DatasetProcessor.Views
         /// </summary>
         protected override void OnDataContextChanged(EventArgs e)
         {
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged -= OnTagsPropertyChanged;
+            }
+
             _viewModel = DataContext as TagEditorViewModel;
+
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged += OnTagsPropertyChanged;
+            }
+
             _viewModel!.PropertyChanged += OnTagsPropertyChanged;
-
-            _inputHooks.ButtonF1 += async (sender, args) => await OnNavigationButtonDown("-1");
-            _inputHooks.ButtonF2 += async (sender, args) => await OnNavigationButtonDown("1");
-            _inputHooks.ButtonF3 += async (sender, args) => await OnNavigationButtonDown("-10");
-            _inputHooks.ButtonF4 += async (sender, args) => await OnNavigationButtonDown("10");
-            _inputHooks.ButtonF5 += async (sender, args) => await OnNavigationButtonDown("-100");
-            _inputHooks.ButtonF6 += async (sender, args) => await OnNavigationButtonDown("100");
-            _inputHooks.ButtonF8 += async (sender, args) => await _viewModel.BlurImageAsync();
-
-            _inputHooks.MouseButton3 += async (sender, args) => await _viewModel.BlurImageAsync();
-            _inputHooks.MouseButton4 += async (sender, args) => await OnNavigationButtonDown("-1");
-            _inputHooks.MouseButton5 += async (sender, args) => await OnNavigationButtonDown("1");
-
-            _inputHooks.AltLeftArrowCombo += async (sender, args) => await OnNavigationButtonDown("-1");
-            _inputHooks.AltRightArrowCombo += async (sender, args) => await OnNavigationButtonDown("1");
 
             base.OnDataContextChanged(e);
         }
