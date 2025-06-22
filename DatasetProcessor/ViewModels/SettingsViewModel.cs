@@ -69,7 +69,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _contentAwareApplySharpen;
         [ObservableProperty]
-        public double _contentAwareSharpenSigma;
+        private double _contentAwareSharpenSigma;
         private int? _contentAwareSigmaResolution;
         public string ContentAwareSigmaResolution
         {
@@ -109,7 +109,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _resizeImagesApplySharpen;
         [ObservableProperty]
-        public double _resizeImagesSharpenSigma;
+        private double _resizeImagesSharpenSigma;
         private int? _resizeImagesSigmaResolution;
         public string ResizeImagesSigmaResolution
         {
@@ -269,7 +269,7 @@ namespace DatasetProcessor.ViewModels
 
         [ObservableProperty]
         private bool _showMetadataViewerSettings;
-        // TODO: Add configs for Metadata page.
+        // TODO: Add configs for missing pages.
 
         public SettingsViewModel(ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {

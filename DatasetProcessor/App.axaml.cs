@@ -61,34 +61,6 @@ public partial class App : Application
         // Line below is needed to remove Avalonia data validation.
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
-        #region SERVICES
-        var fileManager = _servicesProvider.GetRequiredService<IFileManagerService>();
-        var modelManager = _servicesProvider.GetRequiredService<IModelManagerService>();
-        var imageProcessor = _servicesProvider.GetRequiredService<IImageProcessorService>();
-        var wDautoTagger = _servicesProvider.GetRequiredService<WDAutoTaggerService>();
-        var wDv3autoTagger = _servicesProvider.GetRequiredService<WDV3AutoTaggerService>();
-        var wDv3largeAutoTagger = _servicesProvider.GetRequiredService<WDV3LargeAutoTaggerService>();
-        var joyTagautoTagger = _servicesProvider.GetRequiredService<JoyTagAutoTaggerService>();
-        var e621autoTagger = _servicesProvider.GetRequiredService<E621AutoTaggerService>();
-        var tagProcessor = _servicesProvider.GetRequiredService<ITagProcessorService>();
-        var contentAwareCrop = _servicesProvider.GetRequiredService<IContentAwareCropService>();
-        var inputHooks = _servicesProvider.GetRequiredService<IInputHooksService>();
-        var promptGenerator = _servicesProvider.GetRequiredService<IPromptGeneratorService>();
-        var clipTokenizer = _servicesProvider.GetRequiredService<ICLIPTokenizerService>();
-        var upscaler = _servicesProvider.GetRequiredService<IUpscalerService>();
-        var inpaint = _servicesProvider.GetRequiredService<IInpaintService>();
-        var gemini = _servicesProvider.GetRequiredService<IGeminiService>();
-        var florence2 = _servicesProvider.GetRequiredService<IFlorence2Service>();
-        var textRemover = _servicesProvider.GetRequiredService<ITextRemoverService>();
-        var python = _servicesProvider.GetRequiredService<IPythonService>();
-
-        var logger = _servicesProvider.GetRequiredService<ILoggerService>();
-        var configs = _servicesProvider.GetRequiredService<IConfigsService>();
-        #endregion
-
-        #region VIEW MODELS
-
-        #endregion
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

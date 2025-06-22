@@ -4,11 +4,12 @@ using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
+using DatasetProcessor.src.Helpers;
+
 using Interfaces;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
-using SmartData.Lib.Interfaces.MachineLearning;
 using SmartData.Lib.Services.MachineLearning;
 
 using System;
@@ -22,10 +23,9 @@ namespace DatasetProcessor.ViewModels
     public partial class MetadataViewModel : BaseViewModel
     {
         private const string _dragAndDropPath = @"avares://DatasetProcessor/Assets/Images/drag_and_drop.png";
-        private readonly IFileManagerService _fileManager;
         private readonly IModelManagerService _modelManager;
         private readonly IImageProcessorService _imageProcessor;
-        private readonly IAutoTaggerService _autoTagger;
+        private readonly WDAutoTaggerService _autoTagger;
 
         [ObservableProperty]
         private Bitmap _selectedImage;
@@ -46,9 +46,11 @@ namespace DatasetProcessor.ViewModels
             get => _threshold;
             set
             {
-                if (Math.Round(value, 2) != _threshold)
+                double roundedValue = Math.Round(value, 2);
+
+                if (Math.Abs(roundedValue - _threshold) >= UserInterfaceHelpers.EPSILON)
                 {
-                    _threshold = Math.Round(value, 2);
+                    _threshold = roundedValue;
                     OnPropertyChanged(nameof(Threshold));
                 }
             }
@@ -56,10 +58,9 @@ namespace DatasetProcessor.ViewModels
 
         public bool IsGenerating { get; private set; } = false;
 
-        public MetadataViewModel(IFileManagerService fileManager, IModelManagerService modelManager, IImageProcessorService imageProcessor,
-            WDAutoTaggerService autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public MetadataViewModel(IModelManagerService modelManager, IImageProcessorService imageProcessor, WDAutoTaggerService autoTagger,
+            ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
-            _fileManager = fileManager;
             _modelManager = modelManager;
             _imageProcessor = imageProcessor;
             _autoTagger = autoTagger;
@@ -151,19 +152,14 @@ namespace DatasetProcessor.ViewModels
             await CopyToClipboard(PredictedTags);
         }
 
-        private string GetSeedFromParameters(string parameters)
+        private static string GetSeedFromParameters(string parameters)
         {
-            string[] parametersSplit = parameters.Split(",");
+            string[] parametersSplit = parameters.Split(",", StringSplitOptions.TrimEntries);
 
-            string seed = null;
-            foreach (string parameter in parametersSplit)
-            {
-                if (parameter.Contains("Seed"))
-                {
-                    string[] parameterSplit = parameter.Split(":");
-                    seed = parameterSplit.Last().Trim();
-                }
-            }
+            string seed = parametersSplit
+                .Where(parameter => parameter.StartsWith("Seed", StringComparison.OrdinalIgnoreCase))
+                .Select(parameter => parameter.Split(':', StringSplitOptions.TrimEntries).Last())
+                .LastOrDefault();
 
             return seed;
         }

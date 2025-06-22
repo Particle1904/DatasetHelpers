@@ -118,6 +118,10 @@ namespace DatasetProcessor.ViewModels
             IsUiEnabled = true;
         }
 
+        /// <summary>
+        /// Selects a folder path using the folder picker dialog and updates the InputFolderPath property.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task SelectInputFolderAsync()
         {
@@ -128,6 +132,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Selects a folder path using the folder picker dialog and updates the OutputFolderPath property.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task SelectOutputFolderAsync()
         {
@@ -138,6 +146,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Starts the cropping process for images in the input folder and saves the results to the output folder.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         public async Task CropImagesAsync()
         {
@@ -192,6 +204,11 @@ namespace DatasetProcessor.ViewModels
             timer.Stop();
         }
 
+        /// <summary>
+        /// Downloads the model files if they are not already present on the system.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         private async Task DownloadModelFiles(AvailableModels model)
         {
             if (_modelManager.FileNeedsToBeDownloaded(model))
@@ -200,32 +217,55 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Rounds the score threshold value to two decimal places when it changes.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnScoreThresholdChanged(double value)
         {
             ScoreThreshold = Math.Round(value, 2);
         }
 
+        /// <summary>
+        /// Rounds the IoU threshold value to two decimal places when it changes.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnIouThresholdChanged(double value)
         {
             IouThreshold = Math.Round(value, 2);
         }
 
+        /// <summary>
+        /// Rounds the expansion percentage value to two decimal places when it changes.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnExpansionPercentageChanged(double value)
         {
             ExpansionPercentage = Math.Round(value, 2);
             OnPropertyChanged(nameof(ExpansionPercentageString));
         }
 
+        /// <summary>
+        /// Clamps the Lanczos radius value to a range of 1 to 25 when it changes.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnLanczosRadiusChanged(double value)
         {
             LanczosRadius = Math.Clamp(Math.Round(value), 1, 25);
         }
 
+        /// <summary>
+        /// Clamps the sharpen sigma value to a range of 0.5 to 5 when it changes.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnSharpenSigmaChanged(double value)
         {
             SharpenSigma = Math.Clamp(Math.Round(value, 2), 0.5d, 5d);
         }
 
+        /// <summary>
+        /// Cancels the current cropping task if it is running.
+        /// </summary>
         [RelayCommand]
         private void CancelTask()
         {
@@ -233,6 +273,10 @@ namespace DatasetProcessor.ViewModels
             (_contentAwareCrop as ICancellableService)?.CancelCurrentTask();
         }
 
+        /// <summary>
+        /// Handles changes to the IsUiEnabled property and updates the IsCancelEnabled property accordingly.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnIsUiEnabledChanged(bool value)
         {
             if (value)

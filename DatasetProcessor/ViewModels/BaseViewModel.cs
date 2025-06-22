@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
+using DatasetProcessor.src.Helpers;
 
 using Interfaces;
 
@@ -171,8 +172,7 @@ public partial class BaseViewModel : ObservableObject
             return new Progress();
         }
 
-        const float epsilon = 0.0001f;
-        if (Math.Abs(progress.PercentFloat) > epsilon)
+        if (Math.Abs(progress.PercentFloat) > UserInterfaceHelpers.EPSILON)
         {
             progress.Reset();
         }

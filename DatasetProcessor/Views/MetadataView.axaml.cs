@@ -34,9 +34,8 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Event handler for the Drop event. Handles dropping of files onto the view.
         /// </summary>
-        /// <param name="sender">The event sender.</param>
         /// <param name="e">The event arguments.</param>
-        private async Task OnDrop(object sender, DragEventArgs e)
+        private async Task OnDrop(object _, DragEventArgs e)
         {
             if (_viewModel.IsGenerating)
             {

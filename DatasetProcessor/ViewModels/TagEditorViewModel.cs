@@ -22,9 +22,6 @@ using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
 {
-    /// <summary>
-    /// View model for the Tag Editor, responsible for managing image tags and text editing.
-    /// </summary>
     public partial class TagEditorViewModel : BaseViewModel
     {
         private readonly IFileManagerService _fileManager;
@@ -167,23 +164,23 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void GoToItem(string parameter)
         {
-            if (!IsActive)
+            if (!int.TryParse(parameter, out int parameterInt))
+            {
+                return;
+            }
+
+            if (ImageFiles?.Count == 0)
             {
                 return;
             }
 
             try
             {
-                int.TryParse(parameter, out int parameterInt);
-
-                if (ImageFiles?.Count != 0)
-                {
-                    SelectedItemIndex += parameterInt;
-                }
+                SelectedItemIndex += parameterInt;
             }
             catch
             {
-                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
+                Logger.SetLatestLogMessage("An error occurred while loading the image.", LogMessageColor.Error);
             }
         }
 
@@ -227,12 +224,17 @@ namespace DatasetProcessor.ViewModels
                 {
                     await Dispatcher.UIThread.InvokeAsync(async () =>
                     {
-                        MemoryStream imageMemoryStream = await _imageProcessor.GetBlurredImageAsync(ImageFiles[SelectedItemIndex]);
-                        imageMemoryStream.Seek(0, SeekOrigin.Begin);
-                        _currentImageMemoryStream?.Dispose();
-                        MemoryStream imageMemoryStreamCopy = new MemoryStream(imageMemoryStream.ToArray());
-                        SelectedImage = new Bitmap(imageMemoryStream);
-                        await imageMemoryStream.DisposeAsync();
+                        MemoryStream newImageStream = await _imageProcessor.GetBlurredImageAsync(ImageFiles[SelectedItemIndex]);
+                        newImageStream.Seek(0, SeekOrigin.Begin);
+
+                        Bitmap bitmap = new Bitmap(newImageStream);
+
+                        SelectedImage = bitmap;
+                        if (_currentImageMemoryStream != null)
+                        {
+                            await _currentImageMemoryStream.DisposeAsync();
+                        }
+                        _currentImageMemoryStream = newImageStream;
                     });
                 }
                 else
@@ -472,15 +474,22 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnCurrentImageTagsChanged(string value)
         {
-            try
-            {
-                string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
-                _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
-            }
-            catch (NullReferenceException)
+            if (ImageFiles == null || SelectedItemIndex < 0 || SelectedItemIndex >= ImageFiles.Count)
             {
                 Logger.SetLatestLogMessage("You need to select a folder with image files!", LogMessageColor.Warning);
+                return;
             }
+
+            if (_fileManager == null)
+            {
+                Logger.SetLatestLogMessage("Internal error: FileManager not initialized.", LogMessageColor.Error);
+                return;
+            }
+
+
+            string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
+            _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
+
         }
 
         /// <summary>

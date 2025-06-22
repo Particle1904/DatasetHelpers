@@ -84,6 +84,10 @@ namespace DatasetProcessor.ViewModels
             CurrentPageString = string.Empty;
         }
 
+        /// <summary>
+        /// Selects the input folder for the gallery and loads images from it asynchronously.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task SelectInputFolderAsync()
         {
@@ -262,28 +266,47 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Handles the change in the maximum image size and updates the display string accordingly.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnMaxImageSizeChanged(int value)
         {
             MaxImageSizeString = $"{value}px";
         }
 
+        /// <summary>
+        /// Handles the change in the current page and updates the current page string accordingly.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnCurrentPageChanged(int value)
         {
             CurrentPageString = $"Current page: {CurrentPage + 1}";
             CurrentPage = Math.Clamp(CurrentPage, 0, Math.Abs(ImageFiles.Count / ItemsPerPage));
         }
 
+        /// <summary>
+        /// Handles the change in the image collection and updates the current page string accordingly.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnImageCollectionChanged(ObservableCollection<ImageItem> value)
         {
             CurrentPageString = $"Current page: {CurrentPage + 1}";
         }
 
+        /// <summary>
+        /// Cancels the current task if it is cancellable.
+        /// </summary>
         [RelayCommand]
         private void CancelTask()
         {
             (_fileManager as ICancellableService)?.CancelCurrentTask();
         }
 
+        /// <summary>
+        /// Handles the change in the UI enabled state and updates the cancel button state accordingly.
+        /// </summary>
+        /// <param name="value"></param>
         partial void OnIsUiEnabledChanged(bool value)
         {
             if (value)

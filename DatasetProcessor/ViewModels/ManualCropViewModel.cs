@@ -1,5 +1,4 @@
 ﻿using Avalonia.Media.Imaging;
-using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -97,18 +96,23 @@ namespace DatasetProcessor.ViewModels
         [RelayCommand]
         private void GoToItem(string parameter)
         {
+            if (!int.TryParse(parameter, out int parameterInt))
+            {
+                return;
+            }
+
+            if (ImageFiles?.Count == 0)
+            {
+                return;
+            }
+
             try
             {
-                int.TryParse(parameter, out int parameterInt);
-
-                if (ImageFiles?.Count != 0)
-                {
-                    SelectedItemIndex += parameterInt;
-                }
+                SelectedItemIndex += parameterInt;
             }
             catch
             {
-                Logger.SetLatestLogMessage("Couldn't load the image.", LogMessageColor.Error);
+                Logger.SetLatestLogMessage("An unexpected error occurred while processing the image.", LogMessageColor.Error);
             }
         }
 
@@ -202,20 +206,6 @@ namespace DatasetProcessor.ViewModels
         partial void OnImageFilesChanged(List<string> value)
         {
             TotalImageFiles = $"Total files found: {ImageFiles.Count.ToString()}.";
-        }
-
-        /// <summary>
-        /// Handles a button down event and navigates to the item with the specified index.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="e">The event arguments.</param>
-        /// <param name="index">The index of the item to navigate to.</param>
-        private void OnNavigationButtonDown(string index)
-        {
-            if (IsActive)
-            {
-                Dispatcher.UIThread.InvokeAsync(() => GoToItem(index));
-            }
         }
 
         /// <summary>

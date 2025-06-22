@@ -219,12 +219,9 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="view">The target view to set as active.</param>
     private void SetViewAsActive(AppPages view)
     {
-        if (_viewCache.TryGetValue(view, out UserControl viewInstance))
+        if (_viewCache.TryGetValue(view, out UserControl viewInstance) && viewInstance.DataContext is BaseViewModel viewModel)
         {
-            if (viewInstance.DataContext is BaseViewModel viewModel)
-            {
-                viewModel.IsActive = true;
-            }
+            viewModel.IsActive = true;
         }
     }
 

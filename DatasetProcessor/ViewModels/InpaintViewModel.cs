@@ -119,6 +119,9 @@ namespace DatasetProcessor.ViewModels
             InpaintCurrentButtonEnabled = true;
         }
 
+        /// <summary>
+        /// Saves the current image mask to a file with a "_mask" suffix in the same directory as the current image file.
+        /// </summary>
         public void SaveCurrentImageMask()
         {
             bool savedSuccesfully = false;
@@ -151,6 +154,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Selects an input folder for image files to be processed.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task SelectInputFolderAsync()
         {
@@ -162,6 +169,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task SelectOutputFolderAsync()
         {
@@ -172,6 +183,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Navigates to a specific item in the image list.
+        /// </summary>
+        /// <param name="parameter">The navigation parameter indicating the item index.</param>
         [RelayCommand]
         private void GoToItem(string parameter)
         {
@@ -195,6 +210,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Inpaints the currently selected image using the LaMa model.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task InpaintCurrentImageAsync()
         {
@@ -224,6 +243,10 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Inpaints all images in the input folder using the LaMa model.
+        /// </summary>
+        /// <returns></returns>
         [RelayCommand]
         private async Task InpaintingImagesAsync()
         {
@@ -270,6 +293,9 @@ namespace DatasetProcessor.ViewModels
             _timer.Stop();
         }
 
+        /// <summary>
+        /// Cancels the current inpainting task if it is running.
+        /// </summary>
         [RelayCommand]
         private void CancelTask()
         {

@@ -18,12 +18,10 @@ namespace DatasetProcessor.Views
         private InpaintViewModel? _viewModel;
 
         private bool _isDragging = false;
-        private Point _startingPosition = Point.Empty;
 
         public InpaintView()
         {
             InitializeComponent();
-            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(255, 255, 179, 71), 0.5f);
             EllipseControl.IsVisible = false;
         }
 
@@ -88,7 +86,6 @@ namespace DatasetProcessor.Views
             if (!_isDragging)
             {
                 e.Handled = true;
-                return;
             }
             else
             {
