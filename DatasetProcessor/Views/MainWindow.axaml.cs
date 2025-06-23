@@ -9,7 +9,7 @@ namespace DatasetProcessor.Views
 {
     public partial class MainWindow : Window
     {
-        public MainViewModel _viewModel;
+        private MainViewModel _viewModel;
 
         public MainWindow()
         {

@@ -19,8 +19,6 @@ namespace DatasetProcessor.Views
         {
             base.OnAttachedToVisualTree(e);
 
-            TopLevel topLevel = TopLevel.GetTopLevel(this);
-
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 Metadata_ViewerButton.IsEnabled = false;
@@ -29,7 +27,7 @@ namespace DatasetProcessor.Views
 
         }
 
-        private void OnNavigationButton(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private void OnNavigationButton(object? sender, RoutedEventArgs e)
         {
             var primaryColor = (ImmutableSolidColorBrush)Application.Current.Resources["Primary"];
             foreach (Control item in LeftMenuStackPanel.Children)

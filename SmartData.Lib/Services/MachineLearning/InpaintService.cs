@@ -23,7 +23,6 @@ namespace SmartData.Lib.Services.MachineLearning
         public InpaintService(IImageProcessorService imageProcessor, string modelPath) : base(modelPath)
         {
             _imageProcessor = imageProcessor;
-            _useGPU = false;
         }
 
         protected override string[] GetInputColumns()
@@ -50,7 +49,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             LaMaInputData inputData = await _imageProcessor.ProcessImageForInpaintAsync(inputImagePath, inputMaskPath);
@@ -93,7 +92,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             TileData[] inputData = await _imageProcessor.ProcessImageForTileInpaintAsync(inputImagePath, inputMaskPath, tileSize, overlap);
@@ -180,7 +179,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension)

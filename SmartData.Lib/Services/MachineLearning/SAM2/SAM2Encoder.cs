@@ -40,7 +40,7 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             SAM2EncoderInputData inputData = await _imageProcessor.ProcessImageForSAM2EncodingAsync(inputImagePath);

@@ -107,7 +107,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
                 _isModelLoaded = true;
             }
 
@@ -215,7 +215,7 @@ namespace SmartData.Lib.Services.MachineLearning
                     throw new ArgumentException("Model is not a Upscaler Model!");
             }
 
-            await LoadModel();
+            await LoadModelAsync();
         }
 
         public void UnloadAIModel()

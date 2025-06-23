@@ -58,9 +58,9 @@ namespace SmartData.Lib.Services.Base
             TagsPath = tagsPath;
         }
 
-        protected override async Task LoadModel()
+        protected override async Task LoadModelAsync()
         {
-            await base.LoadModel();
+            await base.LoadModelAsync();
 
             LoadTags(TagsPath);
             if (_tags?.Length > 0)
@@ -95,7 +95,7 @@ namespace SmartData.Lib.Services.Base
         {
             if (!_isModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
                 _isModelLoaded = true;
             }
 
@@ -125,7 +125,7 @@ namespace SmartData.Lib.Services.Base
         {
             if (!_isModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
                 _isModelLoaded = true;
             }
 
@@ -156,7 +156,7 @@ namespace SmartData.Lib.Services.Base
         {
             if (!_isModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
                 _isModelLoaded = true;
             }
 

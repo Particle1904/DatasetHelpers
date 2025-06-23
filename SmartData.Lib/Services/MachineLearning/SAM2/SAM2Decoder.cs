@@ -47,7 +47,7 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             Size originalImageSize = await _imageProcessor.GetImageSizeAsync(imagePath);
@@ -121,7 +121,7 @@ namespace SmartData.Lib.Services.MachineLearning.SAM2
         {
             if (!IsModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
             }
 
             Size originalImageSize = await _imageProcessor.GetImageSizeAsync(imagePath);

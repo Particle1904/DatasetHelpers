@@ -105,7 +105,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             if (!_isModelLoaded)
             {
-                await LoadModel();
+                await LoadModelAsync();
                 _isModelLoaded = true;
             }
 

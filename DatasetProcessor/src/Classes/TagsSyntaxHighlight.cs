@@ -53,12 +53,12 @@ namespace DatasetProcessor.src.Classes
         /// <summary>
         /// Gets a collection of named highlighting colors, which is not used in this custom syntax highlighting.
         /// </summary>
-        public IEnumerable<HighlightingColor> NamedHighlightingColors => null;
+        public IEnumerable<HighlightingColor> NamedHighlightingColors => new List<HighlightingColor>();
 
         /// <summary>
         /// Gets a collection of properties, which is not used in this custom syntax highlighting.
         /// </summary>
-        public IDictionary<string, string> Properties => null;
+        public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
         /// <summary>
         /// Gets a named highlighting color by name, which is not used in this custom syntax highlighting.

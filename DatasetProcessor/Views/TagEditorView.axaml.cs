@@ -32,14 +32,14 @@ namespace DatasetProcessor.Views
         {
             InitializeComponent();
 
-            EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged(sender, args));
-            EditorTags.TextChanged += async (sender, args) => await OnEditorTextChangedAsync(sender, args);
+            EditorHighlight.TextChanged += async (sender, args) => await DebounceOnTextChangedAsync(() => OnEditorHighlightTextChanged());
+            EditorTags.TextChanged += async (sender, args) => await OnEditorTextChangedAsync();
         }
 
         /// <summary>
         /// Handles the TextChanged event of the EditorHighlight control to update tag highlighting.
         /// </summary>
-        private void OnEditorHighlightTextChanged(object? sender, TextChangedEventArgs e)
+        private void OnEditorHighlightTextChanged()
         {
             if (string.IsNullOrEmpty(EditorHighlight.Text))
             {
@@ -58,7 +58,7 @@ namespace DatasetProcessor.Views
         /// <summary>
         /// Handles the TextChanged event of the EditorTags control to process changes in tags.
         /// </summary>
-        private async Task OnEditorTextChangedAsync(object? sender, EventArgs args)
+        private async Task OnEditorTextChangedAsync()
         {
             if (_viewModel != null)
             {
@@ -97,7 +97,7 @@ namespace DatasetProcessor.Views
         /// </summary>
         private async Task DebounceOnTextChangedAsync(Action action)
         {
-            _cancellationTokenSource.Cancel();
+            await _cancellationTokenSource.CancelAsync();
             _cancellationTokenSource.Dispose();
             _cancellationTokenSource = new CancellationTokenSource();
 

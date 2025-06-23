@@ -1,4 +1,6 @@
-﻿using Microsoft.ML.OnnxRuntime;
+﻿using Enums;
+
+using Microsoft.ML.OnnxRuntime;
 
 namespace SmartData.Lib.Services.Base
 {
@@ -7,6 +9,15 @@ namespace SmartData.Lib.Services.Base
         where TOutput : class, new()
     {
         protected InferenceSession _session;
+
+        private readonly List<OnnxRuntimeProvider> _executionProviders = new List<OnnxRuntimeProvider>()
+        {
+            OnnxRuntimeProvider.CUDA,
+            OnnxRuntimeProvider.ROCm,
+            OnnxRuntimeProvider.DirectML
+        };
+
+        private readonly SemaphoreSlim _loadModelSemaphore = new SemaphoreSlim(1, 1);
 
         public string ModelPath { get; set; }
 
@@ -19,8 +30,6 @@ namespace SmartData.Lib.Services.Base
                 _isModelLoaded = value;
             }
         }
-
-        protected bool _useGPU = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseAIConsumer{TInput, TOutput}"/> class.
@@ -46,48 +55,79 @@ namespace SmartData.Lib.Services.Base
         /// <summary>
         /// Loads the machine learning model and initializes the prediction session.
         /// </summary>
-        protected virtual async Task LoadModel()
+        protected virtual async Task LoadModelAsync()
         {
-            if (_session != null)
+            await _loadModelSemaphore.WaitAsync();
+            try
             {
-                _session = null;
+                if (IsModelLoaded)
+                {
+                    return;
+                }
+
+                ResetState();
+
+                SessionOptions sessionOptions = new SessionOptions()
+                {
+                    GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL,
+                    IntraOpNumThreads = 1,
+                    ExecutionMode = ExecutionMode.ORT_SEQUENTIAL,
+                    EnableMemoryPattern = false
+                };
+
+                foreach (OnnxRuntimeProvider provider in _executionProviders)
+                {
+                    if (TryAppendProvider(sessionOptions, provider))
+                    {
+                        break;
+                    }
+                }
+
+                sessionOptions.ApplyConfiguration();
+                _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));
+                IsModelLoaded = true;
             }
-
-            int[] gpuIdsToTry = { 0, 1 };
-
-            SessionOptions sessionOptions = new SessionOptions();
-
-            if (_useGPU)
+            catch (Exception exception)
             {
-                sessionOptions.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL;
-                sessionOptions.IntraOpNumThreads = 1;
-                sessionOptions.ExecutionMode = ExecutionMode.ORT_SEQUENTIAL;
-                sessionOptions.EnableMemoryPattern = false;
-                //sessionOptions.LogVerbosityLevel = 1;
-                //sessionOptions.LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE;
+                ResetState();
 
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_DML(0);
-                }
-                catch (Exception) { /* DML Failed */ }
-
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_CUDA(0);
-                }
-                catch (Exception) { /* CUDA Failed */ }
-
-                try
-                {
-                    sessionOptions.AppendExecutionProvider_ROCm(0);
-                }
-                catch (Exception) { /* ROCm Failed */ }
+                throw new InvalidOperationException($"Failed to load model from {ModelPath}.", exception);
             }
+            finally
+            {
+                _loadModelSemaphore.Release();
+            }
+        }
 
-            sessionOptions.ApplyConfiguration();
-            _session = await Task.Run(() => new InferenceSession(ModelPath, sessionOptions));
-            IsModelLoaded = true;
+        /// <summary>
+        /// Attempts to append the specified execution provider to the session options.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        private bool TryAppendProvider(SessionOptions options, OnnxRuntimeProvider provider)
+        {
+            try
+            {
+                switch (provider)
+                {
+                    case OnnxRuntimeProvider.CUDA:
+                        options.AppendExecutionProvider_CUDA();
+                        break;
+                    case OnnxRuntimeProvider.ROCm:
+                        options.AppendExecutionProvider_ROCm();
+                        break;
+                    case OnnxRuntimeProvider.DirectML:
+                        options.AppendExecutionProvider_DML();
+                        break;
+                }
+                return true;
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // The specified provider is not available.
+                return false;
+            }
         }
 
         /// <summary>
@@ -100,8 +140,25 @@ namespace SmartData.Lib.Services.Base
         /// </remarks>
         protected virtual void UnloadModel()
         {
+            _loadModelSemaphore.Wait();
+            try
+            {
+                ResetState();
+            }
+            finally
+            {
+                _loadModelSemaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Resets the state of the AI consumer, disposing of the session and setting the model loaded flag to false.
+        /// </summary>
+        private void ResetState()
+        {
             _session?.Dispose();
-            _isModelLoaded = false;
+            _session = null;
+            IsModelLoaded = false;
         }
     }
 }

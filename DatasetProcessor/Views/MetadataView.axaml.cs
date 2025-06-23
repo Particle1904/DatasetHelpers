@@ -113,7 +113,7 @@ namespace DatasetProcessor.Views
         /// </summary>
         /// <param name="filePath">The file path to check.</param>
         /// <returns>True if the file is a valid image; otherwise, false.</returns>
-        private bool IsImage(string filePath)
+        private static bool IsImage(string filePath)
         {
             string extension = Path.GetExtension(filePath);
 
@@ -130,7 +130,7 @@ namespace DatasetProcessor.Views
         /// </summary>
         /// <param name="text">The text to check.</param>
         /// <returns>True if the text is a valid URL; otherwise, false.</returns>
-        private bool IsUrl(string text)
+        private static bool IsUrl(string text)
         {
             return Uri.TryCreate(text, UriKind.Absolute, out Uri uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
