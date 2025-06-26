@@ -4,6 +4,7 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 
 using DatasetProcessor.ViewModels;
 using DatasetProcessor.Views;
@@ -30,6 +31,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace DatasetProcessor;
 
@@ -80,6 +82,28 @@ public partial class App : Application
                 DataContext = _servicesProvider.GetRequiredService<MainViewModel>()
             };
         }
+
+        ILoggerService loggerService = _servicesProvider.GetRequiredService<ILoggerService>();
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+        {
+            Exception exception = args.ExceptionObject as Exception;
+            loggerService.SaveExceptionStackTrace(exception);
+        };
+
+        TaskScheduler.UnobservedTaskException += (sender, args) =>
+        {
+            Exception exception = args.Exception;
+            loggerService.SaveExceptionStackTrace(exception);
+            args.SetObserved();
+        };
+
+        Dispatcher.UIThread.UnhandledException += (sender, args) =>
+        {
+            Exception exception = args.Exception;
+            loggerService.SaveExceptionStackTrace(exception);
+            args.Handled = true;
+        };
 
         base.OnFrameworkInitializationCompleted();
     }
