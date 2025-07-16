@@ -189,13 +189,6 @@ public partial class App : Application
                 Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.WDv3Large].Csv.Filename)
         ));
 
-        services.AddSingleton<E621AutoTaggerService>(service =>
-            new E621AutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
-                service.GetRequiredService<ITagProcessorService>(),
-                Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Z3DE621].Model.Filename),
-                Path.Combine(_modelsPath, ModelRegistry.RequiredFiles[AvailableModels.Z3DE621].Csv.Filename)
-        ));
-
         services.AddSingleton<JoyTagAutoTaggerService>(service =>
             new JoyTagAutoTaggerService(service.GetRequiredService<IImageProcessorService>(),
                 service.GetRequiredService<ITagProcessorService>(),

@@ -7,7 +7,6 @@
         WDv3,
         WDv3Large,
         JoyTag,
-        Z3DE621,
         #endregion
         #region Yolo models
         Yolov4,

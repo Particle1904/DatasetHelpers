@@ -208,7 +208,6 @@ namespace SmartData.Lib.Services.MachineLearning
                 case AvailableModels.JoyTag:
                 case AvailableModels.WD14v2:
                 case AvailableModels.WDv3:
-                case AvailableModels.Z3DE621:
                 case AvailableModels.Yolov4:
                 case AvailableModels.CLIPTokenizer:
                 default:

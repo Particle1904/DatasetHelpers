@@ -30,7 +30,6 @@ namespace DatasetProcessor.ViewModels
         private readonly IAutoTaggerService _wDv3autoTagger;
         private readonly IAutoTaggerService _wDv3largeAutoTagger;
         private readonly IAutoTaggerService _joyTagautoTagger;
-        private readonly IAutoTaggerService _e621autoTagger;
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -59,7 +58,7 @@ namespace DatasetProcessor.ViewModels
 
         public GenerateTagsViewModel(IFileManagerService fileManager, IModelManagerService modelManager, WDAutoTaggerService wDautoTagger,
             WDV3AutoTaggerService wDV3autoTagger, JoyTagAutoTaggerService joyTagautoTagger, WDV3LargeAutoTaggerService wDv3largeAutoTagger,
-            E621AutoTaggerService e621autoTagger, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+            ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManager = fileManager;
 
@@ -103,14 +102,6 @@ namespace DatasetProcessor.ViewModels
                 PredictionProgress.TotalFiles = args;
             };
             (_joyTagautoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
-
-            _e621autoTagger = e621autoTagger;
-            (_e621autoTagger as INotifyProgress).TotalFilesChanged += (sender, args) =>
-            {
-                PredictionProgress = ResetProgress(PredictionProgress);
-                PredictionProgress.TotalFiles = args;
-            };
-            (_e621autoTagger as INotifyProgress).ProgressUpdated += (sender, args) => PredictionProgress.UpdateProgress();
 
             InputFolderPath = _configs.Configurations.GenerateTagsConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);
@@ -183,10 +174,6 @@ namespace DatasetProcessor.ViewModels
                         await DownloadModelFiles(_modelManager, AvailableModels.WDv3Large);
                         await CallAutoTaggerService(_wDv3largeAutoTagger);
                         break;
-                    case AvailableModels.Z3DE621:
-                        await DownloadModelFiles(_modelManager, AvailableModels.Z3DE621);
-                        await CallAutoTaggerService(_e621autoTagger);
-                        break;
                     default:
                         Logger.SetLatestLogMessage($"Something went wrong while trying to load one of the auto tagger models!",
                             LogMessageColor.Error);
@@ -253,7 +240,6 @@ namespace DatasetProcessor.ViewModels
             (_wDv3autoTagger as IUnloadModel)?.UnloadAIModel();
             (_wDv3largeAutoTagger as IUnloadModel)?.UnloadAIModel();
             (_joyTagautoTagger as IUnloadModel)?.UnloadAIModel();
-            (_e621autoTagger as IUnloadModel)?.UnloadAIModel();
         }
 
         partial void OnThresholdChanged(double value)
@@ -269,7 +255,6 @@ namespace DatasetProcessor.ViewModels
             (_wDv3autoTagger as ICancellableService)?.CancelCurrentTask();
             (_wDv3largeAutoTagger as ICancellableService)?.CancelCurrentTask();
             (_joyTagautoTagger as ICancellableService)?.CancelCurrentTask();
-            (_e621autoTagger as ICancellableService)?.CancelCurrentTask();
         }
 
         partial void OnIsUiEnabledChanged(bool value)

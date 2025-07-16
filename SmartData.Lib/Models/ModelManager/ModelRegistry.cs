@@ -58,17 +58,6 @@ namespace Models.ModelManager
                         DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/jtTags.csv?download=true"
                     }),
 
-                [AvailableModels.Z3DE621] = (
-                    new ModelFileInfo
-                    {
-                        Filename = "e621Model.onnx",
-                        DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Model.onnx?download=true"
-                    },
-                    new ModelFileInfo
-                    {
-                        Filename = "e621Tags.csv",
-                        DownloadUrl = @"https://huggingface.co/Crowlley/DatasetToolsModels/resolve/main/e621Tags.csv?download=true"
-                    }),
                 #endregion
                 #region Yolo
                 [AvailableModels.Yolov4] = (
