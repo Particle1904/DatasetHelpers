@@ -122,7 +122,10 @@ namespace DatasetProcessor.Views
         {
             if (e.PropertyName == nameof(_viewModel.CurrentImageTags))
             {
-                EditorTags.Text = _viewModel.CurrentImageTags;
+                if (EditorTags.Text != _viewModel.CurrentImageTags)
+                {
+                    EditorTags.Text = _viewModel.CurrentImageTags;
+                }
             }
         }
 
