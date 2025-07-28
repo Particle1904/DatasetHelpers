@@ -87,8 +87,6 @@ namespace DatasetProcessor.Views
                 _viewModel.PropertyChanged += OnTagsPropertyChanged;
             }
 
-            _viewModel!.PropertyChanged += OnTagsPropertyChanged;
-
             base.OnDataContextChanged(e);
         }
 
