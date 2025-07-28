@@ -387,6 +387,10 @@ namespace DatasetProcessor.ViewModels
                     SelectedItemIndex = 0;
                 }
             }
+            catch (FormatException)
+            {
+                Logger.SetLatestLogMessage("Sorting failed because one or more image files have non-numeric names. Images will still be loaded but in an unsorted order.", LogMessageColor.Warning);
+            }
             catch
             {
                 Logger.SetLatestLogMessage("No image files were found in the directory.", LogMessageColor.Error);
