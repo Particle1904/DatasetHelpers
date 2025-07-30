@@ -78,7 +78,7 @@
 					Width="40"
 					Height="40"
 					Command="{Binding OpenFolderInExplorerCommand}"
-					CommandParameter="{Binding OutputFolderPath}">
+					CommandParameter="{Binding FailedFolderPath}">
 				<Panel>
 					<Image Source="{SvgImage /Assets/Icons/folder_opened.svg}"
 						   HorizontalAlignment="Stretch"
