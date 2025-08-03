@@ -96,7 +96,7 @@ def setup_model(system_instruction: str):
     }
     
     return genai.GenerativeModel(
-        model_name='gemini-2.0-flash-exp',
+        model_name='gemini-2.0-flash-lite',
         safety_settings=safety_settings,
         system_instruction=system_instruction
     )
