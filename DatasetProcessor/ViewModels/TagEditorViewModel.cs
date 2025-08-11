@@ -397,7 +397,7 @@ namespace DatasetProcessor.ViewModels
             }
             finally
             {
-                if (ImageFiles.Count != 0)
+                if (ImageFiles != null && ImageFiles.Count > 0 && SelectedItemIndex >= 0 && SelectedItemIndex < ImageFiles.Count)
                 {
                     SelectedImage = SelectBitmapInterpolation();
                 }
@@ -502,7 +502,7 @@ namespace DatasetProcessor.ViewModels
         /// <returns>The selected bitmap.</returns>
         private Bitmap SelectBitmapInterpolation()
         {
-            Bitmap imageBitmap = new Bitmap((ImageFiles[SelectedItemIndex]));
+            Bitmap imageBitmap = new Bitmap(ImageFiles[SelectedItemIndex]);
             if (imageBitmap.PixelSize.Width < 256 || imageBitmap.PixelSize.Height < 256)
             {
                 double aspectRatio = (double)imageBitmap.PixelSize.Width / imageBitmap.PixelSize.Height;
