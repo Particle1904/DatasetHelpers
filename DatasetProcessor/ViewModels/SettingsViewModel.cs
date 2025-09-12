@@ -105,7 +105,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private SupportedDimensions _resizeImagesOutputDimension;
         [ObservableProperty]
-        private int _resizeImagesLanczosRadius;
+        private float _resizeImagesResamplerSigma;
         [ObservableProperty]
         private bool _resizeImagesApplySharpen;
         [ObservableProperty]
@@ -300,7 +300,7 @@ namespace DatasetProcessor.ViewModels
             ResizeImagesInputFolder = Configs.Configurations.ResizeImagesConfigs.InputFolder;
             ResizeImagesOutputFolder = Configs.Configurations.ResizeImagesConfigs.OutputFolder;
             ResizeImagesOutputDimension = Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
-            ResizeImagesLanczosRadius = Configs.Configurations.ResizeImagesConfigs.LanczosRadius;
+            ResizeImagesResamplerSigma = Configs.Configurations.ResizeImagesConfigs.ResamplerSigma;
             ResizeImagesApplySharpen = Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
             ResizeImagesSharpenSigma = Configs.Configurations.ResizeImagesConfigs.SharpenSigma;
             ResizeImagesSigmaResolution = Configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen.ToString();
@@ -686,7 +686,7 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.ResizeImagesConfigs.InputFolder = ResizeImagesInputFolder;
             Configs.Configurations.ResizeImagesConfigs.OutputFolder = ResizeImagesOutputFolder;
             Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize = ResizeImagesOutputDimension;
-            Configs.Configurations.ResizeImagesConfigs.LanczosRadius = ResizeImagesLanczosRadius;
+            Configs.Configurations.ResizeImagesConfigs.ResamplerSigma = ResizeImagesResamplerSigma;
             Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma = ResizeImagesApplySharpen;
             Configs.Configurations.ResizeImagesConfigs.SharpenSigma = (float)ResizeImagesSharpenSigma;
             Configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen = Math.Clamp(

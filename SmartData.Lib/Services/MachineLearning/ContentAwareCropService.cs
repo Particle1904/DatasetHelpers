@@ -187,7 +187,7 @@ namespace SmartData.Lib.Services.MachineLearning
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
-            _imageProcessor.LanczosSamplerRadius = LanczosRadius;
+            _imageProcessor.SamplerSigma = LanczosRadius;
             _imageProcessor.ApplySharpen = ApplySharpen;
             _imageProcessor.SharpenSigma = (float)SharpenSigma;
             _imageProcessor.MinimumResolutionForSigma = MinimumResolutionForSigma;

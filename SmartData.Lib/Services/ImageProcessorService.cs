@@ -28,6 +28,7 @@ using SmartData.Lib.Interfaces;
 using SmartData.Lib.Models.MachineLearning;
 using SmartData.Lib.Models.MachineLearning.SAM2;
 using SmartData.Lib.Services.Base;
+using SmartData.Lib.Services.ImageProcessor;
 
 namespace SmartData.Lib.Services
 {
@@ -55,6 +56,8 @@ namespace SmartData.Lib.Services
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
         private CubicResampler _cubicResampler;
+        private DpidResampler _dpidResampler;
+
 
         private const ushort _semaphoreConcurrent = 6;
 
@@ -63,16 +66,16 @@ namespace SmartData.Lib.Services
         private const ushort _divisor = 64;
         private readonly int _baseResolution = 512;
 
-        private int _lanczosSamplerRadius = 3;
-        public int LanczosSamplerRadius
+        private int _samplerSigma = 3;
+        public int SamplerSigma
         {
-            get => _lanczosSamplerRadius;
+            get => _samplerSigma;
             set
             {
-                _lanczosSamplerRadius = Math.Clamp(value, 1, 25);
-                if (_lanczosSamplerRadius != _lanczosResampler.Radius)
+                _samplerSigma = Math.Clamp(value, 1, 25);
+                if (_samplerSigma != _lanczosResampler.Radius)
                 {
-                    _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
+                    _lanczosResampler = new LanczosResampler(_samplerSigma);
                 }
             }
         }
@@ -117,8 +120,9 @@ namespace SmartData.Lib.Services
             _totalBlocks = BlocksPerRow * BlocksPerRow;
             _aspectRatioToBlocks = CalculateBuckets(_totalBlocks);
             _bicubicResampler = new BicubicResampler();
-            _lanczosResampler = new LanczosResampler(_lanczosSamplerRadius);
+            _lanczosResampler = new LanczosResampler(_samplerSigma);
             _cubicResampler = CubicResampler.MitchellNetravali;
+            _dpidResampler = new DpidResampler();
             MinimumResolutionForSigma = 512;
         }
 
@@ -252,7 +256,8 @@ namespace SmartData.Lib.Services
 
                 try
                 {
-                    await ResizeImageAsync(file, outputPath, dimension);
+                    //await ResizeImageAsync(file, outputPath, dimension);
+                    await ResizeImageAsync(file, outputPath, dimension, _samplerSigma);
                 }
                 finally
                 {
@@ -1568,7 +1573,52 @@ namespace SmartData.Lib.Services
 
                 string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
                 await image.SaveAsPngAsync(outputFilePath, _pngEncoder);
+            }
+        }
 
+        /// <summary>
+        /// Asynchronously resizes an image using the DPID algorithm to fit within the specified dimensions,
+        /// maintaining aspect ratio and applying optional sharpening.
+        /// </summary>
+        /// <param name="inputPath">The file path of the source image to be resized.</param>
+        /// <param name="outputPath">The directory where the resized image will be saved.</param>
+        /// <param name="dimension">The target dimension to resize the longest side of the image to.</param>
+        /// <param name="lambda">The detail-preserving factor for the DPID algorithm. A value of -0.5 is a good starting point.</param>
+        /// <returns>A task representing the asynchronous image resizing operation.</returns>
+        /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
+        /// <exception cref="System.IO.IOException">An error occurred while reading or writing image files.</exception>
+        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension, float lambda = 0.6f)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+
+            using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
+            {
+                int finalWidth;
+                int finalHeight;
+
+                if (image.Width >= image.Height)
+                {
+                    finalWidth = (int)dimension;
+                    double idealHeight = (double)image.Height * ((double)finalWidth / image.Width);
+                    finalHeight = RoundToNearestMultiple((int)Math.Round(idealHeight, MidpointRounding.AwayFromZero), 16);
+                }
+                else
+                {
+                    finalHeight = (int)dimension;
+                    double idealWidth = (double)image.Width * ((double)finalHeight / image.Height);
+                    finalWidth = RoundToNearestMultiple((int)Math.Round(idealWidth, MidpointRounding.AwayFromZero), 16);
+                }
+
+                using (Image<Rgba32> dpidImage = await Task.Run(() => _dpidResampler.DpidResampleRgb(image, finalWidth, finalHeight, lambda)))
+                {
+                    if (ApplySharpen && (dpidImage.Width >= MinimumResolutionForSigma || dpidImage.Height >= MinimumResolutionForSigma))
+                    {
+                        dpidImage.Mutate(context => context.GaussianSharpen(_sharpenSigma));
+                    }
+
+                    string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
+                    await dpidImage.SaveAsPngAsync(outputFilePath, _pngEncoder);
+                }
             }
         }
 

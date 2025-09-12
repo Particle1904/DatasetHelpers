@@ -15,14 +15,14 @@ namespace Models.Configurations
         [JsonPropertyName("outputDimensionSize")]
         public SupportedDimensions OutputDimensionSize { get; set; } = SupportedDimensions.Resolution1024x1024;
 
-        private int _lanczosRadius = 3;
-        [JsonPropertyName("lanczosRadius")]
-        public int LanczosRadius
+        private float _resamplerSigma = 0.65F;
+        [JsonPropertyName("resamplerSigma")]
+        public float ResamplerSigma
         {
-            get => _lanczosRadius;
+            get => _resamplerSigma;
             set
             {
-                _lanczosRadius = Math.Clamp(value, 1, 25);
+                _resamplerSigma = Math.Clamp(value, 0.1f, 2.0f);
             }
         }
 

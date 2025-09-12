@@ -31,7 +31,7 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private SupportedDimensions _dimension;
         [ObservableProperty]
-        private double _lanczosRadius;
+        private double _resamplerSigma;
         [ObservableProperty]
         private bool _applySharpen;
         [ObservableProperty]
@@ -95,7 +95,7 @@ namespace DatasetProcessor.ViewModels
             OutputFolderPath = _configs.Configurations.ResizeImagesConfigs.OutputFolder;
             _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             Dimension = _configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
-            LanczosRadius = _configs.Configurations.ResizeImagesConfigs.LanczosRadius;
+            ResamplerSigma = _configs.Configurations.ResizeImagesConfigs.ResamplerSigma;
             ApplySharpen = _configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
             SharpenSigma = _configs.Configurations.ResizeImagesConfigs.SharpenSigma;
             MinimumResolutionForSigma = _configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen.ToString();
@@ -142,7 +142,7 @@ namespace DatasetProcessor.ViewModels
             TaskStatus = ProcessingStatus.Running;
             try
             {
-                _imageProcessor.LanczosSamplerRadius = (int)LanczosRadius;
+                _imageProcessor.SamplerSigma = (int)ResamplerSigma;
                 _imageProcessor.ApplySharpen = ApplySharpen;
                 _imageProcessor.SharpenSigma = (float)SharpenSigma;
                 if (_minimumResolutionForSigma == null)
@@ -174,9 +174,9 @@ namespace DatasetProcessor.ViewModels
             timer.Stop();
         }
 
-        partial void OnLanczosRadiusChanged(double value)
+        partial void OnResamplerSigmaChanged(double value)
         {
-            LanczosRadius = Math.Round(value, 2);
+            ResamplerSigma = Math.Round(value, 2);
         }
 
         partial void OnSharpenSigmaChanged(double value)

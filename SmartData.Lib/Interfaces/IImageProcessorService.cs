@@ -14,7 +14,7 @@ namespace SmartData.Lib.Interfaces
 {
     public interface IImageProcessorService
     {
-        public int LanczosSamplerRadius { get; set; }
+        public int SamplerSigma { get; set; }
         public float SharpenSigma { get; set; }
         public bool ApplySharpen { get; set; }
         public int MinimumResolutionForSigma { get; set; }

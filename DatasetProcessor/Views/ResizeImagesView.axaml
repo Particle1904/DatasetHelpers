@@ -85,15 +85,15 @@
 				  ColumnDefinitions="auto, 10, *, 10, auto">
 			<Label Grid.Column="0"
 				   Width="300"
-				   Content="Lanczos sampler radius:"/>
+				   Content="Resampler Sigma:"/>
 			<Slider Grid.Column="2"
-					Minimum="1"
-					Maximum="25"
-					Value="{Binding LanczosRadius}"/>
+					Minimum="0.1"
+					Maximum="10"
+					Value="{Binding ResamplerSigma}"/>
 			<Label Grid.Column="4"
 				   Width="50"
 				   HorizontalAlignment="Right"
-				   Content="{Binding LanczosRadius}"/>
+				   Content="{Binding ResamplerSigma}"/>
 		</Grid>
 		<!-- SHARPEN SIGMA SLIDER -->
 		<Grid Classes="gridSecondary"
