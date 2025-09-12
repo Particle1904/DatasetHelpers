@@ -4,63 +4,34 @@
 		<TargetFrameworks>net9.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>annotations</Nullable>
-		<Platforms>AnyCPU</Platforms>
 		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.18.1" />
+	<ItemGroup>
 
 		<PackageReference Include="HeyRed.ImageSharp.Heif" Version="2.1.3" />
 		<PackageReference Include="LibHeif.Native.linux-x64" Version="1.15.1" />
 		<PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
 		<PackageReference Include="Microsoft.ML" Version="4.0.2" />
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.14.0" />
+		<PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.22.1" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
+		<PackageReference Include="LibVLCSharp" Version="3.9.4" />
+		<PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.4" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.8.2" />
+		<PackageReference Include="Magick.NET.Core" Version="14.8.2" />
+		<PackageReference Include="pythonnet" Version="3.0.5" />
+		<PackageReference Include="SharpHook" Version="7.0.1" />
+		<PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(RuntimeIdentifier)' == 'win-x64' Or '$(RuntimeIdentifier)' == 'win-x86' ">
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.18.1" />
-		
-		<PackageReference Include="HeyRed.ImageSharp.Heif" Version="2.1.3" />
-		<PackageReference Include="LibHeif.Native.linux-x64" Version="1.15.1" />
-		<PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
-		<PackageReference Include="Microsoft.ML" Version="4.0.0-preview.24271.1" />
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.11.0-dev-20240524-2333-8d8670f7" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
+	<ItemGroup>
+		<ProjectReference Include="..\Florence2Lab.Core\Florence2Lab.Core.csproj" />
 	</ItemGroup>
-	
-	<ItemGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' Or '$(RuntimeIdentifier)' == 'osx-x64' Or '$(RuntimeIdentifier)' == 'osx-arm64' ">
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.18.1" />
 
-		<PackageReference Include="HeyRed.ImageSharp.Heif" Version="2.1.3" />
-		<PackageReference Include="LibHeif.Native.linux-x64" Version="1.15.1" />
-		<PackageReference Include="LibHeif.Native.win-x64" Version="1.15.1" />
-		<PackageReference Include="Microsoft.ML" Version="4.0.0-preview.24271.1" />
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.11.0-dev-20240524-2333-8d8670f7" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
-		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
-	</ItemGroup>
-	
 	<ItemGroup>
-	  <PackageReference Include="LibVLCSharp" Version="3.9.4" />
-	  <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.4" />
-	  <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.8.1" />
-	  <PackageReference Include="Magick.NET.Core" Version="14.8.1" />
-	  <PackageReference Include="pythonnet" Version="3.0.5" />
-	  <PackageReference Include="SharpHook" Version="7.0.1" />
+		<None Update="Assets\system_notification.mp3">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
-	
-	<ItemGroup>
-	  <ProjectReference Include="..\Florence2Lab.Core\Florence2Lab.Core.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <None Update="Assets\system_notification.mp3">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-	
 </Project>

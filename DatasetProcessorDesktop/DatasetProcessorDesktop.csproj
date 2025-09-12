@@ -8,7 +8,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <Platforms>AnyCPU</Platforms>
+	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
@@ -16,8 +16,6 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.4" />
-    <PackageReference Include="Microsoft.AI.DirectML" Version="1.15.4" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.18.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
   </ItemGroup>

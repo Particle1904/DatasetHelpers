@@ -80,7 +80,7 @@ namespace Services
                 using (Image inputImage = Image.Load(file))
                 {
                     // CaptionToGrounding best performance so far in actually finding text, logos and other types of watermarks.
-                    Florence2Query query = Florence2Tasks.CreateQuery(Florence2TaskType.CaptionToGrounding, "text, watermark, logo, website, patreon, twitter, artist signature");
+                    Florence2Query query = Florence2Tasks.CreateQuery(Florence2TaskType.CaptionToGrounding, "text, watermark, logo, website, patreon, twitter, artist signature, speech bubble");
                     Florence2Result result = await _florence2.ProcessAsync(inputImage, query);
                     florence2QueryResults.Add(file, result);
                 }
