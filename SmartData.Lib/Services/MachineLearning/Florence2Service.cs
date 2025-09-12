@@ -130,6 +130,7 @@ namespace Services.MachineLearning
         public void UnloadAIModel()
         {
             _florence2Pipeline.Dispose();
+            _florence2Pipeline = null;
         }
 
         /// <summary>
