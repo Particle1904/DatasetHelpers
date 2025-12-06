@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
@@ -24,8 +25,12 @@ namespace DatasetProcessor.ViewModels
     public partial class GalleryViewModel : BaseViewModel
     {
         private readonly IFileManagerService _fileManager;
+        private readonly IImageProcessorService _imageProcessor;
 
         private const int ItemsPerPage = 200;
+
+        private readonly SemaphoreSlim _loadingSemaphore = new SemaphoreSlim(Environment.ProcessorCount);
+        private CancellationTokenSource _loadingCancellationTokenSource = new CancellationTokenSource();
 
         [ObservableProperty]
         private string _inputFolderPath;
@@ -57,9 +62,10 @@ namespace DatasetProcessor.ViewModels
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
 
-        public GalleryViewModel(IFileManagerService fileManager, ILoggerService logger, IConfigsService configs) : base(logger, configs)
+        public GalleryViewModel(IFileManagerService fileManager, IImageProcessorService imageProcessor, ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _fileManager = fileManager;
+            _imageProcessor = imageProcessor;
 
             (_fileManager as INotifyProgress).TotalFilesChanged += (sender, args) =>
             {
@@ -68,18 +74,15 @@ namespace DatasetProcessor.ViewModels
             };
             (_fileManager as INotifyProgress).ProgressUpdated += (sender, args) => GalleryProcessingProgress.UpdateProgress();
 
-
             InputFolderPath = Configs.Configurations.GalleryConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);
-            MaxImageSize = Configs.Configurations.GalleryConfigs.ImageDisplaySize;
+            MaxImageSize = Math.Clamp(Configs.Configurations.GalleryConfigs.ImageDisplaySize, 256, 576);
 
             IsUiEnabled = true;
             _timer = new Stopwatch();
             TaskStatus = ProcessingStatus.Idle;
-
             ImageCollection = new ObservableCollection<ImageItem>();
             SelectedImageItems = new ObservableCollection<ImageItem>();
-
             CurrentPage = 0;
             CurrentPageString = string.Empty;
         }
@@ -104,72 +107,97 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         private async Task LoadImagesFromInputFolder()
         {
-            IsUiEnabled = false;
-            IsCancelEnabled = false;
+            if (_loadingCancellationTokenSource != null)
+            {
+                _loadingCancellationTokenSource.Cancel();
+                _loadingCancellationTokenSource.Dispose();
+            }
+            _loadingCancellationTokenSource = new CancellationTokenSource();
+            CancellationToken cancellationToken = _loadingCancellationTokenSource.Token;
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            IsUiEnabled = false;
+            IsCancelEnabled = true;
+
+            _timer.Restart();
+            DispatcherTimer uiTImer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTImer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTImer.Start();
 
             TaskStatus = ProcessingStatus.Running;
+            ImageCollection.Clear();
+            SelectedImageItems.Clear();
 
             try
             {
-                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
-                    .Where(x => !x.Contains("_mask")).ToList();
-
-                if (ImageFiles.Count <= 0)
+                await Task.Run(() =>
                 {
-                    timer.Stop();
+                    try
+                    {
+                        List<string> files = _fileManager.GetImageFiles(InputFolderPath);
+                        ImageFiles = files.Where(x => !x.Contains("_mask")).ToList();
+
+                        try
+                        {
+                            ImageFiles = ImageFiles.OrderBy(x =>
+                            {
+                                string name = Path.GetFileNameWithoutExtension(x);
+                                return int.TryParse(name, out int val) ? val : int.MaxValue;
+                            }).ToList();
+                        }
+                        catch { /* Failed to sort numerically. Ignore sort errors */ }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.SetLatestLogMessage($"Error listing files: {ex.Message}", LogMessageColor.Error);
+                        ImageFiles = new List<string>();
+                    }
+                }, cancellationToken);
+
+                if (ImageFiles.Count == 0)
+                {
+                    uiTImer.Stop();
                     _timer.Stop();
                     return;
                 }
 
-                ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
-            }
-            catch (FormatException)
-            {
-                Logger.SetLatestLogMessage($"Tried to sort the files but one of more images doesn't have a valid file name.", LogMessageColor.Warning);
-            }
-
-            try
-            {
                 int startIndex = CurrentPage * ItemsPerPage;
                 int endIndex = Math.Min(startIndex + ItemsPerPage, ImageFiles.Count);
-                List<string> visibleImages = ImageFiles.GetRange(Math.Clamp(startIndex, 0, ImageFiles.Count),
-                    Math.Clamp(endIndex - startIndex, 0, ImageFiles.Count));
 
-                GalleryProcessingProgress.TotalFiles = visibleImages.Count;
-
-                // Load the images into a temporary List<ImageItem> so we can sort it
-                List<ImageItem> imageItems = new List<ImageItem>(visibleImages.Count);
-                Logger.SetLatestLogMessage("Loading image files...", LogMessageColor.Informational);
-                await Task.Run(() =>
+                if (startIndex >= ImageFiles.Count)
                 {
-                    for (int i = 0; i < visibleImages.Count; i++)
-                    {
-                        ImageItem item = new ImageItem()
-                        {
-                            FileName = Path.GetFileName(visibleImages[i]),
-                            Bitmap = new Bitmap(visibleImages[i])
-                        };
-                        imageItems.Add(item);
-                        GalleryProcessingProgress.UpdateProgress();
-                    }
-                });
+                    CurrentPage = 0;
+                    startIndex = 0;
+                    endIndex = Math.Min(ItemsPerPage, ImageFiles.Count);
+                }
 
-                ImageCollection = new ObservableCollection<ImageItem>(imageItems);
-                Logger.SetLatestLogMessage("Finished loading image files.", LogMessageColor.Informational);
+                List<string> visibleImages = ImageFiles.GetRange(startIndex, endIndex - startIndex);
+                GalleryProcessingProgress.TotalFiles = visibleImages.Count;
+                GalleryProcessingProgress.Reset();
+
+                Logger.SetLatestLogMessage("Loading images.", LogMessageColor.Informational);
+
+                List<ImageItem> placeholders = new List<ImageItem>(visibleImages.Count);
+                foreach (string file in visibleImages)
+                {
+                    placeholders.Add(new ImageItem(file));
+                }
+                ImageCollection = new ObservableCollection<ImageItem>(placeholders);
+
+                List<Task> loadingTasks = new List<Task>();
+                foreach (ImageItem item in ImageCollection)
+                {
+                    loadingTasks.Add(LoadThumbnailAsync(item, cancellationToken));
+                }
+
+                await Task.WhenAll(loadingTasks);
+                Logger.SetLatestLogMessage("Finished loading images.", LogMessageColor.Informational, false);
             }
-            catch (NotSupportedException exception)
+            catch (OperationCanceledException)
             {
-                Logger.SetLatestLogMessage(exception.Message, LogMessageColor.Error);
-                return;
+                Logger.SetLatestLogMessage("Loading cancelled!", LogMessageColor.Informational, false);
             }
             catch (Exception exception)
             {
@@ -183,8 +211,43 @@ namespace DatasetProcessor.ViewModels
                 IsCancelEnabled = false;
             }
 
-            timer.Stop();
+            uiTImer.Stop();
             _timer.Stop();
+        }
+
+        private async Task LoadThumbnailAsync(ImageItem image, CancellationToken token)
+        {
+            await _loadingSemaphore.WaitAsync(token);
+            try
+            {
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
+                using (MemoryStream memoryStream = await _imageProcessor.GetThumbnailStreamAsync(image.FilePath, MaxImageSize))
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        image.Bitmap = new Bitmap(memoryStream);
+                        image.IsLoading = false;
+                        GalleryProcessingProgress.UpdateProgress();
+                    });
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.SetLatestLogMessage("Something went wrong while trying to load the images. Error log will be saved inside the logs folder.", LogMessageColor.Error);
+                await Logger.SaveExceptionStackTrace(exception);
+            }
+            finally
+            {
+                _loadingSemaphore.Release();
+            }
         }
 
         /// <summary>
@@ -224,14 +287,13 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            _timer.Restart();
+            DispatcherTimer uiTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTimer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTimer.Start();
 
             TaskStatus = ProcessingStatus.Running;
             try
@@ -256,7 +318,7 @@ namespace DatasetProcessor.ViewModels
                 IsUiEnabled = true;
                 TaskStatus = ProcessingStatus.Finished;
 
-                timer.Stop();
+                uiTimer.Stop();
                 _timer.Stop();
 
                 // Clear the gallery and load the images again

@@ -128,14 +128,13 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            _timer.Restart();
+            DispatcherTimer uiTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTimer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTimer.Start();
 
             TaskStatus = ProcessingStatus.Running;
 
@@ -220,7 +219,7 @@ namespace DatasetProcessor.ViewModels
             }
 
             _timer.Stop();
-            timer.Stop();
+            uiTimer.Stop();
         }
 
         [RelayCommand]

@@ -11,6 +11,7 @@ using Models.MachineLearning;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Png;
@@ -42,7 +43,8 @@ namespace SmartData.Lib.Services
                 new GifConfigurationModule(),
                 new WebpConfigurationModule(),
                 new AvifConfigurationModule(),
-                new HeifConfigurationModule())
+                new HeifConfigurationModule(),
+                new BmpConfigurationModule())
         };
 
         private readonly PngEncoder _pngEncoder = new PngEncoder()
@@ -1024,6 +1026,32 @@ namespace SmartData.Lib.Services
 
                 return blurredImageStream;
             }
+        }
+
+        /// <summary>
+        /// Gets a thumbnail stream of the specified image with the given maximum size.
+        /// </summary>
+        /// <param name="inputPath"></param>
+        /// <param name="maxSize"></param>
+        /// <returns></returns>
+        public async Task<MemoryStream> GetThumbnailStreamAsync(string inputPath, int maxSize)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            using (Image image = await Image.LoadAsync(_decoderOptions, inputPath))
+            {
+                ResizeOptions resizeOptions = new ResizeOptions()
+                {
+                    Size = new Size(maxSize, maxSize),
+                    Mode = ResizeMode.Max,
+                    Sampler = _bicubicResampler,
+                };
+
+                image.Mutate(image => image.Resize(resizeOptions));
+                await image.SaveAsBmpAsync(memoryStream);
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         /// <summary>

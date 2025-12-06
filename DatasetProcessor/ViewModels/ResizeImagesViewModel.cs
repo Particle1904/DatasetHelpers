@@ -130,14 +130,13 @@ namespace DatasetProcessor.ViewModels
         {
             IsUiEnabled = false;
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            _timer.Restart();
+            DispatcherTimer uiTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTimer.Tick += (s, e) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTimer.Start();
 
             TaskStatus = ProcessingStatus.Running;
             try
@@ -171,7 +170,7 @@ namespace DatasetProcessor.ViewModels
             }
 
             _timer.Stop();
-            timer.Stop();
+            uiTimer.Stop();
         }
 
         partial void OnResamplerSigmaChanged(double value)

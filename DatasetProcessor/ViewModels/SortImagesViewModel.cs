@@ -115,14 +115,13 @@ namespace DatasetProcessor.ViewModels
 
             SortProgress = ResetProgress(SortProgress);
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            _timer.Restart();
+            DispatcherTimer uiTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTimer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTimer.Start();
 
             if (BackupImages)
             {
@@ -167,7 +166,7 @@ namespace DatasetProcessor.ViewModels
                 TaskStatus = ProcessingStatus.Finished;
             }
 
-            timer.Stop();
+            uiTimer.Stop();
             _timer.Stop();
         }
 

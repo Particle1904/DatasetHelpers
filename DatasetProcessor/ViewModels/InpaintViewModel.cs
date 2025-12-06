@@ -253,14 +253,13 @@ namespace DatasetProcessor.ViewModels
             IsUiEnabled = false;
             InpaintCurrentButtonEnabled = false;
 
-            _timer.Reset();
-            _timer.Start();
-            DispatcherTimer timer = new DispatcherTimer()
+            _timer.Restart();
+            DispatcherTimer uiTimer = new DispatcherTimer()
             {
                 Interval = TimeSpan.FromMilliseconds(100)
             };
-            timer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
-            timer.Start();
+            uiTimer.Tick += (sender, eventArgs) => OnPropertyChanged(nameof(ElapsedTime));
+            uiTimer.Start();
 
             InpaintingProgress = ResetProgress(InpaintingProgress);
             TaskStatus = ProcessingStatus.Running;
