@@ -5,9 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 
 using DatasetProcessor.src.Enums;
 
-using Exceptions;
-
 using SmartData.Lib.Enums;
+using SmartData.Lib.Exceptions;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 
@@ -142,6 +141,10 @@ namespace DatasetProcessor.ViewModels
             {
                 IsCancelEnabled = false;
                 Logger.SetLatestLogMessage($"Cancelled the current operation!", LogMessageColor.Informational);
+            }
+            catch (PythonNotFoundException)
+            {
+                Logger.SetLatestLogMessage($"Failed to initialize Python! Ensure Python 3.8-3.13 is installed and ensure it's added to the PATH.", LogMessageColor.Error);
             }
             catch (Exception exception)
             {

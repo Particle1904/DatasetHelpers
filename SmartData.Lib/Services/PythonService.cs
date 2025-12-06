@@ -1,8 +1,10 @@
 ﻿using Python.Runtime;
 
+using SmartData.Lib.Exceptions;
 using SmartData.Lib.Interfaces;
 
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Services
 {
@@ -15,7 +17,6 @@ namespace Services
 
         public PythonService()
         {
-
         }
 
         /// <summary>
@@ -24,9 +25,27 @@ namespace Services
         /// </summary>
         public void InitializePython()
         {
-            Runtime.PythonDLL = "python310.dll";
-            PythonEngine.Initialize();
-            PythonEngine.BeginAllowThreads();
+            if (PythonEngine.IsInitialized)
+            {
+                return;
+            }
+
+            try
+            {
+                string detectedDll = AutoDetectPythonPath();
+
+                if (!string.IsNullOrEmpty(detectedDll))
+                {
+                    Runtime.PythonDLL = detectedDll;
+                }
+
+                PythonEngine.Initialize();
+                PythonEngine.BeginAllowThreads();
+            }
+            catch (Exception)
+            {
+                throw new PythonNotFoundException();
+            }
         }
 
         /// <summary>
@@ -61,12 +80,12 @@ namespace Services
         /// Generates content using the configured Python model.
         /// </summary>
         /// <param name="base64Image">The base64-encoded image data to be used as input.</param>
-        /// <param name="promtp">The text prompt to guide content generation.</param>
+        /// <param name="prompt">The text prompt to guide content generation.</param>
         /// <param name="geminiApiKey">The API key for authentication with the Generative AI service.</param>
         /// <param name="systemInstructions">System-level instructions for the model configuration.</param>
         /// <returns>A string containing the generated content.</returns>
         /// <exception cref="Exception">Thrown if content generation fails.</exception>
-        public async Task<string> GenerateContent(string base64Image, string prompt, string geminiApiKey, string systemInstructions)
+        public async Task<string> GenerateContent(string base64Image, string prompt, string geminiApiKey, string systemInstructions, string modelName = "gemini-2.0-flash-lite")
         {
             return await Task.Run(() =>
             {
@@ -80,6 +99,7 @@ namespace Services
                         scope.Set("system_instructions", systemInstructions);
                         scope.Set("image_base64", base64Image);
                         scope.Set("text_prompt", prompt);
+                        scope.Set("model_name", modelName);
 
                         string setupModelScript = @"
 import google.generativeai as genai
@@ -96,7 +116,7 @@ def setup_model(system_instruction: str):
     }
     
     return genai.GenerativeModel(
-        model_name='gemini-3-pro-preview',
+        model_name=model_name,
         safety_settings=safety_settings,
         system_instruction=system_instruction
     )
@@ -145,7 +165,7 @@ response_text = response.text
         public void InstallPackage(string packageName)
         {
             string pythonVersion = string.Empty;
-            if (OperatingSystem.IsWindows())
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 pythonVersion = "python";
             }
@@ -189,6 +209,112 @@ response_text = response.text
             {
                 Debug.WriteLine($"An error occurred: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Auto-detects the Python DLL path by searching common installation directories.
+        /// </summary>
+        /// <returns></returns>
+        private string AutoDetectPythonPath()
+        {
+            string[] possibleNames = GetPossiblePythonDllNames();
+            IEnumerable<string> searchPaths = GetSearchPaths();
+
+            foreach (string path in searchPaths)
+            {
+                if (!Directory.Exists(path))
+                {
+                    continue;
+                }
+
+                foreach (string name in possibleNames)
+                {
+                    string fullPath = Path.Combine(path, name);
+                    if (File.Exists(fullPath))
+                    {
+                        return fullPath;
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Gets a list of common search paths for Python installations based on the operating system.
+        /// </summary>
+        private static IEnumerable<string> GetSearchPaths()
+        {
+            List<string> paths = new List<string>();
+
+            string pathEnv = Environment.GetEnvironmentVariable("PATH");
+            if (!string.IsNullOrEmpty(pathEnv))
+            {
+                paths.AddRange(pathEnv.Split(Path.PathSeparator));
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+                string[] commonRoots = new[]
+                {
+                    Path.Combine(localAppData, "Programs", "Python"),
+                    Path.Combine(programFiles, "Python3"),
+                    "C:\\Python312", "C:\\Python311", "C:\\Python310", "C:\\Python39"
+                };
+
+                foreach (string root in commonRoots)
+                {
+                    if (Directory.Exists(root))
+                    {
+                        paths.AddRange(Directory.GetDirectories(root, "Python3*"));
+                        paths.Add(root);
+                    }
+                }
+            }
+            // Linux and macOS paths
+            else
+            {
+                paths.Add("/usr/lib");
+                paths.Add("/usr/local/lib");
+                paths.Add("/usr/lib/x86_64-linux-gnu");
+                paths.Add("/opt/homebrew/lib");
+            }
+
+            return paths.Distinct();
+        }
+
+        /// <summary>
+        /// Gets possible Python DLL names based on the operating system.
+        /// </summary>
+        private static string[] GetPossiblePythonDllNames()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return new[]
+                {
+                    "python313.dll", "python312.dll", "python311.dll", "python310.dll", "python39.dll", "python38.dll"
+                };
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return new[]
+                {
+                    "libpython3.13.so", "libpython3.12.so", "libpython3.11.so", "libpython3.10.so", "libpython3.9.so", "libpython3.8.so",
+                    "libpython3.so"
+                };
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return new[]
+                {
+                    "libpython3.13.dylib", "libpython3.12.dylib", "libpython3.11.dylib", "libpython3.10.dylib", "libpython3.9.dylib", "libpython3.8.dylib"
+                };
+            }
+
+            return Array.Empty<string>();
         }
     }
 }

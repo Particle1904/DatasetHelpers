@@ -1,7 +1,7 @@
 ﻿namespace SmartData.Lib.Exceptions
 {
     [Serializable]
-    public class InvalidGeminiAPIKeyException : Exception
+    public class PythonNotFoundException : Exception
     {
     }
 }

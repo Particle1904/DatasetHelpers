@@ -1,5 +1,4 @@
-﻿using Exceptions;
-
+﻿using SmartData.Lib.Exceptions;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
 using SmartData.Lib.Services.Base;
@@ -35,8 +34,9 @@ namespace Services
         /// </summary>
         /// <param name="inputFolderPath">The path to the folder containing the images to be captioned.</param>
         /// <param name="outputFolderPath">The path to the folder where the captioned images and text files will be saved.</param>
-        /// <param name="prompt">
-        /// A base prompt to guide the captioning process. If the prompt is empty, a default prompt is used.
+        /// <param name="userGeminiPrompt">
+        /// User-defined prompt to guide the caption generation. If empty, a default prompt will be used. Tags (if file exists) is     
+        /// still prioritized over this prompt.
         /// </param>
         /// <remarks>
         /// This method processes all supported image files in the input folder. 
@@ -47,7 +47,7 @@ namespace Services
         /// </remarks>
         /// <exception cref="OperationCanceledException">Thrown when the operation is canceled via the cancellation token.</exception>
         /// <exception cref="HttpRequestException">Thrown if an HTTP request error occurs during the API call.</exception>
-        public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, string failedOutputFolderPath, string prompt)
+        public async Task CaptionImagesAsync(string inputFolderPath, string outputFolderPath, string failedOutputFolderPath, string userGeminiPrompt)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputFolderPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
@@ -59,7 +59,14 @@ namespace Services
             await Task.Run(() => _python.DownloadPythonPackages());
             if (!_python.IsInitialized)
             {
-                _python.InitializePython();
+                try
+                {
+                    await Task.Run(() => _python.InitializePython());
+                }
+                catch (PythonNotFoundException)
+                {
+                    throw;
+                }
             }
 
             foreach (string file in files)
@@ -68,26 +75,33 @@ namespace Services
 
                 string tagsFilePath = Path.ChangeExtension(file, ".txt");
                 string captionedImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.png");
+
                 if (File.Exists(captionedImagePath))
                 {
+                    ProgressUpdated?.Invoke(this, EventArgs.Empty);
                     continue;
                 }
 
                 try
                 {
+                    // Try to use existing tags if available.
                     string finalPrompt = string.Empty;
-                    // Read tags from file for guided captioning.
-                    if (File.Exists(file))
+
+                    // Get tags from the text file if it exists, use the user prompt otherwise.
+                    if (File.Exists(tagsFilePath))
                     {
-                        finalPrompt = _fileManager.GetTextFromFile(tagsFilePath, ".txt");
+                        finalPrompt = await Task.Run(() => _fileManager.GetTextFromFile(tagsFilePath, ".txt"));
                     }
                     else
                     {
-                        // If prompt is null, use the base one.
-                        if (string.IsNullOrEmpty(prompt))
-                        {
-                            finalPrompt = BASE_PROMPT;
-                        }
+                        finalPrompt = userGeminiPrompt;
+                    }
+
+
+                    // Use the base prompt if no prompt or tags is provided.
+                    if (string.IsNullOrEmpty(finalPrompt))
+                    {
+                        finalPrompt = BASE_PROMPT;
                     }
 
                     string base64Image = await _imageProcessor.GetBase64ImageAsync(file);
@@ -100,26 +114,30 @@ namespace Services
 
                     if (result.Contains("BLOCKED CONTENT") || result.Contains("CHECK QUOTA"))
                     {
-                        File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file)));
+                        await Task.Run(() => File.Move(file, Path.Combine(failedOutputFolderPath, Path.GetFileName(file))));
                         imagesThatFailed++;
                     }
                     else
                     {
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
-                        File.Move(file, resultPath);
-                        _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
+                        await Task.Run(() =>
+                        {
+                            File.Move(file, resultPath);
+                            _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
+                        });
                     }
 
                     // Sleep for 5 seconds since Gemini API have a 15 requests per minute limitation for free users.
                     if (FreeApi == true)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
                     }
                 }
                 catch (Exception)
                 {
                     throw;
                 }
+
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -143,7 +161,8 @@ namespace Services
         {
             string fullSystemInstructions = $"{systemInstructions}\nDo NOT include names of real-world people or personalities, or any references to children or teenagers.\nOutput Format: Output a string containing a caption (without double quotes), like:\n<Best caption goes here>";
 
-            return await _python.GenerateContent(base64image, prompt, ApiKey, systemInstructions);
+            // TODO: Expose Model name to settings and UI.
+            return await _python.GenerateContent(base64image, prompt, ApiKey, systemInstructions, "gemini-2.0-flash-lite");
         }
 
         /// <summary>
