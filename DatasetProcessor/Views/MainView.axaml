@@ -124,7 +124,11 @@
 			<Panel Grid.Row="2"
 				   Background="Transparent">
 				<Button Name="FlyoutButton"
-						Width="22" Height="22" HorizontalAlignment="Center">					
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						HorizontalContentAlignment="Center"
+						VerticalContentAlignment="Center"
+						Height="22">					
 					<Button.Flyout>
 						<Flyout>
 							<Border Margin="1"

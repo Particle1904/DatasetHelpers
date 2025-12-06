@@ -1,4 +1,4 @@
-﻿using LibVLCSharp.Shared;
+﻿using NetCoreAudio;
 
 using SmartData.Lib.Enums;
 using SmartData.Lib.Interfaces;
@@ -11,9 +11,8 @@ namespace SmartData.Lib.Services
 {
     public class LoggerService : ILoggerService, INotifyPropertyChanged
     {
-        private LibVLC _mainLibVLC;
-        private MediaPlayer _mainMediaPlayer;
-        private Media _notificationSound;
+        private readonly Player _audioPlayer;
+        private readonly string _notificationSoundPath;
 
         private string _latestLogMessage = string.Empty;
         public string LatestLogMessage
@@ -48,10 +47,10 @@ namespace SmartData.Lib.Services
 
         public LoggerService()
         {
-            _mainLibVLC = new LibVLC();
-            _mainMediaPlayer = new MediaPlayer(_mainLibVLC);
+            _audioPlayer = new Player();
+
             string _assetsFolder = Path.Combine(AppContext.BaseDirectory, "Assets");
-            _notificationSound = new Media(_mainLibVLC, Path.Combine(_assetsFolder, "system_notification.mp3"));
+            _notificationSoundPath = Path.Combine(_assetsFolder, "system_notification.wav");
         }
 
         /// <summary>
@@ -67,7 +66,11 @@ namespace SmartData.Lib.Services
             if (playNotificationSound)
             {
                 LatestLogChangedEvent?.Invoke(this, messageColor);
-                _mainMediaPlayer.Play(_notificationSound);
+                try
+                {
+                    _audioPlayer.Play(_notificationSoundPath);
+                }
+                catch (Exception) { /* Ignore audio playback errors */}
             }
         }
 
