@@ -88,7 +88,7 @@
 				   Content="Resampler Sigma:"/>
 			<Slider Grid.Column="2"
 					Minimum="0.1"
-					Maximum="10"
+					Maximum="5"
 					Value="{Binding ResamplerSigma}"/>
 			<Label Grid.Column="4"
 				   Width="50"

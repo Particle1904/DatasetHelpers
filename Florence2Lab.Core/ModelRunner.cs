@@ -18,7 +18,7 @@ internal sealed class ModelRunner : IDisposable
     private readonly InferenceSession _decoder;
 
     private readonly SessionOptions _sessionOptions;
-    private bool _useGPU = false;
+    private bool _useGPU = true;
 
     public ModelRunner(IOnnxModelPathProvider pathProvider)
     {
