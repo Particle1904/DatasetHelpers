@@ -101,7 +101,7 @@ namespace SmartData.Lib.Services
             string[] imageFiles = Utilities.GetFilesByMultipleExtensions(inputPath, Utilities.GetSupportedImagesExtension);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
-            foreach (var image in imageFiles)
+            foreach (string image in imageFiles)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 

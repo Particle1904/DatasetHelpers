@@ -28,7 +28,7 @@ public class ImageProcessor
     public DenseTensor<float> ProcessImage(Image image, bool padToSquare = true)
     {
         // Clone the image to avoid modifying the original
-        using var processedImage = image.CloneAs<Rgb24>();
+        using Image<Rgb24> processedImage = image.CloneAs<Rgb24>();
 
         // Resize to square (768x768)
         ResizeImage(processedImage, padToSquare);

@@ -291,7 +291,7 @@ namespace SmartData.Lib.Services
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
-            foreach (var file in files)
+            foreach (string file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -1049,7 +1049,7 @@ namespace SmartData.Lib.Services
         /// <returns>True if the tag is an edge case; otherwise, false.</returns>
         private static bool IsEdgeCase(string tag)
         {
-            foreach (var edgeCase in _edgeCasesContains)
+            foreach (string edgeCase in _edgeCasesContains)
             {
                 string pattern = @$"\b{Regex.Escape(edgeCase)}\b";
                 if (Regex.IsMatch(tag, pattern, RegexOptions.IgnoreCase, Utilities.RegexTimeout))
@@ -1098,7 +1098,7 @@ namespace SmartData.Lib.Services
 
             Dictionary<string, int> hashedTags = new Dictionary<string, int>(tags.Count);
 
-            foreach (var item in tags)
+            foreach (string item in tags)
             {
                 byte[] data = Encoding.UTF8.GetBytes(item);
                 byte[] hash = sha256.ComputeHash(data);

@@ -127,7 +127,7 @@ namespace SmartData.Lib.Services
 
             stringBuilder.AppendLine("Additional Information");
             stringBuilder.AppendLine("======================");
-            foreach (var key in exception.Data.Keys)
+            foreach (object key in exception.Data.Keys)
             {
                 stringBuilder.AppendLine($"{key}: {exception.Data[key]}");
             }

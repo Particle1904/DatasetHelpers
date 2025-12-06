@@ -32,9 +32,9 @@ public class ModelOutput : IDisposable
     /// </returns>
     public IReadOnlyList<Tensor<float>> GetPresent()
     {
-        var presentTensors = new List<Tensor<float>>();
+        List<Tensor<float>> presentTensors = new List<Tensor<float>>();
 
-        foreach (var output in _outputs)
+        foreach (DisposableNamedOnnxValue output in _outputs)
         {
             if (output.Name.StartsWith("present."))
             {

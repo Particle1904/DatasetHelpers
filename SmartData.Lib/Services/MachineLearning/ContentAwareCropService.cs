@@ -211,7 +211,7 @@ namespace SmartData.Lib.Services.MachineLearning
         {
             Yolov4OutputData boundingBoxPrediction = await GetPredictionAsync(file);
             System.Drawing.Size imageSize = await _imageProcessor.GetImageSizeAsync(file);
-            var results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
+            List<DetectedPerson> results = GetPersonBoundingBox(boundingBoxPrediction, imageSize.Width, imageSize.Height);
             await _imageProcessor.CropImageAsync(file, outputPath, results, _expansionPercentage, dimension);
         }
 
@@ -256,8 +256,8 @@ namespace SmartData.Lib.Services.MachineLearning
 
             for (int i = 0; i < predictionResults.Length; i++)
             {
-                var prediction = predictionResults[i];
-                var outputSize = _shapes[i];
+                float[] prediction = predictionResults[i];
+                int outputSize = _shapes[i];
 
                 for (int boxY = 0; boxY < outputSize; boxY++)
                 {
@@ -265,18 +265,18 @@ namespace SmartData.Lib.Services.MachineLearning
                     {
                         for (int a = 0; a < _anchors.Length; a++)
                         {
-                            var offset = boxY * outputSize * (classesCount + 5) * _anchors.Length + boxX * (classesCount + 5) *
+                            int offset = boxY * outputSize * (classesCount + 5) * _anchors.Length + boxX * (classesCount + 5) *
                                 _anchors.Length + a * (classesCount + 5);
-                            var predictionBoundingBox = prediction.Skip(offset).Take(classesCount + 5).ToArray();
+                            float[] predictionBoundingBox = prediction.Skip(offset).Take(classesCount + 5).ToArray();
 
-                            var boundingBoxXYWH = predictionBoundingBox.Take(4).ToArray();
-                            var predictionConfidence = predictionBoundingBox[4];
-                            var predictionProbabilities = predictionBoundingBox.Skip(5).ToArray();
+                            float[] boundingBoxXYWH = predictionBoundingBox.Take(4).ToArray();
+                            float predictionConfidence = predictionBoundingBox[4];
+                            float[] predictionProbabilities = predictionBoundingBox.Skip(5).ToArray();
 
-                            var deltaX = boundingBoxXYWH[0];
-                            var deltaY = boundingBoxXYWH[1];
-                            var deltaWidth = boundingBoxXYWH[2];
-                            var deltaHeight = boundingBoxXYWH[3];
+                            float deltaX = boundingBoxXYWH[0];
+                            float deltaY = boundingBoxXYWH[1];
+                            float deltaWidth = boundingBoxXYWH[2];
+                            float deltaHeight = boundingBoxXYWH[3];
 
                             float centerX = (Utilities.Sigmoid(deltaX) * _xyScale[i] - 0.5f * (_xyScale[i] - 1) + boxX) * _strides[i];
                             float centerY = (Utilities.Sigmoid(deltaY) * _xyScale[i] - 0.5f * (_xyScale[i] - 1) + boxY) * _strides[i];
@@ -293,10 +293,10 @@ namespace SmartData.Lib.Services.MachineLearning
                             float widthOffset = (inputSize - resizeRatio * imageWidth) / 2f;
                             float heightOffset = (inputSize - resizeRatio * imageHeight) / 2f;
 
-                            var originalX1 = 1f * (x1 - widthOffset) / resizeRatio; // left
-                            var originalX2 = 1f * (x2 - widthOffset) / resizeRatio; // right
-                            var originalY1 = 1f * (y1 - heightOffset) / resizeRatio; // top
-                            var originalY2 = 1f * (y2 - heightOffset) / resizeRatio; // bottom
+                            float originalX1 = 1f * (x1 - widthOffset) / resizeRatio; // left
+                            float originalX2 = 1f * (x2 - widthOffset) / resizeRatio; // right
+                            float originalY1 = 1f * (y1 - heightOffset) / resizeRatio; // top
+                            float originalY2 = 1f * (y2 - heightOffset) / resizeRatio; // bottom
 
                             originalX1 = Math.Max(originalX1, 0);
                             originalY1 = Math.Max(originalY1, 0);
@@ -307,7 +307,7 @@ namespace SmartData.Lib.Services.MachineLearning
                                 continue;
                             }
 
-                            var predictionScores = predictionProbabilities.Select(p => p * predictionConfidence).ToList();
+                            List<float> predictionScores = predictionProbabilities.Select(p => p * predictionConfidence).ToList();
 
                             float maxScore = predictionScores.Max();
                             if (maxScore > _scoreThreshold)
@@ -338,17 +338,17 @@ namespace SmartData.Lib.Services.MachineLearning
 
             for (int i = 0; i < detectedObjects.Count; i++)
             {
-                var boundingBox1 = detectedObjects[i];
+                float[] boundingBox1 = detectedObjects[i];
                 if (boundingBox1 == null)
                 {
                     continue;
                 }
 
-                var confidence = boundingBox1[4];
+                float confidence = boundingBox1[4];
 
                 results.Add(new DetectedPerson(boundingBox1.Take(4).ToArray(), confidence));
 
-                var iou = detectedObjects.Select(boundingBox2 => boundingBox2 == null ? float.NaN : CalculateIoU(boundingBox1, boundingBox2)).ToList();
+                List<float> iou = detectedObjects.Select(boundingBox2 => boundingBox2 == null ? float.NaN : CalculateIoU(boundingBox1, boundingBox2)).ToList();
                 for (int j = 0; j < iou.Count; j++)
                 {
                     if (!float.IsNaN(iou[j]) && iou[j] > _iouThreshold)
@@ -370,15 +370,15 @@ namespace SmartData.Lib.Services.MachineLearning
         /// <returns>The IoU value between the two bounding boxes.</returns>
         private static float CalculateIoU(float[] boundingBox1, float[] boundingBox2)
         {
-            var area1 = CalculateBoundingBoxArea(boundingBox1);
-            var area2 = CalculateBoundingBoxArea(boundingBox2);
+            float area1 = CalculateBoundingBoxArea(boundingBox1);
+            float area2 = CalculateBoundingBoxArea(boundingBox2);
 
             Debug.Assert(area1 >= 0);
             Debug.Assert(area2 >= 0);
 
-            var intersectionWidth = Math.Max(0, Math.Min(boundingBox1[2], boundingBox2[2]) - Math.Max(boundingBox1[0], boundingBox2[0]));
-            var intersectionHeight = Math.Max(0, Math.Min(boundingBox1[3], boundingBox2[3]) - Math.Max(boundingBox1[1], boundingBox2[1]));
-            var intersectionArea = intersectionWidth * intersectionHeight;
+            float intersectionWidth = Math.Max(0, Math.Min(boundingBox1[2], boundingBox2[2]) - Math.Max(boundingBox1[0], boundingBox2[0]));
+            float intersectionHeight = Math.Max(0, Math.Min(boundingBox1[3], boundingBox2[3]) - Math.Max(boundingBox1[1], boundingBox2[1]));
+            float intersectionArea = intersectionWidth * intersectionHeight;
 
             return intersectionArea / (area1 + area2 - intersectionArea);
         }

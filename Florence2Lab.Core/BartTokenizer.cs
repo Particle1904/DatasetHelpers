@@ -354,7 +354,7 @@ public partial class BartTokenizer
 
         foreach (byte b in bytes)
         {
-            if (_byteEncoder.TryGetValue(b, out var value))
+            if (_byteEncoder.TryGetValue(b, out int value))
             {
                 encoded.Append((char)value);
             }

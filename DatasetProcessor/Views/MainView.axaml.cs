@@ -29,7 +29,7 @@ namespace DatasetProcessor.Views
 
         private void OnNavigationButton(object? sender, RoutedEventArgs e)
         {
-            var primaryColor = (ImmutableSolidColorBrush)Application.Current.Resources["Primary"];
+            ImmutableSolidColorBrush primaryColor = (ImmutableSolidColorBrush)Application.Current.Resources["Primary"];
             foreach (Control item in LeftMenuStackPanel.Children)
             {
                 if (item.GetType() == typeof(Button))

@@ -29,7 +29,7 @@ namespace SmartData.Lib.Services
         /// </summary>
         public bool FileNeedsToBeDownloaded(AvailableModels model)
         {
-            if (!ModelRegistry.RequiredFiles.TryGetValue(model, out var entry))
+            if (!ModelRegistry.RequiredFiles.TryGetValue(model, out (Models.ModelManager.ModelFileInfo Model, Models.ModelManager.ModelFileInfo? Csv) entry))
             {
                 return false;
             }
@@ -73,7 +73,7 @@ namespace SmartData.Lib.Services
             {
                 client.Timeout = TimeSpan.FromMinutes(5);
                 // Lookup in registry instead of switch.
-                if (!ModelRegistry.RequiredFiles.TryGetValue(model, out var entry))
+                if (!ModelRegistry.RequiredFiles.TryGetValue(model, out (Models.ModelManager.ModelFileInfo Model, Models.ModelManager.ModelFileInfo? Csv) entry))
                 {
                     return;
                 }

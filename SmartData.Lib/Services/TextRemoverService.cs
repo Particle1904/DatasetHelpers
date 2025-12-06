@@ -98,7 +98,7 @@ namespace Services
             }
 
             TotalFilesChanged?.Invoke(this, florence2QueryResults.Count);
-            foreach (var keyValuePair in florence2QueryResults)
+            foreach (KeyValuePair<string, Florence2Result> keyValuePair in florence2QueryResults)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string file = keyValuePair.Key;
