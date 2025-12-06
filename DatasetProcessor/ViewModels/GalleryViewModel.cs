@@ -29,7 +29,7 @@ namespace DatasetProcessor.ViewModels
 
         private const int ItemsPerPage = 200;
 
-        private readonly SemaphoreSlim _loadingSemaphore = new SemaphoreSlim(Environment.ProcessorCount);
+        private readonly SemaphoreSlim _loadingSemaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount - 1));
         private CancellationTokenSource _loadingCancellationTokenSource = new CancellationTokenSource();
 
         [ObservableProperty]

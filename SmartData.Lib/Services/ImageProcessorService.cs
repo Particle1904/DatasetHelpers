@@ -58,9 +58,6 @@ namespace SmartData.Lib.Services
         private CubicResampler _cubicResampler;
         private DpidResampler _dpidResampler;
 
-
-        private const ushort _semaphoreConcurrent = 6;
-
         private const float _blurRadius = 22f;
 
         private const ushort _divisor = 64;
@@ -235,28 +232,42 @@ namespace SmartData.Lib.Services
         /// This method uses multiple threads to resize the images in parallel. Each image is resized to a target aspect ratio based on a predetermined set of aspect ratio buckets. The resized images are saved as PNG files in the output directory.
         /// </remarks>
         /// <exception cref="System.ArgumentNullException">Thrown when either the inputPath or outputPath is null.</exception>
-        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension)
+        public async Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension, AvailableResizeSampler resampler)
         {
             string[] files = Utilities.GetFilesByMultipleExtensions(inputPath, _imageSearchPattern);
             CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
-            SemaphoreSlim semaphore = new SemaphoreSlim(_semaphoreConcurrent);
+            SemaphoreSlim resizeSemaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount - 1));
             foreach (string file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await semaphore.WaitAsync();
+                await resizeSemaphore.WaitAsync();
 
                 try
                 {
-                    //await ResizeImageAsync(file, outputPath, dimension);
-                    await ResizeImageAsync(file, outputPath, dimension, _samplerSigma);
+                    switch (resampler)
+                    {
+                        default:
+                        case AvailableResizeSampler.Lanczos:
+                            await ResizeImageAsync(file, outputPath, dimension, _lanczosResampler);
+                            break;
+                        case AvailableResizeSampler.DDIM:
+                            await ResizeImageAsync(file, outputPath, dimension, _samplerSigma);
+                            break;
+                        case AvailableResizeSampler.Cubic:
+                            await ResizeImageAsync(file, outputPath, dimension, _cubicResampler);
+                            break;
+                        case AvailableResizeSampler.Bicubic:
+                            await ResizeImageAsync(file, outputPath, dimension, _bicubicResampler);
+                            break;
+                    }
                 }
                 finally
                 {
                     ProgressUpdated?.Invoke(this, EventArgs.Empty);
-                    semaphore.Release();
+                    resizeSemaphore.Release();
                 }
             }
         }
@@ -1549,7 +1560,7 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous image resizing operation.</returns>
         /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
         /// <exception cref="System.IO.IOException">An error occurred while reading or writing image files.</exception>
-        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension)
+        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension, IResampler resampler)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
@@ -1580,7 +1591,7 @@ namespace SmartData.Lib.Services
                     Size = new Size(canvasWidth, canvasHeight),
                     Mode = ResizeMode.Crop,
                     Position = AnchorPositionMode.Center,
-                    Sampler = _lanczosResampler,
+                    Sampler = resampler,
                     Compand = true
                 };
 

@@ -31,6 +31,8 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private SupportedDimensions _dimension;
         [ObservableProperty]
+        private AvailableResizeSampler _resizerSampler;
+        [ObservableProperty]
         private double _resamplerSigma;
         [ObservableProperty]
         private bool _applySharpen;
@@ -89,12 +91,14 @@ namespace DatasetProcessor.ViewModels
             (_imageProcessor as INotifyProgress).ProgressUpdated += (sender, args) => ResizeProgress.UpdateProgress();
 
             Dimension = SupportedDimensions.Resolution1024x1024;
+            ResizerSampler = AvailableResizeSampler.Lanczos;
 
             InputFolderPath = _configs.Configurations.ResizeImagesConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);
             OutputFolderPath = _configs.Configurations.ResizeImagesConfigs.OutputFolder;
             _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             Dimension = _configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
+            ResizerSampler = _configs.Configurations.ResizeImagesConfigs.ResamplerName;
             ResamplerSigma = _configs.Configurations.ResizeImagesConfigs.ResamplerSigma;
             ApplySharpen = _configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
             SharpenSigma = _configs.Configurations.ResizeImagesConfigs.SharpenSigma;
@@ -150,7 +154,7 @@ namespace DatasetProcessor.ViewModels
                 }
                 _imageProcessor.MinimumResolutionForSigma = Math.Clamp((int)_minimumResolutionForSigma, byte.MaxValue + 1,
                     ushort.MaxValue);
-                await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, Dimension);
+                await _imageProcessor.ResizeImagesAsync(InputFolderPath, OutputFolderPath, Dimension, ResizerSampler);
             }
             catch (OperationCanceledException)
             {

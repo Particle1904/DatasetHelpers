@@ -105,6 +105,8 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private SupportedDimensions _resizeImagesOutputDimension;
         [ObservableProperty]
+        private AvailableResizeSampler _resizeImagesResamplerName;
+        [ObservableProperty]
         private float _resizeImagesResamplerSigma;
         [ObservableProperty]
         private bool _resizeImagesApplySharpen;
@@ -686,6 +688,7 @@ namespace DatasetProcessor.ViewModels
             Configs.Configurations.ResizeImagesConfigs.InputFolder = ResizeImagesInputFolder;
             Configs.Configurations.ResizeImagesConfigs.OutputFolder = ResizeImagesOutputFolder;
             Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize = ResizeImagesOutputDimension;
+            Configs.Configurations.ResizeImagesConfigs.ResamplerName = ResizeImagesResamplerName;
             Configs.Configurations.ResizeImagesConfigs.ResamplerSigma = ResizeImagesResamplerSigma;
             Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma = ResizeImagesApplySharpen;
             Configs.Configurations.ResizeImagesConfigs.SharpenSigma = (float)ResizeImagesSharpenSigma;

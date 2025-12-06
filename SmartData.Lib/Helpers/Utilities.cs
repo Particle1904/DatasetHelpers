@@ -20,6 +20,11 @@ namespace SmartData.Lib.Helpers
         public static SupportedDimensions[] ResolutionValues => (SupportedDimensions[])Enum.GetValues(typeof(SupportedDimensions));
 
         /// <summary>
+        /// Gets an array of supported resamplers.
+        /// </summary>
+        public static AvailableResizeSampler[] ResamplerValues => (AvailableResizeSampler[])Enum.GetValues(typeof(AvailableResizeSampler));
+
+        /// <summary>
         /// Gets an array of supported tag generator models.
         /// </summary>
         public static AvailableModels[] GeneratorModelValues

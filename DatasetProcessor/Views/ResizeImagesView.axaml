@@ -79,13 +79,13 @@
 					  ItemsSource="{Binding Source={x:Static local2:Utilities.ResolutionValues}}">
 			</ComboBox>
 		</Grid>
-		<!-- LANCOZS SAMPLER SLIDER -->
+		<!-- SAMPLER SLIDER -->
 		<Grid Classes="gridSecondary"
 				  Grid.Row="5"
-				  ColumnDefinitions="auto, 10, *, 10, auto">
+				  ColumnDefinitions="auto, 10, *, 10, auto, 10, auto">
 			<Label Grid.Column="0"
 				   Width="300"
-				   Content="Resampler Sigma:"/>
+				   Content="Resampler Sigma (Lanczos &amp; DDIM):"/>
 			<Slider Grid.Column="2"
 					Minimum="0.1"
 					Maximum="5"
@@ -94,7 +94,14 @@
 				   Width="50"
 				   HorizontalAlignment="Right"
 				   Content="{Binding ResamplerSigma}"/>
-		</Grid>
+			<ComboBox Grid.Column="6" Grid.ColumnSpan="3"
+					  HorizontalAlignment="Right"
+					  MinWidth="200"
+					  MaxWidth="200"
+					  SelectedItem="{Binding ResizerSampler}"
+					  ItemsSource="{Binding Source={x:Static local2:Utilities.ResamplerValues}}">
+			</ComboBox>
+		</Grid>	
 		<!-- SHARPEN SIGMA SLIDER -->
 		<Grid Classes="gridSecondary"
 				  Grid.Row="6"

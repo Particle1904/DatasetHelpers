@@ -15,6 +15,9 @@ namespace Models.Configurations
         [JsonPropertyName("outputDimensionSize")]
         public SupportedDimensions OutputDimensionSize { get; set; } = SupportedDimensions.Resolution1024x1024;
 
+        [JsonPropertyName("resamplerName")]
+        public AvailableResizeSampler ResamplerName { get; set; } = AvailableResizeSampler.Lanczos;
+
         private float _resamplerSigma = 0.65F;
         [JsonPropertyName("resamplerSigma")]
         public float ResamplerSigma

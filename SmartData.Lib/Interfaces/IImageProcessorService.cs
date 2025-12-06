@@ -20,7 +20,7 @@ namespace SmartData.Lib.Interfaces
         public int MinimumResolutionForSigma { get; set; }
         public Task<System.Drawing.Size> GetImageSizeAsync(string filePath);
         public Task CropImageAsync(string inputPath, string outputPath, List<DetectedPerson> results, float expansionPercentage, SupportedDimensions dimension);
-        public Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension);
+        public Task ResizeImagesAsync(string inputPath, string outputPath, SupportedDimensions dimension, AvailableResizeSampler resampler);
         public Task<WDInputData> ProcessImageForTagPredictionAsync(string inputPath);
         public Task<WDInputData> ProcessImageForTagPredictionAsync(Stream inputStream);
         public Task<JoyTagInputData> ProcessImageForJoyTagPredictionAsync(string inputPath);
