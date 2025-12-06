@@ -131,14 +131,8 @@ namespace SmartData.Lib.Services
         /// <returns>A <see cref="System.Drawing.Size"/> representing the width and height of the image.</returns>
         public async Task<System.Drawing.Size> GetImageSizeAsync(string filePath)
         {
-            System.Drawing.Size size = new System.Drawing.Size();
-            using (Image image = await Image.LoadAsync(_decoderOptions, filePath))
-            {
-                size.Width = image.Width;
-                size.Height = image.Height;
-            }
-
-            return size;
+            ImageInfo info = await Image.IdentifyAsync(_decoderOptions, filePath);
+            return new System.Drawing.Size(info.Width, info.Height);
         }
 
         /// <summary>
