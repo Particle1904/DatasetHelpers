@@ -3,8 +3,6 @@
 using HeyRed.ImageSharp.Heif.Formats.Avif;
 using HeyRed.ImageSharp.Heif.Formats.Heif;
 
-using ImageMagick;
-
 using Microsoft.ML.OnnxRuntime.Tensors;
 
 using Models;
@@ -1830,39 +1828,5 @@ namespace SmartData.Lib.Services
 
             return dilated;
         }
-
-        #region Magick.NET
-        private async Task<MagickImage> ConvertToMagickImageAsync(Image<Rgba32> image)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                await image.SaveAsPngAsync(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                return new MagickImage(memoryStream);
-            }
-        }
-
-        private async Task<Image<Rgba32>> ConvertToImageSharpAsync(MagickImage magickImage)
-        {
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                await magickImage.WriteAsync(memoryStream, MagickFormat.Bmp);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                return await Image.LoadAsync<Rgba32>(memoryStream);
-            }
-        }
-
-        private void ApplyAutoCorrections(MagickImage magickImage, bool autoLevel, bool autoGamma)
-        {
-            if (autoLevel)
-            {
-                magickImage.AutoLevel();
-            }
-            if (autoGamma)
-            {
-                magickImage.AutoGamma();
-            }
-        }
-        #endregion
     }
 }
