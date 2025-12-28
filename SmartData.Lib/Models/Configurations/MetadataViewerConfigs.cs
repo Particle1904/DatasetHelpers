@@ -18,6 +18,6 @@ namespace Models.Configurations
         }
 
         [JsonPropertyName("autoTaggerModel")]
-        public AvailableModels AutoTaggerModel { get; set; } = AvailableModels.WD14v2;
+        public AvailableModels AutoTaggerModel { get; set; } = AvailableModels.WDv3Large;
     }
 }

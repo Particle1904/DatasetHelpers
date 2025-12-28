@@ -25,7 +25,7 @@ namespace DatasetProcessor.ViewModels
         private const string _dragAndDropPath = @"avares://DatasetProcessor/Assets/Images/drag_and_drop.png";
         private readonly IModelManagerService _modelManager;
         private readonly IImageProcessorService _imageProcessor;
-        private readonly WDAutoTaggerService _autoTagger;
+        private readonly WDV3LargeAutoTaggerService _autoTagger;
 
         [ObservableProperty]
         private Bitmap _selectedImage;
@@ -58,7 +58,7 @@ namespace DatasetProcessor.ViewModels
 
         public bool IsGenerating { get; private set; } = false;
 
-        public MetadataViewModel(IModelManagerService modelManager, IImageProcessorService imageProcessor, WDAutoTaggerService autoTagger,
+        public MetadataViewModel(IModelManagerService modelManager, IImageProcessorService imageProcessor, WDV3LargeAutoTaggerService autoTagger,
             ILoggerService logger, IConfigsService configs) : base(logger, configs)
         {
             _modelManager = modelManager;
