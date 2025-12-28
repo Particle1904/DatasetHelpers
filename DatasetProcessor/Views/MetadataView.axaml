@@ -101,7 +101,7 @@
 				  ColumnDefinitions="*, 10, 40"
 				  MaxHeight="160">
 				<Label Grid.Row="0" Grid.Column="0"
-				   Content="WD 1.4 interrogated tags:"
+				   Content="WD3-Large interrogated tags:"
 				   HorizontalAlignment="Left"/>
 				<Button Grid.Row="0" Grid.Column="2"
 						Command="{Binding CopyPredictedTagsToClipboardCommand}">
