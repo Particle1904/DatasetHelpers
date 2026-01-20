@@ -189,7 +189,7 @@ namespace DatasetProcessor.ViewModels
             {
                 if (_datasetTags == null || _datasetTags.Length == 0)
                 {
-                    _datasetTags = Task.Run(() => _tagProcessor.GetTagsFromDataset(InputFolderPath)).Result;
+                    _datasetTags = await Task.Run(() => _tagProcessor.GetTagsFromDataset(InputFolderPath));
                 }
 
                 string outputPath = Path.Combine(OutputFolderPath, "generatedPrompts.txt");

@@ -141,6 +141,9 @@ namespace SmartData.Lib.Services
         public event EventHandler<int> TotalFilesChanged;
         public event EventHandler ProgressUpdated;
 
+        private static readonly Regex EdgeCasesPattern = new Regex(@"\b(" + string.Join("|", _edgeCasesContains.Select(Regex.Escape)) + @")\b",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         /// <summary>
         /// Processes all tag files in the specified folder by adding, emphasizing, or removing tags asynchronously.
         /// </summary>
@@ -1051,8 +1054,7 @@ namespace SmartData.Lib.Services
         {
             foreach (string edgeCase in _edgeCasesContains)
             {
-                string pattern = @$"\b{Regex.Escape(edgeCase)}\b";
-                if (Regex.IsMatch(tag, pattern, RegexOptions.IgnoreCase, Utilities.RegexTimeout))
+                if (EdgeCasesPattern.IsMatch(tag))
                 {
                     return true;
                 }

@@ -86,7 +86,8 @@ namespace DatasetProcessor.ViewModels
 
             try
             {
-                SelectedImage = new Bitmap(imageStream);
+                Bitmap bitmap = await Task.Run(() => new Bitmap(imageStream));
+                SelectedImage = bitmap;
 
                 List<string> metadata = await _imageProcessor.ReadImageMetadataAsync(metadataStream);
                 if (metadata != null)

@@ -207,7 +207,7 @@ namespace SmartData.Lib.Services.Base
         }
 
         /// <summary>
-        /// Processes a list of tags from a file and generates a summarized version of the tags.
+        /// Generates tags for an image, applies redundancy removal, and saves/overwrites the result to a text file.
         /// </summary>
         /// <param name="outputPath">The output path where the summarized tags will be saved.</param>
         /// <param name="weightedCaptions">A boolean value indicating whether weighted captions are used.</param>
