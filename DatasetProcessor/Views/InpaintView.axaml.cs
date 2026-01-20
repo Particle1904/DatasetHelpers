@@ -51,6 +51,12 @@ namespace DatasetProcessor.Views
         /// <param name="e">The event arguments.</param>
         private void CanvasPressed(object? sender, PointerPressedEventArgs e)
         {
+            if (String.IsNullOrEmpty(_viewModel.OutputFolderPath))
+            {
+                _viewModel.Logger.SetLatestLogMessage("You need to first select a folder for output files!", SmartData.Lib.Enums.LogMessageColor.Warning);
+                return;
+            }
+
             bool isLeftButton = e.GetCurrentPoint(sender as Panel).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed;
             bool isRightButton = e.GetCurrentPoint(sender as Panel).Properties.PointerUpdateKind == PointerUpdateKind.RightButtonPressed;
 

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DatasetProcessor.ViewModels
@@ -65,6 +66,8 @@ namespace DatasetProcessor.ViewModels
 
         private bool _showBlurredImage;
         private MemoryStream _currentImageMemoryStream = null;
+
+        CancellationTokenSource _saveCancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// Gets the current type of file being edited, either .txt or .caption.
@@ -438,7 +441,12 @@ namespace DatasetProcessor.ViewModels
             if (ImageFiles?.Count > 0)
             {
                 SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
-                SelectedImage = SelectBitmapInterpolation();
+                string path = ImageFiles[SelectedItemIndex];
+                Task.Run(() =>
+                {
+                    var bitmap = new Bitmap(path);
+                    Dispatcher.UIThread.Post(() => SelectedImage = bitmap);
+                });
             }
             else
             {
@@ -478,6 +486,10 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnCurrentImageTagsChanged(string value)
         {
+            _saveCancellationTokenSource?.Cancel();
+            _saveCancellationTokenSource = new CancellationTokenSource();
+            CancellationToken token = _saveCancellationTokenSource.Token;
+
             if (ImageFiles == null || SelectedItemIndex < 0 || SelectedItemIndex >= ImageFiles.Count)
             {
                 Logger.SetLatestLogMessage("You need to select a folder with image files!", LogMessageColor.Warning);
@@ -491,9 +503,16 @@ namespace DatasetProcessor.ViewModels
             }
 
 
-            string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
-            _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
+            Task.Run(async () =>
+            {
+                await Task.Delay(500, token);
 
+                if (!token.IsCancellationRequested)
+                {
+                    string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
+                    _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
+                }
+            }, token);
         }
 
         /// <summary>

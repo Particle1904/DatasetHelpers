@@ -86,7 +86,7 @@ namespace Services.MachineLearning
                 {
                     using (Image inputImage = Image.Load(file))
                     {
-                        Florence2Result result = await Task.Run(() => _florence2Pipeline.Process(inputImage, query));
+                        Florence2Result result = await _florence2Pipeline.ProcessAsync(inputImage, query);
 
                         string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
                         File.Move(file, resultPath);
@@ -121,7 +121,7 @@ namespace Services.MachineLearning
         {
             await LoadFlorence2PipelineAsync();
 
-            return await Task.Run(() => _florence2Pipeline.Process(image, query));
+            return await _florence2Pipeline.ProcessAsync(image, query);
         }
 
         /// <summary>

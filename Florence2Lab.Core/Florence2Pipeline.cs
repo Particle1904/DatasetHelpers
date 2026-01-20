@@ -59,7 +59,7 @@ public partial class Florence2Pipeline : IDisposable
     /// The pipeline performs image preprocessing, tokenization, multimodal feature fusion, encoder-decoder inference,
     /// and output post-processing. The final result is shaped by the specified task type in the query.
     /// </remarks>
-    public Florence2Result Process(Image image, Florence2Query query)
+    public async Task<Florence2Result> ProcessAsync(Image image, Florence2Query query)
     {
         (Florence2TaskType taskType, string prompt) = query;
 
@@ -91,7 +91,7 @@ public partial class Florence2Pipeline : IDisposable
         string text = _tokenizer.Decode(decoderOutput.Select(f => (int)f).ToList());
 
         // 6. Post-processing
-        return _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height).Result;
+        return await _postProcessor.ProcessAsync(text, taskType, true, image.Width, image.Height);
     }
 
     /// <summary>

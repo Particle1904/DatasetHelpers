@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -164,7 +165,12 @@ namespace DatasetProcessor.ViewModels
             if (ImageFiles?.Count > 0)
             {
                 SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
-                SelectedImage = new Bitmap((ImageFiles[SelectedItemIndex]));
+                string path = ImageFiles[SelectedItemIndex];
+                Task.Run(() =>
+                {
+                    var bitmap = new Bitmap(path);
+                    Dispatcher.UIThread.Post(() => SelectedImage = bitmap);
+                });
             }
             else
             {

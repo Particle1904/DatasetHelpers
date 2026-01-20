@@ -1106,7 +1106,7 @@ namespace SmartData.Lib.Services
 
                 image.Mutate(context => context.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await image.SaveAsWebpAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".web"), _webpEncoder);
+                await image.SaveAsWebpAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".webp"), _webpEncoder);
             }
         }
 

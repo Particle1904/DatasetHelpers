@@ -336,7 +336,12 @@ namespace DatasetProcessor.ViewModels
             if (ImageFiles?.Count > 0)
             {
                 SelectedItemIndex = Math.Clamp(value, 0, ImageFiles.Count - 1);
-                SelectedImage = new Bitmap((ImageFiles[SelectedItemIndex]));
+                string path = ImageFiles[SelectedItemIndex];
+                Task.Run(() =>
+                {
+                    Bitmap bitmap = new Bitmap(path);
+                    Dispatcher.UIThread.Post(() => SelectedImage = bitmap);
+                });
             }
             else
             {
@@ -520,7 +525,7 @@ namespace DatasetProcessor.ViewModels
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
-                _rawMaskImage.SaveAsPng(memoryStream);
+                _rawMaskImage.SaveAsWebp(memoryStream);
                 memoryStream.Position = 0;
                 SelectedImageMask = new Bitmap(memoryStream);
             }

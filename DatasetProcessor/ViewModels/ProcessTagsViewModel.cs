@@ -227,7 +227,7 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                SortedByFrequency = _tagProcessor.CalculateListOfMostFrequentTags(InputFolderPath);
+                SortedByFrequency = await Task.Run(() => _tagProcessor.CalculateListOfMostFrequentTags(InputFolderPath));
             }
             catch (Exception exception)
             {

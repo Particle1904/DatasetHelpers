@@ -116,8 +116,8 @@
 			<!-- IMAGE DISPLAY -->
 			<Grid Classes="gridPrimary" Grid.Column="2"
 				  HorizontalAlignment="Stretch"
-				  MinWidth="256"
-				  MinHeight="256">
+				  MinWidth="128"
+				  MinHeight="128">
 				<Button Classes="emptyButton"
 						x:Name="CanvasButton"	
 						Width="{Binding ImageSize.X}"
