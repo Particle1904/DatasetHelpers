@@ -19,7 +19,7 @@
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
 		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
 		<PackageReference Include="pythonnet" Version="3.1.0-preview2024-09-06" />
-		<PackageReference Include="SharpHook" Version="7.1.0" />
+		<PackageReference Include="SharpHook" Version="7.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>
