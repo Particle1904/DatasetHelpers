@@ -202,7 +202,7 @@ namespace DatasetProcessor.ViewModels
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage("Something went wrong while trying to load the images. Error log will be saved inside the logs folder.", LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             finally
             {
@@ -242,7 +242,7 @@ namespace DatasetProcessor.ViewModels
             catch (Exception exception)
             {
                 Logger.SetLatestLogMessage("Something went wrong while trying to load the images. Error log will be saved inside the logs folder.", LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             finally
             {
@@ -311,7 +311,7 @@ namespace DatasetProcessor.ViewModels
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                         LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             finally
             {

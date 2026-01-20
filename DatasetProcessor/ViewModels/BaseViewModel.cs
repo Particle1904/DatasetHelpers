@@ -222,7 +222,7 @@ public partial class BaseViewModel : ObservableObject
         {
             Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                 LogMessageColor.Error);
-            await Logger.SaveExceptionStackTrace(exception);
+            await Logger.SaveExceptionStackTraceAsync(exception);
         }
     }
 

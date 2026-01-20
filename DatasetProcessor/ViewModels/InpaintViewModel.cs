@@ -143,7 +143,7 @@ namespace DatasetProcessor.ViewModels
                     else
                     {
                         Logger.SetLatestLogMessage("Unable to save mask image due to unexpected error. Error log will be saved inside the logs folder.", LogMessageColor.Error);
-                        Logger.SaveExceptionStackTrace(exception);
+                        Logger.SaveExceptionStackTraceAsync(exception);
                     }
                 }
             }
@@ -233,7 +233,7 @@ namespace DatasetProcessor.ViewModels
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                     LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             finally
             {
@@ -279,7 +279,7 @@ namespace DatasetProcessor.ViewModels
             {
                 Logger.SetLatestLogMessage($"Something went wrong! Error log will be saved inside the logs folder.",
                         LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             finally
             {

@@ -11,6 +11,8 @@ namespace SmartData.Lib.Services
 {
     public class LoggerService : ILoggerService, INotifyPropertyChanged
     {
+        private readonly object _logLock = new object();
+
         private readonly Player _audioPlayer;
         private readonly string _notificationSoundPath;
 
@@ -75,67 +77,22 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
-        /// Saves the details of an exception and its stack trace to a text file.
+        /// Saves the stack trace information from the specified exception. This method is used for Crash-to-Desktop scenarios.
         /// </summary>
-        /// <param name="exception">The exception to save.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        /// <remarks>
-        /// This method creates a text file in the "logs" folder to store the details of the specified exception.
-        /// It constructs a string containing the exception details, including the date and time, source, message, help link, HResult, and inner exception details if present.
-        /// The method appends the stack trace and target site information to the string.
-        /// It also includes additional information from the exception's data dictionary, if available.
-        /// Finally, it appends the constructed string to the text file.
-        /// </remarks>
-        public async Task SaveExceptionStackTrace(Exception exception)
+        /// <param name="exception">The exception whose stack trace is to be saved.</param>
+        public void SaveExceptionStackTrace(Exception exception)
         {
-            string outputFolder = GetLogsFolder();
-            if (!Directory.Exists(outputFolder))
-            {
-                Directory.CreateDirectory(outputFolder);
-            }
+            SaveExceptionStackTraceInternal(exception);
+        }
 
-            string filePath = Path.Combine(outputFolder, $"error_{GetTimeNowString(true)}.txt");
-
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Exception Details");
-            stringBuilder.AppendLine("=================");
-            stringBuilder.AppendLine($"Date and Time: {GetTimeNowString(false)}");
-            stringBuilder.AppendLine($"Source: {exception.Source}");
-            stringBuilder.AppendLine($"Message: {exception.Message}");
-            stringBuilder.AppendLine($"Help Link: {exception.HelpLink}");
-            stringBuilder.AppendLine($"HResult: {exception.HResult}");
-            stringBuilder.AppendLine();
-
-            if (exception.InnerException != null)
-            {
-                stringBuilder.AppendLine("Inner Exception Details");
-                stringBuilder.AppendLine("======================");
-                stringBuilder.AppendLine($"Source: {exception.InnerException.Source}");
-                stringBuilder.AppendLine($"Message: {exception.InnerException.Message}");
-                stringBuilder.AppendLine($"Help Link: {exception.InnerException.HelpLink}");
-                stringBuilder.AppendLine($"HResult: {exception.InnerException.HResult}");
-                stringBuilder.AppendLine();
-            }
-
-            stringBuilder.AppendLine("Stack Trace");
-            stringBuilder.AppendLine("============");
-            stringBuilder.AppendLine(exception.StackTrace);
-            stringBuilder.AppendLine();
-
-            stringBuilder.AppendLine("Target Site");
-            stringBuilder.AppendLine("============");
-            stringBuilder.AppendLine($"Declaring Type: {exception.TargetSite.DeclaringType}");
-            stringBuilder.AppendLine($"Method Name: {exception.TargetSite.Name}");
-            stringBuilder.AppendLine();
-
-            stringBuilder.AppendLine("Additional Information");
-            stringBuilder.AppendLine("======================");
-            foreach (object key in exception.Data.Keys)
-            {
-                stringBuilder.AppendLine($"{key}: {exception.Data[key]}");
-            }
-
-            await File.AppendAllTextAsync(filePath, stringBuilder.ToString());
+        /// <summary>
+        /// Asynchronously saves the stack trace of the specified exception. This method is used for non-blocking scenarios and UI exceptions.
+        /// </summary>
+        /// <param name="exception">The exception whose stack trace is to be saved.</param>
+        /// <returns>A task that represents the asynchronous save operation.</returns>
+        public Task SaveExceptionStackTraceAsync(Exception exception)
+        {
+            return Task.Run(() => SaveExceptionStackTraceInternal(exception));
         }
 
         /// <summary>
@@ -155,6 +112,72 @@ namespace SmartData.Lib.Services
 
             await File.WriteAllTextAsync(filePath, stringBuilder.ToString());
             LatestLogMessage = $"Saved a Log File with consolidated tags that looks like possible outliers. Please check the file: {filePath}";
+        }
+
+        /// <summary>
+        /// Saves detailed information about the specified exception, including stack trace and additional data, to a
+        /// log file in the logs folder.
+        /// </summary>
+        /// <param name="exception">The exception whose details are to be saved.</param>
+        private void SaveExceptionStackTraceInternal(Exception exception)
+        {
+            try
+            {
+                string outputFolder = GetLogsFolder();
+                if (!Directory.Exists(outputFolder))
+                {
+                    Directory.CreateDirectory(outputFolder);
+                }
+
+                string filePath = Path.Combine(outputFolder, $"error_{GetTimeNowString(true)}.txt");
+
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine("Exception Details");
+                stringBuilder.AppendLine("=================");
+                stringBuilder.AppendLine($"Date and Time: {GetTimeNowString(false)}");
+                stringBuilder.AppendLine($"Source: {exception.Source}");
+                stringBuilder.AppendLine($"Message: {exception.Message}");
+                stringBuilder.AppendLine($"Help Link: {exception.HelpLink}");
+                stringBuilder.AppendLine($"HResult: {exception.HResult}");
+                stringBuilder.AppendLine();
+
+                if (exception.InnerException != null)
+                {
+                    stringBuilder.AppendLine("Inner Exception Details");
+                    stringBuilder.AppendLine("======================");
+                    stringBuilder.AppendLine($"Source: {exception.InnerException.Source}");
+                    stringBuilder.AppendLine($"Message: {exception.InnerException.Message}");
+                    stringBuilder.AppendLine($"Help Link: {exception.InnerException.HelpLink}");
+                    stringBuilder.AppendLine($"HResult: {exception.InnerException.HResult}");
+                    stringBuilder.AppendLine();
+                }
+
+                stringBuilder.AppendLine("Stack Trace");
+                stringBuilder.AppendLine("============");
+                stringBuilder.AppendLine(exception.StackTrace);
+                stringBuilder.AppendLine();
+
+                stringBuilder.AppendLine("Target Site");
+                stringBuilder.AppendLine("============");
+                stringBuilder.AppendLine($"Declaring Type: {exception.TargetSite.DeclaringType}");
+                stringBuilder.AppendLine($"Method Name: {exception.TargetSite.Name}");
+                stringBuilder.AppendLine();
+
+                stringBuilder.AppendLine("Additional Information");
+                stringBuilder.AppendLine("======================");
+                foreach (object key in exception.Data.Keys)
+                {
+                    stringBuilder.AppendLine($"{key}: {exception.Data[key]}");
+                }
+
+                lock (_logLock)
+                {
+                    File.AppendAllText(filePath, stringBuilder.ToString());
+                }
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>

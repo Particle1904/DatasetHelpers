@@ -123,7 +123,7 @@ namespace DatasetProcessor.ViewModels
                 PredictedTags = string.Empty;
                 Logger.SetLatestLogMessage($"An error occurred while trying to generate tags for the image! Error log will be saved inside the logs folder.",
                     LogMessageColor.Error);
-                await Logger.SaveExceptionStackTrace(exception);
+                await Logger.SaveExceptionStackTraceAsync(exception);
             }
             IsGenerating = false;
         }
