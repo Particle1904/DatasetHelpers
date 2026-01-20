@@ -87,7 +87,7 @@
 
 		<!-- BRUSH SIZE -->
 		<Grid Classes="gridSecondary" Grid.Row="6"
-			  ColumnDefinitions="auto, 10, auto, 10, *"
+			  ColumnDefinitions="auto, 10, auto, 10, auto, 10, *"
 			  Height="40">
 			<Grid ColumnDefinitions="auto, 10, auto, 10, auto">
 				<Label Grid.Column="0" 
@@ -96,13 +96,28 @@
 						VerticalAlignment="Center"
 						Minimum="1"
 						Maximum="100"
-						MinWidth="250"
+						MinWidth="150"
 						Margin="0,-8,0,0"
 						Value="{Binding CircleRadius}"/>
 				<Label Grid.Column="4"
 					   Content="{Binding CircleRadius}"/>
 			</Grid>
-			<Grid Grid.Column="2" 
+			<Grid Grid.Column="2"
+				ColumnDefinitions="auto, 10, auto, 10, auto">
+				<Label Grid.Column="0" Content="Hardness:"/>
+				<Slider Grid.Column="2"
+						VerticalAlignment="Center"
+						Minimum="0"
+						Maximum="1"
+						MinWidth="150"
+						Margin="0,-8,0,0"
+						Value="{Binding BrushHardness}"/>
+				<Label Grid.Column="4"
+					   Content="{Binding BrushHardnessString}"
+					   Width="40"/>
+			</Grid>
+
+			<Grid Grid.Column="4" 
 				  ColumnDefinitions="auto, 10, auto, 10, auto">
 				<Label Grid.Column="0"
 					   Content="Mask opacity:"/>
@@ -110,7 +125,7 @@
 						VerticalAlignment="Center"
 						Minimum="0"
 						Maximum="1"
-						MinWidth="250"
+						MinWidth="150"
 						Margin="0,-8,0,0"
 						Value="{Binding MaskOpacity}"/>
 				<Label Grid.Column="4"

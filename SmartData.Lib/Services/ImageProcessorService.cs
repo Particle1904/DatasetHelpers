@@ -1,5 +1,4 @@
 ﻿// Ignore Spelling: Metadata Lanczos
-
 using HeyRed.ImageSharp.Heif.Formats.Avif;
 using HeyRed.ImageSharp.Heif.Formats.Heif;
 
@@ -9,6 +8,7 @@ using Models;
 using Models.MachineLearning;
 
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Bmp;
@@ -28,6 +28,8 @@ using SmartData.Lib.Models.MachineLearning;
 using SmartData.Lib.Models.MachineLearning.SAM2;
 using SmartData.Lib.Services.Base;
 using SmartData.Lib.Services.ImageProcessor;
+
+using Path = System.IO.Path;
 
 namespace SmartData.Lib.Services
 {
@@ -1202,20 +1204,27 @@ namespace SmartData.Lib.Services
         /// The resulting memory stream containing the PNG image is returned to the caller.
         /// </para>
         /// </remarks>
-        public MemoryStream DrawCircleOnMask(MemoryStream maskStream, Point position, float radius, Color color)
+        public void DrawCircleOnInMemoryMask(Image<Rgba32> maskImage, Point position, float radius, Color color, float hardness = 1.0f)
         {
-            maskStream.Seek(0, SeekOrigin.Begin);
-            using (Image image = Image.Load(maskStream))
+            hardness = Math.Clamp(hardness, 0f, 1f);
+
+            EllipsePolygon circle = new EllipsePolygon(position.X, position.Y, radius);
+            if (hardness >= 0.99f)
             {
-                SolidBrush brush = new SolidBrush(color);
-                SixLabors.ImageSharp.Drawing.EllipsePolygon circle = new SixLabors.ImageSharp.Drawing.EllipsePolygon(position.X,
-                    position.Y, radius);
-                image.Mutate(context => context.Fill(brush, circle));
-
-                MemoryStream imageMaskStream = new MemoryStream();
-                image.SaveAsPng(imageMaskStream, _pngEncoder);
-
-                return imageMaskStream;
+                SolidBrush solidBrush = new SolidBrush(color);
+                maskImage.Mutate(context => context.Fill(solidBrush, circle));
+            }
+            else
+            {
+                PointF center = new PointF(position.X, position.Y);
+                ColorStop[] colorStop = new ColorStop[]
+                {
+                    new ColorStop(0f, color),
+                    new ColorStop(hardness, color),
+                    new ColorStop(1f, color.WithAlpha(0))
+                };
+                GradientBrush solidBrush = new RadialGradientBrush(center, radius, GradientRepetitionMode.None, colorStop);
+                maskImage.Mutate(context => context.Fill(solidBrush, circle));
             }
         }
 

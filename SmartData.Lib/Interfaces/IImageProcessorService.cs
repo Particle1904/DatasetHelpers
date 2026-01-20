@@ -36,7 +36,7 @@ namespace SmartData.Lib.Interfaces
         public Task<MemoryStream> GetBlurredImageAsync(string inputPath);
         public Task<MemoryStream> GetThumbnailStreamAsync(string inputPath, int maxSize);
         public MemoryStream CreateImageMask(int width, int height);
-        public MemoryStream DrawCircleOnMask(MemoryStream maskStream, Point position, float radius, Color color);
+        public void DrawCircleOnInMemoryMask(Image<Rgba32> maskImage, Point position, float radius, Color color, float hardness = 1.0f);
         public Task<List<string>> ReadImageMetadataAsync(Stream imageStream);
         public Task CropImageAsync(string inputPath, string outputPath, System.Drawing.Point startingPosition, System.Drawing.Point endingPosition);
         public Task<string> GetBase64ImageAsync(string inputPath);

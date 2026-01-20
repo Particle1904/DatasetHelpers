@@ -9,8 +9,6 @@ using DatasetProcessor.ViewModels;
 
 using System;
 
-using Point = System.Drawing.Point;
-
 namespace DatasetProcessor.Views
 {
     public partial class InpaintView : UserControl
@@ -90,7 +88,7 @@ namespace DatasetProcessor.Views
             else
             {
                 Avalonia.Point clickPosition = e.GetPosition(sender as Panel);
-                _viewModel.CirclePosition = new Point((int)clickPosition.X, (int)clickPosition.Y);
+                _viewModel.CirclePosition = new SixLabors.ImageSharp.Point((int)clickPosition.X, (int)clickPosition.Y);
             }
         }
 

@@ -8,6 +8,10 @@ using DatasetProcessor.src.Enums;
 
 using Interfaces;
 
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+
 using SmartData.Lib.Enums;
 using SmartData.Lib.Helpers;
 using SmartData.Lib.Interfaces;
@@ -16,11 +20,11 @@ using SmartData.Lib.Interfaces.MachineLearning;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+
+using Color = System.Drawing.Color;
 
 namespace DatasetProcessor.ViewModels
 {
@@ -47,7 +51,6 @@ namespace DatasetProcessor.ViewModels
         private Bitmap? _selectedImage;
         [ObservableProperty]
         private Bitmap? _selectedImageMask;
-        private MemoryStream _selectedImageMaskStream;
         [ObservableProperty]
         private string _selectedImageFilename;
         [ObservableProperty]
@@ -67,11 +70,20 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         private bool _inpaintCurrentButtonEnabled;
 
+        private Image<Rgba32> _rawMaskImage;
+
         [ObservableProperty]
         private Point _circlePosition;
 
         [ObservableProperty]
         private double _circleRadius;
+
+        [ObservableProperty]
+        private double _brushHardness = 1.0f;
+        public string BrushHardnessString
+        {
+            get => $"{Math.Round(BrushHardness * 100, 2)}%";
+        }
         public double CircleWidthHeight
         {
             get => CircleRadius * 2.0d;
@@ -124,33 +136,24 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         public void SaveCurrentImageMask()
         {
-            bool savedSuccesfully = false;
-            for (int i = 0; i < 5; i++)
+            if (_rawMaskImage == null)
             {
-                try
-                {
-                    SelectedImageMask.Save(GetCurrentFileMaskFilename(), 100);
-                    savedSuccesfully = true;
-                    break;
-                }
-                catch (IOException exception)
-                {
-                    if (exception.Message.Contains("being used by another process", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Logger.SetLatestLogMessage("Unable to save mask image because its being used by another process. Trying again in 1 second...", LogMessageColor.Error);
-                        Thread.Sleep(TimeSpan.FromSeconds(1));
-                    }
-                    else
-                    {
-                        Logger.SetLatestLogMessage("Unable to save mask image due to unexpected error. Error log will be saved inside the logs folder.", LogMessageColor.Error);
-                        Logger.SaveExceptionStackTraceAsync(exception);
-                    }
-                }
+                return;
             }
-
-            if (!savedSuccesfully)
+            try
             {
-                Logger.SetLatestLogMessage("Unable to save mask image after 10 attempts.", LogMessageColor.Error);
+                string maskPath = GetCurrentFileMaskFilename();
+                string directory = Path.GetDirectoryName(maskPath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                _rawMaskImage.SaveAsJpeg(maskPath);
+            }
+            catch (Exception ex)
+            {
+                Logger.SetLatestLogMessage($"An error occurred while saving the mask image: {ex.Message}", LogMessageColor.Error);
             }
         }
 
@@ -169,10 +172,6 @@ namespace DatasetProcessor.ViewModels
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         [RelayCommand]
         private async Task SelectOutputFolderAsync()
         {
@@ -373,22 +372,24 @@ namespace DatasetProcessor.ViewModels
                 _imageWasDownscaled = false;
             }
 
-            if (File.Exists(GetCurrentFileMaskFilename()))
+            _rawMaskImage?.Dispose();
+
+            string maskPath = GetCurrentFileMaskFilename();
+            if (File.Exists(maskPath))
             {
-                // Load mask if it exists, dispose the old MemoryStream and "save" the bitmap to the MemoryStream
-                SelectedImageMask = new Bitmap(GetCurrentFileMaskFilename());
-                _selectedImageMaskStream?.Dispose();
-                _selectedImageMaskStream = new MemoryStream();
-                SelectedImageMask.Save(_selectedImageMaskStream);
-                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
+                _rawMaskImage = Image.Load<Rgba32>(maskPath);
+                if (_imageWasDownscaled)
+                {
+                    _rawMaskImage.Mutate(x => x.Resize(ImageSize.X, ImageSize.Y));
+                }
             }
             else
             {
-                _selectedImageMaskStream = _imageProcessor.CreateImageMask((int)SelectedImage.Size.Width, (int)SelectedImage.Size.Height);
-                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
-                SelectedImageMask = new Bitmap(_selectedImageMaskStream);
-                SaveCurrentImageMask();
+                _rawMaskImage = new Image<Rgba32>(ImageSize.X, ImageSize.Y);
+                _rawMaskImage.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.Black));
             }
+
+            UpdateMaskDisplay();
         }
 
         /// <summary>
@@ -404,7 +405,7 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnCirclePositionChanged(Point value)
         {
-            if (SelectedImage == null)
+            if (SelectedImage == null || _rawMaskImage == null)
             {
                 return;
             }
@@ -432,24 +433,26 @@ namespace DatasetProcessor.ViewModels
                     return;
                 }
 
+                float x;
+                float y;
+                float radius;
+
                 if (_imageWasDownscaled)
                 {
-                    // Create new variables so the program doesn't enter in an infinite loop calling OnEndingPositionChanged.
-                    Point position = new Point((int)(value.X / (ImageSize.X / (float)SelectedImage.Size.Width)),
-                        (int)(value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height)));
-
-                    double adjustedRadius = CircleRadius / _scaleFactor;
-                    _selectedImageMaskStream = _imageProcessor.DrawCircleOnMask(_selectedImageMaskStream,
-                        new SixLabors.ImageSharp.Point(position.X, position.Y), (float)adjustedRadius, color);
+                    x = value.X / (ImageSize.X / (float)SelectedImage.Size.Width);
+                    y = value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height);
+                    radius = (float)(CircleRadius / _scaleFactor);
                 }
                 else
                 {
-                    _selectedImageMaskStream = _imageProcessor.DrawCircleOnMask(_selectedImageMaskStream,
-                        new SixLabors.ImageSharp.Point(value.X, value.Y), (float)CircleRadius, color);
+                    x = value.X;
+                    y = value.Y;
+                    radius = (float)CircleRadius;
                 }
 
-                _selectedImageMaskStream.Seek(0, SeekOrigin.Begin);
-                SelectedImageMask = new Bitmap(_selectedImageMaskStream);
+                _imageProcessor.DrawCircleOnInMemoryMask(_rawMaskImage, new Point((int)x, (int)y), radius, color, (float)BrushHardness);
+
+                UpdateMaskDisplay();
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -465,6 +468,17 @@ namespace DatasetProcessor.ViewModels
         {
             CircleRadius = Math.Round(value, 2);
             OnPropertyChanged(nameof(CircleWidthHeight));
+        }
+
+        /// <summary>
+        /// Handles changes to the brush hardness by rounding the value and updating the property.
+        /// </summary>
+        /// <param name="value">The new brush hardness value.</param>
+        partial void OnBrushHardnessChanged(double value)
+        {
+            BrushHardness = Math.Round(value, 2);
+            OnPropertyChanged(nameof(BrushHardness));
+            OnPropertyChanged(nameof(BrushHardnessString));
         }
 
         /// <summary>
@@ -500,6 +514,16 @@ namespace DatasetProcessor.ViewModels
                 Directory.CreateDirectory(masksPath);
             }
             return Path.Combine(masksPath, Path.Combine($"{filename}_mask.jpeg"));
+        }
+
+        private void UpdateMaskDisplay()
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                _rawMaskImage.SaveAsPng(memoryStream);
+                memoryStream.Position = 0;
+                SelectedImageMask = new Bitmap(memoryStream);
+            }
         }
     }
 }
