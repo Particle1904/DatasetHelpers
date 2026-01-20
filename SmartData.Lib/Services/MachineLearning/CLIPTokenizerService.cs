@@ -31,30 +31,35 @@ namespace SmartData.Lib.Services.MachineLearning
         /// </summary>
         /// <param name="inputText">The input text to tokenize and count tokens.</param>
         /// <returns>The total number of tokens in the input text.</returns>
-        public int CountTokens(string inputText)
+        public async Task<int> CountTokensAsync(string inputText)
         {
-            if (!_isModelLoaded)
+            return await Task.Run(() =>
             {
-                LoadModel();
-            }
+                if (!_isModelLoaded)
+                {
+                    LoadModel();
+                }
 
-            if (string.IsNullOrEmpty(inputText))
-            {
-                return 0;
-            }
+                if (string.IsNullOrEmpty(inputText))
+                {
+                    return 0;
+                }
 
-            DenseTensor<string> inputTensor = new DenseTensor<string>(new string[] { inputText }, new int[] { 1 });
-            List<NamedOnnxValue> inputString = new List<NamedOnnxValue>
-            {
-                NamedOnnxValue.CreateFromTensor<string>("string_input", inputTensor)
-            };
-            IDisposableReadOnlyCollection<DisposableNamedOnnxValue> tokens = _session.Run(inputString);
-            List<long> inputIds = (tokens.ToList().First().Value as IEnumerable<long>).ToList();
-            // Remove beginning (49406) of stream and ending (49407) of stream tokens
-            // since they don't matter for counting the prompt total tokens.
-            inputIds.Remove(49406);
-            inputIds.Remove(49407);
-            return inputIds.Count();
+                DenseTensor<string> inputTensor = new DenseTensor<string>(new string[] { inputText }, new int[] { 1 });
+                List<NamedOnnxValue> inputString = new List<NamedOnnxValue>
+                {
+                    NamedOnnxValue.CreateFromTensor<string>("string_input", inputTensor)
+                };
+                using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> tokens = _session.Run(inputString))
+                {
+                    List<long> inputIds = (tokens.ToList().First().Value as IEnumerable<long>).ToList();
+                    // Remove beginning (49406) of stream and ending (49407) of stream tokens
+                    // since they don't matter for counting the prompt total tokens.
+                    inputIds.Remove(49406);
+                    inputIds.Remove(49407);
+                    return inputIds.Count();
+                }
+            });
         }
 
         /// <summary>

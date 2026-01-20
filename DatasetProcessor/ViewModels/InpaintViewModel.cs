@@ -356,11 +356,11 @@ namespace DatasetProcessor.ViewModels
                 return;
             }
 
-            double widthScale = 768.0 / value.Size.Width;
-            double heightScale = 768.0 / value.Size.Height;
+            double widthScale = 768.0f / value.Size.Width;
+            double heightScale = 768.0f / value.Size.Height;
             _scaleFactor = Math.Min(widthScale, heightScale);
 
-            if (_scaleFactor < 1.0)
+            if (_scaleFactor < 1.0f)
             {
                 ImageSize = new Point((int)(value.Size.Width * _scaleFactor),
                     (int)(value.Size.Height * _scaleFactor));

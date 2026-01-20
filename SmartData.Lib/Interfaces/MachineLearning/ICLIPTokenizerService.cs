@@ -2,6 +2,6 @@
 {
     public interface ICLIPTokenizerService
     {
-        public int CountTokens(string inputText);
+        public Task<int> CountTokensAsync(string inputText);
     }
 }

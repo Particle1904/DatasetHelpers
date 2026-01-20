@@ -53,7 +53,7 @@ namespace SmartData.Lib.Services.MachineLearning
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string upscaledImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.png");
+                string upscaledImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.webp");
                 if (File.Exists(upscaledImagePath))
                 {
                     continue;
@@ -94,7 +94,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 {
                     Output = new DenseTensor<float>(outputArray, tensorPrediction.Dimensions.ToArray())
                 };
-                _imageProcessor.SaveUpscaledImage(outputImagePath, outputData);
+                await Task.Run(() => _imageProcessor.SaveUpscaledImage(outputImagePath, outputData)).ConfigureAwait(false);
             }
         }
 

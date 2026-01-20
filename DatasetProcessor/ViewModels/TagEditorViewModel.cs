@@ -348,7 +348,7 @@ namespace DatasetProcessor.ViewModels
             int count = 0;
             try
             {
-                count = await Task.Run(() => _clipTokenizer.CountTokens(CurrentImageTags));
+                count = await Task.Run(() => _clipTokenizer.CountTokensAsync(CurrentImageTags));
                 CurrentImageTokenCount = $"Token count: {count}/75";
 
                 if (count < 75)

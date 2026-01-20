@@ -186,8 +186,8 @@
 			</Grid>
 			<Grid Grid.Column="2"
 				  HorizontalAlignment="Stretch"
-				  MinWidth="256"
-				  MinHeight="256"
+				  MinWidth="128"
+				  MinHeight="128"
 				  Background="Transparent">
 				<Panel x:Name="CanvasPanel"
 					   Width="{Binding ImageSize.X}"

@@ -55,6 +55,12 @@ namespace SmartData.Lib.Services
             SkipMetadata = false
         };
 
+        private readonly WebpEncoder _webpEncoder = new WebpEncoder()
+        {
+            Quality = 95,
+            FileFormat = WebpFileFormatType.Lossless
+        };
+
         private LanczosResampler _lanczosResampler;
         private BicubicResampler _bicubicResampler;
         private CubicResampler _cubicResampler;
@@ -220,7 +226,7 @@ namespace SmartData.Lib.Services
 
                 image.Mutate(context => context.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
+                await image.SaveAsWebpAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".webp"), _webpEncoder);
             }
         }
 
@@ -253,16 +259,16 @@ namespace SmartData.Lib.Services
                     {
                         default:
                         case AvailableResizeSampler.Lanczos:
-                            await ResizeImageAsync(file, outputPath, dimension, _lanczosResampler);
+                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _lanczosResampler));
                             break;
-                        case AvailableResizeSampler.DDIM:
-                            await ResizeImageAsync(file, outputPath, dimension, _samplerSigma);
+                        case AvailableResizeSampler.DPID:
+                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _samplerSigma));
                             break;
                         case AvailableResizeSampler.Cubic:
-                            await ResizeImageAsync(file, outputPath, dimension, _cubicResampler);
+                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _cubicResampler));
                             break;
                         case AvailableResizeSampler.Bicubic:
-                            await ResizeImageAsync(file, outputPath, dimension, _bicubicResampler);
+                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _bicubicResampler));
                             break;
                     }
                 }
@@ -786,26 +792,25 @@ namespace SmartData.Lib.Services
             int width = outputData.Output.Dimensions[3];
             int height = outputData.Output.Dimensions[2];
 
-            byte[] imageByte = new byte[3 * width * height];
-            for (int row = 0; row < height; row++)
+            using (Image<Rgb24> image = new Image<Rgb24>(width, height))
             {
-                for (int col = 0; col < width; col++)
+                image.ProcessPixelRows(accessor =>
                 {
-                    int baseIndex = (row * width + col) * 3;
-                    byte r = (byte)Math.Clamp(outputData.Output[0, 2, row, col] * 255, 0, 255);
-                    byte g = (byte)Math.Clamp(outputData.Output[0, 1, row, col] * 255, 0, 255);
-                    byte b = (byte)Math.Clamp(outputData.Output[0, 0, row, col] * 255, 0, 255);
+                    for (int row = 0; row < height; row++)
+                    {
+                        Span<Rgb24> pixelRow = accessor.GetRowSpan(row);
+                        for (int col = 0; col < width; col++)
+                        {
+                            byte r = (byte)Math.Clamp(outputData.Output[0, 2, row, col] * 255, 0, 255);
+                            byte g = (byte)Math.Clamp(outputData.Output[0, 1, row, col] * 255, 0, 255);
+                            byte b = (byte)Math.Clamp(outputData.Output[0, 0, row, col] * 255, 0, 255);
 
-                    imageByte[baseIndex] = r;
-                    imageByte[baseIndex + 1] = g;
-                    imageByte[baseIndex + 2] = b;
-                }
-            }
+                            pixelRow[col] = new Rgb24(r, g, b);
+                        }
+                    }
+                });
 
-            ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(imageByte);
-            using (Image<Rgb24> image = Image.LoadPixelData<Rgb24>(bytes, width, height))
-            {
-                image.SaveAsPng(outputPath);
+                image.SaveAsWebp(outputPath, _webpEncoder);
             }
         }
 
@@ -861,7 +866,7 @@ namespace SmartData.Lib.Services
                 image.Mutate(context => context.Crop(new Rectangle(cropX, cropY, cropWidth, cropHeight)));
                 image.Mutate(context => context.Resize(inputData.OriginalSize.X, inputData.OriginalSize.Y, KnownResamplers.Lanczos3));
 
-                image.SaveAsPng(outputPath);
+                image.SaveAsWebp(outputPath, _webpEncoder);
             }
         }
 
@@ -977,7 +982,7 @@ namespace SmartData.Lib.Services
                     }
                 });
 
-                resultImage.SaveAsPng(outputPath);
+                resultImage.SaveAsWebp(outputPath, _webpEncoder);
             }
         }
 
@@ -1035,7 +1040,7 @@ namespace SmartData.Lib.Services
 
                 MemoryStream blurredImageStream = new MemoryStream();
                 image.Mutate(context => context.BackgroundColor(Color.White));
-                image.SaveAsJpeg(blurredImageStream, new JpegEncoder());
+                image.SaveAsBmp(blurredImageStream);
 
                 return blurredImageStream;
             }
@@ -1101,7 +1106,7 @@ namespace SmartData.Lib.Services
 
                 image.Mutate(context => context.BackgroundColor(Color.White));
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                await image.SaveAsPngAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png"), _pngEncoder);
+                await image.SaveAsWebpAsync(Path.ChangeExtension(Path.Combine(outputPath, fileName), ".web"), _webpEncoder);
             }
         }
 
@@ -1181,7 +1186,7 @@ namespace SmartData.Lib.Services
                 image.Mutate(context => context.BackgroundColor(Color.Black));
 
                 MemoryStream imageMaskStream = new MemoryStream();
-                image.SaveAsPng(imageMaskStream, _pngEncoder);
+                image.SaveAsWebp(imageMaskStream, _webpEncoder);
 
                 return imageMaskStream;
             }
@@ -1262,7 +1267,7 @@ namespace SmartData.Lib.Services
                 {
                     PngEncoder pngEncoder = new PngEncoder();
 
-                    await image.SaveAsPngAsync(memoryStream, pngEncoder);
+                    await image.SaveAsWebpAsync(memoryStream, _webpEncoder);
                     byte[] jpegBytes = memoryStream.ToArray();
                     return Convert.ToBase64String(jpegBytes);
                 }
@@ -1383,7 +1388,7 @@ namespace SmartData.Lib.Services
                                 Image<L8> dilatedMask = DilateMask(binaryMask, dilationSizeInPixels);
                                 dilatedMask.Mutate(context => context.MedianBlur(3, true));
                                 dilatedMask.Mutate(context => context.GaussianBlur(5.0f));
-                                await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
+                                await dilatedMask.SaveAsWebpAsync(outputPath, _webpEncoder);
                                 dilatedMask.Dispose();
                             }
                         }
@@ -1554,7 +1559,7 @@ namespace SmartData.Lib.Services
                 {
                     dilatedMask.Mutate(context => context.MedianBlur(3, true));
                     dilatedMask.Mutate(context => context.GaussianBlur(5.0f));
-                    await dilatedMask.SaveAsPngAsync(outputPath, _pngEncoder);
+                    await dilatedMask.SaveAsWebpAsync(outputPath, _webpEncoder);
                 }
             }
         }
@@ -1611,8 +1616,8 @@ namespace SmartData.Lib.Services
                     image.Mutate(context => context.GaussianSharpen(_sharpenSigma));
                 }
 
-                string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
-                await image.SaveAsPngAsync(outputFilePath, _pngEncoder);
+                string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".webp");
+                await image.SaveAsWebpAsync(outputFilePath, _webpEncoder);
             }
         }
 
@@ -1656,8 +1661,8 @@ namespace SmartData.Lib.Services
                         dpidImage.Mutate(context => context.GaussianSharpen(_sharpenSigma));
                     }
 
-                    string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".png");
-                    await dpidImage.SaveAsPngAsync(outputFilePath, _pngEncoder);
+                    string outputFilePath = Path.ChangeExtension(Path.Combine(outputPath, fileName), ".webp");
+                    await dpidImage.SaveAsWebpAsync(outputFilePath, _webpEncoder);
                 }
             }
         }
