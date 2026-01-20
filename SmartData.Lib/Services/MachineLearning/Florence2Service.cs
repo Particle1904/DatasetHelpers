@@ -97,7 +97,7 @@ namespace Services.MachineLearning
                         {
                             caption = caption.Substring(0, caption.Length - _eosToken.Length);
                         }
-                        _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), caption.TrimEnd());
+                        await _fileManager.SaveTextToFileAsync(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), caption.TrimEnd());
                     }
                 }
                 catch (Exception)

@@ -510,7 +510,7 @@ namespace DatasetProcessor.ViewModels
                 if (!token.IsCancellationRequested)
                 {
                     string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
-                    _fileManager.SaveTextToFile(txtFile, CurrentImageTags);
+                    await _fileManager.SaveTextToFileAsync(txtFile, CurrentImageTags);
                 }
             }, token);
         }

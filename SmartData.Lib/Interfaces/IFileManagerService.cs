@@ -13,7 +13,7 @@ namespace SmartData.Lib.Interfaces
         public List<string> GetFilteredImageFiles(string inputPath, string txtFileExtension, string wordsToFilter);
         public Task DeleteFilesAsync(string inputPath, List<string> imageFiles);
         public string GetTextFromFile(string imageFilePath, string txtFileExtension);
-        public void SaveTextToFile(string filePath, string textToSave);
+        public Task SaveTextToFileAsync(string filePath, string textToSave);
         public Task CreateSubsetAsync(List<string> files, string outputPath);
     }
 }

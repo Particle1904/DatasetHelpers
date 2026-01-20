@@ -142,7 +142,7 @@
 			</StackPanel>
 			<!-- CURRENTLY PROCESSING -->
 			<Label Grid.Row="4"
-				   Content="{Binding GalleryProcessingProgress.TotalFiles, StringFormat='Found {0} images.'}"/>
+				   Content="{Binding ImagesCountInfo}"/>
 			<!-- ELAPSED TIME -->
 			<Label Grid.Row="6"
 				   Content="{Binding ElapsedTime, StringFormat='Processing elapsed time: {0:hh\\:mm\\:ss\\.fff}'}"/>

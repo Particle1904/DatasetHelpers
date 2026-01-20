@@ -123,8 +123,8 @@ namespace Services
                         await Task.Run(() =>
                         {
                             File.Move(file, resultPath);
-                            _fileManager.SaveTextToFile(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
                         });
+                        await _fileManager.SaveTextToFileAsync(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), result.TrimEnd());
                     }
 
                     // Sleep for 5 seconds since Gemini API have a 15 requests per minute limitation for free users.

@@ -55,6 +55,27 @@ namespace DatasetProcessor.ViewModels
         [ObservableProperty]
         Progress _galleryProcessingProgress;
         [ObservableProperty]
+        int _totalImages;
+        public string ImagesCountInfo
+        {
+            get
+            {
+                int total = 0;
+                if (ImageFiles != null)
+                {
+                    total = ImageFiles.Count;
+                }
+
+                int shown = 0;
+                if (ImageCollection != null)
+                {
+                    shown = ImageCollection.Count;
+                }
+
+                return $"Found {total} images - Currently displaying {shown}.";
+            }
+        }
+        [ObservableProperty]
         private bool _isUiEnabled;
         [ObservableProperty]
         private bool _isCancelEnabled;
@@ -139,6 +160,8 @@ namespace DatasetProcessor.ViewModels
                         List<string> files = _fileManager.GetImageFiles(InputFolderPath);
                         ImageFiles = files.Where(x => !x.Contains("_mask")).ToList();
 
+                        TotalImages = ImageFiles.Count;
+
                         try
                         {
                             ImageFiles = ImageFiles.OrderBy(x =>
@@ -174,8 +197,8 @@ namespace DatasetProcessor.ViewModels
                 }
 
                 List<string> visibleImages = ImageFiles.GetRange(startIndex, endIndex - startIndex);
-                GalleryProcessingProgress.TotalFiles = visibleImages.Count;
                 GalleryProcessingProgress.Reset();
+                GalleryProcessingProgress.TotalFiles = visibleImages.Count;
 
                 Logger.SetLatestLogMessage("Loading images.", LogMessageColor.Informational);
 
@@ -185,6 +208,7 @@ namespace DatasetProcessor.ViewModels
                     placeholders.Add(new ImageItem(file));
                 }
                 ImageCollection = new ObservableCollection<ImageItem>(placeholders);
+                OnPropertyChanged(nameof(ImagesCountInfo));
 
                 List<Task> loadingTasks = new List<Task>();
                 foreach (ImageItem item in ImageCollection)
@@ -224,6 +248,7 @@ namespace DatasetProcessor.ViewModels
                 {
                     return;
                 }
+
                 using (MemoryStream memoryStream = await _imageProcessor.GetThumbnailStreamAsync(image.FilePath, MaxImageSize))
                 {
                     if (token.IsCancellationRequested)
@@ -231,12 +256,14 @@ namespace DatasetProcessor.ViewModels
                         return;
                     }
 
+                    Bitmap bitmap = new Bitmap(memoryStream);
+
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        image.Bitmap = new Bitmap(memoryStream);
+                        image.Bitmap = bitmap;
                         image.IsLoading = false;
                         GalleryProcessingProgress.UpdateProgress();
-                    });
+                    }, DispatcherPriority.Background);
                 }
             }
             catch (Exception exception)

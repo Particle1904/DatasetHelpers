@@ -370,9 +370,9 @@ namespace SmartData.Lib.Services
         /// <param name="filePath">The file path where the text will be saved.</param>
         /// <param name="textToSave">The text to save to the file.</param>
         /// <returns>A Task representing the asynchronous operation.</returns>
-        public void SaveTextToFile(string filePath, string textToSave)
+        public async Task SaveTextToFileAsync(string filePath, string textToSave)
         {
-            File.WriteAllText(filePath, textToSave);
+            await File.WriteAllTextAsync(filePath, textToSave);
         }
 
         /// <summary>
