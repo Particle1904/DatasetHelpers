@@ -46,7 +46,7 @@ namespace Services.MachineLearning
         {
             try
             {
-                await LoadFlorence2PipelineAsync();
+                await Task.Run(LoadFlorence2PipelineAsync);
             }
             catch (Exception)
             {
@@ -73,6 +73,8 @@ namespace Services.MachineLearning
                     break;
             }
 
+            int counter = 0;
+
             foreach (string file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -84,21 +86,24 @@ namespace Services.MachineLearning
                 }
                 try
                 {
-                    using (Image inputImage = Image.Load(file))
+                    await Task.Run(async () =>
                     {
-                        Florence2Result result = await _florence2Pipeline.ProcessAsync(inputImage, query);
-
-                        string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
-                        File.Move(file, resultPath);
-
-                        string caption = result.Text.Trim();
-                        // Make sure to remove EOS token, if its present.
-                        if (caption.EndsWith(_eosToken))
+                        using (Image inputImage = Image.Load(file))
                         {
-                            caption = caption.Substring(0, caption.Length - _eosToken.Length);
+                            Florence2Result result = await _florence2Pipeline.ProcessAsync(inputImage, query);
+
+                            string resultPath = Path.Combine(outputFolderPath, Path.GetFileName(file));
+                            File.Move(file, resultPath);
+
+                            string caption = result.Text.Trim();
+                            // Make sure to remove EOS token, if its present.
+                            if (caption.EndsWith(_eosToken))
+                            {
+                                caption = caption.Substring(0, caption.Length - _eosToken.Length);
+                            }
+                            await _fileManager.SaveTextToFileAsync(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), caption.TrimEnd());
                         }
-                        await _fileManager.SaveTextToFileAsync(Path.Combine(outputFolderPath, Path.ChangeExtension(Path.GetFileName(file), ".txt")), caption.TrimEnd());
-                    }
+                    });
                 }
                 catch (Exception)
                 {
@@ -106,6 +111,15 @@ namespace Services.MachineLearning
                         throw;
                     }
                 }
+
+                // Try to be more aggressive with garbage collection. Perform GC every 10 images to free up memory.
+                if (counter % 10 == 0)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+
+                counter++;
                 ProgressUpdated?.Invoke(this, EventArgs.Empty);
             }
             UnloadAIModel();
@@ -121,7 +135,7 @@ namespace Services.MachineLearning
         {
             await LoadFlorence2PipelineAsync();
 
-            return await _florence2Pipeline.ProcessAsync(image, query);
+            return await Task.Run(() => _florence2Pipeline.ProcessAsync(image, query));
         }
 
         /// <summary>
@@ -131,6 +145,8 @@ namespace Services.MachineLearning
         {
             _florence2Pipeline.Dispose();
             _florence2Pipeline = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         /// <summary>
