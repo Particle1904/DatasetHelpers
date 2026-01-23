@@ -1,4 +1,6 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,9 +24,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 using Color = System.Drawing.Color;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 
 namespace DatasetProcessor.ViewModels
 {
@@ -57,8 +62,12 @@ namespace DatasetProcessor.ViewModels
         private string _currentAndTotal;
         [ObservableProperty]
         private Point _imageSize;
+        private Size _originalImageSize;
         private double _scaleFactor;
         private bool _imageWasDownscaled;
+
+        private WriteableBitmap? _writeableMaskBitmap;
+        private byte[]? _pixelBuffer;
 
         private readonly Stopwatch _timer;
         public TimeSpan ElapsedTime => _timer.Elapsed;
@@ -361,36 +370,41 @@ namespace DatasetProcessor.ViewModels
                 return;
             }
 
+            _originalImageSize = new Size(value.PixelSize.Width, value.PixelSize.Height);
+
             double widthScale = 768.0f / value.Size.Width;
             double heightScale = 768.0f / value.Size.Height;
             _scaleFactor = Math.Min(widthScale, heightScale);
 
             if (_scaleFactor < 1.0f)
             {
-                ImageSize = new Point((int)(value.Size.Width * _scaleFactor),
-                    (int)(value.Size.Height * _scaleFactor));
+                ImageSize = new Point((int)(value.Size.Width * _scaleFactor), (int)(value.Size.Height * _scaleFactor));
                 _imageWasDownscaled = true;
             }
             else
             {
                 ImageSize = new Point((int)value.Size.Width, (int)value.Size.Height);
                 _imageWasDownscaled = false;
+                _scaleFactor = 1.0f;
             }
 
             _rawMaskImage?.Dispose();
+            _writeableMaskBitmap?.Dispose();
+            _writeableMaskBitmap = null;
+            _pixelBuffer = null;
 
             string maskPath = GetCurrentFileMaskFilename();
             if (File.Exists(maskPath))
             {
                 _rawMaskImage = Image.Load<Rgba32>(maskPath);
-                if (_imageWasDownscaled)
+                if (_rawMaskImage.Width != _originalImageSize.Width || _rawMaskImage.Height != _originalImageSize.Height)
                 {
-                    _rawMaskImage.Mutate(x => x.Resize(ImageSize.X, ImageSize.Y));
+                    _rawMaskImage.Mutate(x => x.Resize(_originalImageSize.Width, _originalImageSize.Height));
                 }
             }
             else
             {
-                _rawMaskImage = new Image<Rgba32>(ImageSize.X, ImageSize.Y);
+                _rawMaskImage = new Image<Rgba32>(_originalImageSize.Width, _originalImageSize.Height);
                 _rawMaskImage.Mutate(x => x.BackgroundColor(SixLabors.ImageSharp.Color.Black));
             }
 
@@ -444,8 +458,11 @@ namespace DatasetProcessor.ViewModels
 
                 if (_imageWasDownscaled)
                 {
-                    x = value.X / (ImageSize.X / (float)SelectedImage.Size.Width);
-                    y = value.Y / (ImageSize.Y / (float)SelectedImage.Size.Height);
+                    float scaleX = (float)ImageSize.X / (float)_originalImageSize.Width;
+                    float scaleY = (float)ImageSize.Y / (float)_originalImageSize.Height;
+
+                    x = value.X / scaleX;
+                    y = value.Y / scaleY;
                     radius = (float)(CircleRadius / _scaleFactor);
                 }
                 else
@@ -455,7 +472,7 @@ namespace DatasetProcessor.ViewModels
                     radius = (float)CircleRadius;
                 }
 
-                _imageProcessor.DrawCircleOnInMemoryMask(_rawMaskImage, new Point((int)x, (int)y), radius, color, (float)BrushHardness);
+                _imageProcessor.DrawCircleOnInMemoryMask(_rawMaskImage, new SixLabors.ImageSharp.Point((int)x, (int)y), radius, color, (float)BrushHardness);
 
                 UpdateMaskDisplay();
             }
@@ -523,12 +540,36 @@ namespace DatasetProcessor.ViewModels
 
         private void UpdateMaskDisplay()
         {
-            using (MemoryStream memoryStream = new MemoryStream())
+            if (_rawMaskImage == null)
             {
-                _rawMaskImage.SaveAsWebp(memoryStream);
-                memoryStream.Position = 0;
-                SelectedImageMask = new Bitmap(memoryStream);
+                return;
             }
+
+            int width = _rawMaskImage.Width;
+            int height = _rawMaskImage.Height;
+
+            if (_writeableMaskBitmap == null || _writeableMaskBitmap.PixelSize.Width != width || _writeableMaskBitmap.PixelSize.Height != height)
+            {
+                _writeableMaskBitmap?.Dispose();
+                _writeableMaskBitmap = new WriteableBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Rgba8888, AlphaFormat.Unpremul);
+
+                SelectedImageMask = _writeableMaskBitmap;
+
+                int requiredBytes = width * height * 4;
+                if (_pixelBuffer == null || _pixelBuffer.Length != requiredBytes)
+                {
+                    _pixelBuffer = new byte[requiredBytes];
+                }
+            }
+
+            Span<Rgba32> targetSpan = MemoryMarshal.Cast<byte, Rgba32>(new Span<byte>(_pixelBuffer));
+            _rawMaskImage.CopyPixelDataTo(targetSpan);
+
+            using (var frameBuffer = _writeableMaskBitmap.Lock())
+            {
+                Marshal.Copy(_pixelBuffer!, 0, frameBuffer.Address, _pixelBuffer!.Length);
+            }
+            OnPropertyChanged(nameof(SelectedImageMask));
         }
     }
 }
