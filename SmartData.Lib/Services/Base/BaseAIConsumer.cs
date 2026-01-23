@@ -123,7 +123,7 @@ namespace SmartData.Lib.Services.Base
                 }
                 return true;
             }
-            catch (EntryPointNotFoundException)
+            catch (Exception)
             {
                 // The specified provider is not available.
                 return false;
@@ -140,14 +140,16 @@ namespace SmartData.Lib.Services.Base
         /// </remarks>
         protected virtual void UnloadModel()
         {
-            _loadModelSemaphore.Wait();
-            try
+            if (_loadModelSemaphore.Wait(1000))
             {
-                ResetState();
-            }
-            finally
-            {
-                _loadModelSemaphore.Release();
+                try
+                {
+                    ResetState();
+                }
+                finally
+                {
+                    _loadModelSemaphore.Release();
+                }
             }
         }
 
