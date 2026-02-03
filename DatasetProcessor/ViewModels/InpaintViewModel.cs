@@ -235,7 +235,7 @@ namespace DatasetProcessor.ViewModels
 
                 string imageFilename = Path.GetFileNameWithoutExtension(ImageFiles[SelectedItemIndex]);
                 await _inpaint.InpaintImageTilesAsync(ImageFiles[SelectedItemIndex], GetCurrentFileMaskFilename(),
-                    Path.Combine(OutputFolderPath, $"{imageFilename}.png"));
+                    Path.Combine(OutputFolderPath, $"{imageFilename}.webp"));
             }
             catch (Exception exception)
             {

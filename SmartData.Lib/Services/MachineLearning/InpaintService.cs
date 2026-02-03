@@ -159,7 +159,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 outputs.Add(outputData);
             }
 
-            _imageProcessor.SaveInpaintedImage(outputImagePath, outputs.ToArray(), originalSize, tileSize, overlap);
+            await Task.Run(() => _imageProcessor.SaveInpaintedImage(outputImagePath, outputs.ToArray(), originalSize, tileSize, overlap));
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace SmartData.Lib.Services.MachineLearning
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(file);
                 string inputMask = Path.Combine(masksPath, $"{filenameWithoutExtension}_mask.jpeg");
 
-                string outputImagePath = Path.Combine(outputFolderPath, $"{filenameWithoutExtension}.png");
+                string outputImagePath = Path.Combine(outputFolderPath, $"{filenameWithoutExtension}.webp");
 
                 try
                 {

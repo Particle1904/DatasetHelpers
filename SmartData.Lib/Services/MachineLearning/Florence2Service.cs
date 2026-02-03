@@ -79,7 +79,7 @@ namespace Services.MachineLearning
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string captionedImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.png");
+                string captionedImagePath = Path.Combine(outputFolderPath, $"{Path.GetFileNameWithoutExtension(file)}.webp");
                 if (File.Exists(captionedImagePath))
                 {
                     continue;
