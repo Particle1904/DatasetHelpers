@@ -69,6 +69,8 @@ namespace DatasetProcessor.ViewModels
 
         CancellationTokenSource _saveCancellationTokenSource = new CancellationTokenSource();
 
+        private bool _isLoading = false;
+
         /// <summary>
         /// Gets the current type of file being edited, either .txt or .caption.
         /// </summary>
@@ -140,23 +142,24 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         public void UpdateCurrentSelectedTags()
         {
-            if (!IsActive)
+            if (!IsActive || ImageFiles == null || SelectedItemIndex < 0)
             {
                 return;
             }
 
-            if (SelectedImage != null)
+            try
             {
-                try
-                {
-                    CurrentImageTags = _fileManager.GetTextFromFile(ImageFiles[SelectedItemIndex], CurrentType);
-                }
-                catch
-                {
-                    Logger.SetLatestLogMessage($".txt or .caption file for current image not found, just type in the editor and one will be created!",
-                        LogMessageColor.Warning);
-                    CurrentImageTags = string.Empty;
-                }
+                _isLoading = true;
+                CurrentImageTags = _fileManager.GetTextFromFile(ImageFiles[SelectedItemIndex], CurrentType);
+            }
+            catch
+            {
+                Logger.SetLatestLogMessage($".txt or .caption file not found...", LogMessageColor.Warning);
+                CurrentImageTags = string.Empty;
+            }
+            finally
+            {
+                _isLoading = false;
             }
         }
 
@@ -486,6 +489,11 @@ namespace DatasetProcessor.ViewModels
         /// </summary>
         partial void OnCurrentImageTagsChanged(string value)
         {
+            if (_isLoading)
+            {
+                return;
+            }
+
             _saveCancellationTokenSource?.Cancel();
             _saveCancellationTokenSource = new CancellationTokenSource();
             CancellationToken token = _saveCancellationTokenSource.Token;
@@ -502,15 +510,24 @@ namespace DatasetProcessor.ViewModels
                 return;
             }
 
+            string pathSnapshot = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
+            string tagsSnapshot = value;
 
             Task.Run(async () =>
             {
-                await Task.Delay(500, token);
-
-                if (!token.IsCancellationRequested)
+                try
                 {
-                    string txtFile = Path.ChangeExtension(ImageFiles[SelectedItemIndex], CurrentType);
-                    await _fileManager.SaveTextToFileAsync(txtFile, CurrentImageTags);
+                    await Task.Delay(500, token);
+
+                    if (!token.IsCancellationRequested)
+                    {
+                        await _fileManager.SaveTextToFileAsync(pathSnapshot, tagsSnapshot);
+                    }
+                }
+                catch (TaskCanceledException) { }
+                catch (Exception ex)
+                {
+                    Logger.SetLatestLogMessage($"Error saving: {ex.Message}", LogMessageColor.Error);
                 }
             }, token);
         }
