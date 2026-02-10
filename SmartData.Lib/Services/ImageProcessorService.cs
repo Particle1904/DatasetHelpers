@@ -250,6 +250,8 @@ namespace SmartData.Lib.Services
 
             foreach (string file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     switch (resampler)
