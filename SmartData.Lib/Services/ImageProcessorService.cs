@@ -129,6 +129,7 @@ namespace SmartData.Lib.Services
             _cubicResampler = CubicResampler.MitchellNetravali;
             _dpidResampler = new DpidResampler();
             MinimumResolutionForSigma = 512;
+            Configuration.Default.MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2);
         }
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace SmartData.Lib.Services
         {
             if (results == null || results.Count == 0)
             {
-                await ResizeImageAsync(inputPath, outputPath, dimension);
+                await ResizeImageDpidAsync(inputPath, outputPath, dimension);
                 return;
             }
 
@@ -247,35 +248,30 @@ namespace SmartData.Lib.Services
 
             TotalFilesChanged?.Invoke(this, files.Length);
 
-            SemaphoreSlim resizeSemaphore = new SemaphoreSlim(Math.Max(1, Environment.ProcessorCount - 1));
             foreach (string file in files)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                await resizeSemaphore.WaitAsync();
-
                 try
                 {
                     switch (resampler)
                     {
                         default:
                         case AvailableResizeSampler.Lanczos:
-                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _lanczosResampler));
-                            break;
-                        case AvailableResizeSampler.DPID:
-                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _samplerSigma));
+                            await ResizeImageStandardAsync(file, outputPath, dimension, _lanczosResampler);
                             break;
                         case AvailableResizeSampler.Cubic:
-                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _cubicResampler));
+                            await ResizeImageStandardAsync(file, outputPath, dimension, _cubicResampler);
                             break;
                         case AvailableResizeSampler.Bicubic:
-                            await Task.Run(() => ResizeImageAsync(file, outputPath, dimension, _bicubicResampler));
+                            await ResizeImageStandardAsync(file, outputPath, dimension, _bicubicResampler);
+                            break;
+                        case AvailableResizeSampler.DPID:
+                            await ResizeImageDpidAsync(file, outputPath, dimension, _samplerSigma);
                             break;
                     }
                 }
                 finally
                 {
                     ProgressUpdated?.Invoke(this, EventArgs.Empty);
-                    resizeSemaphore.Release();
                 }
             }
         }
@@ -1422,7 +1418,6 @@ namespace SmartData.Lib.Services
 
             DenseTensor<float> maskTensor = SAM2masks.Masks!;
 
-            // Select the best mask based on IoU
             int bestIndex = 0;
             float bestIoU = SAM2masks.IouPredictions[0, 0];
             for (int i = 1; i < SAM2masks.IouPredictions.Length; i++)
@@ -1434,7 +1429,6 @@ namespace SmartData.Lib.Services
                 }
             }
 
-            // Build the low-res float mask
             using Image<L16> floatMask = new Image<L16>(maskResolution, maskResolution);
             for (int y = 0; y < maskResolution; y++)
             {
@@ -1447,7 +1441,6 @@ namespace SmartData.Lib.Services
                 }
             }
 
-            // Resize to 1024x1024
             ResizeOptions upscaleResizeOptions = new ResizeOptions
             {
                 Size = new Size(encoderInputSize, encoderInputSize),
@@ -1457,7 +1450,6 @@ namespace SmartData.Lib.Services
 
             using Image<L16> upscaledMask = floatMask.Clone(context => context.Resize(upscaleResizeOptions));
 
-            // Crop padding (BoxPad logic)
             float originalAspect = (float)originalWidth / originalHeight;
             int paddedWidth, paddedHeight, offsetX, offsetY;
 
@@ -1478,10 +1470,8 @@ namespace SmartData.Lib.Services
 
             using Image<L16> croppedMask = upscaledMask.Clone(context => context.Crop(new Rectangle(offsetX, offsetY, paddedWidth, paddedHeight)));
 
-            // Resize to original image size
             using Image<L16> finalFloatMask = croppedMask.Clone(context => context.Resize(originalWidth, originalHeight, _lanczosResampler));
 
-            // Threshold to binary mask
             Image<L8> binaryMask = new Image<L8>(originalWidth, originalHeight);
             for (int y = 0; y < finalFloatMask.Height; y++)
             {
@@ -1574,31 +1564,13 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous image resizing operation.</returns>
         /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
         /// <exception cref="System.IO.IOException">An error occurred while reading or writing image files.</exception>
-        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension, IResampler resampler)
+        private async Task ResizeImageStandardAsync(string inputPath, string outputPath, SupportedDimensions dimension, IResampler resampler)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
             using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
-                double aspectRatio = image.Width / (double)image.Height;
-
-                int canvasWidth, canvasHeight;
-                int computedWidth, computedHeight;
-
-                if (image.Width >= image.Height)
-                {
-                    computedWidth = (int)dimension;
-                    computedHeight = (int)Math.Round(computedWidth / aspectRatio);
-                    canvasWidth = computedWidth;
-                    canvasHeight = RoundToNearestMultiple(computedHeight, 16);
-                }
-                else
-                {
-                    computedHeight = (int)dimension;
-                    computedWidth = (int)Math.Round(computedHeight * aspectRatio);
-                    canvasHeight = computedHeight;
-                    canvasWidth = RoundToNearestMultiple(computedWidth, 16);
-                }
+                var (canvasWidth, canvasHeight) = CalculateAlignedDimensions(image.Width, image.Height, (int)dimension);
 
                 ResizeOptions resizeOptions = new ResizeOptions
                 {
@@ -1632,30 +1604,25 @@ namespace SmartData.Lib.Services
         /// <returns>A task representing the asynchronous image resizing operation.</returns>
         /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="inputPath"/> does not exist.</exception>
         /// <exception cref="System.IO.IOException">An error occurred while reading or writing image files.</exception>
-        private async Task ResizeImageAsync(string inputPath, string outputPath, SupportedDimensions dimension, float lambda = 0.6f)
+        private async Task ResizeImageDpidAsync(string inputPath, string outputPath, SupportedDimensions dimension, float lambda = 0.6f)
         {
             string fileName = Path.GetFileNameWithoutExtension(inputPath);
 
             using (Image<Rgba32> image = await Image.LoadAsync<Rgba32>(_decoderOptions, inputPath))
             {
-                int finalWidth;
-                int finalHeight;
-
-                if (image.Width >= image.Height)
-                {
-                    finalWidth = (int)dimension;
-                    double idealHeight = (double)image.Height * ((double)finalWidth / image.Width);
-                    finalHeight = RoundToNearestMultiple((int)Math.Round(idealHeight, MidpointRounding.AwayFromZero), 16);
-                }
-                else
-                {
-                    finalHeight = (int)dimension;
-                    double idealWidth = (double)image.Width * ((double)finalHeight / image.Height);
-                    finalWidth = RoundToNearestMultiple((int)Math.Round(idealWidth, MidpointRounding.AwayFromZero), 16);
-                }
+                (int finalWidth, int finalHeight) = CalculateAlignedDimensions(image.Width, image.Height, (int)dimension);
 
                 using (Image<Rgba32> dpidImage = await Task.Run(() => _dpidResampler.DpidResampleRgb(image, finalWidth, finalHeight, lambda)))
                 {
+                    if (dpidImage.Width != finalWidth || dpidImage.Height != finalHeight)
+                    {
+                        dpidImage.Mutate(x => x.Resize(new ResizeOptions
+                        {
+                            Size = new Size(finalWidth, finalHeight),
+                            Mode = ResizeMode.Crop
+                        }));
+                    }
+
                     if (ApplySharpen && (dpidImage.Width >= MinimumResolutionForSigma || dpidImage.Height >= MinimumResolutionForSigma))
                     {
                         dpidImage.Mutate(context => context.GaussianSharpen(_sharpenSigma));
@@ -1668,12 +1635,43 @@ namespace SmartData.Lib.Services
         }
 
         /// <summary>
+        /// Calculates new dimensions aligned to the nearest multiple of 16 while preserving the aspect ratio, based on
+        /// a target dimension.
+        /// </summary>
+        /// <param name="currentWidth">The current width of the item.</param>
+        /// <param name="currentHeight">The current height of the item.</param>
+        /// <param name="targetDimension">The target size for the longer side.</param>
+        /// <returns>A tuple containing the aligned width and height.</returns>
+        private (int width, int height) CalculateAlignedDimensions(int currentWidth, int currentHeight, int targetDimension)
+        {
+            double aspectRatio = currentWidth / (double)currentHeight;
+            int target_width;
+            int target_height;
+
+            if (currentWidth >= currentHeight)
+            {
+                target_width = targetDimension;
+                target_height = (int)Math.Round(target_width / aspectRatio);
+            }
+            else
+            {
+                target_height = targetDimension;
+                target_width = (int)Math.Round(target_height * aspectRatio);
+            }
+
+            target_width = Math.Max(16, RoundToNearestMultiple(target_width, 16));
+            target_height = Math.Max(16, RoundToNearestMultiple(target_height, 16));
+
+            return (target_width, target_height);
+        }
+
+        /// <summary>
         /// Rounds the provided value to the nearest multiple of the specified number.
         /// </summary>
         /// <param name="value">The value to round.</param>
         /// <param name="multiple">The multiple to round to.</param>
         /// <returns>The rounded value.</returns>
-        private int RoundToNearestMultiple(int value, int multiple)
+        private static int RoundToNearestMultiple(int value, int multiple)
         {
             if (multiple == 0)
             {
@@ -1681,22 +1679,14 @@ namespace SmartData.Lib.Services
             }
 
             int remainder = value % multiple;
-            if (remainder == 0)
+            int halfThreshold = multiple / 2;
+
+            if (remainder >= halfThreshold)
             {
-                return value;
+                return value + (multiple - remainder);
             }
 
-            int lowerMultiple = value - remainder;
-            int upperMultiple = lowerMultiple + multiple;
-
-            if (value - lowerMultiple < upperMultiple - value)
-            {
-                return lowerMultiple;
-            }
-            else
-            {
-                return upperMultiple;
-            }
+            return value - remainder;
         }
 
         /// <summary>
