@@ -256,16 +256,16 @@ namespace SmartData.Lib.Services
                     {
                         default:
                         case AvailableResizeSampler.Lanczos:
-                            await ResizeImageStandardAsync(file, outputPath, dimension, _lanczosResampler);
+                            await Task.Run(() => ResizeImageStandardAsync(file, outputPath, dimension, _lanczosResampler));
                             break;
                         case AvailableResizeSampler.Cubic:
-                            await ResizeImageStandardAsync(file, outputPath, dimension, _cubicResampler);
+                            await Task.Run(() => ResizeImageStandardAsync(file, outputPath, dimension, _cubicResampler));
                             break;
                         case AvailableResizeSampler.Bicubic:
-                            await ResizeImageStandardAsync(file, outputPath, dimension, _bicubicResampler);
+                            await Task.Run(() => ResizeImageStandardAsync(file, outputPath, dimension, _bicubicResampler));
                             break;
                         case AvailableResizeSampler.DPID:
-                            await ResizeImageDpidAsync(file, outputPath, dimension, _samplerSigma);
+                            await Task.Run(() => ResizeImageDpidAsync(file, outputPath, dimension, _samplerSigma));
                             break;
                     }
                 }
