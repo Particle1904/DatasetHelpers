@@ -316,11 +316,20 @@ namespace DatasetProcessor.ViewModels
         {
             try
             {
-                ImageFiles = _fileManager.GetImageFiles(InputFolderPath)
-                    .Where(x => !x.Contains("_mask")).ToList();
+                ImageFiles = _fileManager.GetImageFiles(InputFolderPath).Where(x => !x.Contains("_mask")).ToList();
                 if (ImageFiles.Count != 0)
                 {
-                    ImageFiles = ImageFiles.OrderBy(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToList();
+                    try
+                    {
+                        ImageFiles = ImageFiles.OrderBy(x =>
+                        {
+                            string name = Path.GetFileNameWithoutExtension(x);
+                            return int.TryParse(name, out int val) ? val : int.MaxValue;
+                        })
+                        .ThenBy(x => x)
+                        .ToList();
+                    }
+                    catch { /* Failed to sort numerically. Ignore sort errors */ }
                     SelectedItemIndex = 0;
                 }
             }

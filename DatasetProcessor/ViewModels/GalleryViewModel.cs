@@ -168,7 +168,9 @@ namespace DatasetProcessor.ViewModels
                             {
                                 string name = Path.GetFileNameWithoutExtension(x);
                                 return int.TryParse(name, out int val) ? val : int.MaxValue;
-                            }).ToList();
+                            })
+                            .ThenBy(x => x)
+                            .ToList();
                         }
                         catch { /* Failed to sort numerically. Ignore sort errors */ }
                     }

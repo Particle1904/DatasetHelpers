@@ -105,7 +105,7 @@ namespace SmartData.Lib.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string finalPath = Path.Combine(Path.GetFileName(image), backupPath);
+                string finalPath = Path.Combine(backupPath, Path.GetFileName(image));
                 await Task.Run(() => File.Copy(image, finalPath), cancellationToken);
             }
         }

@@ -537,10 +537,10 @@
 								Grid.ColumnSpan="2"
 								Minimum="1"
 								Maximum="25"
-								Value="{Binding ResizeImagesLanczosRadius}"
+								Value="{Binding ResizeImagesResamplerSigma}"
 								Margin="0, 0, 15, 0"/>
 						<Label Grid.Column="4"
-							   Content="{Binding ResizeImagesLanczosRadius}"
+							   Content="{Binding ResizeImagesResamplerSigma}"
 							   Margin="0, 0, 12, 0"
 							   Width="45"/>
 					</Grid>
@@ -1251,7 +1251,7 @@
 						<CheckBox Grid.Column="0"
 								  HorizontalAlignment="Left"
 								  Margin="10, 0, 0, 0"
-								  IsChecked="{Binding SearchTxt}"/>
+								  IsChecked="{Binding ExtractSubsetSearchTxt}"/>
 						<Label Grid.Column="1"
 							   HorizontalAlignment="Left"
 							   Content="Search txt files?"/>
@@ -1262,7 +1262,7 @@
 						<CheckBox Grid.Column="0"
 								  HorizontalAlignment="Left"
 								  Margin="10, 0, 0, 0"
-								  IsChecked="{Binding SearchCaption}"/>
+								  IsChecked="{Binding ExtractSubsetSearchCaption}"/>
 						<Label Grid.Column="1"
 							   HorizontalAlignment="Left"
 							   Content="Search caption files?"/>
@@ -1273,7 +1273,7 @@
 						<CheckBox Grid.Column="0"
 								  HorizontalAlignment="Left"
 								  Margin="10, 0, 0, 0"
-								  IsChecked="{Binding ExactMatchesFiltering}"/>
+								  IsChecked="{Binding ExtractSubsetExactMatchesFiltering}"/>
 						<Label Grid.Column="1"
 							   HorizontalAlignment="Left"
 							   Content="Exact matches when filtering?"/>

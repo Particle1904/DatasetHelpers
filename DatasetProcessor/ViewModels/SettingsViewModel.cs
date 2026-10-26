@@ -303,6 +303,7 @@ namespace DatasetProcessor.ViewModels
             ResizeImagesOutputFolder = Configs.Configurations.ResizeImagesConfigs.OutputFolder;
             ResizeImagesOutputDimension = Configs.Configurations.ResizeImagesConfigs.OutputDimensionSize;
             ResizeImagesResamplerSigma = Configs.Configurations.ResizeImagesConfigs.ResamplerSigma;
+            ResizeImagesResamplerName = Configs.Configurations.ResizeImagesConfigs.ResamplerName;
             ResizeImagesApplySharpen = Configs.Configurations.ResizeImagesConfigs.ApplySharpenSigma;
             ResizeImagesSharpenSigma = Configs.Configurations.ResizeImagesConfigs.SharpenSigma;
             ResizeImagesSigmaResolution = Configs.Configurations.ResizeImagesConfigs.MinimumResolutionForSharpen.ToString();

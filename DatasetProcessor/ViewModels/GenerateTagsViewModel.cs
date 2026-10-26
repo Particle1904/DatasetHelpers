@@ -105,7 +105,7 @@ namespace DatasetProcessor.ViewModels
 
             InputFolderPath = _configs.Configurations.GenerateTagsConfigs.InputFolder;
             _fileManager.CreateFolderIfNotExist(InputFolderPath);
-            OutputFolderPath = _configs.Configurations.UpscaleImagesConfigs.OutputFolder;
+            OutputFolderPath = _configs.Configurations.GenerateTagsConfigs.OutputFolder;
             _fileManager.CreateFolderIfNotExist(OutputFolderPath);
             GeneratorModel = _configs.Configurations.GenerateTagsConfigs.AutoTaggerModel;
             Threshold = _configs.Configurations.GenerateTagsConfigs.PredictionsThreshold;
