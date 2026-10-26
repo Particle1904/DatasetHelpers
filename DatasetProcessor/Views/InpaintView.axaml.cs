@@ -141,7 +141,10 @@ namespace DatasetProcessor.Views
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = DataContext as InpaintViewModel;
-            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            }
             base.OnDataContextChanged(e);
         }
     }

@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <ApplicationIcon>Assets\Icons\icon.ico</ApplicationIcon>
 	<PlatformTarget>x64</PlatformTarget>
+	<AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   
@@ -43,19 +44,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.11" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.11" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.11" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.11" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
-    <PackageReference Include="NetCoreAudio" Version="2.0.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
-    <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.6.2" />
-    <PackageReference Include="System.Reactive" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+    <PackageReference Include="NetCoreAudio" Version="2.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="4.1.3" />
+    <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.17" />
+    <PackageReference Include="System.Reactive" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -300,7 +300,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
                     Compand = true,
-                    PadColor = new Bgr24(255, 255, 255),
+                    PadColor = Color.White,
                     Size = new Size(448, 448),
                 };
 
@@ -348,7 +348,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
                     Compand = true,
-                    PadColor = new Bgr24(255, 255, 255),
+                    PadColor = new Color(),
                     Size = new Size(448, 448),
                 };
 
@@ -399,7 +399,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _bicubicResampler,
                     Compand = true,
-                    PadColor = new Rgb24(255, 255, 255),
+                    PadColor = Color.White,
                     Size = new Size(448, 448),
                 };
 
@@ -447,7 +447,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
                     Compand = true,
-                    PadColor = new Rgb24(0, 0, 0),
+                    PadColor = Color.Black,
                     Size = new Size(416, 416),
                 };
 
@@ -505,7 +505,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
                     Compand = true,
-                    PadColor = new Rgb24(0, 0, 0),
+                    PadColor = Color.Black,
                     Size = new Size(width, height),
                 };
 
@@ -554,7 +554,7 @@ namespace SmartData.Lib.Services
                 Position = AnchorPositionMode.Center,
                 Sampler = _cubicResampler,
                 Compand = true,
-                PadColor = new Rgb24(0, 0, 0),
+                PadColor = Color.Black,
                 Size = new Size(512, 512),
             };
 
@@ -748,7 +748,7 @@ namespace SmartData.Lib.Services
                     Position = AnchorPositionMode.Center,
                     Sampler = _lanczosResampler,
                     Compand = true,
-                    PadColor = new Rgb24(0, 0, 0),
+                    PadColor = Color.Black,
                     Size = new Size(sam2ImageInputSize, sam2ImageInputSize)
                 };
 
@@ -1212,23 +1212,25 @@ namespace SmartData.Lib.Services
             hardness = Math.Clamp(hardness, 0f, 1f);
 
             EllipsePolygon circle = new EllipsePolygon(position.X, position.Y, radius);
-            if (hardness >= 0.99f)
+            maskImage.Mutate(context => context.Paint(canvas =>
             {
-                SolidBrush solidBrush = new SolidBrush(color);
-                maskImage.Mutate(context => context.Fill(solidBrush, circle));
-            }
-            else
-            {
-                PointF center = new PointF(position.X, position.Y);
-                ColorStop[] colorStop = new ColorStop[]
+                if (hardness >= 0.99f)
                 {
-                    new ColorStop(0f, color),
-                    new ColorStop(hardness, color),
-                    new ColorStop(1f, color.WithAlpha(0))
-                };
-                GradientBrush solidBrush = new RadialGradientBrush(center, radius, GradientRepetitionMode.None, colorStop);
-                maskImage.Mutate(context => context.Fill(solidBrush, circle));
-            }
+                    canvas.Fill(Brushes.Solid(color), circle);
+                }
+                else
+                {
+                    PointF center = new PointF(position.X, position.Y);
+                    ColorStop[] colorStop = new ColorStop[]
+                    {
+                        new ColorStop(0f, color),
+                        new ColorStop(hardness, color),
+                        new ColorStop(1f, color.WithAlpha(0))
+                    };
+                    RadialGradientBrush radialBrush = new RadialGradientBrush(center, radius, GradientRepetitionMode.None, colorStop);
+                    canvas.Fill(radialBrush, circle);
+                }
+            }));
         }
 
         /// <summary>

@@ -47,24 +47,24 @@ namespace DatasetProcessor.Views
             string fileOrigin = string.Empty;
             try
             {
-                if (e.Data.Contains(DataFormats.Text))
+                if (e.DataTransfer.Contains(DataFormat.Text))
                 {
                     fileOrigin = "browser";
 
-                    string text = e.Data.GetText();
+                    string text = e.DataTransfer.TryGetText();
                     await HandleFilesFromBrowser(text);
                 }
                 else
                 {
                     fileOrigin = "file explorer";
 
-                    IEnumerable<IStorageItem> files = e.Data.GetFiles();
+                    IEnumerable<IStorageItem> files = e.DataTransfer.TryGetFiles();
                     await HandleFilesFromExplorer(files);
                 }
             }
             catch
             {
-                _viewModel.Logger.SetLatestLogMessage($"An error occured while trying to read the image file from the {fileOrigin}.",
+                _viewModel.Logger.SetLatestLogMessage($"An error occurred while trying to read the image file from the {fileOrigin}.",
                     LogMessageColor.Error);
             }
         }

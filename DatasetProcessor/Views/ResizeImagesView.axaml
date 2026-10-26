@@ -133,7 +133,7 @@
 						 MinWidth="240"
 						 MaxHeight="70"
 						 Text="{Binding MinimumResolutionForSigma}"
-						 Watermark="Enter here a minimum resolution size for Sigma to be applied. For example: setting this value to be 2048 will make it so sharpen is only applied to images bigger or equal to 2048px in either Width or Height. Input 256 to apply it to all images."/>
+						 PlaceholderText="Enter here a minimum resolution size for Sigma to be applied. For example: setting this value to be 2048 will make it so sharpen is only applied to images bigger or equal to 2048px in either Width or Height. Input 256 to apply it to all images."/>
 			</Grid>
 		</Grid>
 		<Separator Grid.Row="7"/>

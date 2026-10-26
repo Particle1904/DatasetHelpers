@@ -70,7 +70,7 @@
 					<TextBox Grid.Row="2"
 							 Grid.Column="2"
 							 Text="{Binding GalleryDisplayImageSize}"
-							 Watermark="Enter here a number between 256 and 576."/>
+							 PlaceholderText="Enter here a number between 256 and 576."/>
 				</Grid>
 			</Border>
 		</Grid>
@@ -375,7 +375,7 @@
 					<TextBox Grid.Row="18"
 							 Grid.Column="2"
 							 Text="{Binding ContentAwareSigmaResolution}"
-							 Watermark="Enter here a number between 256 and 65535. Images bigger than this value will be sharpened."/>
+							 PlaceholderText="Enter here a number between 256 and 65535. Images bigger than this value will be sharpened."/>
 				</Grid>
 			</Border>
 		</Grid>
@@ -582,7 +582,7 @@
 					<TextBox Grid.Row="12"
 							 Grid.Column="2"
 							 Text="{Binding ResizeImagesSigmaResolution}"
-							 Watermark="Enter here a number between 256 and 65535. Images bigger than this value will be sharpened."/>
+							 PlaceholderText="Enter here a number between 256 and 65535. Images bigger than this value will be sharpened."/>
 				</Grid>
 			</Border>
 		</Grid>
@@ -881,7 +881,7 @@
 					<TextBox Grid.Row="6"
 							 Grid.Column="2"
 							 Text="{Binding GeminiCaptionAPIKey}"
-							 Watermark="Enter here your Gemini API Key."/>
+							 PlaceholderText="Enter here your Gemini API Key."/>
 					<Grid Grid.Row="8"
 						  Grid.Column="0"
 						  Grid.ColumnSpan="3" ColumnDefinitions="auto, *">
@@ -901,7 +901,7 @@
 					<TextBox Grid.Row="10"
 							 Grid.Column="2"
 							 Text="{Binding GeminiCaptionPrompt}"
-							 Watermark="Enter here the prompt for Gemini."/>
+							 PlaceholderText="Enter here the prompt for Gemini."/>
 					<Label Grid.Row="12"
 						   Grid.Column="0"
 						   Content="System Instructions:"
@@ -910,7 +910,7 @@
 					<TextBox Grid.Row="12"
 							 Grid.Column="2"
 							 Text="{Binding GeminiCaptionSystemInstructions}"
-							 Watermark="Enter here the system instructions for Gemini."/>
+							 PlaceholderText="Enter here the system instructions for Gemini."/>
 				</Grid>
 			</Border>
 		</Grid>
@@ -1032,7 +1032,7 @@
 					<TextBox Grid.Row="2"
 							 Grid.Column="2"
 							 Text="{Binding ProcessTagsTagsToAdd}"
-							 Watermark="Enter here the tags you want to add."/>
+							 PlaceholderText="Enter here the tags you want to add."/>
 					<Label Grid.Row="4"
 						   Grid.Column="0"
 						   Content="Tags to emphasize:"
@@ -1041,7 +1041,7 @@
 					<TextBox Grid.Row="4"
 							 Grid.Column="2"
 							 Text="{Binding ProcessTagsTagsToEmphasize}"
-							 Watermark="Enter here the tags you want to emphasize."/>
+							 PlaceholderText="Enter here the tags you want to emphasize."/>
 					<Label Grid.Row="6"
 						   Grid.Column="0"
 						   Content="Tags to remove:"
@@ -1050,7 +1050,7 @@
 					<TextBox Grid.Row="6"
 							 Grid.Column="2"
 							 Text="{Binding ProcessTagsTagsToRemove}"
-							 Watermark="Enter here the tags you want to remove."/>
+							 PlaceholderText="Enter here the tags you want to remove."/>
 
 					<Label Grid.Row="8"
 						   Grid.Column="0"
@@ -1062,10 +1062,10 @@
 						  ColumnDefinitions="1*, 10, 1*">
 						<TextBox Grid.Column="0"
 								 Text="{Binding ProcessTagsTagsToUpdate}"
-								 Watermark="Enter here the tags you want to be replaced."/>
+								 PlaceholderText="Enter here the tags you want to be replaced."/>
 						<TextBox Grid.Column="2"
 								 Text="{Binding ProcessTagsNewTags}"
-								 Watermark="Enter here the tags you want to replace with."/>
+								 PlaceholderText="Enter here the tags you want to replace with."/>
 					</Grid>
 					
 					<Grid Grid.Row="10"
@@ -1352,7 +1352,7 @@
 					<TextBox Grid.Row="4"
 							 Grid.Column="2"
 							 Text="{Binding PromptGeneratorTagsToPrepend}"
-							 Watermark="Enter here the tags you want to prepend."/>
+							 PlaceholderText="Enter here the tags you want to prepend."/>
 					<Label Grid.Row="6"
 						   Grid.Column="0"
 						   Content="Tags to append:"
@@ -1361,7 +1361,7 @@
 					<TextBox Grid.Row="6"
 							 Grid.Column="2"
 							 Text="{Binding PromptGeneratorTagsToAppend}"
-							 Watermark="Enter here the tags you want to append."/>
+							 PlaceholderText="Enter here the tags you want to append."/>
 					<Label Grid.Row="8"
 						   Grid.Column="0"
 						   Content="Amount of random tags:"
@@ -1370,7 +1370,7 @@
 					<TextBox Grid.Row="8"
 							 Grid.Column="2"
 							 Text="{Binding PromptGeneratorAmountOfTags}"
-							 Watermark="Enter here a number between 10 and 50."/>
+							 PlaceholderText="Enter here a number between 10 and 50."/>
 					<Label Grid.Row="10"
 						   Grid.Column="0"
 						   Content="Default image display size:"
@@ -1379,7 +1379,7 @@
 					<TextBox Grid.Row="10"
 							 Grid.Column="2"
 							 Text="{Binding PromptGeneratorAmountOfPrompts}"
-							 Watermark="Enter here a number between 10 and 65535."/>
+							 PlaceholderText="Enter here a number between 10 and 65535."/>
 				</Grid>
 			</Border>
 		</Grid>

@@ -105,6 +105,8 @@ public partial class MainViewModel : BaseViewModel
         {
             _pageRegistry.Add(AppPages.Metadata_Viewer, (typeof(MetadataView), typeof(MetadataViewModel)));
         }
+
+        NavigateToPage(AppPages.Welcome);
     }
 
     /// <summary>

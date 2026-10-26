@@ -96,7 +96,7 @@
 				   VerticalAlignment="Center"/>
 			<TextBox Grid.Row="0"
 					 Grid.Column="2"
-					 Watermark="This is where you can add tags to filter out.&#10;Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags.&#10;For example: 'tag1, !tag2, tag3 AND tag4'."
+					 PlaceholderText="This is where you can add tags to filter out.&#10;Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags.&#10;For example: 'tag1, !tag2, tag3 AND tag4'."
 					 Text="{Binding TagsToFilter}"/>
 		</Grid>
 		<Separator Grid.Row="7"/>

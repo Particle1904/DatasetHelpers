@@ -70,13 +70,16 @@ namespace DatasetProcessor.Views
             _viewModel = DataContext as MainViewModel;
             base.OnDataContextChanged(e);
 
-            _viewModel.Logger.LatestLogChangedEvent += (sender, args) =>
+            if (_viewModel?.Logger != null)
             {
-                if (args is SmartData.Lib.Enums.LogMessageColor.Error)
+                _viewModel.Logger.LatestLogChangedEvent += (sender, args) =>
                 {
-                    MainViewControl.FlyoutButton.Flyout.ShowAt(MainViewControl.FlyoutButton);
-                }
-            };
+                    if (args is SmartData.Lib.Enums.LogMessageColor.Error)
+                    {
+                        MainViewControl.FlyoutButton.Flyout.ShowAt(MainViewControl.FlyoutButton);
+                    }
+                };
+            }
         }
     }
 }

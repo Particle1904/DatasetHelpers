@@ -50,7 +50,7 @@
 			<TextBox Grid.Row="0"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter tags you want to add, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 PlaceholderText="Enter tags you want to add, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 					 Text="{Binding TagsToAdd}"/>
 			<!-- TAGS TO EMPHASIZE -->
 			<Label Grid.Row="2"
@@ -60,7 +60,7 @@
 			<TextBox Grid.Row="2"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter tags you want to emphasize by bringing them to the beginning, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 PlaceholderText="Enter tags you want to emphasize by bringing them to the beginning, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 					 Text="{Binding TagsToEmphasize}"/>
 			<!-- TAGS TO REMOVE -->
 			<Label Grid.Row="4"
@@ -70,7 +70,7 @@
 			<TextBox Grid.Row="4"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter tags you want to remove, separated by commas. For example: 'obsolete, redundant'. Leave blank if not applicable."
+					 PlaceholderText="Enter tags you want to remove, separated by commas. For example: 'obsolete, redundant'. Leave blank if not applicable."
 					 Text="{Binding TagsToRemove}"/>
 			<!-- TAGS TO REPLACE -->
 			<Label Grid.Row="6"
@@ -79,11 +79,11 @@
 				   HorizontalAlignment="Left"/>
 			<TextBox Grid.Row="6"
 					 Grid.Column="2"
-					 Watermark="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+					 PlaceholderText="Enter the tags you want to replace, separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 				     Text="{Binding TagsToBeReplaced}"/>
 			<TextBox Grid.Row="6"
 					 Grid.Column="4"
-					 Watermark="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
+					 PlaceholderText="Enter the tags you want to replace with, separated by commas. For example: 'newtag1, newtag2'. Leave blank if not applicable."
 					 Text="{Binding TagsToReplace}"/>
 		</Grid>
 		<!-- CHECK BOXES -->
@@ -112,7 +112,7 @@
 						 MinWidth="240"
 						 MaxHeight="70"
 						 Text="{Binding StartingNumberForFileNames}"
-						 Watermark="Enter here a number for file names, it will be incremented for each file. For example: 10.jpeg, 11.jpeg, etc."/>
+						 PlaceholderText="Enter here a number for file names, it will be incremented for each file. For example: 10.jpeg, 11.jpeg, etc."/>
 			</Grid>
 			<CheckBox Grid.Row="2" 
 					  HorizontalAlignment="Left"
@@ -134,7 +134,7 @@
 			<TextBox Grid.Column="2"
 					 MinHeight="100"
 					 MaxHeight="100"
-					 Watermark="Click the button to process tags by frequency.&#xa;This will use the .txt files in the input folder."
+					 PlaceholderText="Click the button to process tags by frequency.&#xa;This will use the .txt files in the input folder."
 					 Text="{Binding SortedByFrequency}"/>
 			<Button Grid.Column="4"
 					Content="Calculate frequency"

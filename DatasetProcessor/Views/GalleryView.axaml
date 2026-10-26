@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DatasetProcessor.ViewModels"
+			 xmlns:models="clr-namespace:DatasetProcessor.src.Models"
 			 mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="1024"
              x:Class="DatasetProcessor.Views.GalleryView"
 			 Background="{DynamicResource SecondarySurfaceDark}"
@@ -64,7 +65,7 @@
 					</ItemsPanelTemplate>
 				</ListBox.ItemsPanel>
 				<ListBox.ItemTemplate>
-					<DataTemplate>
+					<DataTemplate x:DataType="models:ImageItem">
 						<Grid RowDefinitions="auto, 4, *">
 							<TextBlock Grid.Row="0"
 									   Text="{Binding FileName}"

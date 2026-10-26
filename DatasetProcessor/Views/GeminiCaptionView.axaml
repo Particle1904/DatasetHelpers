@@ -100,7 +100,7 @@
 			<TextBox Grid.Row="0"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter your Gemini API Key. For example: 'XXxxXxXXXXxXx0_x0XXXxxxx0x0XX0xxXXx0XX0'"
+					 PlaceholderText="Enter your Gemini API Key. For example: 'XXxxXxXXXXxXx0_x0XXXxxxx0x0XX0xxXXx0XX0'"
 					 Text="{Binding GeminiApi}"/>
 			<Button Grid.Row="0"
 					Grid.Column="6"
@@ -130,7 +130,7 @@
 			<TextBox Grid.Row="4"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="5"
-					 Watermark="Enter your prompt. For example: 'Caption the image.'"
+					 PlaceholderText="Enter your prompt. For example: 'Caption the image.'"
 					 Text="{Binding GeminiPrompt}"/>
 
 			<Label Grid.Row="6"
@@ -140,7 +140,7 @@
 			<TextBox Grid.Row="6"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="5"
-					 Watermark="Enter your System Instruction."
+					 PlaceholderText="Enter your System Instruction."
 					 Text="{Binding GeminiSystemInstruction}"
 					 MaxHeight="300"/>
 		</Grid>

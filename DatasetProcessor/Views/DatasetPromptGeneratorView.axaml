@@ -50,7 +50,7 @@
 			<TextBox Grid.Row="0"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter the tags you want to prepend to the start of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+					 PlaceholderText="Enter the tags you want to prepend to the start of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
                      Text="{Binding TagsToPrepend}"/>
 			<!-- TAGS TO EMPHASIZE -->
 			<Label Grid.Row="2"
@@ -60,7 +60,7 @@
 			<TextBox Grid.Row="2"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter the tags you want to append to the end of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
+					 PlaceholderText="Enter the tags you want to append to the end of the generated prompt, separated by commas. For example: 'tag, tag'. Leave blank if not applicable."
 					 Text="{Binding TagsToAppend}"/>
 			<!-- TAGS TO REMOVE -->
 			<TextBlock Grid.Row="4"
@@ -70,7 +70,7 @@
 			<TextBox Grid.Row="4"
 					 Grid.Column="2"
 					 Grid.ColumnSpan="3"
-					 Watermark="Enter here the number of random tags to use for the generation. Note: value will be clamped to be between 5 and 50; your append and prepend tags aren't taken into consideration."
+					 PlaceholderText="Enter here the number of random tags to use for the generation. Note: value will be clamped to be between 5 and 50; your append and prepend tags aren't taken into consideration."
 					 Text="{Binding AmountOfTags}"/>
 		</Grid>
 		<Separator Grid.Row="5"/>
@@ -90,7 +90,7 @@
 			<TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
 					 Text="{Binding GeneratedPrompt}"
 					 Height="60"
-					 Watermark="This is where you can view and edit your generated prompt. Click the button on the far right to copy the contents to your system clipboard."/>
+					 PlaceholderText="This is where you can view and edit your generated prompt. Click the button on the far right to copy the contents to your system clipboard."/>
 		</Grid>
 		<!-- OUTPUT PANEL -->
 		<Grid Classes="gridSecondary" Grid.Row="8" 

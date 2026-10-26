@@ -62,7 +62,7 @@
 					 Height="60"
 					 AcceptsReturn="True"
 					 Text="{Binding WordsToFilter}"
-					 Watermark="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."/>
+					 PlaceholderText="This is where you can add tags to filter out. Use '!' before a tag to exclude it, and 'AND' (in uppercase) between 2 or more tags to find files with all specified tags. For example: 'tag1, !tag2, tag3 AND tag4'."/>
 			<Button Grid.Column="2" Height="60"
 					Content="Filter images" 
 					IsEnabled="{Binding ButtonEnabled}"
@@ -208,7 +208,7 @@
 								 x:Name="EditorHighlight"
 								 TextWrapping="Wrap"
 								 Background="Transparent"
-								 Watermark="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
+								 PlaceholderText="Enter words you want to highlight (even if its just part of a tag), separated by commas. For example: 'tag1, tag2'. Leave blank if not applicable."
 								 Text="{Binding WordsToHighlight}"/>
 					</Grid>
 					<Label Grid.Row="6"

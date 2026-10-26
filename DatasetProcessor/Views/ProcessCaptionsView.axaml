@@ -44,10 +44,10 @@
 			<Label Grid.Column="0" 
 				   Content="Words to replace:"/>
 			<TextBox Grid.Column="2"
-					 Watermark="Enter the words you want to search to be replaced, separated by commas.&#10;For example: 'word1, word2'.&#10;Leave blank if not applicable."
+					 PlaceholderText="Enter the words you want to search to be replaced, separated by commas.&#10;For example: 'word1, word2'.&#10;Leave blank if not applicable."
                      Text="{Binding WordsToBeReplaced}"/>
 			<TextBox Grid.Column="4"
-					 Watermark="Enter the words you want to replace with, separated by commas.&#10;For example: 'newword1, newword2'.&#10;Leave blank if not applicable."
+					 PlaceholderText="Enter the words you want to replace with, separated by commas.&#10;For example: 'newword1, newword2'.&#10;Leave blank if not applicable."
                      Text="{Binding WordsToReplace}"/>
 		</Grid>
 		<!-- NOTE TEXT BOX -->

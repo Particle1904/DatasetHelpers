@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
@@ -54,16 +55,19 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+#if DEBUG
+        this.AttachDeveloperTools();
+        #endif
 
         NativeLibrary.SetDllImportResolver(Assembly.Load("Microsoft.ML.OnnxRuntime"), OnnxRuntimeImportResolver);
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Line below is needed to remove Avalonia data validation.
-        // Without this line you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
-
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow()

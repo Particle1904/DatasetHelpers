@@ -157,7 +157,10 @@ namespace DatasetProcessor.Views
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = DataContext as ManualCropViewModel;
-            _viewModel.PropertyChanged += (sender, e) => ClearLines(sender, e);
+            if (_viewModel != null)
+            {
+                _viewModel.PropertyChanged += (sender, e) => ClearLines(sender, e);
+            }
             base.OnDataContextChanged(e);
         }
     }
