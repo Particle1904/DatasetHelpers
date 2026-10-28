@@ -12,6 +12,7 @@
 	<Design.DesignStyle>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml" />
 	</Design.DesignStyle>
+	
 	<Grid RowDefinitions="auto, 10, auto, 10, auto, 10, auto, 10, auto, 20"
 		  Background="Transparent">
 		<!-- INPUT FOLDER -->
@@ -90,18 +91,21 @@
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F1"
 						CommandParameter="-1"/>
 				<Button Grid.Row="2"
 						Content="&lt;&lt;"
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F3"
 						CommandParameter="-10"/>
 				<Button Grid.Row="4"
 						Content="&lt;&lt;&lt;"
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F5"
 						CommandParameter="-100"/>
 			</Grid>
 
@@ -113,6 +117,7 @@
 						MaxHeight="512" MinHeight="512"
 						MaxWidth="512" MinWidth="512"
 						Command="{Binding BlurImageCommand}"
+						HotKey="F8"
 						x:Name="ImagePanel">
 					<Panel Margin="0">
 						<Image HorizontalAlignment="Center"
@@ -131,18 +136,21 @@
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F2"
 						CommandParameter="1"/>
 				<Button Grid.Row="2"
 						Content="&gt;&gt;"
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F4"
 						CommandParameter="10"/>
 				<Button Grid.Row="4"
 						Content="&gt;&gt;&gt;"
 						Height="50"
 						Width="50"
 						Command="{Binding GoToItemCommand}"
+						HotKey="F6"
 						CommandParameter="100"/>
 			</Grid>
 

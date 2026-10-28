@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
@@ -165,7 +164,6 @@ public partial class App : Application
         services.AddSingleton<IImageProcessorService, ImageProcessorService>();
         services.AddSingleton<ITagProcessorService, TagProcessorService>();
         services.AddSingleton<IPythonService, PythonService>();
-        services.AddSingleton<IInputHooksService, InputHooksService>();
 
         services.AddSingleton<IContentAwareCropService>(service =>
             new ContentAwareCropService(service.GetRequiredService<IImageProcessorService>(),

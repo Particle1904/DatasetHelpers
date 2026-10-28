@@ -18,4 +18,10 @@
 	<Window.Styles>
 		<StyleInclude Source="/Assets/Styles/GlobalStyles.axaml"/>
 	</Window.Styles>
+
+    <Window.KeyBindings>
+		<KeyBinding Gesture="Alt+Left" Command="{Binding DynamicView.DataContext.GoToItemCommand}" CommandParameter="-1"/>
+		<KeyBinding Gesture="Alt+Right" Command="{Binding DynamicView.DataContext.GoToItemCommand}" CommandParameter="1"/>
+	</Window.KeyBindings>
+
 </Window>

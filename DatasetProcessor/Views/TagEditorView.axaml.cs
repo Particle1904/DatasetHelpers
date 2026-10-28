@@ -147,5 +147,16 @@ namespace DatasetProcessor.Views
                 EditorTags.CaretOffset = Math.Clamp(caretOffset, 0, EditorTags.Text.Length);
             });
         }
+
+        /// <summary>
+        /// Handles a event to blur the current image in the editor.
+        /// </summary>
+        public async Task OnBlurButtonDown()
+        {
+            if (_viewModel.IsActive)
+            {
+                await _viewModel.BlurImageAsync();
+            }
+        }
     }
 }

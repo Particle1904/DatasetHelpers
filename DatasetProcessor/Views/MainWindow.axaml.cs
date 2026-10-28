@@ -1,9 +1,11 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 
 using DatasetProcessor.ViewModels;
 
 using System;
+using System.Diagnostics;
 
 namespace DatasetProcessor.Views
 {
@@ -14,39 +16,6 @@ namespace DatasetProcessor.Views
         public MainWindow()
         {
             InitializeComponent();
-
-            this.PropertyChanged += OnWindowPropertyChanged;
-            this.Activated += OnWindowActivated;
-            this.Deactivated += OnWindowDeactivated;
-        }
-
-        private void OnWindowPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-        {
-            if (e.Property == WindowStateProperty)
-            {
-                WindowState newState = (WindowState)e.NewValue!;
-                switch (newState)
-                {
-                    // Disable/Enable InputEvents based on WindowState
-                    case WindowState.Minimized:
-                        _viewModel.UnsubscribeFromInputEvents();
-                        break;
-                    case WindowState.Normal:
-                    case WindowState.Maximized:
-                        _viewModel.SubscribeToInputEvents();
-                        break;
-                }
-            }
-        }
-
-        private void OnWindowActivated(object? sender, EventArgs e)
-        {
-            _viewModel.SubscribeToInputEvents();
-        }
-
-        private void OnWindowDeactivated(object? sender, EventArgs e)
-        {
-            _viewModel.UnsubscribeFromInputEvents();
         }
 
         protected override void OnInitialized()
@@ -63,6 +32,32 @@ namespace DatasetProcessor.Views
             }
 
             base.OnClosing(e);
+        }
+
+        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        {
+            PointerPointProperties pointerPointProperties = e.GetCurrentPoint(this).Properties;
+
+            if (_viewModel.DynamicView is TagEditorView tagEditorView)
+            {
+                if (pointerPointProperties.IsXButton1Pressed)
+                {
+                    _ = tagEditorView.OnNavigationButtonDown("-1");
+                    e.Handled = true;
+                }
+                else if (pointerPointProperties.IsXButton2Pressed)
+                {
+                    _ = tagEditorView.OnNavigationButtonDown("1");
+                    e.Handled = true;
+                }
+                else if (pointerPointProperties.IsMiddleButtonPressed)
+                {
+                    _ = tagEditorView.OnBlurButtonDown();
+                    e.Handled = true;
+                }
+            }
+
+            base.OnPointerPressed(e);
         }
 
         protected override void OnDataContextChanged(EventArgs e)

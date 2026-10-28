@@ -28,7 +28,6 @@ namespace DatasetProcessor.ViewModels;
 public partial class MainViewModel : BaseViewModel
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IInputHooksService _inputHooks;
     private readonly IModelManagerService _modelManager;
 
     [ObservableProperty]
@@ -61,7 +60,6 @@ public partial class MainViewModel : BaseViewModel
     /// <param name="e621AutoTagger">The E621 auto-tagging service.</param>
     /// <param name="tagProcessor">The tag processing service.</param>
     /// <param name="contentAwareCrop">The content-aware crop service.</param>
-    /// <param name="inputHooks">The input hooks service.</param>
     /// <param name="promptGenerator">The prompt generator service.</param>
     /// <param name="clipTokenizer">The clip tokenizer.</param>
     /// <param name="upscaler">The upscaler service.</param>
@@ -72,7 +70,6 @@ public partial class MainViewModel : BaseViewModel
     public MainViewModel(IServiceProvider serviceProvider, ILoggerService logger, IConfigsService configs) : base(logger, configs)
     {
         _serviceProvider = serviceProvider;
-        _inputHooks = serviceProvider.GetRequiredService<IInputHooksService>();
         _modelManager = serviceProvider.GetRequiredService<IModelManagerService>();
 
         ((INotifyPropertyChanged)_logger).PropertyChanged += OnLoggerServicePropertyChanged;
@@ -116,7 +113,6 @@ public partial class MainViewModel : BaseViewModel
     [RelayCommand]
     public void NavigateToPage(AppPages parameter)
     {
-        _inputHooks.UnsubscribeFromInputEvents();
         SetAllViewsAsInactive();
 
         if (!_viewCache.TryGetValue(parameter, out UserControl targetView))
@@ -145,7 +141,6 @@ public partial class MainViewModel : BaseViewModel
         tagEditorViewModel.UpdateCurrentSelectedTags();
 
         NavigateToPage(AppPages.Tag_Editor);
-        _inputHooks.SubscribeToInputEvents();
     }
 
     /// <summary>
@@ -174,22 +169,6 @@ public partial class MainViewModel : BaseViewModel
         {
             NavigateToPage(AppPages.Welcome);
         }
-    }
-
-    /// <summary>
-    /// Unsubscribe from Input Events.
-    /// </summary>
-    public void UnsubscribeFromInputEvents()
-    {
-        _inputHooks.UnsubscribeFromInputEvents();
-    }
-
-    /// <summary>
-    /// Subscribe to Input Events.
-    /// </summary>
-    public void SubscribeToInputEvents()
-    {
-        _inputHooks.SubscribeToInputEvents();
     }
 
     /// <summary>
