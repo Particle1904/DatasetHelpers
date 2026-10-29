@@ -1,18 +1,18 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 
 using DatasetProcessor.ViewModels;
 
 using System;
-using System.Diagnostics;
 
 namespace DatasetProcessor.Views
 {
     public partial class MainWindow : Window
     {
         private MainViewModel _viewModel;
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -33,33 +33,7 @@ namespace DatasetProcessor.Views
 
             base.OnClosing(e);
         }
-
-        protected override void OnPointerPressed(PointerPressedEventArgs e)
-        {
-            PointerPointProperties pointerPointProperties = e.GetCurrentPoint(this).Properties;
-
-            if (_viewModel.DynamicView is TagEditorView tagEditorView)
-            {
-                if (pointerPointProperties.IsXButton1Pressed)
-                {
-                    _ = tagEditorView.OnNavigationButtonDown("-1");
-                    e.Handled = true;
-                }
-                else if (pointerPointProperties.IsXButton2Pressed)
-                {
-                    _ = tagEditorView.OnNavigationButtonDown("1");
-                    e.Handled = true;
-                }
-                else if (pointerPointProperties.IsMiddleButtonPressed)
-                {
-                    _ = tagEditorView.OnBlurButtonDown();
-                    e.Handled = true;
-                }
-            }
-
-            base.OnPointerPressed(e);
-        }
-
+        
         protected override void OnDataContextChanged(EventArgs e)
         {
             _viewModel = DataContext as MainViewModel;

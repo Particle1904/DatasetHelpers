@@ -119,8 +119,10 @@
 						Command="{Binding BlurImageCommand}"
 						HotKey="F8"
 						x:Name="ImagePanel">
-					<Panel Margin="0">
-						<Image HorizontalAlignment="Center"
+					<Panel Margin="0"
+						   ClipToBounds="True">
+						<Image Name="EditorImage"
+							   HorizontalAlignment="Center"
 							   VerticalAlignment="Center"
 							   Source="{Binding SelectedImage, Mode=TwoWay}"/>
 						</Panel>

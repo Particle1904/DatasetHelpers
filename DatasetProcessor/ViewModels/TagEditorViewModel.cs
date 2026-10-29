@@ -439,6 +439,8 @@ namespace DatasetProcessor.ViewModels
             {
                 SelectedItemIndex = 0;
             }
+
+            
         }
 
         /// <summary>
